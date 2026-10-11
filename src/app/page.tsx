@@ -8,6 +8,7 @@ import DonationSection from "@/components/DonationSection";
 import NewsSection from "@/components/NewsSection";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import AnimatedSection from "@/components/AnimatedSection";
 
 export default function Home() {
   return (
@@ -20,20 +21,30 @@ export default function Home() {
 
         {/* Floating Live Prayer Times Card Container */}
         <section className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 mb-8 sm:mb-12">
-          <PrayerCountdownCard />
+          <AnimatedSection animation="scale-up" duration={700}>
+            <PrayerCountdownCard />
+          </AnimatedSection>
         </section>
 
         {/* Agendas Section */}
-        <AgendaSection />
+        <AnimatedSection animation="fade-up" duration={700}>
+          <AgendaSection />
+        </AnimatedSection>
 
         {/* Jadwal Petugas Shalat & Khatib Pekan Ini */}
-        <FridayScheduleSection />
+        <AnimatedSection animation="fade-up" duration={700}>
+          <FridayScheduleSection />
+        </AnimatedSection>
 
         {/* Infaq Digital & QRIS Section */}
-        <DonationSection />
+        <AnimatedSection animation="fade-up" duration={700}>
+          <DonationSection />
+        </AnimatedSection>
 
         {/* Kabar Persyarikatan & Warta Kampus (UMS, Suara Muhammadiyah, Lensamu) */}
-        <NewsSection />
+        <AnimatedSection animation="fade-up" duration={700}>
+          <NewsSection />
+        </AnimatedSection>
       </main>
 
       <Footer />

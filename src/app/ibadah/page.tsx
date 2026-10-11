@@ -140,10 +140,10 @@ export default function IbadahPage() {
             {/* Hero Section */}
             <section className="bg-gradient-to-b from-white via-white to-[#FAF8F5] border-b border-stone-200/80 pt-10 pb-12 sm:pt-14 sm:pb-16 text-center">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight animate-fade-up">
                   Ruang Ibadah <span className="text-[#0D5C58]">Digital</span>
                 </h1>
-                <p className="text-sm sm:text-base text-stone-600 mt-4 leading-relaxed max-w-2xl mx-auto font-sans">
+                <p className="text-sm sm:text-base text-stone-600 mt-4 leading-relaxed max-w-2xl mx-auto font-sans animate-fade-up delay-150">
                   Kumpulan piranti penunjang ibadah harian jamaah Masjid Sudalmiyah Rais Universitas Muhammadiyah Surakarta untuk memperkaya kedekatan spiritual setiap saat.
                 </p>
               </div>
@@ -151,7 +151,7 @@ export default function IbadahPage() {
 
             {/* 10 Feature Tiles Section: 3 Columns on Mobile, 5 Columns on Laptop */}
             <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-8 sm:pt-12">
-              <div className="mb-5 sm:mb-7 px-1">
+              <div className="mb-5 sm:mb-7 px-1 animate-fade-up delay-200">
                 <h2 className="text-lg sm:text-2xl font-bold text-stone-900 font-serif">
                   Menu Layanan Ibadah
                 </h2>
@@ -160,16 +160,17 @@ export default function IbadahPage() {
                 </p>
               </div>
 
-              {/* GRID: grid-cols-3 on mobile, lg:grid-cols-5 on laptop */}
+              {/* GRID: grid-cols-3 on mobile, lg:grid-cols-5 on laptop with Staggered Entrance */}
               <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-4 lg:gap-5">
-                {FEATURE_LIST.map((feat) => (
+                {FEATURE_LIST.map((feat, idx) => (
                   <button
                     key={feat.id}
                     onClick={() => {
                       setActiveFeature(feat.id);
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
-                    className="group relative bg-white border border-stone-200/90 rounded-2xl sm:rounded-3xl p-3 sm:p-5 flex flex-col items-center justify-between text-center shadow-sm hover:shadow-xl hover:border-[#D4AF37] hover:-translate-y-1 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden aspect-square sm:aspect-auto sm:min-h-[200px]"
+                    style={{ animationDelay: `${idx * 45}ms` }}
+                    className="group relative bg-white border border-stone-200/90 rounded-2xl sm:rounded-3xl p-3 sm:p-5 flex flex-col items-center justify-between text-center shadow-sm hover:shadow-xl hover:border-[#D4AF37] hover:-translate-y-1.5 active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden aspect-square sm:aspect-auto sm:min-h-[200px] animate-fade-up"
                   >
                     {/* Decorative background glow on hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#0D5C58]/5 via-transparent to-[#D4AF37]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
@@ -182,7 +183,7 @@ export default function IbadahPage() {
                     </div>
 
                     {/* Central Icon Box (App-Icon style with Arabic text) */}
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] group-hover:bg-[#0D5C58] group-hover:text-white group-hover:border-[#0D5C58] transition-all duration-300 flex items-center justify-center font-serif text-base sm:text-xl font-bold shadow-inner my-auto sm:my-2">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] group-hover:bg-[#0D5C58] group-hover:text-white group-hover:border-[#0D5C58] group-hover:scale-110 transition-all duration-300 flex items-center justify-center font-serif text-base sm:text-xl font-bold shadow-inner my-auto sm:my-2">
                       <span className="leading-none select-none tracking-normal">
                         {feat.iconSymbol}
                       </span>
@@ -204,9 +205,9 @@ export default function IbadahPage() {
           </div>
         ) : (
           /* VIEW 2: In-Page Full Feature View (Not a pop-up modal) */
-          <div>
+          <div className="animate-fade-in">
             {/* Header In-Page Navigation Bar */}
-            <section className="bg-white border-b border-stone-200/90 py-4 sm:py-5 sticky top-16 z-30 shadow-xs">
+            <section className="bg-white border-b border-stone-200/90 py-4 sm:py-5 sticky top-16 z-30 shadow-xs animate-fade-down">
               <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10">
                 <div className="flex items-center justify-between gap-3">
                   {/* Back button (Arrow Icon) + Title */}
@@ -1007,8 +1008,8 @@ function QuranFeatureView() {
 
       {/* MODAL PENGATURAN TAMPILAN AL-QUR'AN (Khusus Ramah Lansia & Jamaah) */}
       {isSettingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-stone-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-stone-800 animate-scale-up">
             {/* Modal Header */}
             <div className="px-5 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FAF8F5]">
               <div className="flex items-center gap-2.5">

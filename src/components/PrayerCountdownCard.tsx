@@ -93,9 +93,9 @@ export default function PrayerCountdownCard() {
 
   return (
     <div className="w-full bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-      {/* Background Soft Accent Glows */}
-      <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-[#0D5C58]/5 rounded-full blur-3xl pointer-events-none" />
+      {/* Background Soft Accent Glows with breathing glow */}
+      <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#D4AF37]/15 rounded-full blur-3xl pointer-events-none animate-soft-glow" />
+      <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-[#0D5C58]/10 rounded-full blur-3xl pointer-events-none animate-soft-glow" />
 
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-200/80">
@@ -114,7 +114,7 @@ export default function PrayerCountdownCard() {
         </div>
 
         {/* Live Countdown Badge (Teal and Gold style) */}
-        <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+        <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="p-3 rounded-xl bg-[#0D5C58]/10 text-[#0D5C58]">
             <BellRing className="w-6 h-6 animate-pulse" />
           </div>
@@ -139,10 +139,10 @@ export default function PrayerCountdownCard() {
           return (
             <div
               key={prayer.name}
-              className={`relative rounded-2xl p-4 transition-all duration-200 flex flex-col justify-between ${
+              className={`relative rounded-2xl p-4 transition-all duration-300 flex flex-col justify-between hover:-translate-y-0.5 ${
                 isNext
-                  ? "bg-gradient-to-b from-[#0D5C58] to-[#094744] text-white shadow-lg shadow-[#0D5C58]/20 scale-[1.02] border border-[#0D5C58]"
-                  : "bg-[#FAF8F5] border border-stone-200/80 text-stone-700 hover:border-[#D4AF37]/50 hover:bg-white"
+                  ? "bg-gradient-to-b from-[#0D5C58] to-[#094744] text-white shadow-xl shadow-[#0D5C58]/25 scale-[1.03] border border-emerald-400/30 animate-pulse-glow"
+                  : "bg-[#FAF8F5] border border-stone-200/80 text-stone-700 hover:border-[#D4AF37]/50 hover:bg-white hover:shadow-sm"
               }`}
             >
               {isNext && (
