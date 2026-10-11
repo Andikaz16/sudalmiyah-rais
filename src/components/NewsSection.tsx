@@ -248,17 +248,17 @@ export default function NewsSection() {
           </p>
         </div>
 
-        {/* Source Filter Tabs & Auto-Refresh Indicator */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10">
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 no-scrollbar w-full sm:w-auto justify-start sm:justify-center">
+        {/* Source Filter Tabs & Auto-Refresh Indicator (Flex-wrap responsif tanpa scrollbar) */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mb-8 sm:mb-10">
+          <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start w-full sm:w-auto">
             {sources.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setActiveSource(s.id)}
-                className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                   activeSource === s.id
                     ? "bg-[#0D5C58] text-white shadow-md shadow-[#0D5C58]/20"
-                    : "bg-white text-stone-600 border border-stone-200 hover:text-stone-900 hover:bg-stone-100/70"
+                    : "bg-white text-stone-600 border border-stone-200 hover:text-stone-900 hover:bg-stone-100/70 shadow-2xs"
                 }`}
               >
                 {s.label}
@@ -271,7 +271,7 @@ export default function NewsSection() {
             <button
               onClick={handleManualRefresh}
               disabled={isRefreshing}
-              className="px-4 py-2 rounded-full text-xs font-semibold bg-white border border-stone-200 text-stone-600 hover:text-[#0D5C58] hover:border-[#0D5C58]/30 transition-all shadow-sm disabled:opacity-50"
+              className="px-4 py-2 rounded-full text-xs font-semibold bg-white border border-stone-200 text-stone-600 hover:text-[#0D5C58] hover:border-[#0D5C58]/30 transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
             >
               {isRefreshing ? "Memperbarui Warta..." : "Segarkan Warta"}
             </button>

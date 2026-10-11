@@ -59,16 +59,16 @@ export default function AgendaSection() {
           </p>
         </div>
 
-        {/* Category Filter Tabs */}
-        <div className="flex items-center justify-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar">
+        {/* Category Filter Tabs (Wrapping responsif agar semua terlihat utuh di mobile tanpa scrollbar) */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-8 sm:mb-10 px-1">
           {categories.map((c) => (
             <button
               key={c.id}
               onClick={() => setActiveCategory(c.id)}
-              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+              className={`px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeCategory === c.id
                   ? "bg-[#0D5C58] text-white shadow-md shadow-[#0D5C58]/15"
-                  : "bg-stone-100 text-stone-600 hover:text-stone-900 hover:bg-stone-200/80"
+                  : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100/70 shadow-2xs"
               }`}
             >
               {c.label}
