@@ -167,9 +167,7 @@ const initialNewsData: NewsItem[] = [
 
 export default function NewsSection() {
   const [newsList, setNewsList] = useState<NewsItem[]>(initialNewsData);
-  const [activeSource, setActiveSource] = useState<string>("ALL");
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [now, setNow] = useState<number | null>(null);
 
   // Defer Date.now() read into useEffect so it does NOT run during static prerender
@@ -206,40 +204,11 @@ export default function NewsSection() {
     };
   }, []);
 
-  const handleManualRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      const res = await fetch("/api/news");
-      if (res.ok) {
-        const data = await res.json();
-        if (data.articles && Array.isArray(data.articles) && data.articles.length > 0) {
-          setNewsList(data.articles);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  const sources = [
-    { id: "ALL", label: "Semua Warta" },
-    { id: "UMS", label: "UMS News" },
-    { id: "SUARA_MUHAMMADIYAH", label: "Suara Muhammadiyah" },
-    { id: "LENSAMU", label: "Lensamu" },
-  ];
-
-  const filteredNews =
-    activeSource === "ALL"
-      ? newsList
-      : newsList.filter((item) => item.source === activeSource);
-
   return (
     <section id="berita" className="py-12 sm:py-18 bg-[#FAF8F5] text-stone-900 border-t border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
             Kabar Persyarikatan & <span className="text-[#0D5C58]">Warta Kampus</span>
           </h2>
@@ -248,39 +217,9 @@ export default function NewsSection() {
           </p>
         </div>
 
-        {/* Source Filter Tabs & Auto-Refresh Indicator (Flex-wrap responsif tanpa scrollbar) */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mb-8 sm:mb-10">
-          <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start w-full sm:w-auto">
-            {sources.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setActiveSource(s.id)}
-                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  activeSource === s.id
-                    ? "bg-[#0D5C58] text-white shadow-md shadow-[#0D5C58]/20"
-                    : "bg-white text-stone-600 border border-stone-200 hover:text-stone-900 hover:bg-stone-100/70 shadow-2xs"
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Text-only manual sync trigger */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleManualRefresh}
-              disabled={isRefreshing}
-              className="px-4 py-2 rounded-full text-xs font-semibold bg-white border border-stone-200 text-stone-600 hover:text-[#0D5C58] hover:border-[#0D5C58]/30 transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
-            >
-              {isRefreshing ? "Memperbarui Warta..." : "Segarkan Warta"}
-            </button>
-          </div>
-        </div>
-
         {/* News Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-          {filteredNews.map((item) => (
+          {newsList.map((item) => (
             <article
               key={item.id}
               className="bg-white border border-stone-200/90 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#D4AF37]/50 transition-all duration-300 flex flex-col justify-between group"
