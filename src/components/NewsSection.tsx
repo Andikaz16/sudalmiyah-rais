@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 
 interface NewsItem {
@@ -169,6 +170,39 @@ export default function NewsSection() {
   const [newsList, setNewsList] = useState<NewsItem[]>(initialNewsData);
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
   const [now, setNow] = useState<number | null>(null);
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  // Mark client mounted for React Portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Lock background scroll when modal is active
+  useEffect(() => {
+    if (selectedArticle) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [selectedArticle]);
+
+  // Handle escape key to dismiss modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedArticle(null);
+      }
+    };
+    if (selectedArticle) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedArticle]);
 
   // Defer Date.now() read into useEffect so it does NOT run during static prerender
   useEffect(() => {
@@ -278,10 +312,16 @@ export default function NewsSection() {
         </div>
       </div>
 
-      {/* Article Detail Modal Dialog */}
-      {selectedArticle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-2xl bg-white border border-stone-200 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col text-stone-800">
+      {/* Article Detail Modal Dialog via React Portal */}
+      {mounted && selectedArticle && createPortal(
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setSelectedArticle(null)}
+        >
+          <div
+            className="relative w-full max-w-2xl bg-white border border-stone-200 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col text-stone-800"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FAF8F5]">
               <div className="flex items-center gap-3">
@@ -296,7 +336,7 @@ export default function NewsSection() {
               </div>
               <button
                 onClick={() => setSelectedArticle(null)}
-                className="px-4 py-1.5 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-semibold transition-colors"
+                className="px-4 py-1.5 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
               >
                 Tutup
               </button>
@@ -336,14 +376,15 @@ export default function NewsSection() {
                   href={selectedArticle.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-2 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] text-white text-xs font-bold text-center transition-colors"
+                  className="px-5 py-2 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] text-white text-xs font-bold text-center transition-colors cursor-pointer"
                 >
                   Kunjungi Sumber Resmi
                 </a>
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
