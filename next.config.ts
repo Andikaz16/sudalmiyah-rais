@@ -4,6 +4,16 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "news.ums.ac.id" },
+      { protocol: "https", hostname: "muhammadiyah.or.id" },
+      { protocol: "https", hostname: "cdn.suaramuhammadiyah.id" },
+      { protocol: "https", hostname: "suaramuhammadiyah.id" },
+      { protocol: "https", hostname: "lensamu.id" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+    ],
+  },
   turbopack: {
     rules: {
       "*.css": {

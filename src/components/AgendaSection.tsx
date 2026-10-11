@@ -1,0 +1,235 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+  Users,
+  ArrowRight,
+} from "lucide-react";
+import { Agenda, AgendaCategory } from "@/lib/types";
+import RegistrationModal from "./RegistrationModal";
+
+export default function AgendaSection() {
+  const [agendas, setAgendas] = useState<Agenda[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<string>("ALL");
+  const [selectedAgenda, setSelectedAgenda] = useState<Agenda | null>(null);
+
+  const fetchAgendas = async (cat: string) => {
+    setLoading(true);
+    try {
+      const url = cat === "ALL" ? "/api/agendas" : `/api/agendas?category=${cat}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      setAgendas(data.agendas || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAgendas(activeCategory);
+  }, [activeCategory]);
+
+  const categories: Array<{ id: string; label: string }> = [
+    { id: "ALL", label: "Semua Kegiatan" },
+    { id: "SHALAT_JUMAT", label: "Shalat Jumat" },
+    { id: "KAJIAN_MAHASISWA", label: "Kajian Mahasiswa" },
+    { id: "TABLIGH_AKBAR", label: "Tabligh Akbar" },
+    { id: "TAHSIN", label: "Tahsin Al-Qur'an" },
+    { id: "SOSIAL", label: "Sosial" },
+  ];
+
+  return (
+    <section id="agenda" className="py-10 sm:py-16 bg-[#FAF8F5] text-stone-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Heading Centered */}
+        <div className="text-center max-w-3xl mx-auto mb-10">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
+            Agenda & Kajian <span className="text-[#0D5C58]">Masjid Sudalmiyah</span>
+          </h1>
+          <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
+            Ikuti kegiatan ibadah berjamaah, kajian tematik mahasiswa berkemajuan, serta kelas bimbingan tahsin Al-Qur&apos;an di lingkungan Kampus 2 UMS.
+          </p>
+        </div>
+
+        {/* Category Filter Tabs */}
+        <div className="flex items-center justify-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar">
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setActiveCategory(c.id)}
+              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+                activeCategory === c.id
+                  ? "bg-[#0D5C58] text-white shadow-md shadow-[#0D5C58]/15"
+                  : "bg-stone-100 text-stone-600 hover:text-stone-900 hover:bg-stone-200/80"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Agenda Cards Grid (Matching reference 3-column card cards) */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="h-80 rounded-3xl bg-stone-100 border border-stone-200 animate-pulse"
+              />
+            ))}
+          </div>
+        ) : agendas.length === 0 ? (
+          <div className="p-12 text-center rounded-3xl bg-stone-50 border border-stone-200 text-stone-500">
+            Tidak ada agenda untuk kategori ini saat ini.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {agendas.map((item) => {
+              const quotaPercent = Math.min(
+                100,
+                Math.round((item.registeredCount / item.quota) * 100)
+              );
+              const isFull = item.registeredCount >= item.quota;
+
+              return (
+                <div
+                  key={item.id}
+                  className="rounded-3xl bg-white border border-stone-200 hover:border-[#D4AF37]/60 overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl group"
+                >
+                  <div>
+                    {/* Thumbnail Image Container */}
+                    <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-stone-100">
+                      <Image
+                        src={item.bannerUrl || "/uploads/agendas/agenda-jumat.jpg"}
+                        alt={item.title}
+                        fill
+                        unoptimized
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {/* Top Badges Overlay */}
+                      <div className="absolute top-3 left-3">
+                        <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-stone-200 text-[#0D5C58] shadow-sm">
+                          {item.category.replace(/_/g, " ")}
+                        </span>
+                      </div>
+                      <div className="absolute top-3 right-3">
+                        {item.requiresRegistration ? (
+                          <span className="text-[10px] text-white bg-[#B58A1E] font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                            Wajib Registrasi
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-white bg-emerald-600 font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                            Terbuka Umum
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Card Content Body */}
+                    <div className="p-6">
+                      {/* Title */}
+                      <h3 className="text-base sm:text-lg font-bold text-stone-900 group-hover:text-[#0D5C58] transition-colors line-clamp-2 mb-3 font-serif">
+                        {item.title}
+                      </h3>
+
+                    {/* Speaker Info */}
+                    <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-stone-200/80 mb-4 flex items-start gap-3">
+                      <div className="p-2 rounded-xl bg-[#0D5C58]/10 text-[#0D5C58] shrink-0">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-stone-900">
+                          {item.speaker}
+                        </div>
+                        <div className="text-[11px] text-stone-500">
+                          {item.speakerRole}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Event Meta */}
+                    <div className="space-y-2 text-xs text-stone-600 mb-5">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-stone-400" />
+                        <span>{item.date}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-stone-400" />
+                        <span>{item.time}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-stone-400" />
+                        <span className="line-clamp-1">{item.location}</span>
+                      </div>
+                    </div>
+
+                    {/* Quota Progress */}
+                    {item.requiresRegistration && (
+                      <div className="mb-4">
+                        <div className="flex justify-between text-[11px] text-stone-500 mb-1.5 font-medium">
+                          <span className="flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-stone-400" />
+                            <span>Kapasitas Terisi</span>
+                          </span>
+                          <span className="text-stone-700 font-semibold">
+                            {item.registeredCount} / {item.quota} Jamaah
+                          </span>
+                        </div>
+                        <div className="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              isFull ? "bg-rose-500" : "bg-[#0D5C58]"
+                            }`}
+                            style={{ width: `${quotaPercent}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <div className="p-6 pt-0">
+                    {item.requiresRegistration ? (
+                      <button
+                        onClick={() => setSelectedAgenda(item)}
+                        disabled={isFull || !item.isOpen}
+                        className={`w-full text-center px-4 py-3 rounded-full text-xs sm:text-sm font-semibold transition-all ${
+                          isFull
+                            ? "bg-stone-200 text-stone-400 cursor-not-allowed"
+                            : "bg-[#0D5C58] hover:bg-[#0A4D4A] text-white shadow-md shadow-[#0D5C58]/15"
+                        }`}
+                      >
+                        {isFull ? "Kuota Penuh" : "Daftar Presensi Tiket"}
+                      </button>
+                    ) : (
+                      <div className="text-center py-2.5 text-xs text-stone-500 font-medium bg-[#FAF8F5] rounded-full border border-stone-200">
+                        Silakan Hadir Langsung di Masjid
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Registration Modal Dialog */}
+      <RegistrationModal
+        agenda={selectedAgenda}
+        onClose={() => setSelectedAgenda(null)}
+        onSuccess={() => fetchAgendas(activeCategory)}
+      />
+    </section>
+  );
+}
