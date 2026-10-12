@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import QuranIcon from "@/components/QuranIcon";
+import TasbihIcon from "@/components/TasbihIcon";
 import {
   SURAH_LIST,
   JUZ_LIST,
@@ -183,10 +184,12 @@ export default function IbadahPage() {
                       </span>
                     </div>
 
-                    {/* Central Icon Box (App-Icon style with Quran icon or Arabic text) */}
+                    {/* Central Icon Box (App-Icon style with Quran/Tasbih icon or Arabic text) */}
                     <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] group-hover:bg-[#0D5C58] group-hover:text-white group-hover:border-[#0D5C58] group-hover:scale-110 transition-all duration-300 flex items-center justify-center font-serif text-base sm:text-xl font-bold shadow-inner my-auto sm:my-2">
                       {feat.id === "quran" ? (
                         <QuranIcon className="w-7 h-7 sm:w-9 sm:h-9" />
+                      ) : feat.id === "tasbih" ? (
+                        <TasbihIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : (
                         <span className="leading-none select-none tracking-normal">
                           {feat.iconSymbol}
@@ -254,6 +257,9 @@ export default function IbadahPage() {
                       <h1 className="text-base sm:text-xl font-bold text-stone-900 font-serif leading-tight flex items-center gap-2">
                         {currentFeat?.id === "quran" && (
                           <QuranIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                        )}
+                        {currentFeat?.id === "tasbih" && (
+                          <TasbihIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
                         )}
                         <span>{currentFeat?.title}</span>
                       </h1>
@@ -1421,7 +1427,10 @@ function TasbihFeatureView() {
           <span className="text-xs text-[#D4AF37] font-semibold mt-1 tracking-wider uppercase">
             {target > 0 ? `Target ${target}` : "Hitung Dzikir"}
           </span>
-          <span className="text-[10px] text-white/70 mt-1">Tekan di Sini</span>
+          <span className="text-[10px] text-white/70 mt-1 flex items-center gap-1.5">
+            <TasbihIcon className="w-3.5 h-3.5 inline-block shrink-0 text-[#D4AF37]" />
+            Tekan di Sini
+          </span>
         </button>
       </div>
 
