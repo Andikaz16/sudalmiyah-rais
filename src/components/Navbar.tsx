@@ -29,7 +29,6 @@ export default function Navbar() {
 
   const navLinks = [
     { href: "/", label: "Beranda" },
-    { href: "/#masjidmu", label: "MasjidMu Percontohan" },
     { href: "/ibadah", label: "Ruang Ibadah" },
     { href: "/jadwal", label: "Jadwal Shalat" },
     { href: "/agenda", label: "Agenda & Kajian" },
