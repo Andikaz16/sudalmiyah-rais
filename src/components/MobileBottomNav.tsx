@@ -7,9 +7,9 @@ import {
   Compass,
   Calendar,
   HeartHandshake,
-  BookOpen,
   Home,
 } from "lucide-react";
+import QuranIcon from "@/components/QuranIcon";
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
@@ -20,7 +20,7 @@ export default function MobileBottomNav() {
 
   const items = [
     { href: "/", label: "Beranda", icon: Home },
-    { href: "/ibadah", label: "Ibadah", icon: BookOpen },
+    { href: "/ibadah", label: "Ibadah", icon: QuranIcon },
     { href: "/jadwal", label: "Jadwal", icon: Compass },
     { href: "/agenda", label: "Agenda", icon: Calendar },
     { href: "/donasi", label: "Infaq", icon: HeartHandshake },

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import QuranIcon from "@/components/QuranIcon";
 import {
   SURAH_LIST,
   JUZ_LIST,
@@ -182,11 +183,15 @@ export default function IbadahPage() {
                       </span>
                     </div>
 
-                    {/* Central Icon Box (App-Icon style with Arabic text) */}
+                    {/* Central Icon Box (App-Icon style with Quran icon or Arabic text) */}
                     <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] group-hover:bg-[#0D5C58] group-hover:text-white group-hover:border-[#0D5C58] group-hover:scale-110 transition-all duration-300 flex items-center justify-center font-serif text-base sm:text-xl font-bold shadow-inner my-auto sm:my-2">
-                      <span className="leading-none select-none tracking-normal">
-                        {feat.iconSymbol}
-                      </span>
+                      {feat.id === "quran" ? (
+                        <QuranIcon className="w-7 h-7 sm:w-9 sm:h-9" />
+                      ) : (
+                        <span className="leading-none select-none tracking-normal">
+                          {feat.iconSymbol}
+                        </span>
+                      )}
                     </div>
 
                     {/* Title & Short Description */}
@@ -246,8 +251,11 @@ export default function IbadahPage() {
                           {currentFeat?.badge}
                         </span>
                       </div>
-                      <h1 className="text-base sm:text-xl font-bold text-stone-900 font-serif leading-tight">
-                        {currentFeat?.title}
+                      <h1 className="text-base sm:text-xl font-bold text-stone-900 font-serif leading-tight flex items-center gap-2">
+                        {currentFeat?.id === "quran" && (
+                          <QuranIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                        )}
+                        <span>{currentFeat?.title}</span>
                       </h1>
                     </div>
                   </div>
