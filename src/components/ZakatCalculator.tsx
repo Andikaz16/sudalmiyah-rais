@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
+import ZakatIcon from "@/components/ZakatIcon";
 import {
   Calculator,
   CheckCircle2,
@@ -148,10 +150,19 @@ export default function ZakatCalculator() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Banner Resmi Ketetapan BAZNAS RI 2026 */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-[#0D5C58]/10 via-[#0D5C58]/5 to-[#D4AF37]/15 border border-[#0D5C58]/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-2xs">
-        <div className="space-y-1">
+      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-[#0D5C58]/10 via-[#0D5C58]/5 to-[#D4AF37]/15 border border-[#0D5C58]/20 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left shadow-2xs">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center p-1 rounded-2xl bg-white shadow-md border border-stone-200">
+          <Image
+            src="/images/icon-zakat.png"
+            alt="Ikon Zakat BAZNAS"
+            width={80}
+            height={80}
+            className="object-contain"
+          />
+        </div>
+        <div className="space-y-1 flex-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0D5C58] text-white text-[11px] font-semibold">
-            <Scale className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <ZakatIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span>Ketetapan Resmi BAZNAS RI 2026 M / 1447 H</span>
           </div>
           <h2 className="text-base sm:text-lg font-bold text-stone-900 font-serif">

@@ -13,6 +13,7 @@ import KiblatIcon from "@/components/KiblatIcon";
 import KiblatCompass from "@/components/KiblatCompass";
 import AsmaulHusnaIcon from "@/components/AsmaulHusnaIcon";
 import ZakatCalculator from "@/components/ZakatCalculator";
+import ZakatIcon from "@/components/ZakatIcon";
 import {
   SURAH_LIST,
   JUZ_LIST,
@@ -205,6 +206,8 @@ export default function IbadahPage() {
                         <KiblatIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : feat.id === "asmaul-husna" ? (
                         <AsmaulHusnaIcon className="w-7 h-7 sm:w-9 sm:h-9" />
+                      ) : feat.id === "zakat" ? (
+                        <ZakatIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : (
                         <span className="leading-none select-none tracking-normal">
                           {feat.iconSymbol}
@@ -287,6 +290,9 @@ export default function IbadahPage() {
                         )}
                         {currentFeat?.id === "asmaul-husna" && (
                           <AsmaulHusnaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                        )}
+                        {currentFeat?.id === "zakat" && (
+                          <ZakatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
                         )}
                         <span>{currentFeat?.title}</span>
                       </h1>
