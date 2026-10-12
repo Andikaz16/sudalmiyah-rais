@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import QuranIcon from "@/components/QuranIcon";
 import TasbihIcon from "@/components/TasbihIcon";
+import TilawahIcon from "@/components/TilawahIcon";
+import DoaIcon from "@/components/DoaIcon";
 import {
   SURAH_LIST,
   JUZ_LIST,
@@ -184,12 +186,16 @@ export default function IbadahPage() {
                       </span>
                     </div>
 
-                    {/* Central Icon Box (App-Icon style with Quran/Tasbih icon or Arabic text) */}
+                    {/* Central Icon Box (App-Icon style with custom icons or Arabic text) */}
                     <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] group-hover:bg-[#0D5C58] group-hover:text-white group-hover:border-[#0D5C58] group-hover:scale-110 transition-all duration-300 flex items-center justify-center font-serif text-base sm:text-xl font-bold shadow-inner my-auto sm:my-2">
                       {feat.id === "quran" ? (
                         <QuranIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : feat.id === "tasbih" ? (
                         <TasbihIcon className="w-7 h-7 sm:w-9 sm:h-9" />
+                      ) : feat.id === "tilawah" ? (
+                        <TilawahIcon className="w-7 h-7 sm:w-9 sm:h-9" />
+                      ) : feat.id === "doa" ? (
+                        <DoaIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : (
                         <span className="leading-none select-none tracking-normal">
                           {feat.iconSymbol}
@@ -260,6 +266,12 @@ export default function IbadahPage() {
                         )}
                         {currentFeat?.id === "tasbih" && (
                           <TasbihIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                        )}
+                        {currentFeat?.id === "tilawah" && (
+                          <TilawahIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                        )}
+                        {currentFeat?.id === "doa" && (
+                          <DoaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
                         )}
                         <span>{currentFeat?.title}</span>
                       </h1>
@@ -1527,7 +1539,8 @@ function TilawahFeatureView() {
       <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0D5C58] to-[#083E3B] text-white shadow-xl space-y-4">
         <div className="flex items-center justify-between border-b border-white/10 pb-3">
           <div>
-            <span className="text-[11px] text-[#D4AF37] font-semibold uppercase tracking-wider">
+            <span className="text-[11px] text-[#D4AF37] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+              <TilawahIcon className="w-4 h-4 text-[#D4AF37] shrink-0" />
               Surat Ke-{currentSurah.number} ({currentSurah.revelation})
             </span>
             <h3 className="text-xl sm:text-2xl font-bold font-serif text-white">
@@ -1725,7 +1738,8 @@ function DoaFeatureView() {
             className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm space-y-3"
           >
             <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
-              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] uppercase tracking-wider">
+              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] uppercase tracking-wider flex items-center gap-1.5">
+                <DoaIcon className="w-3.5 h-3.5 text-[#0D5C58] shrink-0" />
                 {doa.categoryLabel}
               </span>
               <button
