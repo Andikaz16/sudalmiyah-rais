@@ -414,6 +414,27 @@ function QuranFeatureView() {
     } catch {}
   }, []);
 
+  // Lock body scroll and handle Escape key when settings modal is open
+  useEffect(() => {
+    if (!isSettingsOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        setIsSettingsOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isSettingsOpen]);
+
   const updateSettings = (newSettings: QuranSettings) => {
     setSettings(newSettings);
     try {
@@ -1073,14 +1094,19 @@ function QuranFeatureView() {
 
       {/* MODAL PENGATURAN TAMPILAN AL-QUR'AN (Khusus Ramah Lansia & Jamaah) */}
       {isSettingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs animate-fade-in">
-          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-stone-800 animate-scale-up">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsSettingsOpen(false);
+          }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-black/70 backdrop-blur-sm animate-fade-in"
+        >
+          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-stone-800 animate-scale-up max-h-[90dvh] sm:max-h-[85vh] my-auto">
             {/* Modal Header */}
-            <div className="px-5 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FAF8F5]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] flex items-center justify-center">
+            <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-stone-200 flex items-center justify-between bg-[#FAF8F5] shrink-0 sticky top-0 z-10">
+              <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] flex items-center justify-center shrink-0">
                   <svg
-                    className="w-4 h-4"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -1098,27 +1124,40 @@ function QuranFeatureView() {
                     />
                   </svg>
                 </div>
-                <div>
-                  <h3 className="font-bold text-stone-900 text-base font-serif">
+                <div className="min-w-0">
+                  <h3 className="font-bold text-stone-900 text-sm sm:text-base font-serif truncate">
                     Pengaturan Tampilan Al-Qur'an
                   </h3>
-                  <p className="text-[11px] text-stone-500">
+                  <p className="text-[10px] sm:text-[11px] text-stone-500 truncate">
                     Kenyamanan membaca untuk seluruh jamaah & orang tua
                   </p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsSettingsOpen(false)}
-                className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition-colors cursor-pointer"
+                className="w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-stone-100 hover:bg-[#0D5C58] active:scale-95 text-stone-600 hover:text-white border border-stone-200 hover:border-[#0D5C58] flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-xs"
+                title="Tutup Pengaturan"
+                aria-label="Tutup Pengaturan"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5 sm:w-4 sm:h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 sm:p-6 space-y-5 overflow-y-auto max-h-[75vh]">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1 min-h-0 overscroll-contain">
               {/* Presets Cepat */}
               <div>
                 <label className="text-xs font-bold text-stone-700 block mb-2">
@@ -1349,8 +1388,9 @@ function QuranFeatureView() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-5 py-3.5 border-t border-stone-200 bg-[#FAF8F5] flex items-center justify-between">
+            <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-stone-200 bg-[#FAF8F5] flex items-center justify-between shrink-0 sticky bottom-0 z-10">
               <button
+                type="button"
                 onClick={() =>
                   updateSettings({
                     arabicSize: "md",
@@ -1360,15 +1400,16 @@ function QuranFeatureView() {
                     translationSize: "md",
                   })
                 }
-                className="text-xs font-semibold text-stone-600 hover:text-stone-900 underline cursor-pointer"
+                className="text-xs font-semibold text-stone-600 hover:text-stone-900 underline cursor-pointer py-1"
               >
                 Setel Ulang Standar
               </button>
               <button
+                type="button"
                 onClick={() => setIsSettingsOpen(false)}
-                className="px-5 py-2 rounded-xl bg-[#0D5C58] hover:bg-[#094340] text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                className="px-5 py-2.5 rounded-xl bg-[#0D5C58] hover:bg-[#094340] active:scale-95 text-white text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
               >
-                Simpan & Tutup
+                <span>Simpan & Tutup</span>
               </button>
             </div>
           </div>
