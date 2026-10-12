@@ -38,16 +38,16 @@ export default function MobileBottomNav() {
               href={item.href}
               className={`flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all duration-150 ${
                 isActive
-                  ? "text-[#0D5C58] font-bold"
+                  ? "text-[#003B73] font-bold"
                   : "text-stone-400 hover:text-stone-700"
               }`}
             >
               <div
                 className={`p-1.5 rounded-xl transition-colors ${
-                  isActive ? "bg-[#0D5C58]/10" : "bg-transparent"
+                  isActive ? "bg-[#003B73]/10" : "bg-transparent"
                 }`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? "text-[#0D5C58]" : "text-stone-400"}`} />
+                <Icon className={`w-5 h-5 ${isActive ? "text-[#003B73]" : "text-stone-400"}`} />
               </div>
               <span className="text-[10px] tracking-tight mt-0.5">{item.label}</span>
             </Link>

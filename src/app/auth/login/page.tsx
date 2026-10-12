@@ -79,7 +79,7 @@ function LoginForm() {
               placeholder="takmir@sudalmiyah.ums.ac.id"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 placeholder-stone-400 text-sm focus:outline-none focus:border-[#0D5C58]"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 placeholder-stone-400 text-sm focus:outline-none focus:border-[#003B73]"
             />
           </div>
         </div>
@@ -97,7 +97,7 @@ function LoginForm() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 placeholder-stone-400 text-sm focus:outline-none focus:border-[#0D5C58]"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 placeholder-stone-400 text-sm focus:outline-none focus:border-[#003B73]"
             />
           </div>
         </div>
@@ -105,7 +105,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full text-center px-6 py-3.5 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] disabled:bg-stone-300 text-white font-bold text-sm shadow-md transition-all active:scale-[0.99]"
+          className="w-full text-center px-6 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] disabled:bg-stone-300 text-white font-bold text-sm shadow-md transition-all active:scale-[0.99]"
         >
           {loading ? "Memverifikasi Kredensial..." : "Masuk ke Dashboard"}
         </button>
@@ -113,8 +113,8 @@ function LoginForm() {
 
       {/* Test Credentials Sandbox Helper */}
       <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 text-xs space-y-2">
-        <div className="font-semibold text-[#0D5C58] flex items-center gap-1.5">
-          <ShieldCheck className="w-4 h-4 text-[#0D5C58]" />
+        <div className="font-semibold text-[#003B73] flex items-center gap-1.5">
+          <ShieldCheck className="w-4 h-4 text-[#003B73]" />
           <span>Kredensial Pengujian:</span>
         </div>
         <div className="text-stone-700 space-y-1 font-mono text-[11px]">
@@ -139,7 +139,7 @@ export default function LoginPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-stone-500 hover:text-[#0D5C58] mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-stone-500 hover:text-[#003B73] mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Kembali ke Beranda Utama</span>

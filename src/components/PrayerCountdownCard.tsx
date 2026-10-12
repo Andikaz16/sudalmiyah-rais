@@ -95,7 +95,7 @@ export default function PrayerCountdownCard() {
     <div className="w-full bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
       {/* Background Soft Accent Glows with breathing glow */}
       <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#D4AF37]/15 rounded-full blur-3xl pointer-events-none animate-soft-glow" />
-      <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-[#0D5C58]/10 rounded-full blur-3xl pointer-events-none animate-soft-glow" />
+      <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-[#003B73]/10 rounded-full blur-3xl pointer-events-none animate-soft-glow" />
 
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-200/80">
@@ -106,7 +106,7 @@ export default function PrayerCountdownCard() {
               <span>Kampus 2 UMS Surakarta</span>
             </div>
             <span className="text-stone-300">•</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] border border-[#0D5C58]/20">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#003B73]/10 text-[#003B73] border border-[#003B73]/20">
               Standar MASA (Muhammadiyah)
             </span>
           </div>
@@ -119,16 +119,16 @@ export default function PrayerCountdownCard() {
           </p>
         </div>
 
-        {/* Live Countdown Badge (Teal and Gold style) */}
+        {/* Live Countdown Badge (Navy Blue and Gold style) */}
         <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
-          <div className="p-3 rounded-xl bg-[#0D5C58]/10 text-[#0D5C58]">
+          <div className="p-3 rounded-xl bg-[#003B73]/10 text-[#003B73]">
             <BellRing className="w-6 h-6 animate-pulse" />
           </div>
           <div>
             <div className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">
               Menuju Waktu {data.nextPrayer.name} ({data.nextPrayer.time} WIB)
             </div>
-            <div className="font-mono text-2xl sm:text-3xl font-extrabold text-[#0D5C58] tracking-tight">
+            <div className="font-mono text-2xl sm:text-3xl font-extrabold text-[#003B73] tracking-tight">
               {String(hours).padStart(2, "0")}:{String(minutes).padStart(2, "0")}:
               {String(seconds).padStart(2, "0")}
             </div>
@@ -147,7 +147,7 @@ export default function PrayerCountdownCard() {
               key={prayer.name}
               className={`relative rounded-2xl p-4 transition-all duration-300 flex flex-col justify-between hover:-translate-y-0.5 ${
                 isNext
-                  ? "bg-gradient-to-b from-[#0D5C58] to-[#094744] text-white shadow-xl shadow-[#0D5C58]/25 scale-[1.03] border border-emerald-400/30 animate-pulse-glow"
+                  ? "bg-gradient-to-b from-[#003B73] to-[#002855] text-white shadow-xl shadow-[#003B73]/25 scale-[1.03] border border-amber-400/40 animate-pulse-glow"
                   : "bg-[#FAF8F5] border border-stone-200/80 text-stone-700 hover:border-[#D4AF37]/50 hover:bg-white hover:shadow-sm"
               }`}
             >
@@ -201,7 +201,7 @@ export default function PrayerCountdownCard() {
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-[11px] text-[#0D5C58] font-semibold bg-[#0D5C58]/10 px-2.5 py-0.5 rounded-full border border-[#0D5C58]/20">
+          <span className="text-[11px] text-[#003B73] font-semibold bg-[#003B73]/10 px-2.5 py-0.5 rounded-full border border-[#003B73]/20">
             Hisab Tarjih Munas XXXI (Subuh -18°)
           </span>
           <div className="flex items-center gap-1.5 text-stone-500">

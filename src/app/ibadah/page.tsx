@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -155,7 +156,7 @@ export default function IbadahPage() {
             <section className="bg-gradient-to-b from-white via-white to-[#FAF8F5] border-b border-stone-200/80 pt-10 pb-12 sm:pt-14 sm:pb-16 text-center">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight animate-fade-up">
-                  Ruang Ibadah <span className="text-[#0D5C58]">Digital</span>
+                  Ruang Ibadah <span className="text-[#003B73]">Digital</span>
                 </h1>
                 <p className="text-sm sm:text-base text-stone-600 mt-4 leading-relaxed max-w-2xl mx-auto font-sans animate-fade-up delay-150">
                   Kumpulan piranti penunjang ibadah harian jamaah Masjid Sudalmiyah Rais Universitas Muhammadiyah Surakarta untuk memperkaya kedekatan spiritual setiap saat.
@@ -187,17 +188,17 @@ export default function IbadahPage() {
                     className="group relative bg-white border border-stone-200/90 rounded-2xl sm:rounded-3xl p-3 sm:p-5 flex flex-col items-center justify-between text-center shadow-sm hover:shadow-xl hover:border-[#D4AF37] hover:-translate-y-1.5 active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden aspect-square sm:aspect-auto sm:min-h-[200px] animate-fade-up"
                   >
                     {/* Decorative background glow on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#0D5C58]/5 via-transparent to-[#D4AF37]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#003B73]/5 via-transparent to-[#D4AF37]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
                     {/* Top Badge (Hidden on mobile for clean app-icon look, visible on desktop) */}
                     <div className="hidden sm:flex w-full justify-end">
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 group-hover:bg-[#0D5C58] group-hover:text-white transition-colors">
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 group-hover:bg-[#003B73] group-hover:text-white transition-colors">
                         {feat.badge}
                       </span>
                     </div>
 
                     {/* Central Icon Box (App-Icon style with custom icons or Arabic text) */}
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] group-hover:bg-[#0D5C58] group-hover:text-white group-hover:border-[#0D5C58] group-hover:scale-110 transition-all duration-300 flex items-center justify-center font-serif text-base sm:text-xl font-bold shadow-inner my-auto sm:my-2">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-[#003B73]/10 border border-[#003B73]/20 text-[#003B73] group-hover:bg-[#003B73] group-hover:text-white group-hover:border-[#003B73] group-hover:scale-110 transition-all duration-300 flex items-center justify-center font-serif text-base sm:text-xl font-bold shadow-inner my-auto sm:my-2">
                       {feat.id === "quran" ? (
                         <QuranIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : feat.id === "tasbih" ? (
@@ -227,7 +228,7 @@ export default function IbadahPage() {
 
                     {/* Title & Short Description */}
                     <div className="w-full">
-                      <h3 className="font-bold text-xs sm:text-sm text-stone-900 group-hover:text-[#0D5C58] transition-colors line-clamp-2 leading-tight">
+                      <h3 className="font-bold text-xs sm:text-sm text-stone-900 group-hover:text-[#003B73] transition-colors line-clamp-2 leading-tight">
                         {feat.title}
                       </h3>
                       <p className="hidden sm:block text-[11px] text-stone-500 mt-1 line-clamp-2 leading-snug">
@@ -278,40 +279,40 @@ export default function IbadahPage() {
                           Ruang Ibadah
                         </span>
                         <span className="text-stone-300">•</span>
-                        <span className="text-[11px] font-semibold text-[#0D5C58]">
+                        <span className="text-[11px] font-semibold text-[#003B73]">
                           {currentFeat?.badge}
                         </span>
                       </div>
                       <h1 className="text-base sm:text-xl font-bold text-stone-900 font-serif leading-tight flex items-center gap-2">
                         {currentFeat?.id === "quran" && (
-                          <QuranIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                          <QuranIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
                         )}
                         {currentFeat?.id === "tasbih" && (
-                          <TasbihIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                          <TasbihIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
                         )}
                         {currentFeat?.id === "tilawah" && (
-                          <TilawahIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                          <TilawahIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
                         )}
                         {currentFeat?.id === "doa" && (
-                          <DoaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                          <DoaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
                         )}
                         {currentFeat?.id === "kiblat" && (
-                          <KiblatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                          <KiblatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
                         )}
                         {currentFeat?.id === "asmaul-husna" && (
-                          <AsmaulHusnaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                          <AsmaulHusnaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
                         )}
                         {currentFeat?.id === "zakat" && (
-                          <ZakatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                          <ZakatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
                         )}
                         {currentFeat?.id === "panduan-shalat" && (
-                          <ShalatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                          <ShalatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
                         )}
                         {currentFeat?.id === "kalender" && (
-                          <KalenderIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                          <KalenderIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
                         )}
                         {currentFeat?.id === "hadits" && (
-                          <HaditsIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                          <HaditsIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
                         )}
                         <span>{currentFeat?.title}</span>
                       </h1>
@@ -653,13 +654,13 @@ function QuranFeatureView() {
 
           {/* Banner Context Jika Sedang Membaca Berdasarkan Juz */}
           {juzContext && surahDetail && (
-            <div className="p-4 rounded-2xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+            <div className="p-4 rounded-2xl bg-[#003B73]/10 border border-[#003B73]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#0D5C58] text-white">
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#003B73] text-white">
                     Juz {juzContext.juzNumber}
                   </span>
-                  <span className="text-xs font-bold text-[#0D5C58]">
+                  <span className="text-xs font-bold text-[#003B73]">
                     {juzContext.juzName}
                   </span>
                 </div>
@@ -692,8 +693,8 @@ function QuranFeatureView() {
             <div className="space-y-6">
               {/* Basmalah Banner */}
               {juzContext && juzContext.startAyah > 1 ? (
-                <div className="p-4 sm:p-5 rounded-2xl bg-[#0D5C58]/5 border border-[#0D5C58]/15 text-center mb-6 space-y-1">
-                  <p className="font-serif text-xl sm:text-2xl text-[#0D5C58]">
+                <div className="p-4 sm:p-5 rounded-2xl bg-[#003B73]/5 border border-[#003B73]/15 text-center mb-6 space-y-1">
+                  <p className="font-serif text-xl sm:text-2xl text-[#003B73]">
                     أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ • بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيْمِ
                   </p>
                   <p className="text-xs text-stone-500 font-sans">
@@ -701,8 +702,8 @@ function QuranFeatureView() {
                   </p>
                 </div>
               ) : surahDetail.nomor !== 1 && surahDetail.nomor !== 9 ? (
-                <div className="p-4 sm:p-5 rounded-2xl bg-[#0D5C58]/5 border border-[#0D5C58]/15 text-center mb-6">
-                  <p className="font-serif text-2xl sm:text-3xl text-[#0D5C58]">
+                <div className="p-4 sm:p-5 rounded-2xl bg-[#003B73]/5 border border-[#003B73]/15 text-center mb-6">
+                  <p className="font-serif text-2xl sm:text-3xl text-[#003B73]">
                     بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيْمِ
                   </p>
                   <p className="text-xs text-stone-500 mt-1 font-sans">
@@ -722,17 +723,17 @@ function QuranFeatureView() {
                       id={`ayah-${ayah.nomorAyat}`}
                       className={`p-5 sm:p-6 rounded-2xl bg-white border transition-all space-y-3 ${
                         isJuzStart
-                          ? "border-[#0D5C58] ring-2 ring-[#0D5C58]/20 shadow-md"
+                          ? "border-[#003B73] ring-2 ring-[#003B73]/20 shadow-md"
                           : "border-stone-200/90 shadow-xs"
                       }`}
                     >
                       <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
                         <div className="flex items-center gap-2">
-                          <span className="w-8 h-8 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] font-bold text-xs flex items-center justify-center font-mono">
+                          <span className="w-8 h-8 rounded-full bg-[#003B73]/10 text-[#003B73] font-bold text-xs flex items-center justify-center font-mono">
                             {ayah.nomorAyat}
                           </span>
                           {isJuzStart && (
-                            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#0D5C58] text-white">
+                            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#003B73] text-white">
                               Awal Bacaan Juz {juzContext.juzNumber}
                             </span>
                           )}
@@ -752,7 +753,7 @@ function QuranFeatureView() {
                       {/* Teks Latin Transliterasi */}
                       {settings.showLatin && (
                         <p
-                          className={`text-[#0D5C58] italic font-sans leading-relaxed pt-1 ${getLatinClass()}`}
+                          className={`text-[#003B73] italic font-sans leading-relaxed pt-1 ${getLatinClass()}`}
                         >
                           {ayah.teksLatin}
                         </p>
@@ -818,7 +819,7 @@ function QuranFeatureView() {
                                   currentJuzObj.surahNumbers[sIdx + 1]
                                 )
                               }
-                              className="px-4 py-2 rounded-xl bg-[#0D5C58] hover:bg-[#094340] text-white text-xs font-semibold transition-colors cursor-pointer"
+                              className="px-4 py-2 rounded-xl bg-[#003B73] hover:bg-[#002855] text-white text-xs font-semibold transition-colors cursor-pointer"
                             >
                               Lanjut Surat Berikutnya dalam Juz {juzContext.juzNumber}
                             </button>
@@ -835,7 +836,7 @@ function QuranFeatureView() {
                                   );
                                 }
                               }}
-                              className="px-4 py-2 rounded-xl bg-[#0D5C58] hover:bg-[#094340] text-white text-xs font-semibold transition-colors cursor-pointer"
+                              className="px-4 py-2 rounded-xl bg-[#003B73] hover:bg-[#002855] text-white text-xs font-semibold transition-colors cursor-pointer"
                             >
                               Selesai Juz {juzContext.juzNumber} • Lanjut ke Juz{" "}
                               {juzContext.juzNumber + 1}
@@ -858,7 +859,7 @@ function QuranFeatureView() {
                     {selectedSurah < 114 && (
                       <button
                         onClick={() => handleOpenRegularSurah(selectedSurah + 1)}
-                        className="px-4 py-2 rounded-xl bg-[#0D5C58] hover:bg-[#094340] text-white text-xs font-semibold transition-colors cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-[#003B73] hover:bg-[#002855] text-white text-xs font-semibold transition-colors cursor-pointer"
                       >
                         Surat Berikutnya
                       </button>
@@ -880,7 +881,7 @@ function QuranFeatureView() {
                 onClick={() => setViewMode("surat")}
                 className={`flex-1 py-2 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold text-center transition-all cursor-pointer ${
                   viewMode === "surat"
-                    ? "bg-[#0D5C58] text-white shadow-xs"
+                    ? "bg-[#003B73] text-white shadow-xs"
                     : "text-stone-600 hover:text-stone-900"
                 }`}
               >
@@ -891,7 +892,7 @@ function QuranFeatureView() {
                 onClick={() => setViewMode("juz")}
                 className={`flex-1 py-2 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold text-center transition-all cursor-pointer ${
                   viewMode === "juz"
-                    ? "bg-[#0D5C58] text-white shadow-xs"
+                    ? "bg-[#003B73] text-white shadow-xs"
                     : "text-stone-600 hover:text-stone-900"
                 }`}
               >
@@ -939,7 +940,7 @@ function QuranFeatureView() {
                   value={searchSurah}
                   onChange={(e) => setSearchSurah(e.target.value)}
                   placeholder="Cari nama surat, terjemahan, atau nomor (misal: Kahf, Yasin, 67)..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-stone-800 text-sm focus:outline-none focus:border-[#0D5C58] bg-white shadow-2xs"
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-stone-800 text-sm focus:outline-none focus:border-[#003B73] bg-white shadow-2xs"
                 />
               </div>
 
@@ -949,14 +950,14 @@ function QuranFeatureView() {
                   <button
                     key={surah.number}
                     onClick={() => handleOpenRegularSurah(surah.number)}
-                    className="w-full text-left p-4 rounded-2xl border border-stone-200 hover:border-[#0D5C58] hover:bg-[#0D5C58]/5 transition-all flex items-center justify-between group cursor-pointer bg-white shadow-2xs hover:shadow-sm"
+                    className="w-full text-left p-4 rounded-2xl border border-stone-200 hover:border-[#003B73] hover:bg-[#003B73]/5 transition-all flex items-center justify-between group cursor-pointer bg-white shadow-2xs hover:shadow-sm"
                   >
                     <div className="flex items-center gap-3 min-w-0 pr-2">
-                      <span className="w-8 h-8 rounded-xl bg-stone-100 group-hover:bg-[#0D5C58] group-hover:text-white transition-colors text-stone-700 font-bold text-xs flex items-center justify-center shrink-0 font-mono">
+                      <span className="w-8 h-8 rounded-xl bg-stone-100 group-hover:bg-[#003B73] group-hover:text-white transition-colors text-stone-700 font-bold text-xs flex items-center justify-center shrink-0 font-mono">
                         {surah.number}
                       </span>
                       <div className="min-w-0">
-                        <h4 className="font-bold text-stone-900 text-sm group-hover:text-[#0D5C58] truncate">
+                        <h4 className="font-bold text-stone-900 text-sm group-hover:text-[#003B73] truncate">
                           {surah.name}
                         </h4>
                         <p className="text-[11px] text-stone-500 truncate">
@@ -964,7 +965,7 @@ function QuranFeatureView() {
                         </p>
                       </div>
                     </div>
-                    <span className="font-serif text-lg text-stone-800 group-hover:text-[#0D5C58] shrink-0 font-bold">
+                    <span className="font-serif text-lg text-stone-800 group-hover:text-[#003B73] shrink-0 font-bold">
                       {surah.arabicName}
                     </span>
                   </button>
@@ -988,7 +989,7 @@ function QuranFeatureView() {
                   value={searchJuz}
                   onChange={(e) => setSearchJuz(e.target.value)}
                   placeholder="Cari nomor juz, nama juz, atau nama surat (misal: Juz 30, Amma, Al-Mulk)..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-stone-800 text-sm focus:outline-none focus:border-[#0D5C58] bg-white shadow-2xs"
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-stone-800 text-sm focus:outline-none focus:border-[#003B73] bg-white shadow-2xs"
                 />
               </div>
 
@@ -999,19 +1000,19 @@ function QuranFeatureView() {
                   return (
                     <div
                       key={juz.number}
-                      className="p-5 rounded-2xl border border-stone-200 bg-white hover:border-[#0D5C58] transition-all space-y-3.5 shadow-2xs hover:shadow-sm"
+                      className="p-5 rounded-2xl border border-stone-200 bg-white hover:border-[#003B73] transition-all space-y-3.5 shadow-2xs hover:shadow-sm"
                     >
                       {/* Baris Atas: Badge Juz & Kaligrafi Arab */}
                       <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
                         <div className="flex items-center gap-2">
-                          <span className="px-2.5 py-0.5 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] font-bold text-xs">
+                          <span className="px-2.5 py-0.5 rounded-full bg-[#003B73]/10 text-[#003B73] font-bold text-xs">
                             Juz {juz.number}
                           </span>
                           <span className="text-xs text-stone-400">
                             {juz.surahNumbers.length} Surat
                           </span>
                         </div>
-                        <span className="font-serif text-base text-[#0D5C58] font-bold">
+                        <span className="font-serif text-base text-[#003B73] font-bold">
                           {juz.arabicName}
                         </span>
                       </div>
@@ -1041,7 +1042,7 @@ function QuranFeatureView() {
                             onClick={() =>
                               setExpandedJuz(isExpanded ? null : juz.number)
                             }
-                            className="text-[#0D5C58] font-semibold hover:underline cursor-pointer"
+                            className="text-[#003B73] font-semibold hover:underline cursor-pointer"
                           >
                             {isExpanded ? "Sembunyikan" : "Lihat Semua"}
                           </button>
@@ -1057,7 +1058,7 @@ function QuranFeatureView() {
                               <button
                                 key={sNum}
                                 onClick={() => handleOpenJuzSurah(juz.number, sNum)}
-                                className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-[#0D5C58] hover:text-white text-stone-700 text-xs font-medium transition-colors cursor-pointer"
+                                className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-[#003B73] hover:text-white text-stone-700 text-xs font-medium transition-colors cursor-pointer"
                                 title={`Mulai baca dari Ayat ${segment?.startAyah || 1}`}
                               >
                                 {surahItem.name} ({segment?.startAyah}-{segment?.endAyah})
@@ -1079,7 +1080,7 @@ function QuranFeatureView() {
                       <div className="pt-2 border-t border-stone-100">
                         <button
                           onClick={() => handleOpenJuzSurah(juz.number, juz.startSurahNumber)}
-                          className="w-full py-2.5 px-3 rounded-xl bg-[#0D5C58]/10 hover:bg-[#0D5C58] text-[#0D5C58] hover:text-white text-xs font-bold transition-all text-center cursor-pointer flex items-center justify-center gap-1.5"
+                          className="w-full py-2.5 px-3 rounded-xl bg-[#003B73]/10 hover:bg-[#003B73] text-[#003B73] hover:text-white text-xs font-bold transition-all text-center cursor-pointer flex items-center justify-center gap-1.5"
                         >
                           <span>Mulai Baca Juz {juz.number} (Ayat {juz.startAyah})</span>
                         </button>
@@ -1112,7 +1113,7 @@ function QuranFeatureView() {
             {/* Modal Header */}
             <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-stone-200 flex items-center justify-between bg-[#FAF8F5] shrink-0 sticky top-0 z-20">
               <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#003B73]/10 border border-[#003B73]/20 text-[#003B73] flex items-center justify-center shrink-0">
                   <svg
                     className="w-4 h-4 sm:w-5 sm:h-5"
                     fill="none"
@@ -1144,7 +1145,7 @@ function QuranFeatureView() {
               <button
                 type="button"
                 onClick={() => setIsSettingsOpen(false)}
-                className="w-10 h-10 rounded-full bg-stone-200/90 hover:bg-[#0D5C58] active:scale-90 text-stone-800 hover:text-white border border-stone-300 hover:border-[#0D5C58] flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm"
+                className="w-10 h-10 rounded-full bg-stone-200/90 hover:bg-[#003B73] active:scale-90 text-stone-800 hover:text-white border border-stone-300 hover:border-[#003B73] flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm"
                 title="Tutup Pengaturan (X)"
                 aria-label="Tutup Pengaturan"
               >
@@ -1182,9 +1183,9 @@ function QuranFeatureView() {
                         translationSize: "lg",
                       })
                     }
-                    className="p-3 rounded-2xl border border-[#0D5C58]/30 bg-[#0D5C58]/5 hover:bg-[#0D5C58]/10 text-left transition-all cursor-pointer"
+                    className="p-3 rounded-2xl border border-[#003B73]/30 bg-[#003B73]/5 hover:bg-[#003B73]/10 text-left transition-all cursor-pointer"
                   >
-                    <span className="font-bold text-xs text-[#0D5C58] block">
+                    <span className="font-bold text-xs text-[#003B73] block">
                       Mode Ramah Lansia
                     </span>
                     <span className="text-[10px] text-stone-500 block mt-0.5">
@@ -1220,7 +1221,7 @@ function QuranFeatureView() {
                   <label className="text-xs font-bold text-stone-800">
                     Ukuran Huruf Arab:
                   </label>
-                  <span className="text-[11px] font-semibold text-[#0D5C58]">
+                  <span className="text-[11px] font-semibold text-[#003B73]">
                     {settings.arabicSize === "sm" && "Kecil"}
                     {settings.arabicSize === "md" && "Sedang (Standar)"}
                     {settings.arabicSize === "lg" && "Besar"}
@@ -1243,7 +1244,7 @@ function QuranFeatureView() {
                       }
                       className={`py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                         settings.arabicSize === opt.id
-                          ? "bg-[#0D5C58] text-white shadow-xs"
+                          ? "bg-[#003B73] text-white shadow-xs"
                           : "bg-stone-100 text-stone-700 hover:bg-stone-200"
                       }`}
                     >
@@ -1273,7 +1274,7 @@ function QuranFeatureView() {
                     }
                     className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                       settings.showLatin
-                        ? "bg-[#0D5C58] text-white"
+                        ? "bg-[#003B73] text-white"
                         : "bg-stone-200 text-stone-600"
                     }`}
                   >
@@ -1297,7 +1298,7 @@ function QuranFeatureView() {
                         }
                         className={`py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                           settings.latinSize === opt.id
-                            ? "bg-[#0D5C58] text-white shadow-xs"
+                            ? "bg-[#003B73] text-white shadow-xs"
                             : "bg-stone-100 text-stone-700 hover:bg-stone-200"
                         }`}
                       >
@@ -1328,7 +1329,7 @@ function QuranFeatureView() {
                     }
                     className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                       settings.showTranslation
-                        ? "bg-[#0D5C58] text-white"
+                        ? "bg-[#003B73] text-white"
                         : "bg-stone-200 text-stone-600"
                     }`}
                   >
@@ -1355,7 +1356,7 @@ function QuranFeatureView() {
                         }
                         className={`py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                           settings.translationSize === opt.id
-                            ? "bg-[#0D5C58] text-white shadow-xs"
+                            ? "bg-[#003B73] text-white shadow-xs"
                             : "bg-stone-100 text-stone-700 hover:bg-stone-200"
                         }`}
                       >
@@ -1379,7 +1380,7 @@ function QuranFeatureView() {
                   </p>
                   {settings.showLatin && (
                     <p
-                      className={`text-[#0D5C58] italic font-sans ${getLatinClass()}`}
+                      className={`text-[#003B73] italic font-sans ${getLatinClass()}`}
                     >
                       Bismillahir-rahmanir-rahim
                     </p>
@@ -1415,7 +1416,7 @@ function QuranFeatureView() {
               <button
                 type="button"
                 onClick={() => setIsSettingsOpen(false)}
-                className="px-5 py-2.5 rounded-xl bg-[#0D5C58] hover:bg-[#094340] active:scale-95 text-white text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl bg-[#003B73] hover:bg-[#002855] active:scale-95 text-white text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
               >
                 <span>Simpan & Tutup</span>
               </button>
@@ -1480,7 +1481,7 @@ function TasbihFeatureView() {
             }}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
               dzikirText === d.title
-                ? "bg-[#0D5C58] text-white shadow-sm"
+                ? "bg-[#003B73] text-white shadow-sm"
                 : "bg-stone-100 text-stone-600 hover:bg-stone-200"
             }`}
           >
@@ -1490,8 +1491,8 @@ function TasbihFeatureView() {
       </div>
 
       {/* Dzikir display box */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-[#0D5C58]/5 border border-[#0D5C58]/20 w-full max-w-md">
-        <p className="font-serif text-3xl sm:text-4xl text-[#0D5C58] mb-1">
+      <div className="p-4 sm:p-5 rounded-2xl bg-[#003B73]/5 border border-[#003B73]/20 w-full max-w-md">
+        <p className="font-serif text-3xl sm:text-4xl text-[#003B73] mb-1">
           {currentDzikir.arab}
         </p>
         <p className="text-sm font-bold text-stone-800">{currentDzikir.title}</p>
@@ -1520,7 +1521,7 @@ function TasbihFeatureView() {
       <div className="relative">
         <button
           onClick={handleIncrement}
-          className="w-44 h-44 sm:w-52 sm:h-52 rounded-full bg-gradient-to-br from-[#0D5C58] to-[#083E3B] text-white flex flex-col items-center justify-center shadow-xl shadow-[#0D5C58]/30 hover:scale-105 active:scale-95 transition-all select-none border-4 border-[#D4AF37]"
+          className="w-44 h-44 sm:w-52 sm:h-52 rounded-full bg-gradient-to-br from-[#003B73] to-[#001F3F] text-white flex flex-col items-center justify-center shadow-xl shadow-[#003B73]/30 hover:scale-105 active:scale-95 transition-all select-none border-4 border-[#D4AF37]"
         >
           <span className="text-5xl sm:text-6xl font-black font-mono tracking-tight">
             {count}
@@ -1625,7 +1626,7 @@ function TilawahFeatureView() {
   return (
     <div className="space-y-6">
       {/* Audio Player Card */}
-      <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0D5C58] to-[#083E3B] text-white shadow-xl space-y-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-br from-[#002855] via-[#003B73] to-[#001F3F] border border-blue-400/20 text-white shadow-xl space-y-4">
         <div className="flex items-center justify-between border-b border-white/10 pb-3">
           <div>
             <span className="text-[11px] text-[#D4AF37] font-semibold uppercase tracking-wider flex items-center gap-1.5">
@@ -1678,26 +1679,38 @@ function TilawahFeatureView() {
         </div>
 
         {/* Audio Controls */}
-        <div className="flex items-center justify-center gap-4 pt-2">
+        <div className="flex items-center justify-center gap-6 pt-2">
           <button
             onClick={() => handleSelectSurah(Math.max(1, selectedSurahNumber - 1))}
-            className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-colors"
+            disabled={selectedSurahNumber <= 1}
+            title="Surat Sebelumnya"
+            aria-label="Surat Sebelumnya"
+            className="p-3 rounded-full text-white/90 hover:text-[#D4AF37] hover:bg-white/10 active:scale-95 disabled:opacity-40 disabled:hover:text-white/90 disabled:hover:bg-transparent transition-all cursor-pointer"
           >
-            Surat Sebelumnya
+            <SkipBack className="w-6 h-6 fill-current" />
           </button>
 
           <button
             onClick={togglePlay}
-            className="px-6 py-2.5 rounded-full bg-[#D4AF37] hover:bg-[#b89529] text-stone-900 font-bold text-sm shadow-md transition-transform active:scale-95"
+            title={isPlaying ? "Jeda Audio" : "Putar Tilawah"}
+            aria-label={isPlaying ? "Jeda Audio" : "Putar Tilawah"}
+            className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#D4AF37] to-[#FCD34D] text-[#002855] hover:scale-105 active:scale-95 shadow-lg shadow-amber-500/30 flex items-center justify-center transition-all cursor-pointer"
           >
-            {isPlaying ? "Jeda Audio" : "Putar Tilawah"}
+            {isPlaying ? (
+              <Pause className="w-6 h-6 fill-current" />
+            ) : (
+              <Play className="w-6 h-6 fill-current ml-0.5" />
+            )}
           </button>
 
           <button
             onClick={() => handleSelectSurah(Math.min(114, selectedSurahNumber + 1))}
-            className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-colors"
+            disabled={selectedSurahNumber >= 114}
+            title="Surat Berikutnya"
+            aria-label="Surat Berikutnya"
+            className="p-3 rounded-full text-white/90 hover:text-[#D4AF37] hover:bg-white/10 active:scale-95 disabled:opacity-40 disabled:hover:text-white/90 disabled:hover:bg-transparent transition-all cursor-pointer"
           >
-            Surat Berikutnya
+            <SkipForward className="w-6 h-6 fill-current" />
           </button>
         </div>
       </div>
@@ -1718,7 +1731,7 @@ function TilawahFeatureView() {
               }}
               className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
                 selectedQari === q.id
-                  ? "bg-[#0D5C58] text-white shadow-sm"
+                  ? "bg-[#003B73] text-white shadow-sm"
                   : "bg-stone-100 text-stone-600 hover:bg-stone-200"
               }`}
             >
@@ -1745,7 +1758,7 @@ function TilawahFeatureView() {
                 onClick={() => handleSelectSurah(num)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
                   selectedSurahNumber === num
-                    ? "bg-[#0D5C58] text-white font-bold"
+                    ? "bg-[#003B73] text-white font-bold"
                     : "bg-stone-100 text-stone-700 hover:bg-stone-200"
                 }`}
               >
@@ -1759,7 +1772,7 @@ function TilawahFeatureView() {
         <select
           value={selectedSurahNumber}
           onChange={(e) => handleSelectSurah(Number(e.target.value))}
-          className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-stone-800 text-xs font-semibold bg-white focus:outline-none focus:border-[#0D5C58]"
+          className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-stone-800 text-xs font-semibold bg-white focus:outline-none focus:border-[#003B73]"
         >
           {SURAH_LIST.map((s) => (
             <option key={s.number} value={s.number}>
@@ -1810,7 +1823,7 @@ function DoaFeatureView() {
             onClick={() => setActiveCategory(c.id)}
             className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
               activeCategory === c.id
-                ? "bg-[#0D5C58] text-white"
+                ? "bg-[#003B73] text-white"
                 : "bg-stone-100 text-stone-600 hover:bg-stone-200"
             }`}
           >
@@ -1827,8 +1840,8 @@ function DoaFeatureView() {
             className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm space-y-3"
           >
             <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
-              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] uppercase tracking-wider flex items-center gap-1.5">
-                <DoaIcon className="w-3.5 h-3.5 text-[#0D5C58] shrink-0" />
+              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#003B73]/10 text-[#003B73] uppercase tracking-wider flex items-center gap-1.5">
+                <DoaIcon className="w-3.5 h-3.5 text-[#003B73] shrink-0" />
                 {doa.categoryLabel}
               </span>
               <button
@@ -1847,7 +1860,7 @@ function DoaFeatureView() {
               {doa.arabic}
             </p>
 
-            <p className="text-xs text-[#0D5C58] italic leading-relaxed">
+            <p className="text-xs text-[#003B73] italic leading-relaxed">
               {doa.latin}
             </p>
 
@@ -1888,7 +1901,7 @@ function AsmaulHusnaFeatureView() {
   return (
     <div className="space-y-6">
       {/* Banner Pengantar dengan Ikon Bintang Segi Delapan Asmaul Husna */}
-      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#0D5C58]/10 via-[#0D5C58]/5 to-[#D4AF37]/10 border border-[#0D5C58]/20 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left shadow-2xs">
+      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#003B73]/10 via-[#003B73]/5 to-[#D4AF37]/10 border border-[#003B73]/20 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left shadow-2xs">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center p-1 rounded-2xl bg-white shadow-md border border-stone-200">
           <Image
             src="/images/icon-asmaul-husna.png"
@@ -1899,7 +1912,7 @@ function AsmaulHusnaFeatureView() {
           />
         </div>
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0D5C58] text-white text-[11px] font-semibold">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#003B73] text-white text-[11px] font-semibold">
             <AsmaulHusnaIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span>99 Nama Agung & Sifat Mulia Allah SWT</span>
           </div>
@@ -1917,7 +1930,7 @@ function AsmaulHusnaFeatureView() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Cari Asmaul Husna (misal: Rahman, Pengasih, 1)..."
-        className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-stone-800 text-sm focus:outline-none focus:border-[#0D5C58] bg-stone-50"
+        className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-stone-800 text-sm focus:outline-none focus:border-[#003B73] bg-stone-50"
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -1930,7 +1943,7 @@ function AsmaulHusnaFeatureView() {
               <span className="w-7 h-7 rounded-lg bg-stone-100 text-stone-600 font-bold text-xs flex items-center justify-center">
                 {item.number}
               </span>
-              <span className="font-serif text-2xl text-[#0D5C58] font-bold">
+              <span className="font-serif text-2xl text-[#003B73] font-bold">
                 {item.arabic}
               </span>
             </div>
@@ -1999,7 +2012,7 @@ function KalenderFeatureView() {
   return (
     <div className="space-y-5">
       {/* Current Date Card */}
-      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-[#0D5C58] to-[#083E3B] text-white text-center space-y-2 shadow-md flex flex-col items-center">
+      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-[#003B73] to-[#001F3F] text-white text-center space-y-2 shadow-md flex flex-col items-center">
         <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center p-2 mb-1 shadow-inner">
           <KalenderIcon className="w-7 h-7 text-[#D4AF37]" />
         </div>
@@ -2030,7 +2043,7 @@ function KalenderFeatureView() {
                 <span className="font-bold text-stone-900 text-sm">
                   {p.name}
                 </span>
-                <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-[#0D5C58]/10 text-[#0D5C58]">
+                <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-[#003B73]/10 text-[#003B73]">
                   {p.day}
                 </span>
               </div>
@@ -2044,7 +2057,7 @@ function KalenderFeatureView() {
 
       {/* Niat Puasa Sunnah Card */}
       <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs space-y-1.5">
-        <span className="font-bold text-[#0D5C58] block">Niat Puasa Sunnah:</span>
+        <span className="font-bold text-[#003B73] block">Niat Puasa Sunnah:</span>
         <p className="font-serif text-lg text-stone-800 text-right">
           نَوَيْتُ صَوْمَ يَوْمِ الإِثْنَيْنِ / الخَمِيْسِ سُنَّةً لِلَّهِ تَعَالَى
         </p>
@@ -2070,7 +2083,7 @@ function PanduanShalatFeatureView() {
   return (
     <div className="space-y-5">
       {/* Banner Hero Panduan Shalat */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-[#0D5C58]/10 via-[#0D5C58]/5 to-[#D4AF37]/10 border border-[#0D5C58]/20 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left shadow-2xs">
+      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-[#003B73]/10 via-[#003B73]/5 to-[#D4AF37]/10 border border-[#003B73]/20 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left shadow-2xs">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center p-2 rounded-2xl bg-white shadow-md border border-stone-200">
           <Image
             src="/images/icon-shalat.png"
@@ -2081,7 +2094,7 @@ function PanduanShalatFeatureView() {
           />
         </div>
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0D5C58] text-white text-[11px] font-semibold">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#003B73] text-white text-[11px] font-semibold">
             <ShalatIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span>Tuntunan Ibadah Shalat & Thaharah</span>
           </div>
@@ -2102,7 +2115,7 @@ function PanduanShalatFeatureView() {
             onClick={() => setSelectedId(p.id)}
             className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
               selectedId === p.id
-                ? "bg-[#0D5C58] text-white"
+                ? "bg-[#003B73] text-white"
                 : "bg-stone-100 text-stone-600 hover:bg-stone-200"
             }`}
           >
@@ -2126,7 +2139,7 @@ function PanduanShalatFeatureView() {
             key={idx}
             className="p-4 rounded-2xl bg-white border border-stone-200 space-y-2 shadow-sm"
           >
-            <h4 className="font-bold text-stone-900 text-sm text-[#0D5C58]">
+            <h4 className="font-bold text-stone-900 text-sm text-[#003B73]">
               {step.title}
             </h4>
             <p className="text-xs text-stone-700 leading-relaxed">
@@ -2139,7 +2152,7 @@ function PanduanShalatFeatureView() {
                   {step.readingArab}
                 </p>
                 {step.readingLatin && (
-                  <p className="text-xs text-[#0D5C58] italic font-sans">
+                  <p className="text-xs text-[#003B73] italic font-sans">
                     {step.readingLatin}
                   </p>
                 )}
@@ -2168,7 +2181,7 @@ function HaditsFeatureView() {
   return (
     <div className="space-y-5">
       {/* Banner Hero Hadits Pilihan */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-[#0D5C58]/10 via-[#0D5C58]/5 to-[#D4AF37]/10 border border-[#0D5C58]/20 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left shadow-2xs">
+      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-[#003B73]/10 via-[#003B73]/5 to-[#D4AF37]/10 border border-[#003B73]/20 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left shadow-2xs">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center p-2 rounded-2xl bg-white shadow-md border border-stone-200">
           <Image
             src="/images/icon-hadits.png"
@@ -2179,7 +2192,7 @@ function HaditsFeatureView() {
           />
         </div>
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0D5C58] text-white text-[11px] font-semibold">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#003B73] text-white text-[11px] font-semibold">
             <HaditsIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span>Koleksi Hadits Shahih Arba'in</span>
           </div>
@@ -2200,7 +2213,7 @@ function HaditsFeatureView() {
             onClick={() => setSelectedHaditsId(h.id)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
               selectedHaditsId === h.id
-                ? "bg-[#0D5C58] text-white"
+                ? "bg-[#003B73] text-white"
                 : "bg-stone-100 text-stone-600 hover:bg-stone-200"
             }`}
           >
@@ -2212,7 +2225,7 @@ function HaditsFeatureView() {
       {/* Selected Hadits Card */}
       <div className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200 shadow-sm space-y-4">
         <div className="border-b border-stone-100 pb-3">
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] uppercase">
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#003B73]/10 text-[#003B73] uppercase">
             {currentHadits.theme}
           </span>
           <h3 className="font-bold text-stone-900 text-base font-serif mt-1.5">
@@ -2234,7 +2247,7 @@ function HaditsFeatureView() {
         </div>
 
         <div className="space-y-2 border-t border-stone-100 pt-3">
-          <span className="text-xs font-bold text-[#0D5C58] block">
+          <span className="text-xs font-bold text-[#003B73] block">
             Pelajaran & Faedah Hadits (Fawaid):
           </span>
           <ul className="space-y-1.5 text-xs text-stone-600 list-disc list-inside">

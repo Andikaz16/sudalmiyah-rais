@@ -82,7 +82,7 @@ const initialNewsData: NewsItem[] = [
     id: "masjidmu-1",
     source: "MASJIDMU",
     badge: "MASJIDMU PERCONTOHAN",
-    badgeClass: "bg-[#0D5C58] text-amber-200 border border-amber-300/40",
+    badgeClass: "bg-[#003B73] text-amber-200 border border-amber-300/40",
     timeAgo: "1 jam lalu",
     publishedAt: "2026-10-12T08:00:00Z",
     sourceDomain: "masjidmu.or.id",
@@ -100,7 +100,7 @@ const initialNewsData: NewsItem[] = [
     id: "masjidmu-2",
     source: "MASJIDMU",
     badge: "MASJIDMU PERCONTOHAN",
-    badgeClass: "bg-[#0D5C58] text-amber-200 border border-amber-300/40",
+    badgeClass: "bg-[#003B73] text-amber-200 border border-amber-300/40",
     timeAgo: "4 jam lalu",
     publishedAt: "2026-10-12T05:00:00Z",
     sourceDomain: "lpcrpm.muhammadiyah.or.id",
@@ -118,7 +118,7 @@ const initialNewsData: NewsItem[] = [
     id: "masjidmu-3",
     source: "MASJIDMU",
     badge: "MASJIDMU PERCONTOHAN",
-    badgeClass: "bg-[#0D5C58] text-amber-200 border border-amber-300/40",
+    badgeClass: "bg-[#003B73] text-amber-200 border border-amber-300/40",
     timeAgo: "1 hari lalu",
     publishedAt: "2026-10-11T10:00:00Z",
     sourceDomain: "masjid.ums.ac.id",
@@ -307,7 +307,7 @@ export default function NewsSection() {
         {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-            Kabar MasjidMu Percontohan &amp; <span className="text-[#0D5C58]">Warta Persyarikatan</span>
+            Kabar MasjidMu Percontohan &amp; <span className="text-[#003B73]">Warta Persyarikatan</span>
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
             Warta aktual dan inspiratif: akselerasi gerakan MasjidMu Percontohan, kabar civitas akademika UMS, serta rilis resmi portal Suara Muhammadiyah dan Lensamu.
@@ -327,7 +327,7 @@ export default function NewsSection() {
               onClick={() => setSelectedCategory(cat.key as "ALL" | "MASJIDMU" | "UMS" | "PERSYARIKATAN")}
               className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
                 selectedCategory === cat.key
-                  ? "bg-[#0D5C58] text-white shadow-md scale-105"
+                  ? "bg-[#003B73] text-white shadow-md scale-105"
                   : "bg-white text-stone-600 border border-stone-200/90 hover:bg-stone-50 hover:text-stone-900"
               }`}
             >
@@ -376,7 +376,7 @@ export default function NewsSection() {
                   </div>
 
                   {/* News Title */}
-                  <h3 className="text-stone-900 font-bold text-base sm:text-lg leading-snug line-clamp-2 mb-2.5 font-sans group-hover:text-[#0D5C58] transition-colors">
+                  <h3 className="text-stone-900 font-bold text-base sm:text-lg leading-snug line-clamp-2 mb-2.5 font-sans group-hover:text-[#003B73] transition-colors">
                     {item.title}
                   </h3>
 
@@ -391,7 +391,7 @@ export default function NewsSection() {
               <div className="px-5 sm:px-6 pb-5 pt-3 border-t border-stone-100">
                 <button
                   onClick={() => setSelectedArticle(item)}
-                  className="text-stone-500 hover:text-[#0D5C58] transition-colors text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 focus:outline-none"
+                  className="text-stone-500 hover:text-[#003B73] transition-colors text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 focus:outline-none"
                 >
                   <span>BACA SELENGKAPNYA</span>
                   <span>&rarr;</span>
@@ -467,7 +467,7 @@ export default function NewsSection() {
                   href={selectedArticle.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-2 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] text-white text-xs font-bold text-center transition-colors cursor-pointer"
+                  className="px-5 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold text-center transition-colors cursor-pointer"
                 >
                   Kunjungi Sumber Resmi
                 </a>

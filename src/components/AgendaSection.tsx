@@ -52,7 +52,7 @@ export default function AgendaSection() {
         {/* Section Heading Centered */}
         <div className="text-center max-w-3xl mx-auto mb-10">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
-            Agenda & Kajian <span className="text-[#0D5C58]">Masjid Sudalmiyah</span>
+            Agenda &amp; Kajian <span className="text-[#003B73]">Masjid Sudalmiyah</span>
           </h1>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
             Ikuti kegiatan ibadah berjamaah, kajian tematik mahasiswa berkemajuan, serta kelas bimbingan tahsin Al-Qur&apos;an di lingkungan Kampus 2 UMS.
@@ -67,7 +67,7 @@ export default function AgendaSection() {
               onClick={() => setActiveCategory(c.id)}
               className={`px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeCategory === c.id
-                  ? "bg-[#0D5C58] text-white shadow-md shadow-[#0D5C58]/15"
+                  ? "bg-[#003B73] text-white shadow-md shadow-[#003B73]/15"
                   : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100/70 shadow-2xs"
               }`}
             >
@@ -117,7 +117,7 @@ export default function AgendaSection() {
                       />
                       {/* Top Badges Overlay */}
                       <div className="absolute top-3 left-3">
-                        <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-stone-200 text-[#0D5C58] shadow-sm">
+                        <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-stone-200 text-[#003B73] shadow-sm">
                           {item.category.replace(/_/g, " ")}
                         </span>
                       </div>
@@ -127,7 +127,7 @@ export default function AgendaSection() {
                             Wajib Registrasi
                           </span>
                         ) : (
-                          <span className="text-[10px] text-white bg-emerald-600 font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                          <span className="text-[10px] text-white bg-blue-700 font-semibold px-2.5 py-1 rounded-full shadow-sm">
                             Terbuka Umum
                           </span>
                         )}
@@ -137,13 +137,13 @@ export default function AgendaSection() {
                     {/* Card Content Body */}
                     <div className="p-6">
                       {/* Title */}
-                      <h3 className="text-base sm:text-lg font-bold text-stone-900 group-hover:text-[#0D5C58] transition-colors line-clamp-2 mb-3 font-serif">
+                      <h3 className="text-base sm:text-lg font-bold text-stone-900 group-hover:text-[#003B73] transition-colors line-clamp-2 mb-3 font-serif">
                         {item.title}
                       </h3>
 
                     {/* Speaker Info */}
                     <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-stone-200/80 mb-4 flex items-start gap-3">
-                      <div className="p-2 rounded-xl bg-[#0D5C58]/10 text-[#0D5C58] shrink-0">
+                      <div className="p-2 rounded-xl bg-[#003B73]/10 text-[#003B73] shrink-0">
                         <User className="w-4 h-4" />
                       </div>
                       <div>
@@ -187,7 +187,7 @@ export default function AgendaSection() {
                         <div className="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
                           <div
                             className={`h-full rounded-full transition-all duration-500 ${
-                              isFull ? "bg-rose-500" : "bg-[#0D5C58]"
+                              isFull ? "bg-rose-500" : "bg-[#003B73]"
                             }`}
                             style={{ width: `${quotaPercent}%` }}
                           />
@@ -206,7 +206,7 @@ export default function AgendaSection() {
                         className={`w-full text-center px-4 py-3 rounded-full text-xs sm:text-sm font-semibold transition-all ${
                           isFull
                             ? "bg-stone-200 text-stone-400 cursor-not-allowed"
-                            : "bg-[#0D5C58] hover:bg-[#0A4D4A] text-white shadow-md shadow-[#0D5C58]/15"
+                            : "bg-[#003B73] hover:bg-[#002855] text-white shadow-md shadow-[#003B73]/15"
                         }`}
                       >
                         {isFull ? "Kuota Penuh" : "Daftar Presensi Tiket"}

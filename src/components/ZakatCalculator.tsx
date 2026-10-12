@@ -150,7 +150,7 @@ export default function ZakatCalculator() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Banner Resmi Ketetapan BAZNAS RI 2026 */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-[#0D5C58]/10 via-[#0D5C58]/5 to-[#D4AF37]/15 border border-[#0D5C58]/20 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left shadow-2xs">
+      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-[#003B73]/10 via-[#003B73]/5 to-[#D4AF37]/15 border border-[#003B73]/20 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left shadow-2xs">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center p-1 rounded-2xl bg-white shadow-md border border-stone-200">
           <Image
             src="/images/icon-zakat.png"
@@ -161,7 +161,7 @@ export default function ZakatCalculator() {
           />
         </div>
         <div className="space-y-1 flex-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0D5C58] text-white text-[11px] font-semibold">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#003B73] text-white text-[11px] font-semibold">
             <ZakatIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span>Ketetapan Resmi BAZNAS RI 2026 M / 1447 H</span>
           </div>
@@ -174,7 +174,7 @@ export default function ZakatCalculator() {
         </div>
         <div className="shrink-0 p-2.5 rounded-2xl bg-white border border-stone-200 shadow-2xs text-center hidden md:block">
           <span className="text-[10px] text-stone-400 block font-semibold uppercase">Nisab Bulanan 2026</span>
-          <span className="text-xs font-bold text-[#0D5C58] font-mono">Rp7.640.144</span>
+          <span className="text-xs font-bold text-[#003B73] font-mono">Rp7.640.144</span>
         </div>
       </div>
 
@@ -194,7 +194,7 @@ export default function ZakatCalculator() {
               onClick={() => setActiveTab(t.id as ZakatTab)}
               className={`px-3.5 py-2 rounded-2xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === t.id
-                  ? "bg-[#0D5C58] text-white shadow-sm ring-2 ring-[#0D5C58]/20"
+                  ? "bg-[#003B73] text-white shadow-sm ring-2 ring-[#003B73]/20"
                   : "bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900"
               }`}
             >
@@ -213,7 +213,7 @@ export default function ZakatCalculator() {
           {/* Info Card Nisab BAZNAS 2026 */}
           <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-stone-700 space-y-1.5">
             <div className="flex items-center justify-between font-semibold text-stone-900 border-b border-stone-200/80 pb-1.5">
-              <span className="flex items-center gap-1.5 text-[#0D5C58]">
+              <span className="flex items-center gap-1.5 text-[#003B73]">
                 <Info className="w-4 h-4" />
                 <span>Nisab Resmi Zakat Penghasilan (SK Ketua BAZNAS No. 15/2026)</span>
               </span>
@@ -243,7 +243,7 @@ export default function ZakatCalculator() {
                   onClick={() => setIncomePeriod("bulan")}
                   className={`py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                     incomePeriod === "bulan"
-                      ? "bg-[#0D5C58] text-white"
+                      ? "bg-[#003B73] text-white"
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                   }`}
                 >
@@ -253,7 +253,7 @@ export default function ZakatCalculator() {
                   onClick={() => setIncomePeriod("tahun")}
                   className={`py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                     incomePeriod === "tahun"
-                      ? "bg-[#0D5C58] text-white"
+                      ? "bg-[#003B73] text-white"
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                   }`}
                 >
@@ -269,7 +269,7 @@ export default function ZakatCalculator() {
                   onClick={() => setIncomeCalculationMode("bruto")}
                   className={`py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                     incomeCalculationMode === "bruto"
-                      ? "bg-[#0D5C58] text-white"
+                      ? "bg-[#003B73] text-white"
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                   }`}
                 >
@@ -279,7 +279,7 @@ export default function ZakatCalculator() {
                   onClick={() => setIncomeCalculationMode("netto")}
                   className={`py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                     incomeCalculationMode === "netto"
-                      ? "bg-[#0D5C58] text-white"
+                      ? "bg-[#003B73] text-white"
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                   }`}
                 >
@@ -301,7 +301,7 @@ export default function ZakatCalculator() {
                   type="number"
                   value={mainSalary}
                   onChange={(e) => setMainSalary(Number(e.target.value))}
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#0D5C58]"
+                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#003B73]"
                 />
               </div>
             </div>
@@ -316,7 +316,7 @@ export default function ZakatCalculator() {
                   type="number"
                   value={otherIncome}
                   onChange={(e) => setOtherIncome(Number(e.target.value))}
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#0D5C58]"
+                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#003B73]"
                 />
               </div>
             </div>
@@ -332,7 +332,7 @@ export default function ZakatCalculator() {
                     type="number"
                     value={basicExpenses}
                     onChange={(e) => setBasicExpenses(Number(e.target.value))}
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#0D5C58]"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#003B73]"
                   />
                 </div>
               </div>
@@ -369,7 +369,7 @@ export default function ZakatCalculator() {
               Kewajiban Zakat Penghasilan (2,5% {incomePeriod === "bulan" ? "per Bulan" : "per Tahun"}):
             </span>
 
-            <span className="text-3xl sm:text-4xl font-black text-[#0D5C58] tracking-tight block font-mono">
+            <span className="text-3xl sm:text-4xl font-black text-[#003B73] tracking-tight block font-mono">
               {formatRupiah(zakatPenghasilanNominal)}
             </span>
 
@@ -390,7 +390,7 @@ export default function ZakatCalculator() {
           {/* Ketentuan Nisab Maal BAZNAS 2026 */}
           <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-stone-700 space-y-1.5">
             <div className="flex items-center justify-between font-semibold text-stone-900 border-b border-stone-200/80 pb-1.5">
-              <span className="flex items-center gap-1.5 text-[#0D5C58]">
+              <span className="flex items-center gap-1.5 text-[#003B73]">
                 <Coins className="w-4 h-4" />
                 <span>Ketentuan Zakat Maal BAZNAS (Harta Simpanan 1 Tahun / Haul)</span>
               </span>
@@ -422,7 +422,7 @@ export default function ZakatCalculator() {
                   type="number"
                   value={savingsValue}
                   onChange={(e) => setSavingsValue(Number(e.target.value))}
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#0D5C58]"
+                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#003B73]"
                 />
               </div>
             </div>
@@ -438,7 +438,7 @@ export default function ZakatCalculator() {
                     type="number"
                     value={goldValue}
                     onChange={(e) => setGoldValue(Number(e.target.value))}
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#0D5C58]"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#003B73]"
                   />
                 </div>
               </div>
@@ -453,7 +453,7 @@ export default function ZakatCalculator() {
                     type="number"
                     value={businessAssets}
                     onChange={(e) => setBusinessAssets(Number(e.target.value))}
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#0D5C58]"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#003B73]"
                   />
                 </div>
               </div>
@@ -469,7 +469,7 @@ export default function ZakatCalculator() {
                   type="number"
                   value={shortTermDebts}
                   onChange={(e) => setShortTermDebts(Number(e.target.value))}
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#0D5C58]"
+                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#003B73]"
                 />
               </div>
             </div>
@@ -481,7 +481,7 @@ export default function ZakatCalculator() {
                   type="checkbox"
                   checked={isHaulMet}
                   onChange={(e) => setIsHaulMet(e.target.checked)}
-                  className="w-4 h-4 accent-[#0D5C58] rounded cursor-pointer"
+                  className="w-4 h-4 accent-[#003B73] rounded cursor-pointer"
                 />
                 <span>Harta telah genap dimiliki selama 1 tahun Hijriah (memenuhi syarat <em>haul</em>).</span>
               </label>
@@ -520,7 +520,7 @@ export default function ZakatCalculator() {
               Kewajiban Zakat Maal (2,5% per Tahun):
             </span>
 
-            <span className="text-3xl sm:text-4xl font-black text-[#0D5C58] tracking-tight block font-mono">
+            <span className="text-3xl sm:text-4xl font-black text-[#003B73] tracking-tight block font-mono">
               {formatRupiah(zakatMaalNominal)}
             </span>
 
@@ -539,7 +539,7 @@ export default function ZakatCalculator() {
           {/* Info Card SK BAZNAS RI No. 14/2026 */}
           <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-stone-700 space-y-1.5">
             <div className="flex items-center justify-between font-semibold text-stone-900 border-b border-stone-200/80 pb-1.5">
-              <span className="flex items-center gap-1.5 text-[#0D5C58]">
+              <span className="flex items-center gap-1.5 text-[#003B73]">
                 <Users className="w-4 h-4" />
                 <span>Ketetapan Zakat Fitrah Ramadan 1447 H / 2026 M (SK BAZNAS RI No. 14/2026)</span>
               </span>
@@ -571,7 +571,7 @@ export default function ZakatCalculator() {
                 min={1}
                 value={fitrahMembers}
                 onChange={(e) => setFitrahMembers(Math.max(1, Number(e.target.value)))}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#0D5C58]"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#003B73]"
               />
             </div>
 
@@ -584,7 +584,7 @@ export default function ZakatCalculator() {
                   onClick={() => setFitrahPriceMode("nasional")}
                   className={`p-2.5 rounded-xl border font-semibold transition-all cursor-pointer text-left ${
                     fitrahPriceMode === "nasional"
-                      ? "bg-[#0D5C58]/10 border-[#0D5C58] text-[#0D5C58]"
+                      ? "bg-[#003B73]/10 border-[#003B73] text-[#003B73]"
                       : "bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100"
                   }`}
                 >
@@ -596,7 +596,7 @@ export default function ZakatCalculator() {
                   onClick={() => setFitrahPriceMode("kustom")}
                   className={`p-2.5 rounded-xl border font-semibold transition-all cursor-pointer text-left ${
                     fitrahPriceMode === "kustom"
-                      ? "bg-[#0D5C58]/10 border-[#0D5C58] text-[#0D5C58]"
+                      ? "bg-[#003B73]/10 border-[#003B73] text-[#003B73]"
                       : "bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100"
                   }`}
                 >
@@ -631,7 +631,7 @@ export default function ZakatCalculator() {
             </span>
 
             <div className="space-y-1">
-              <span className="text-3xl sm:text-4xl font-black text-[#0D5C58] tracking-tight block font-mono">
+              <span className="text-3xl sm:text-4xl font-black text-[#003B73] tracking-tight block font-mono">
                 {formatRupiah(totalFitrahRupiah)}
               </span>
               <span className="text-xs text-stone-600 font-semibold block">
@@ -654,7 +654,7 @@ export default function ZakatCalculator() {
           {/* Ketetapan BAZNAS RI Fidyah 2026 */}
           <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-stone-700 space-y-1.5">
             <div className="flex items-center justify-between font-semibold text-stone-900 border-b border-stone-200/80 pb-1.5">
-              <span className="flex items-center gap-1.5 text-[#0D5C58]">
+              <span className="flex items-center gap-1.5 text-[#003B73]">
                 <Calendar className="w-4 h-4" />
                 <span>Ketetapan Fidyah BAZNAS RI Tahun 2026</span>
               </span>
@@ -676,7 +676,7 @@ export default function ZakatCalculator() {
                 min={1}
                 value={missedDays}
                 onChange={(e) => setMissedDays(Math.max(1, Number(e.target.value)))}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#0D5C58]"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#003B73]"
               />
             </div>
           </div>
@@ -687,7 +687,7 @@ export default function ZakatCalculator() {
               Total Fidyah yang Wajib Disalurkan ({missedDays} Hari):
             </span>
 
-            <span className="text-3xl sm:text-4xl font-black text-[#0D5C58] tracking-tight block font-mono">
+            <span className="text-3xl sm:text-4xl font-black text-[#003B73] tracking-tight block font-mono">
               {formatRupiah(totalFidyahRupiah)}
             </span>
 
@@ -710,7 +710,7 @@ export default function ZakatCalculator() {
           {/* Ketentuan BAZNAS Pertanian */}
           <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-stone-700 space-y-1.5">
             <div className="flex items-center justify-between font-semibold text-stone-900 border-b border-stone-200/80 pb-1.5">
-              <span className="flex items-center gap-1.5 text-[#0D5C58]">
+              <span className="flex items-center gap-1.5 text-[#003B73]">
                 <Wheat className="w-4 h-4" />
                 <span>Ketentuan Zakat Pertanian / Hasil Tani BAZNAS</span>
               </span>
@@ -741,7 +741,7 @@ export default function ZakatCalculator() {
                 type="number"
                 value={harvestWeight}
                 onChange={(e) => setHarvestWeight(Number(e.target.value))}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#0D5C58]"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm font-mono text-stone-900 focus:outline-none focus:border-[#003B73]"
               />
             </div>
 
@@ -754,7 +754,7 @@ export default function ZakatCalculator() {
                   onClick={() => setIrrigationType("irigasi")}
                   className={`p-2.5 rounded-xl border font-semibold transition-all cursor-pointer text-left ${
                     irrigationType === "irigasi"
-                      ? "bg-[#0D5C58]/10 border-[#0D5C58] text-[#0D5C58]"
+                      ? "bg-[#003B73]/10 border-[#003B73] text-[#003B73]"
                       : "bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100"
                   }`}
                 >
@@ -766,7 +766,7 @@ export default function ZakatCalculator() {
                   onClick={() => setIrrigationType("tadah_hujan")}
                   className={`p-2.5 rounded-xl border font-semibold transition-all cursor-pointer text-left ${
                     irrigationType === "tadah_hujan"
-                      ? "bg-[#0D5C58]/10 border-[#0D5C58] text-[#0D5C58]"
+                      ? "bg-[#003B73]/10 border-[#003B73] text-[#003B73]"
                       : "bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100"
                   }`}
                 >
@@ -823,7 +823,7 @@ export default function ZakatCalculator() {
             </span>
 
             <div className="space-y-1">
-              <span className="text-3xl sm:text-4xl font-black text-[#0D5C58] tracking-tight block font-mono">
+              <span className="text-3xl sm:text-4xl font-black text-[#003B73] tracking-tight block font-mono">
                 {zakatPertanianKg.toFixed(1)} Kg Beras
               </span>
               <span className="text-sm font-bold text-stone-700 block font-mono">
@@ -843,7 +843,7 @@ export default function ZakatCalculator() {
       {/* ========================================================= */}
       <div className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200 shadow-sm text-left space-y-3.5 text-xs text-stone-700">
         <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
-          <Info className="w-4 h-4 text-[#0D5C58] shrink-0" />
+          <Info className="w-4 h-4 text-[#003B73] shrink-0" />
           <h3 className="font-bold text-stone-900 text-sm font-serif">
             Sumber Data Resmi Badan Amil Zakat Nasional (BAZNAS) RI
           </h3>
@@ -851,14 +851,14 @@ export default function ZakatCalculator() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 leading-relaxed">
           <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
-            <h5 className="font-bold text-[#0D5C58]">1. SK Ketua BAZNAS RI No. 15 Tahun 2026:</h5>
+            <h5 className="font-bold text-[#003B73]">1. SK Ketua BAZNAS RI No. 15 Tahun 2026:</h5>
             <p className="text-[11px] text-stone-600">
               Menetapkan nisab zakat pendapatan dan jasa tahun 2026 mengacu pada 85 gram emas, yaitu sebesar <strong>Rp91.681.728 per tahun</strong> atau <strong>Rp7.640.144 per bulan</strong> dengan kadar zakat 2,5% dari penghasilan yang telah mencapai nisab.
             </p>
           </div>
 
           <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
-            <h5 className="font-bold text-[#0D5C58]">2. SK Ketua BAZNAS RI No. 14 Tahun 2026:</h5>
+            <h5 className="font-bold text-[#003B73]">2. SK Ketua BAZNAS RI No. 14 Tahun 2026:</h5>
             <p className="text-[11px] text-stone-600">
               Menetapkan nilai zakat fitrah tahun 1447 H / 2026 M setara dengan <strong>2,5 kg atau 3,5 liter beras premium per jiwa</strong>, atau nilai uang tunai sebesar <strong>Rp50.000 per jiwa</strong> secara nasional. Serta fidyah puasa ditetapkan sebesar <strong>Rp65.000 per jiwa / hari</strong>.
             </p>
@@ -866,7 +866,7 @@ export default function ZakatCalculator() {
         </div>
 
         <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1 text-[11px] text-stone-600">
-          <h5 className="font-bold text-[#0D5C58]">3. Ketentuan Zakat Maal & Pertanian:</h5>
+          <h5 className="font-bold text-[#003B73]">3. Ketentuan Zakat Maal & Pertanian:</h5>
           <p>
             Zakat Maal (tabungan, emas, perdagangan) wajib dikeluarkan 2,5% bila telah mencapai nisab emas 85 gram (Rp91.681.728) dan genap haul 1 tahun hijriah. Adapun zakat pertanian dikeluarkan seketika saat panen apabila mencapai nisab 653 kg beras (kadar 5% untuk irigasi teknis/berbayar atau 10% untuk tadah hujan alami).
           </p>

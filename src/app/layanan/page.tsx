@@ -95,7 +95,7 @@ export default function LayananPage() {
         <section className="bg-white border-b border-stone-200 py-12 text-center">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="text-3xl sm:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
-              Peminjaman Fasilitas & <span className="text-[#0D5C58]">Ruang Masjid</span>
+              Peminjaman Fasilitas & <span className="text-[#003B73]">Ruang Masjid</span>
             </h1>
             <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
               Fasilitas Masjid Sudalmiyah Rais dapat dimanfaatkan untuk kegiatan organisasi otonom Muhammadiyah (IMM), himpunan mahasiswa prodi (HMP), unit kegiatan mahasiswa, serta kajian keislaman kampus.
@@ -144,7 +144,7 @@ export default function LayananPage() {
                         placeholder="Contoh: Muhammad Ihsan"
                         value={formData.applicantName}
                         onChange={(e) => setFormData({ ...formData, applicantName: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#0D5C58]"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
                       />
                     </div>
                     <div>
@@ -157,7 +157,7 @@ export default function LayananPage() {
                         placeholder="Contoh: L200210044"
                         value={formData.nim}
                         onChange={(e) => setFormData({ ...formData, nim: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm uppercase focus:outline-none focus:border-[#0D5C58]"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm uppercase focus:outline-none focus:border-[#003B73]"
                       />
                     </div>
                   </div>
@@ -173,7 +173,7 @@ export default function LayananPage() {
                         placeholder="Contoh: IMM Korkom UMS / HMP Informatika"
                         value={formData.organization}
                         onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#0D5C58]"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
                       />
                     </div>
                     <div>
@@ -186,7 +186,7 @@ export default function LayananPage() {
                         placeholder="081234567890"
                         value={formData.applicantPhone}
                         onChange={(e) => setFormData({ ...formData, applicantPhone: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#0D5C58]"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
                       />
                     </div>
                   </div>
@@ -203,7 +203,7 @@ export default function LayananPage() {
                           facilityName: e.target.value as FacilityBooking["facilityName"],
                         })
                       }
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#0D5C58]"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
                     >
                       <option value="Aula Utama Lt 1">Aula Utama Serbaguna Lantai 1 (Kapasitas 300 org)</option>
                       <option value="Ruang Rapat Takmir">Ruang Rapat Takmir (Kapasitas 25 org)</option>
@@ -222,7 +222,7 @@ export default function LayananPage() {
                       placeholder="Contoh: Pelatihan Kepemimpinan Kader & Kajian Bulanan"
                       value={formData.eventTitle}
                       onChange={(e) => setFormData({ ...formData, eventTitle: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#0D5C58]"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
                     />
                   </div>
 
@@ -236,7 +236,7 @@ export default function LayananPage() {
                         required
                         value={formData.eventDate}
                         onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#0D5C58]"
+                        className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
                       />
                     </div>
                     <div>
@@ -248,7 +248,7 @@ export default function LayananPage() {
                         required
                         value={formData.startTime}
                         onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#0D5C58]"
+                        className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
                       />
                     </div>
                     <div>
@@ -260,7 +260,7 @@ export default function LayananPage() {
                         required
                         value={formData.endTime}
                         onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#0D5C58]"
+                        className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
                       />
                     </div>
                   </div>
@@ -269,7 +269,7 @@ export default function LayananPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full text-center px-6 py-3.5 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] disabled:bg-stone-300 text-white font-bold text-sm shadow-md transition-colors"
+                      className="w-full text-center px-6 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] disabled:bg-stone-300 text-white font-bold text-sm shadow-md transition-colors"
                     >
                       {loading ? "Mengirim Permohonan..." : "Kirim Permohonan Izin Fasilitas"}
                     </button>

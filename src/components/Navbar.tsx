@@ -71,8 +71,8 @@ export default function Navbar() {
                   href={link.href}
                   className={`px-3.5 py-2 rounded-full text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? "text-[#0D5C58] font-semibold bg-[#0D5C58]/10"
-                      : "text-stone-600 hover:text-[#0D5C58] hover:bg-stone-100/60"
+                      ? "text-[#003B73] font-semibold bg-[#003B73]/10"
+                      : "text-stone-600 hover:text-[#003B73] hover:bg-stone-100/60"
                   }`}
                 >
                   {link.label}
@@ -86,14 +86,14 @@ export default function Navbar() {
             {user ? (
               <Link
                 href="/admin"
-                className="px-6 py-2.5 rounded-full bg-[#0D5C58] hover:bg-[#094744] text-white text-xs sm:text-sm font-semibold shadow-sm transition-all hover:scale-[1.02]"
+                className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-semibold shadow-sm transition-all hover:scale-[1.02]"
               >
                 Panel Takmir
               </Link>
             ) : (
               <Link
                 href="/auth/login"
-                className="px-6 py-2.5 rounded-full bg-[#0D5C58] hover:bg-[#094744] text-white text-xs sm:text-sm font-semibold shadow-sm shadow-[#0D5C58]/15 transition-all hover:scale-[1.02]"
+                className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-semibold shadow-sm shadow-[#003B73]/15 transition-all hover:scale-[1.02]"
               >
                 Portal Pengurus
               </Link>
@@ -125,7 +125,7 @@ export default function Navbar() {
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center px-4 py-3 rounded-xl text-sm font-medium ${
                   isActive
-                    ? "bg-[#0D5C58]/10 text-[#0D5C58] font-bold"
+                    ? "bg-[#003B73]/10 text-[#003B73] font-bold"
                     : "text-stone-700 hover:bg-stone-100"
                 }`}
               >
@@ -138,7 +138,7 @@ export default function Navbar() {
               <Link
                 href="/admin"
                 onClick={() => setIsOpen(false)}
-                className="block text-center w-full px-4 py-3 rounded-full bg-[#0D5C58] text-white font-semibold text-sm"
+                className="block text-center w-full px-4 py-3 rounded-full bg-[#003B73] text-white font-semibold text-sm"
               >
                 Panel Takmir Masjid
               </Link>
@@ -146,7 +146,7 @@ export default function Navbar() {
               <Link
                 href="/auth/login"
                 onClick={() => setIsOpen(false)}
-                className="block text-center w-full px-4 py-3 rounded-full bg-[#0D5C58] text-white font-semibold text-sm shadow-md"
+                className="block text-center w-full px-4 py-3 rounded-full bg-[#003B73] text-white font-semibold text-sm shadow-md"
               >
                 Portal Pengurus
               </Link>

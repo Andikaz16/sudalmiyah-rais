@@ -42,7 +42,7 @@ export default function DonationSection() {
         {/* Section Title */}
         <div className="text-center max-w-3xl mx-auto mb-10">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
-            Infaq Digital <span className="text-[#0D5C58]">QRIS</span>
+            Infaq Digital <span className="text-[#003B73]">QRIS</span>
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
             Salurkan infaq dan sedekah jariyah secara mudah, amanah, dan berkah melalui pemindaian kode QRIS resmi Masjid Sudalmiyah Rais Kampus 2 UMS.
@@ -94,7 +94,7 @@ export default function DonationSection() {
                   <button
                     type="button"
                     onClick={handleDownloadQRIS}
-                    className="w-full text-center px-4 py-3 rounded-full bg-[#0D5C58] hover:bg-[#094744] text-white text-xs font-bold transition-all shadow-sm active:scale-[0.99]"
+                    className="w-full text-center px-4 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-sm active:scale-[0.99]"
                   >
                     Unduh Gambar QRIS
                   </button>
@@ -110,7 +110,7 @@ export default function DonationSection() {
             {/* Right Column: Panduan Scan QRIS & Amanah Penyaluran (7 Cols) */}
             <div className="lg:col-span-7 flex flex-col justify-center space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C58]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#003B73]">
                   Kemudahan Berinfaq Digital
                 </span>
                 <h3 className="text-xl sm:text-3xl font-bold text-stone-900 mt-1 font-serif">
@@ -124,7 +124,7 @@ export default function DonationSection() {
               {/* Steps List */}
               <div className="space-y-3.5">
                 <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
-                  <div className="w-7 h-7 rounded-xl bg-[#0D5C58] text-white text-xs font-bold flex items-center justify-center shrink-0">
+                  <div className="w-7 h-7 rounded-xl bg-[#003B73] text-white text-xs font-bold flex items-center justify-center shrink-0">
                     1
                   </div>
                   <div>
@@ -138,7 +138,7 @@ export default function DonationSection() {
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
-                  <div className="w-7 h-7 rounded-xl bg-[#0D5C58] text-white text-xs font-bold flex items-center justify-center shrink-0">
+                  <div className="w-7 h-7 rounded-xl bg-[#003B73] text-white text-xs font-bold flex items-center justify-center shrink-0">
                     2
                   </div>
                   <div>
@@ -152,12 +152,12 @@ export default function DonationSection() {
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
-                  <div className="w-7 h-7 rounded-xl bg-[#0D5C58] text-white text-xs font-bold flex items-center justify-center shrink-0">
+                  <div className="w-7 h-7 rounded-xl bg-[#003B73] text-white text-xs font-bold flex items-center justify-center shrink-0">
                     3
                   </div>
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-stone-900">
-                      Pastikan Nama Penerima & Masukkan Nominal
+                      Pastikan Nama Penerima &amp; Masukkan Nominal
                     </h4>
                     <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
                       Periksa nama merchant: <strong className="text-stone-900">{qris.merchantName || "MASJID SUDALMIYAH RAIS UMS"}</strong>, kemudian ketik nominal infaq sesuai keikhlasan hati Anda.
@@ -166,7 +166,7 @@ export default function DonationSection() {
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
-                  <div className="w-7 h-7 rounded-xl bg-[#0D5C58] text-white text-xs font-bold flex items-center justify-center shrink-0">
+                  <div className="w-7 h-7 rounded-xl bg-[#003B73] text-white text-xs font-bold flex items-center justify-center shrink-0">
                     4
                   </div>
                   <div>
@@ -183,8 +183,8 @@ export default function DonationSection() {
               {/* Amanah & Keamanan Card */}
               <div className="p-4 rounded-2xl bg-white border border-[#D4AF37]/50 shadow-sm flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#0D5C58]/10 text-[#0D5C58] flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-5 h-5 text-[#0D5C58]" />
+                  <div className="w-9 h-9 rounded-xl bg-[#003B73]/10 text-[#003B73] flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-[#003B73]" />
                   </div>
                   <div>
                     <div className="text-xs font-bold text-stone-900">

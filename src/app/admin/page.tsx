@@ -249,7 +249,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans pb-16">
       {/* Top Admin Header */}
-      <header className="bg-[#093836] border-b border-stone-800 text-white sticky top-0 z-40">
+      <header className="bg-[#001F3F] border-b border-stone-800 text-white sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 p-1.5 flex items-center justify-center shadow-md shrink-0 hover:bg-white/20 transition-colors">
@@ -305,7 +305,7 @@ export default function AdminDashboardPage() {
                   Kegiatan aktif
                 </div>
               </div>
-              <div className="p-3 rounded-2xl bg-[#0D5C58]/10 text-[#0D5C58]">
+              <div className="p-3 rounded-2xl bg-[#003B73]/10 text-[#003B73]">
                 <Calendar className="w-5 h-5" />
               </div>
             </div>
@@ -316,14 +316,14 @@ export default function AdminDashboardPage() {
                 <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
                   Jamaah Terdaftar
                 </span>
-                <div className="text-2xl font-black text-[#0D5C58] mt-1 font-mono">
+                <div className="text-2xl font-black text-[#003B73] mt-1 font-mono">
                   {stats.totalRegistrations}
                 </div>
                 <div className="text-[10px] text-stone-400 mt-0.5">
                   Presensi terverifikasi
                 </div>
               </div>
-              <div className="p-3 rounded-2xl bg-[#0D5C58]/10 text-[#0D5C58]">
+              <div className="p-3 rounded-2xl bg-[#003B73]/10 text-[#003B73]">
                 <Users className="w-5 h-5" />
               </div>
             </div>
@@ -336,7 +336,7 @@ export default function AdminDashboardPage() {
             onClick={() => setActiveTab("AGENDAS")}
             className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
               activeTab === "AGENDAS"
-                ? "bg-[#0D5C58] text-white font-bold shadow-md shadow-[#0D5C58]/15"
+                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
@@ -346,7 +346,7 @@ export default function AdminDashboardPage() {
             onClick={() => setActiveTab("PETUGAS_JUMAT")}
             className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
               activeTab === "PETUGAS_JUMAT"
-                ? "bg-[#0D5C58] text-white font-bold shadow-md shadow-[#0D5C58]/15"
+                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
@@ -356,7 +356,7 @@ export default function AdminDashboardPage() {
             onClick={() => setActiveTab("QRIS_INFAQ")}
             className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
               activeTab === "QRIS_INFAQ"
-                ? "bg-[#0D5C58] text-white font-bold shadow-md shadow-[#0D5C58]/15"
+                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
@@ -366,7 +366,7 @@ export default function AdminDashboardPage() {
             onClick={() => setActiveTab("REGISTRATIONS")}
             className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
               activeTab === "REGISTRATIONS"
-                ? "bg-[#0D5C58] text-white font-bold shadow-md shadow-[#0D5C58]/15"
+                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
@@ -384,7 +384,7 @@ export default function AdminDashboardPage() {
               </div>
               <button
                 onClick={() => setIsNewAgendaOpen(true)}
-                className="px-5 py-2.5 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] text-white text-xs font-bold shadow-md transition-colors whitespace-nowrap"
+                className="px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md transition-colors whitespace-nowrap"
               >
                 Tambah Agenda Baru
               </button>
@@ -408,7 +408,7 @@ export default function AdminDashboardPage() {
                         className="object-cover"
                       />
                       <div className="absolute top-2.5 left-2.5">
-                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/90 backdrop-blur-sm text-[#0D5C58] border border-stone-200">
+                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/90 backdrop-blur-sm text-[#003B73] border border-stone-200">
                           {item.category.replace(/_/g, " ")}
                         </span>
                       </div>
@@ -471,7 +471,7 @@ export default function AdminDashboardPage() {
                       />
                     </div>
                     {/* Media Upload Input */}
-                    <label className="cursor-pointer px-4 py-2 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] text-white text-xs font-semibold text-center transition-colors shadow-sm">
+                    <label className="cursor-pointer px-4 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-semibold text-center transition-colors shadow-sm">
                       {uploadingKhatibPhoto ? "Mengunggah..." : "Ganti Foto Khatib (Media)"}
                       <input
                         type="file"
@@ -576,7 +576,7 @@ export default function AdminDashboardPage() {
                 {/* Imam & Muadzin Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/80 space-y-3">
-                    <span className="text-[11px] font-bold text-[#0D5C58] uppercase tracking-wider block">
+                    <span className="text-[11px] font-bold text-[#003B73] uppercase tracking-wider block">
                       Petugas Imam Shalat Jumat
                     </span>
                     <div>
@@ -655,7 +655,7 @@ export default function AdminDashboardPage() {
                   <button
                     type="submit"
                     disabled={savingFriday}
-                    className="px-8 py-3 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] text-white text-xs font-bold transition-all shadow-md shadow-[#0D5C58]/20 disabled:opacity-50"
+                    className="px-8 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50"
                   >
                     {savingFriday ? "Menyimpan Perubahan..." : "Simpan Perubahan Jadwal Jumat"}
                   </button>
@@ -692,7 +692,7 @@ export default function AdminDashboardPage() {
                 
                 {/* QRIS Image & Upload Row */}
                 <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-stone-200/90 space-y-4">
-                  <span className="text-[11px] font-bold text-[#0D5C58] uppercase tracking-wider block">
+                  <span className="text-[11px] font-bold text-[#003B73] uppercase tracking-wider block">
                     Gambar Kode QRIS Resmi Masjid
                   </span>
 
@@ -800,7 +800,7 @@ export default function AdminDashboardPage() {
                   <button
                     type="submit"
                     disabled={savingQris}
-                    className="px-8 py-3 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] text-white text-xs font-bold transition-all shadow-md shadow-[#0D5C58]/20 disabled:opacity-50"
+                    className="px-8 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50"
                   >
                     {savingQris ? "Menyimpan Pengaturan..." : "Simpan Pengaturan QRIS"}
                   </button>
@@ -837,7 +837,7 @@ export default function AdminDashboardPage() {
                   <tbody className="divide-y divide-stone-100 font-medium">
                     {registrations.map((reg) => (
                       <tr key={reg.id} className="hover:bg-stone-50">
-                        <td className="py-3.5 px-4 font-mono font-bold text-[#0D5C58]">
+                        <td className="py-3.5 px-4 font-mono font-bold text-[#003B73]">
                           {reg.ticketCode}
                         </td>
                         <td className="py-3.5 px-4 text-stone-900">{reg.fullName}</td>
@@ -894,7 +894,7 @@ export default function AdminDashboardPage() {
                     />
                   </div>
                   <div className="flex-1 space-y-1">
-                    <label className="cursor-pointer inline-block px-4 py-2 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] text-white text-xs font-semibold transition-colors">
+                    <label className="cursor-pointer inline-block px-4 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-semibold transition-colors">
                       {uploadingAgendaThumbnail ? "Mengunggah..." : "Pilih Berkas Media"}
                       <input
                         type="file"
@@ -1026,7 +1026,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="submit"
                   disabled={savingAgenda || uploadingAgendaThumbnail}
-                  className="px-6 py-2 rounded-full bg-[#0D5C58] hover:bg-[#0A4D4A] text-white text-xs font-bold transition-colors disabled:opacity-50"
+                  className="px-6 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-colors disabled:opacity-50"
                 >
                   {savingAgenda ? "Menyimpan..." : "Simpan Agenda"}
                 </button>

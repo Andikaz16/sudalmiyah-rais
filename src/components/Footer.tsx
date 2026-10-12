@@ -12,7 +12,7 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="bg-[#093836] border-t border-stone-800 text-stone-300 text-xs sm:text-sm pt-14 pb-24 md:pb-14">
+    <footer className="bg-[#001F3F] border-t border-blue-950 text-stone-300 text-xs sm:text-sm pt-14 pb-24 md:pb-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Identity */}

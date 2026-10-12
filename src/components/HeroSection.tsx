@@ -91,7 +91,7 @@ export default function HeroSection() {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4 animate-fade-up delay-300">
           <Link
             href="/agenda"
-            className="px-8 py-3.5 rounded-full bg-[#0D5C58] hover:bg-[#094744] text-white text-sm sm:text-base font-bold shadow-2xl border border-emerald-400/40 hover:scale-105 active:scale-95 transition-all duration-300"
+            className="px-8 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-sm sm:text-base font-bold shadow-2xl border border-amber-400/40 hover:scale-105 active:scale-95 transition-all duration-300"
           >
             Daftar Kajian & Kegiatan
           </Link>

@@ -71,7 +71,7 @@ export default function JadwalPage() {
         {/* Header Title */}
         <div className="mb-8 text-center max-w-3xl mx-auto space-y-3">
           <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 tracking-tight font-serif">
-            Jadwal Shalat & <span className="text-[#0D5C58]">Imsakiyah Surakarta</span>
+            Jadwal Shalat & <span className="text-[#003B73]">Imsakiyah Surakarta</span>
           </h1>
           <p className="text-xs sm:text-sm text-stone-600 leading-relaxed max-w-2xl mx-auto">
             Dihitung berdasarkan hisab hakiki astronomis titik koordinat Masjid Sudalmiyah Rais Kampus 2 Universitas Muhammadiyah Surakarta (-7.5583° LS, 110.7719° BT) sesuai Putusan Munas Tarjih PP Muhammadiyah ke-31 (Subuh -18°, Isya -18°, Ihtiyat +2 menit).
@@ -105,7 +105,7 @@ export default function JadwalPage() {
                   onClick={() => setMethod("tarjih")}
                   className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
                     method === "tarjih"
-                      ? "bg-[#0D5C58] text-white shadow-xs font-bold"
+                      ? "bg-[#003B73] text-white shadow-xs font-bold"
                       : "text-stone-600 hover:text-stone-900"
                   }`}
                   title="Standar resmi MASA (Muhammadiyah Super App) & Majelis Tarjih"
@@ -117,7 +117,7 @@ export default function JadwalPage() {
                   onClick={() => setMethod("kemenag")}
                   className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
                     method === "kemenag"
-                      ? "bg-[#0D5C58] text-white shadow-xs font-bold"
+                      ? "bg-[#003B73] text-white shadow-xs font-bold"
                       : "text-stone-600 hover:text-stone-900"
                   }`}
                   title="Standar Kementerian Agama RI"
@@ -130,7 +130,7 @@ export default function JadwalPage() {
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                className="px-3.5 py-2 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-800 text-xs font-semibold focus:outline-none focus:border-[#0D5C58] cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-800 text-xs font-semibold focus:outline-none focus:border-[#003B73] cursor-pointer"
               >
                 {monthNames.map((name, idx) => (
                   <option key={idx} value={idx}>
@@ -142,7 +142,7 @@ export default function JadwalPage() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-4 py-2 rounded-xl bg-[#0D5C58] hover:bg-[#0A4D4A] active:scale-95 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#003B73] hover:bg-[#002855] active:scale-95 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
               >
                 Cetak Jadwal
               </button>
@@ -151,7 +151,7 @@ export default function JadwalPage() {
 
           {/* Educational Note: Tarjih vs Kemenag */}
           <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200/90 text-xs space-y-1.5">
-            <div className="flex items-center gap-2 font-bold text-[#0D5C58]">
+            <div className="flex items-center gap-2 font-bold text-[#003B73]">
               <Info className="w-4 h-4 shrink-0" />
               <span>Ketetapan Hisab Majelis Tarjih dan Tajdid PP Muhammadiyah (Aplikasi MASA):</span>
             </div>
@@ -167,13 +167,13 @@ export default function JadwalPage() {
                 <tr className="border-b border-stone-200 text-stone-500 uppercase text-[11px] tracking-wider bg-[#FAF8F5]">
                   <th className="py-3 px-4 font-semibold">Tanggal</th>
                   <th className="py-3 px-3 font-semibold text-stone-400">Imsak</th>
-                  <th className="py-3 px-3 font-semibold text-[#0D5C58]">Subuh</th>
+                  <th className="py-3 px-3 font-semibold text-[#003B73]">Subuh</th>
                   <th className="py-3 px-3 font-semibold text-stone-400">Terbit</th>
                   <th className="py-3 px-3 font-semibold text-stone-500">Dhuha</th>
-                  <th className="py-3 px-3 font-semibold text-[#0D5C58]">Dzuhur</th>
-                  <th className="py-3 px-3 font-semibold text-[#0D5C58]">Ashar</th>
-                  <th className="py-3 px-3 font-semibold text-[#0D5C58]">Maghrib</th>
-                  <th className="py-3 px-3 font-semibold text-[#0D5C58]">Isya</th>
+                  <th className="py-3 px-3 font-semibold text-[#003B73]">Dzuhur</th>
+                  <th className="py-3 px-3 font-semibold text-[#003B73]">Ashar</th>
+                  <th className="py-3 px-3 font-semibold text-[#003B73]">Maghrib</th>
+                  <th className="py-3 px-3 font-semibold text-[#003B73]">Isya</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100 font-mono">
@@ -182,26 +182,26 @@ export default function JadwalPage() {
                     key={item.day}
                     className={`transition-colors ${
                       item.isToday
-                        ? "bg-[#0D5C58]/10 font-bold text-stone-900"
+                        ? "bg-[#003B73]/10 font-bold text-stone-900"
                         : "hover:bg-stone-50 text-stone-700"
                     }`}
                   >
                     <td className="py-3 px-4 font-sans font-medium whitespace-nowrap">
                       {item.dateFormatted}
                       {item.isToday && (
-                        <span className="ml-2 px-2.5 py-0.5 rounded-full text-[10px] bg-[#0D5C58] text-white font-bold uppercase tracking-tight">
+                        <span className="ml-2 px-2.5 py-0.5 rounded-full text-[10px] bg-[#003B73] text-white font-bold uppercase tracking-tight">
                           Hari Ini
                         </span>
                       )}
                     </td>
                     <td className="py-3 px-3 text-stone-400">{item.times.Imsak}</td>
-                    <td className="py-3 px-3 text-[#0D5C58] font-semibold">{item.times.Subuh}</td>
+                    <td className="py-3 px-3 text-[#003B73] font-semibold">{item.times.Subuh}</td>
                     <td className="py-3 px-3 text-stone-400">{item.times.Terbit}</td>
                     <td className="py-3 px-3 text-stone-500">{item.times.Dhuha}</td>
-                    <td className="py-3 px-3 text-[#0D5C58] font-semibold">{item.times.Dzuhur}</td>
-                    <td className="py-3 px-3 text-[#0D5C58] font-semibold">{item.times.Ashar}</td>
-                    <td className="py-3 px-3 text-[#0D5C58] font-semibold">{item.times.Maghrib}</td>
-                    <td className="py-3 px-3 text-[#0D5C58] font-semibold">{item.times.Isya}</td>
+                    <td className="py-3 px-3 text-[#003B73] font-semibold">{item.times.Dzuhur}</td>
+                    <td className="py-3 px-3 text-[#003B73] font-semibold">{item.times.Ashar}</td>
+                    <td className="py-3 px-3 text-[#003B73] font-semibold">{item.times.Maghrib}</td>
+                    <td className="py-3 px-3 text-[#003B73] font-semibold">{item.times.Isya}</td>
                   </tr>
                 ))}
               </tbody>

@@ -41,7 +41,7 @@ export default function FridayScheduleSection() {
         {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto mb-10">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
-            Petugas Shalat & Khatib <span className="text-[#0D5C58]">Pekan Ini</span>
+            Petugas Shalat &amp; Khatib <span className="text-[#003B73]">Pekan Ini</span>
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
             Susunan petugas khidmat dan tema khutbah Shalat Jumat berjamaah di Masjid Sudalmiyah Rais Kampus 2 UMS.
@@ -96,7 +96,7 @@ export default function FridayScheduleSection() {
                     <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                       Khatib
                     </span>
-                    <h4 className="text-base sm:text-lg font-bold text-[#0D5C58]">
+                    <h4 className="text-base sm:text-lg font-bold text-[#003B73]">
                       {schedule.khatibName}
                     </h4>
                     <p className="text-xs text-stone-500 mt-0.5">
@@ -124,7 +124,7 @@ export default function FridayScheduleSection() {
             {/* Imam Card */}
             <div className="bg-white rounded-3xl border border-stone-200/90 shadow-md p-6 flex flex-col justify-between hover:border-[#D4AF37]/60 transition-all duration-300">
               <div className="flex items-center justify-start mb-3">
-                <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#0D5C58] text-white">
+                <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#003B73] text-white">
                   Imam Shalat Jumat
                 </span>
               </div>
@@ -159,7 +159,7 @@ export default function FridayScheduleSection() {
 
             {/* Quick Etiquette Card */}
             <div className="bg-[#FAF8F5] rounded-3xl border border-stone-200 p-5 text-xs text-stone-700 space-y-1.5">
-              <span className="font-bold text-[#0D5C58] uppercase text-[10px] tracking-wider block">
+              <span className="font-bold text-[#003B73] uppercase text-[10px] tracking-wider block">
                 Adab Berjamaah Shalat Jumat
               </span>
               <p className="leading-relaxed">

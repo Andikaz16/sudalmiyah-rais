@@ -129,7 +129,7 @@ export default function KiblatCompass() {
     <div className="flex flex-col items-center text-center space-y-7 py-2 max-w-3xl mx-auto">
       {/* Title & Coordinate Intro */}
       <div className="space-y-2 max-w-xl">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] text-xs font-semibold">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] text-xs font-semibold">
           <KiblatIcon className="w-3.5 h-3.5" />
           <span>Hisab Falak Masjid Sudalmiyah Rais UMS</span>
         </div>
@@ -158,7 +158,7 @@ export default function KiblatCompass() {
           {!hasSensor && sensorPermission !== "granted" && (
             <button
               onClick={requestSensorPermission}
-              className="px-3 py-1 rounded-xl bg-[#0D5C58] hover:bg-[#0A4D4A] text-white font-semibold transition-colors cursor-pointer text-[11px]"
+              className="px-3 py-1 rounded-xl bg-[#003B73] hover:bg-[#002855] text-white font-semibold transition-colors cursor-pointer text-[11px]"
             >
               Aktifkan Sensor Gerak
             </button>
@@ -197,7 +197,7 @@ export default function KiblatCompass() {
         ) : (
           <>
             <Navigation2
-              className="w-4 h-4 text-[#0D5C58] shrink-0"
+              className="w-4 h-4 text-[#003B73] shrink-0"
               style={{ transform: `rotate(${relativeQiblaAngle}deg)` }}
             />
             <div className="text-left text-xs">
@@ -251,8 +251,8 @@ export default function KiblatCompass() {
 
           {/* Top Indicator Arrow on Device (Top of Phone Marker) */}
           <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none z-20">
-            <div className="w-0 h-0 border-l-[7px] border-l-transparent border-r-[7px] border-r-transparent border-b-[11px] border-b-[#0D5C58]" />
-            <span className="text-[9px] font-black uppercase tracking-wider text-[#0D5C58] bg-white/90 px-1.5 py-0.2 rounded-full border border-stone-200 shadow-2xs mt-0.5">
+            <div className="w-0 h-0 border-l-[7px] border-l-transparent border-r-[7px] border-r-transparent border-b-[11px] border-b-[#003B73]" />
+            <span className="text-[9px] font-black uppercase tracking-wider text-[#003B73] bg-white/90 px-1.5 py-0.2 rounded-full border border-stone-200 shadow-2xs mt-0.5">
               Depan Ponsel
             </span>
           </div>
@@ -263,7 +263,7 @@ export default function KiblatCompass() {
       <div className="w-full max-w-md p-4 rounded-2xl bg-stone-50 border border-stone-200 text-left space-y-2">
         <div className="flex items-center justify-between text-xs">
           <span className="font-semibold text-stone-700 flex items-center gap-1.5">
-            <RotateCw className="w-3.5 h-3.5 text-[#0D5C58]" />
+            <RotateCw className="w-3.5 h-3.5 text-[#003B73]" />
             {hasSensor && !isManualSim ? "Sensor Kompas Aktif" : "Uji Putaran Derajat Arah Hadap:"}
           </span>
           <span className="font-mono font-bold text-stone-900 bg-white px-2 py-0.5 rounded-lg border border-stone-200">
@@ -282,14 +282,14 @@ export default function KiblatCompass() {
             setIsManualSim(true);
             setManualHeading(Number(e.target.value));
           }}
-          className="w-full accent-[#0D5C58] h-2 rounded-lg cursor-pointer bg-stone-200 disabled:opacity-60"
+          className="w-full accent-[#003B73] h-2 rounded-lg cursor-pointer bg-stone-200 disabled:opacity-60"
         />
 
         <div className="flex justify-between text-[10px] text-stone-400 font-mono">
           <span>0° (U)</span>
           <span>90° (T)</span>
           <span>180° (S)</span>
-          <span className="text-[#0D5C58] font-bold">294.3° (Kiblat)</span>
+          <span className="text-[#003B73] font-bold">294.3° (Kiblat)</span>
           <span>360°</span>
         </div>
       </div>
@@ -300,7 +300,7 @@ export default function KiblatCompass() {
           <span className="text-[10px] text-stone-400 block font-semibold uppercase tracking-wider">
             Azimut Kiblat
           </span>
-          <span className="text-base font-bold text-[#0D5C58]">294.3°</span>
+          <span className="text-base font-bold text-[#003B73]">294.3°</span>
           <span className="text-[10px] text-stone-500 block">Barat Laut (U-B)</span>
         </div>
 
@@ -334,8 +334,8 @@ export default function KiblatCompass() {
       </div>
 
       {/* Petunjuk Penggunaan Praktis */}
-      <div className="w-full max-w-2xl p-4 rounded-2xl bg-[#0D5C58]/5 border border-[#0D5C58]/20 text-left text-xs space-y-2">
-        <h4 className="font-bold text-[#0D5C58] flex items-center gap-1.5 text-sm">
+      <div className="w-full max-w-2xl p-4 rounded-2xl bg-[#003B73]/5 border border-[#003B73]/20 text-left text-xs space-y-2">
+        <h4 className="font-bold text-[#003B73] flex items-center gap-1.5 text-sm">
           <Compass className="w-4 h-4" />
           <span>Panduan Praktis Menentukan Arah Kiblat:</span>
         </h4>
@@ -349,7 +349,7 @@ export default function KiblatCompass() {
       {/* SEKSI SUMBER DATA & METODOLOGI PERHITUNGAN HISAB FALAK */}
       <div className="w-full max-w-2xl p-5 sm:p-6 rounded-3xl bg-white border border-stone-200 shadow-sm text-left space-y-4 text-xs text-stone-700">
         <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
-          <Info className="w-4 h-4 text-[#0D5C58] shrink-0" />
+          <Info className="w-4 h-4 text-[#003B73] shrink-0" />
           <h3 className="font-bold text-stone-900 text-sm font-serif">
             Sumber Data & Metodologi Perhitungan Arah Kiblat
           </h3>
@@ -375,13 +375,13 @@ export default function KiblatCompass() {
             <h5 className="font-bold text-stone-900 mb-1">2. Data Titik Koordinat:</h5>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] bg-stone-50 p-3 rounded-xl border border-stone-200">
               <div>
-                <span className="font-bold text-[#0D5C58] block">Titik Awal (Masjid Sudalmiyah Rais UMS):</span>
+                <span className="font-bold text-[#003B73] block">Titik Awal (Masjid Sudalmiyah Rais UMS):</span>
                 <span>• Lintang: 7° 33' 30.0" LS (-7.5583°)</span>
                 <br />
                 <span>• Bujur: 110° 46' 18.8" BT (+110.7719°)</span>
               </div>
               <div>
-                <span className="font-bold text-[#0D5C58] block">Titik Tujuan (Ka'bah, Makkah):</span>
+                <span className="font-bold text-[#003B73] block">Titik Tujuan (Ka'bah, Makkah):</span>
                 <span>• Lintang: 21° 25' 21.0" LU (+21.4225°)</span>
                 <br />
                 <span>• Bujur: 39° 49' 34.3" BT (+39.8262°)</span>

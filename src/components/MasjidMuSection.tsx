@@ -21,8 +21,8 @@ export default function MasjidMuSection() {
       title: "Tata Kelola & Manajemen Terbuka",
       subtitle: "Manajemen Modern Berkemajuan",
       icon: ShieldCheck,
-      color: "text-[#0D5C58]",
-      bgBadge: "bg-[#0D5C58]/10 text-[#0D5C58] border-[#0D5C58]/20",
+      color: "text-[#003B73]",
+      bgBadge: "bg-[#003B73]/10 text-[#003B73] border-[#003B73]/20",
       description:
         "Pengelolaan masjid berbasis transparansi digital dengan pencatatan audit log, transparansi keuangan infaq secara terbuka, serta tata administrasi profesional berstandar persyarikatan.",
       points: [
@@ -105,13 +105,13 @@ export default function MasjidMuSection() {
     <section id="masjidmu" className="py-16 sm:py-20 bg-white border-y border-stone-200/80 relative overflow-hidden">
       {/* Decorative Background Accents */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-b from-[#D4AF37]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-t from-[#0D5C58]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-t from-[#003B73]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-            Pusat Inspirasi <span className="text-[#0D5C58]">MasjidMu Percontohan</span>
+            Pusat Inspirasi <span className="text-[#003B73]">MasjidMu Percontohan</span>
           </h2>
 
           <p className="mt-4 text-sm sm:text-base text-stone-600 leading-relaxed">
@@ -128,7 +128,7 @@ export default function MasjidMuSection() {
                 key={idx}
                 className="p-4 sm:p-5 rounded-2xl bg-[#FAF8F5] border border-stone-200/80 shadow-sm flex items-start gap-3.5 hover:border-[#D4AF37]/60 transition-colors"
               >
-                <div className="p-2.5 rounded-xl bg-white text-[#0D5C58] border border-stone-200/70 shadow-xs shrink-0">
+                <div className="p-2.5 rounded-xl bg-white text-[#003B73] border border-stone-200/70 shadow-xs shrink-0">
                   <Icon className="w-5 h-5 text-[#B58A1E]" />
                 </div>
                 <div>
@@ -167,7 +167,7 @@ export default function MasjidMuSection() {
                   </div>
 
                   {/* Title & Subtitle */}
-                  <h3 className="text-lg sm:text-xl font-bold text-stone-900 font-serif mb-1 group-hover:text-[#0D5C58] transition-colors">
+                  <h3 className="text-lg sm:text-xl font-bold text-stone-900 font-serif mb-1 group-hover:text-[#003B73] transition-colors">
                     {pillar.title}
                   </h3>
                   <p className="text-xs font-semibold text-[#B58A1E] uppercase tracking-wider mb-3">
@@ -183,7 +183,7 @@ export default function MasjidMuSection() {
                   <div className="space-y-2 border-t border-stone-200/70 pt-4 mb-4">
                     {pillar.points.map((pt, pIdx) => (
                       <div key={pIdx} className="flex items-start gap-2.5 text-xs text-stone-700">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#0D5C58] shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#003B73] shrink-0 mt-0.5" />
                         <span>{pt}</span>
                       </div>
                     ))}
@@ -192,7 +192,7 @@ export default function MasjidMuSection() {
 
                 {/* Bottom link to related service */}
                 <div className="pt-2">
-                  <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider flex items-center gap-1 group-hover:text-[#0D5C58] transition-colors">
+                  <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider flex items-center gap-1 group-hover:text-[#003B73] transition-colors">
                     <span>Standar Terintegrasi Sudalmiyah</span>
                     <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -203,7 +203,7 @@ export default function MasjidMuSection() {
         </div>
 
         {/* Bottom Banner Call to Action */}
-        <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#0D5C58] to-[#08423f] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-emerald-400/20">
+        <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#002855] via-[#003B73] to-[#001F3F] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-blue-400/20">
           <div className="space-y-2 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-bold font-serif">
               Mewujudkan Masjid yang Makmur dan Memakmurkan
@@ -216,7 +216,7 @@ export default function MasjidMuSection() {
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             <Link
               href="/ibadah"
-              className="px-6 py-3 rounded-full bg-white text-[#0D5C58] hover:bg-stone-100 text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105"
+              className="px-6 py-3 rounded-full bg-white text-[#003B73] hover:bg-stone-100 text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105"
             >
               Ruang Ibadah Digital
             </Link>
