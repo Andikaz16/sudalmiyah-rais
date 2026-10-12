@@ -70,10 +70,6 @@ export default function JadwalPage() {
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         {/* Header Title */}
         <div className="mb-8 text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] border border-[#0D5C58]/20 text-xs font-bold">
-            <span className="w-2 h-2 rounded-full bg-[#0D5C58] animate-pulse"></span>
-            <span>MasjidMu Percontohan • Selaras MASA &amp; Tarjih PP Muhammadiyah</span>
-          </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 tracking-tight font-serif">
             Jadwal Shalat & <span className="text-[#0D5C58]">Imsakiyah Surakarta</span>
           </h1>

@@ -306,9 +306,6 @@ export default function NewsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] text-xs font-bold uppercase tracking-wider mb-3.5">
-            <span>Pusat Informasi Terpadu</span>
-          </div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
             Kabar MasjidMu Percontohan &amp; <span className="text-[#0D5C58]">Warta Persyarikatan</span>
           </h2>

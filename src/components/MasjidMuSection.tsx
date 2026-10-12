@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   Compass,
   HeartHandshake,
-  Award,
   CheckCircle2,
   BookOpen,
   Users,
@@ -111,11 +110,6 @@ export default function MasjidMuSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] text-xs font-bold uppercase tracking-wider mb-3.5">
-            <Award className="w-3.5 h-3.5 text-[#B58A1E]" />
-            <span>Inisiatif LPCR-PM PP Muhammadiyah</span>
-          </div>
-
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
             Pusat Inspirasi <span className="text-[#0D5C58]">MasjidMu Percontohan</span>
           </h2>
@@ -211,10 +205,6 @@ export default function MasjidMuSection() {
         {/* Bottom Banner Call to Action */}
         <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#0D5C58] to-[#08423f] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-emerald-400/20">
           <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-amber-300 text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Gerakan Berkemajuan Umat</span>
-            </div>
             <h3 className="text-xl sm:text-2xl font-bold font-serif">
               Mewujudkan Masjid yang Makmur dan Memakmurkan
             </h3>

@@ -94,9 +94,6 @@ export default function LayananPage() {
         {/* Header Banner */}
         <section className="bg-white border-b border-stone-200 py-12 text-center">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="inline-block px-4 py-1 rounded-full border border-stone-300 text-stone-600 text-xs font-semibold tracking-wide uppercase mb-3">
-              Layanan Kampus Terpadu
-            </div>
             <h1 className="text-3xl sm:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
               Peminjaman Fasilitas & <span className="text-[#0D5C58]">Ruang Masjid</span>
             </h1>
