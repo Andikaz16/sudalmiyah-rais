@@ -1,53 +1,145 @@
 import { DailySchedule, PrayerTime } from "./types";
 
-// Surakarta Coordinates (Kampus 1 & 2 UMS)
-const LATITUDE = -7.5583;
-const LONGITUDE = 110.7719;
-const TIMEZONE = 7; // WIB (UTC+7)
+// Koordinat Presisi Titik Falak Masjid Sudalmiyah Rais (Kampus 2 Universitas Muhammadiyah Surakarta)
+export const MASJID_COORDINATES = {
+  name: "Masjid Sudalmiyah Rais, Kampus 2 UMS",
+  latitude: -7.5583,
+  longitude: 110.7719,
+  timezone: 7, // WIB (UTC+7)
+};
 
-// Helper: Degree to Radian and vice versa
+export type CalculationMethod = "tarjih" | "kemenag";
+
+export const CALCULATION_STANDARDS = {
+  tarjih: {
+    id: "tarjih" as const,
+    name: "MASA (Muhammadiyah Super App) & Majelis Tarjih PP Muhammadiyah",
+    shortName: "Standar MASA (Tarjih Muhammadiyah)",
+    subuhAngle: -18.0,
+    isyaAngle: -18.0,
+    ihtiyatSubuh: 2,
+    ihtiyatDzuhur: 2,
+    ihtiyatAshar: 2,
+    ihtiyatMaghrib: 2,
+    ihtiyatIsya: 2,
+    description:
+      "Berdasarkan Keputusan Munas Tarjih XXXI Tahun 2020: Sudut Subuh -18°, Isya -18°, Ihtiyat +2 menit.",
+  },
+  kemenag: {
+    id: "kemenag" as const,
+    name: "Kementerian Agama Republik Indonesia (Kemenag RI)",
+    shortName: "Standar Kemenag RI",
+    subuhAngle: -20.0,
+    isyaAngle: -18.0,
+    ihtiyatSubuh: 2,
+    ihtiyatDzuhur: 3,
+    ihtiyatAshar: 2,
+    ihtiyatMaghrib: 2,
+    ihtiyatIsya: 2,
+    description:
+      "Berdasarkan standar Bimas Islam Kemenag RI: Sudut Subuh -20°, Isya -18°, Ihtiyat +2-3 menit.",
+  },
+};
+
+// Helper: Konversi Sudut
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 const toDeg = (rad: number) => (rad * 180) / Math.PI;
 
-// Astronomical Prayer Time Calculation using Kemenag Standard
-export function calculatePrayerTimes(date: Date = new Date()): DailySchedule["times"] {
-  const dayOfYear = Math.floor(
-    (date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24
-  );
+// Perhitungan Astronomis Posisi Matahari Presisi Tinggi (Jean Meeus / NOAA Solar Ephemeris)
+function calculateSolarEphemeris(date: Date) {
+  let year = date.getFullYear();
+  let month = date.getMonth() + 1;
+  const day = date.getDate();
 
-  // Solar declination & Equation of time approximation
-  const b = (2 * Math.PI * (dayOfYear - 81)) / 365;
-  const equationOfTime = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b); // minutes
-  const declination = 23.45 * Math.sin(b); // degrees
+  if (month <= 2) {
+    year -= 1;
+    month += 12;
+  }
+
+  const a = Math.floor(year / 100);
+  const b = 2 - a + Math.floor(a / 4);
+  const jd =
+    Math.floor(365.25 * (year + 4716)) +
+    Math.floor(30.6001 * (month + 1)) +
+    day +
+    b -
+    1524.5;
+
+  const t = (jd - 2451545.0) / 36525.0;
+  const l0 = (280.46646 + t * (36000.76983 + 0.0003032 * t)) % 360;
+  const m = (357.52911 + t * (35999.05029 - 0.0001537 * t)) % 360;
+  const mRad = toRad(m);
+  const e = 0.016708634 - t * (0.000042037 + 0.0000001267 * t);
+
+  const c =
+    Math.sin(mRad) * (1.914602 - t * (0.004817 + 0.000014 * t)) +
+    Math.sin(2 * mRad) * (0.019993 - 0.000101 * t) +
+    Math.sin(3 * mRad) * 0.000289;
+
+  const sunTrueLong = (l0 + c) % 360;
+  const eps0 = 23.439291 - t * (0.0130042 + 0.00000016 * t);
+  const epsRad = toRad(eps0);
+  const sunRad = toRad(sunTrueLong);
+
+  const sinDec = Math.sin(epsRad) * Math.sin(sunRad);
+  const declination = toDeg(Math.asin(sinDec));
+
+  const y = Math.tan(epsRad / 2.0) ** 2;
+  const l0Rad = toRad(l0);
+  const equationOfTime =
+    4.0 *
+    toDeg(
+      y * Math.sin(2 * l0Rad) -
+        2 * e * Math.sin(mRad) +
+        4 * e * y * Math.sin(mRad) * Math.cos(2 * l0Rad) -
+        0.5 * (y ** 2) * Math.sin(4 * l0Rad) -
+        1.25 * (e ** 2) * Math.sin(2 * mRad)
+    );
+
+  return { declination, equationOfTime };
+}
+
+// Perhitungan Jadwal Shalat (Default: Standar MASA / Tarjih Muhammadiyah)
+export function calculatePrayerTimes(
+  date: Date = new Date(),
+  method: CalculationMethod = "tarjih"
+): DailySchedule["times"] {
+  const std = CALCULATION_STANDARDS[method] || CALCULATION_STANDARDS.tarjih;
+  const { declination, equationOfTime } = calculateSolarEphemeris(date);
 
   // Solar noon in hours (WIB)
-  const noon = 12 + (TIMEZONE * 15 - LONGITUDE) / 15 - equationOfTime / 60;
+  const noon =
+    12 +
+    (MASJID_COORDINATES.timezone * 15 - MASJID_COORDINATES.longitude) / 15 -
+    equationOfTime / 60;
 
-  // Hour angles
+  // Sudut jam (Hour Angle)
   const hourAngle = (angle: number) => {
-    const latRad = toRad(LATITUDE);
+    const latRad = toRad(MASJID_COORDINATES.latitude);
     const decRad = toRad(declination);
     const angRad = toRad(angle);
-    const cosHA = (Math.sin(angRad) - Math.sin(latRad) * Math.sin(decRad)) / (Math.cos(latRad) * Math.cos(decRad));
+    const cosHA =
+      (Math.sin(angRad) - Math.sin(latRad) * Math.sin(decRad)) /
+      (Math.cos(latRad) * Math.cos(decRad));
     if (cosHA > 1 || cosHA < -1) return 0;
     return toDeg(Math.acos(cosHA)) / 15;
   };
 
-  // Shadow angle for Ashar (Shafi'i: shadow = object + noon shadow)
-  const asharAlt = toDeg(Math.atan(1 / (1 + Math.tan(toRad(Math.abs(LATITUDE - declination))))));
+  // Sudut bayangan Ashar (Jumhur/Muhammadiyah: bayangan = panjang benda + bayangan zawal)
+  const asharAlt = toDeg(
+    Math.atan(1 / (1 + Math.tan(toRad(Math.abs(MASJID_COORDINATES.latitude - declination)))))
+  );
   const haAshar = hourAngle(asharAlt);
 
-  // Fajr/Subuh angle: -20 degrees (Kemenag standard)
-  const haSubuh = hourAngle(-20);
+  // Sudut Subuh: -18 derajat (MASA / Tarjih Muhammadiyah) atau -20 derajat (Kemenag)
+  const haSubuh = hourAngle(std.subuhAngle);
 
-  // Sunrise/Terbit angle: -0.833 degrees
+  // Sudut Terbit (Syuruq) dan Maghrib: -0.833 derajat (semidiameter matahari 16' + refraksi atmosfer 34')
   const haTerbit = hourAngle(-0.833);
-
-  // Maghrib angle: -0.833 degrees
   const haMaghrib = hourAngle(-0.833);
 
-  // Isha/Isya angle: -18 degrees (Kemenag standard)
-  const haIsya = hourAngle(-18);
+  // Sudut Isya: -18 derajat (hilangnya mega merah / syafak ahmar)
+  const haIsya = hourAngle(std.isyaAngle);
 
   const formatHours = (hours: number, ihtiyatMinutes: number = 2) => {
     const totalMinutes = Math.round(hours * 60 + ihtiyatMinutes);
@@ -66,23 +158,29 @@ export function calculatePrayerTimes(date: Date = new Date()): DailySchedule["ti
   const dhuhaH = terbitH + 20 / 60;
 
   return {
-    Imsak: formatHours(imsakH, 2),
-    Subuh: formatHours(subuhH, 2),
+    Imsak: formatHours(imsakH, std.ihtiyatSubuh),
+    Subuh: formatHours(subuhH, std.ihtiyatSubuh),
     Terbit: formatHours(terbitH, -2),
     Dhuha: formatHours(dhuhaH, 2),
-    Dzuhur: formatHours(dzuhurH, 3),
-    Ashar: formatHours(asharH, 2),
-    Maghrib: formatHours(maghribH, 2),
-    Isya: formatHours(isyaH, 2),
+    Dzuhur: formatHours(dzuhurH, std.ihtiyatDzuhur),
+    Ashar: formatHours(asharH, std.ihtiyatAshar),
+    Maghrib: formatHours(maghribH, std.ihtiyatMaghrib),
+    Isya: formatHours(isyaH, std.ihtiyatIsya),
   };
 }
 
-export function getNextPrayer(times: DailySchedule["times"], currentTime: Date = new Date()): {
+export function getNextPrayer(
+  times: DailySchedule["times"],
+  currentTime: Date = new Date()
+): {
   nextPrayer: PrayerTime;
   allPrayers: PrayerTime[];
   remainingSeconds: number;
 } {
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes() + currentTime.getSeconds() / 60;
+  const currentMinutes =
+    currentTime.getHours() * 60 +
+    currentTime.getMinutes() +
+    currentTime.getSeconds() / 60;
 
   const prayers: Array<{ name: PrayerTime["name"]; time: string }> = [
     { name: "Subuh", time: times.Subuh },
@@ -121,7 +219,10 @@ export function getNextPrayer(times: DailySchedule["times"], currentTime: Date =
     isNext: idx === nextIndex,
   }));
 
-  const remainingSeconds = Math.max(0, Math.floor(minDiff * 60 - currentTime.getSeconds()));
+  const remainingSeconds = Math.max(
+    0,
+    Math.floor(minDiff * 60 - currentTime.getSeconds())
+  );
 
   return {
     nextPrayer: allPrayers[nextIndex],
@@ -140,6 +241,6 @@ export function getHijriDate(date: Date = new Date()): string {
     });
     return formatter.format(date);
   } catch {
-    return "1447 H";
+    return "1448 H";
   }
 }

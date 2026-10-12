@@ -100,9 +100,15 @@ export default function PrayerCountdownCard() {
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-200/80">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#B58A1E] mb-1">
-            <MapPin className="w-3.5 h-3.5 text-[#B58A1E]" />
-            <span>Koordinat Masjid Sudalmiyah Rais Kampus 2 UMS</span>
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#B58A1E]">
+              <MapPin className="w-3.5 h-3.5 text-[#B58A1E]" />
+              <span>Kampus 2 UMS Surakarta</span>
+            </div>
+            <span className="text-stone-300">•</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] border border-[#0D5C58]/20">
+              Standar MASA (Muhammadiyah)
+            </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-stone-900 tracking-tight font-serif">
             {data.formattedDate}
@@ -194,9 +200,14 @@ export default function PrayerCountdownCard() {
             <strong className="text-stone-800">Dhuha:</strong> {data.times.Dhuha} WIB
           </span>
         </div>
-        <div className="flex items-center gap-2 text-stone-500">
-          <Compass className="w-3.5 h-3.5 text-[#B58A1E]" />
-          <span>Arah Kiblat Surakarta: 294.5° (Barat Laut)</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-[11px] text-[#0D5C58] font-semibold bg-[#0D5C58]/10 px-2.5 py-0.5 rounded-full border border-[#0D5C58]/20">
+            Hisab Tarjih Munas XXXI (Subuh -18°)
+          </span>
+          <div className="flex items-center gap-1.5 text-stone-500">
+            <Compass className="w-3.5 h-3.5 text-[#B58A1E]" />
+            <span>Kiblat: 294.5°</span>
+          </div>
         </div>
       </div>
     </div>
