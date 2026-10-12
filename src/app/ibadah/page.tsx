@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -391,6 +392,7 @@ function QuranFeatureView() {
   const [expandedJuz, setExpandedJuz] = useState<number | null>(null);
 
   // Settings State
+  const [mounted, setMounted] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<QuranSettings>({
     arabicSize: "md",
@@ -403,6 +405,11 @@ function QuranFeatureView() {
   // Juz Reading Context State
   const [juzContext, setJuzContext] = useState<JuzReadingContext | null>(null);
   const [onlyJuzVerses, setOnlyJuzVerses] = useState<boolean>(true);
+
+  // Set mounted on client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Load saved settings from localStorage
   useEffect(() => {
@@ -1093,16 +1100,17 @@ function QuranFeatureView() {
       )}
 
       {/* MODAL PENGATURAN TAMPILAN AL-QUR'AN (Khusus Ramah Lansia & Jamaah) */}
-      {isSettingsOpen && (
+      {mounted && isSettingsOpen && typeof document !== "undefined" && createPortal(
         <div
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsSettingsOpen(false);
-          }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-black/70 backdrop-blur-sm animate-fade-in"
+          onClick={() => setIsSettingsOpen(false)}
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-sm animate-fade-in"
         >
-          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-stone-800 animate-scale-up max-h-[90dvh] sm:max-h-[85vh] my-auto">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-stone-800 animate-scale-up max-h-[85dvh] sm:max-h-[85vh] my-auto"
+          >
             {/* Modal Header */}
-            <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-stone-200 flex items-center justify-between bg-[#FAF8F5] shrink-0 sticky top-0 z-10">
+            <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-stone-200 flex items-center justify-between bg-[#FAF8F5] shrink-0 sticky top-0 z-20">
               <div className="flex items-center gap-2.5 min-w-0 pr-2">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] flex items-center justify-center shrink-0">
                   <svg
@@ -1136,12 +1144,12 @@ function QuranFeatureView() {
               <button
                 type="button"
                 onClick={() => setIsSettingsOpen(false)}
-                className="w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-stone-100 hover:bg-[#0D5C58] active:scale-95 text-stone-600 hover:text-white border border-stone-200 hover:border-[#0D5C58] flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-xs"
-                title="Tutup Pengaturan"
+                className="w-10 h-10 rounded-full bg-stone-200/90 hover:bg-[#0D5C58] active:scale-90 text-stone-800 hover:text-white border border-stone-300 hover:border-[#0D5C58] flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm"
+                title="Tutup Pengaturan (X)"
                 aria-label="Tutup Pengaturan"
               >
                 <svg
-                  className="w-5 h-5 sm:w-4 sm:h-4"
+                  className="w-5 h-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -1388,7 +1396,7 @@ function QuranFeatureView() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-stone-200 bg-[#FAF8F5] flex items-center justify-between shrink-0 sticky bottom-0 z-10">
+            <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-stone-200 bg-[#FAF8F5] flex items-center justify-between shrink-0 sticky bottom-0 z-20">
               <button
                 type="button"
                 onClick={() =>
@@ -1413,7 +1421,8 @@ function QuranFeatureView() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
