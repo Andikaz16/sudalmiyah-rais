@@ -8,6 +8,8 @@ import QuranIcon from "@/components/QuranIcon";
 import TasbihIcon from "@/components/TasbihIcon";
 import TilawahIcon from "@/components/TilawahIcon";
 import DoaIcon from "@/components/DoaIcon";
+import KiblatIcon from "@/components/KiblatIcon";
+import KiblatCompass from "@/components/KiblatCompass";
 import {
   SURAH_LIST,
   JUZ_LIST,
@@ -196,6 +198,8 @@ export default function IbadahPage() {
                         <TilawahIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : feat.id === "doa" ? (
                         <DoaIcon className="w-7 h-7 sm:w-9 sm:h-9" />
+                      ) : feat.id === "kiblat" ? (
+                        <KiblatIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : (
                         <span className="leading-none select-none tracking-normal">
                           {feat.iconSymbol}
@@ -272,6 +276,9 @@ export default function IbadahPage() {
                         )}
                         {currentFeat?.id === "doa" && (
                           <DoaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                        )}
+                        {currentFeat?.id === "kiblat" && (
+                          <KiblatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
                         )}
                         <span>{currentFeat?.title}</span>
                       </h1>
@@ -1780,74 +1787,7 @@ function DoaFeatureView() {
 // 5. Kompas Arah Kiblat View
 // -------------------------------------------------------------
 function KiblatFeatureView() {
-  return (
-    <div className="flex flex-col items-center text-center space-y-6 py-2">
-      <div className="space-y-2 max-w-md">
-        <h3 className="text-lg font-bold text-stone-900 font-serif">
-          Arah Kiblat Masjid Sudalmiyah Rais
-        </h3>
-        <p className="text-xs text-stone-500 leading-relaxed">
-          Koordinat Kampus UMS Surakarta (7.5583° S, 110.7719° E) mengarah tepat 294.3° ke arah Ka'bah Masjidil Haram di Makkah.
-        </p>
-      </div>
-
-      {/* Visual Compass Graphic */}
-      <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full border-4 border-dashed border-[#0D5C58]/30 flex items-center justify-center bg-gradient-to-br from-[#0D5C58]/5 to-[#D4AF37]/5 shadow-inner">
-        {/* Cardinal Markers */}
-        <span className="absolute top-2 font-bold text-xs text-stone-600">U (Utara)</span>
-        <span className="absolute bottom-2 font-bold text-xs text-stone-600">S (Selatan)</span>
-        <span className="absolute left-2 font-bold text-xs text-stone-600">B (Barat)</span>
-        <span className="absolute right-2 font-bold text-xs text-stone-600">T (Timur)</span>
-
-        {/* Qibla Direction Pointer (Rotating towards 294.3 degrees) */}
-        <div
-          className="absolute w-full h-full flex items-center justify-center"
-          style={{ transform: "rotate(294.3deg)" }}
-        >
-          <div className="relative w-1 h-28 bg-[#D4AF37] rounded-full shadow-lg">
-            {/* Ka'bah Pin */}
-            <div className="absolute -top-3 -left-3 w-7 h-7 rounded-full bg-[#0D5C58] border-2 border-[#D4AF37] flex items-center justify-center text-white text-[10px] font-bold shadow-md">
-              <span>كعبة</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Center Compass Pivot */}
-        <div className="w-16 h-16 rounded-full bg-white border-2 border-stone-200 shadow-md flex flex-col items-center justify-center z-10">
-          <span className="text-xs font-black text-[#0D5C58]">294.3°</span>
-          <span className="text-[9px] text-stone-400">Kiblat</span>
-        </div>
-      </div>
-
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 gap-3 w-full max-w-sm text-left">
-        <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200">
-          <span className="text-[10px] text-stone-400 block font-semibold uppercase">
-            Derajat Azimut
-          </span>
-          <span className="text-base font-bold text-[#0D5C58]">
-            294.3° Barat Laut
-          </span>
-        </div>
-        <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200">
-          <span className="text-[10px] text-stone-400 block font-semibold uppercase">
-            Jarak ke Ka'bah
-          </span>
-          <span className="text-base font-bold text-stone-900">
-            ~8.375 Kilometer
-          </span>
-        </div>
-      </div>
-
-      {/* Manual Compass Instruction */}
-      <div className="p-4 rounded-2xl bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-xs text-stone-700 text-left max-w-sm space-y-1">
-        <p className="font-bold text-[#0D5C58]">Petunjuk Penentuan Kiblat:</p>
-        <p className="text-stone-600 leading-relaxed">
-          Posisikan arah ponsel menghadap ke barat, lalu geser sedikit ke arah utara sekitar 24.3 derajat (arah Barat Laut).
-        </p>
-      </div>
-    </div>
-  );
+  return <KiblatCompass />;
 }
 
 // -------------------------------------------------------------
