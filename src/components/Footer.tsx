@@ -37,11 +37,11 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-stone-300 text-xs leading-relaxed max-w-md">
-              Pusat peribadatan dan pembinaan nilai-nilai Al-Islam dan Kemuhammadiyahan bagi civitas akademika UMS dan masyarakat luas di lingkungan Kampus 2 Pabelan.
+              Pusat peribadatan dan teladan MasjidMu Percontohan (Masjid Percontohan Muhammadiyah) bagi civitas akademika UMS dan masyarakat luas. Mengimplementasikan standar Idarah, Imarah, dan Ri&apos;ayah yang makmur dan memakmurkan.
             </p>
             <div className="flex items-center gap-2 pt-1 text-[#FCD34D] text-xs font-medium">
               <ShieldCheck className="w-4 h-4 shrink-0" />
-              <span>Sistem Terenkripsi & Standar Keamanan OWASP Berlapis</span>
+              <span>Sistem Terenkripsi &amp; Standar Keamanan OWASP Berlapis</span>
             </div>
           </div>
 
@@ -51,6 +51,11 @@ export default function Footer() {
               Navigasi Layanan
             </h4>
             <ul className="space-y-2 text-xs">
+              <li>
+                <Link href="/#masjidmu" className="hover:text-[#FCD34D] transition-colors">
+                  Pilar MasjidMu Percontohan
+                </Link>
+              </li>
               <li>
                 <Link href="/ibadah" className="hover:text-[#FCD34D] transition-colors">
                   Ruang Ibadah Digital
@@ -63,7 +68,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/agenda" className="hover:text-[#FCD34D] transition-colors">
-                  Agenda & Kajian Rutin
+                  Agenda &amp; Kajian Rutin
                 </Link>
               </li>
               <li>
@@ -73,7 +78,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/#berita" className="hover:text-[#FCD34D] transition-colors">
-                  Warta & Berita Persyarikatan
+                  Kabar MasjidMu &amp; Persyarikatan
                 </Link>
               </li>
             </ul>

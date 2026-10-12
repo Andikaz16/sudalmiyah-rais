@@ -154,6 +154,9 @@ export default function IbadahPage() {
             {/* Hero Section */}
             <section className="bg-gradient-to-b from-white via-white to-[#FAF8F5] border-b border-stone-200/80 pt-10 pb-12 sm:pt-14 sm:pb-16 text-center">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0D5C58]/10 text-[#0D5C58] border border-[#0D5C58]/20 text-xs font-bold mb-4 uppercase tracking-wider animate-fade-up">
+                  <span>MasjidMu Percontohan • Layanan Ibadah Digital</span>
+                </div>
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight animate-fade-up">
                   Ruang Ibadah <span className="text-[#0D5C58]">Digital</span>
                 </h1>

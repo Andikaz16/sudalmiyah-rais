@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import AgendaSection from "@/components/AgendaSection";
+import MasjidMuSection from "@/components/MasjidMuSection";
 import FridayScheduleSection from "@/components/FridayScheduleSection";
 import DonationSection from "@/components/DonationSection";
 import NewsSection from "@/components/NewsSection";
@@ -25,6 +26,11 @@ export default function Home() {
             <PrayerCountdownCard />
           </AnimatedSection>
         </section>
+
+        {/* Pilar & Keunggulan MasjidMu Percontohan */}
+        <AnimatedSection animation="fade-up" duration={700}>
+          <MasjidMuSection />
+        </AnimatedSection>
 
         {/* Agendas Section */}
         <AnimatedSection animation="fade-up" duration={700}>

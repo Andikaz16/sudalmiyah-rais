@@ -6,7 +6,7 @@ import Image from "next/image";
 
 interface NewsItem {
   id: string;
-  source: "UMS" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
+  source: "MASJIDMU" | "UMS" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
   badge: string;
   badgeClass: string;
   timeAgo: string;
@@ -78,6 +78,59 @@ export function formatClientTimeAgo(
 }
 
 const initialNewsData: NewsItem[] = [
+  {
+    id: "masjidmu-1",
+    source: "MASJIDMU",
+    badge: "MASJIDMU PERCONTOHAN",
+    badgeClass: "bg-[#0D5C58] text-amber-200 border border-amber-300/40",
+    timeAgo: "1 jam lalu",
+    publishedAt: "2026-10-12T08:00:00Z",
+    sourceDomain: "masjidmu.or.id",
+    sourceUrl: "https://muhammadiyah.or.id",
+    title: "Masjid Sudalmiyah Rais Jadi Rujukan MasjidMu Percontohan Kampus Ramah Umat dan Digital",
+    excerpt: "SURAKARTA — Masjid Sudalmiyah Rais Kampus 2 UMS mengokohkan peran strategis sebagai percontohan nasional pengelolaan masjid ramah lansia, ramah difabel, hisab Tarjih MASA, dan tata kelola digital terbuka.",
+    content: [
+      "SURAKARTA — Masjid Sudalmiyah Rais Universitas Muhammadiyah Surakarta terus memperkuat perannya sebagai model MasjidMu Percontohan di lingkungan Perguruan Tinggi Muhammadiyah dan 'Aisyiyah (PTMA). Langkah ini selaras dengan arahan Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid (LPCR-PM) PP Muhammadiyah.",
+      "Melalui integrasi empat pilar utama—Idarah (tata kelola transparan berbasis sistem informasi), Imarah (shalat berjamaah berstandar Tarjih dan MASA, serta dakwah multi-generasi), Ri'ayah (sarana ramah difabel, eco-mosque ramah lingkungan, ruang ibadah sejuk), dan Pelayanan Sosial Keumatan—Masjid Sudalmiyah Rais membuktikan komitmen masjid yang 'Makmur dan Memakmurkan'.",
+      "Pimpinan Takmir menegaskan bahwa inovasi ruang ibadah digital, kalkulator zakat otomatis, serta transparansi infaq digital menjadi langkah konkret mewujudkan masjid modern yang mencerahkan peradaban."
+    ],
+    imageUrl: "/images/masjid-sudalmiyah.jpg",
+  },
+  {
+    id: "masjidmu-2",
+    source: "MASJIDMU",
+    badge: "MASJIDMU PERCONTOHAN",
+    badgeClass: "bg-[#0D5C58] text-amber-200 border border-amber-300/40",
+    timeAgo: "4 jam lalu",
+    publishedAt: "2026-10-12T05:00:00Z",
+    sourceDomain: "lpcrpm.muhammadiyah.or.id",
+    sourceUrl: "https://muhammadiyah.or.id",
+    title: "LPCR-PM PP Muhammadiyah Akselerasi Standardisasi MasjidMu Percontohan Nasional",
+    excerpt: "YOGYAKARTA — Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid (LPCR-PM) PP Muhammadiyah menggencarkan standardisasi MasjidMu Percontohan di seluruh cabang dan kampus persyarikatan se-Indonesia.",
+    content: [
+      "YOGYAKARTA — Pimpinan Pusat Muhammadiyah melalui LPCR-PM menegaskan bahwa keberadaan masjid bukan sekadar tempat ibadah mahdhah, melainkan episentrum peradaban dan kemakmuran umat secara menyeluruh.",
+      "Program MasjidMu Percontohan menetapkan kriteria ketat meliputi manajemen tata kelola transparan, kebersihan prima, pembinaan generasi muda, sarana inklusif bagi difabel dan lansia, serta pemberdayaan ekonomi jamaah sekitar.",
+      "Masjid-masjid kampus Muhammadiyah, termasuk Masjid Sudalmiyah Rais UMS, diharapkan menjadi lokomotif utama yang menginspirasi ribuan masjid ranting dan cabang Muhammadiyah di tanah air."
+    ],
+    imageUrl: "/images/news/news-sm-1.jpg",
+  },
+  {
+    id: "masjidmu-3",
+    source: "MASJIDMU",
+    badge: "MASJIDMU PERCONTOHAN",
+    badgeClass: "bg-[#0D5C58] text-amber-200 border border-amber-300/40",
+    timeAgo: "1 hari lalu",
+    publishedAt: "2026-10-11T10:00:00Z",
+    sourceDomain: "masjid.ums.ac.id",
+    sourceUrl: "https://news.ums.ac.id",
+    title: "Penerapan Konsep Eco-Mosque dan Digitalisasi Layanan Jamaah di Masjid Kampus Muhammadiyah",
+    excerpt: "SURAKARTA — Transformasi energi berkelanjutan, pengelolaan wudhu hemat air, dan fitur ramah lansia menjadi wujud ri'ayah berkemajuan di lingkungan Masjid Sudalmiyah Rais.",
+    content: [
+      "SURAKARTA — Masjid kampus kini dituntut bertransformasi menjawab tantangan ekologis dan digital. Implementasi konsep Eco-Mosque di Masjid Sudalmiyah Rais mengedepankan efisiensi listrik, pemanfaatan pencahayaan alami kubah, serta manajemen air wudhu berkelanjutan.",
+      "Di sisi lain, kehadiran portal digital mandiri yang menyajikan panduan shalat standar Tarjih, Al-Qur'an ramah lansia, hisab MASA, dan pelaporan keuangan real-time melengkapi ekosistem masjid modern berkemajuan."
+    ],
+    imageUrl: "/images/news/news-lensamu-1.jpg",
+  },
   {
     id: "ums-1",
     source: "UMS",
@@ -169,6 +222,7 @@ const initialNewsData: NewsItem[] = [
 export default function NewsSection() {
   const [newsList, setNewsList] = useState<NewsItem[]>(initialNewsData);
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<"ALL" | "MASJIDMU" | "UMS" | "PERSYARIKATAN">("ALL");
   const [now, setNow] = useState<number | null>(null);
   const [mounted, setMounted] = useState<boolean>(false);
 
@@ -238,22 +292,61 @@ export default function NewsSection() {
     };
   }, []);
 
+  const filteredNews = newsList.filter((item) => {
+    if (selectedCategory === "ALL") return true;
+    if (selectedCategory === "MASJIDMU") return item.source === "MASJIDMU";
+    if (selectedCategory === "UMS") return item.source === "UMS";
+    if (selectedCategory === "PERSYARIKATAN")
+      return item.source === "SUARA_MUHAMMADIYAH" || item.source === "LENSAMU";
+    return true;
+  });
+
   return (
     <section id="berita" className="py-12 sm:py-18 bg-[#FAF8F5] text-stone-900 border-t border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
-            Kabar Persyarikatan & <span className="text-[#0D5C58]">Warta Kampus</span>
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0D5C58]/10 border border-[#0D5C58]/20 text-[#0D5C58] text-xs font-bold uppercase tracking-wider mb-3.5">
+            <span>Pusat Informasi Terpadu</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
+            Kabar MasjidMu Percontohan &amp; <span className="text-[#0D5C58]">Warta Persyarikatan</span>
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
-            Warta aktual terintegrasi langsung dari portal resmi Berita UMS, Suara Muhammadiyah, dan Lensamu.
+            Warta aktual dan inspiratif: akselerasi gerakan MasjidMu Percontohan, kabar civitas akademika UMS, serta rilis resmi portal Suara Muhammadiyah dan Lensamu.
           </p>
         </div>
 
+        {/* Category Filter Tabs */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10">
+          {[
+            { key: "ALL", label: "Semua Warta" },
+            { key: "MASJIDMU", label: "MasjidMu Percontohan" },
+            { key: "UMS", label: "Warta Kampus UMS" },
+            { key: "PERSYARIKATAN", label: "Persyarikatan (SM & Lensamu)" },
+          ].map((cat) => (
+            <button
+              key={cat.key}
+              onClick={() => setSelectedCategory(cat.key as "ALL" | "MASJIDMU" | "UMS" | "PERSYARIKATAN")}
+              className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                selectedCategory === cat.key
+                  ? "bg-[#0D5C58] text-white shadow-md scale-105"
+                  : "bg-white text-stone-600 border border-stone-200/90 hover:bg-stone-50 hover:text-stone-900"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
         {/* News Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-          {newsList.map((item) => (
+        {filteredNews.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-3xl border border-stone-200 p-8 max-w-xl mx-auto shadow-xs">
+            <p className="text-stone-500 text-sm">Belum ada warta untuk kategori ini.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+            {filteredNews.map((item) => (
             <article
               key={item.id}
               className="bg-white border border-stone-200/90 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#D4AF37]/50 transition-all duration-300 flex flex-col justify-between group"
@@ -310,6 +403,7 @@ export default function NewsSection() {
             </article>
           ))}
         </div>
+        )}
       </div>
 
       {/* Article Detail Modal Dialog via React Portal */}

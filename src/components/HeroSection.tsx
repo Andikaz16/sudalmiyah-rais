@@ -67,6 +67,13 @@ export default function HeroSection() {
 
       {/* Hero Content Overlay with Entrance Animations */}
       <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-10 sm:pt-16 pb-24 sm:pb-28">
+        {/* MasjidMu Percontohan Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-amber-300/30 text-amber-300 text-xs sm:text-sm font-semibold tracking-wide uppercase mb-6 shadow-lg animate-fade-up">
+          <span>MasjidMu Percontohan</span>
+          <span className="text-white/40">•</span>
+          <span className="text-stone-200">Kampus 2 UMS</span>
+        </div>
+
         {/* Grand Headline */}
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] font-serif drop-shadow-2xl animate-fade-up">
           Kedamaian Ibadah di
@@ -75,9 +82,9 @@ export default function HeroSection() {
           </span>
         </h1>
 
-        {/* Subtitle with high contrast - Pure welcoming essence, no feature enumeration */}
+        {/* Subtitle with high contrast */}
         <p className="mt-5 sm:mt-6 text-sm sm:text-base lg:text-lg text-stone-200 max-w-2xl mx-auto leading-relaxed drop-shadow-md animate-fade-up delay-150">
-          Tempat yang teduh untuk bersujud dan menenangkan jiwa. Menghadirkan suasana peribadatan yang khusyuk, mempererat ukhuwah, serta menjadi rumah kebaikan yang senantiasa terbuka menyambut seluruh umat.
+          Pusat keteduhan ibadah dan teladan MasjidMu Percontohan yang makmur dan memakmurkan. Menghadirkan kekhusyukan spiritual, mempererat ukhuwah berkemajuan, serta mengabdi sebagai rumah kebaikan bagi sivitas akademika dan seluruh umat.
         </p>
 
         {/* Centered CTA Pill Buttons - Clean and pure text, no icons */}

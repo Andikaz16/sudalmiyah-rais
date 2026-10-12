@@ -13,14 +13,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Masjid Sudalmiyah Rais | Universitas Muhammadiyah Surakarta",
+  title: "Masjid Sudalmiyah Rais | MasjidMu Percontohan UMS",
   description:
-    "Sistem Informasi Terpadu Pengelolaan Masjid Sudalmiyah Rais Kampus 2 UMS. Informasi jadwal shalat real-time, manajemen kajian mahasiswa, presensi tiket QR, dan transparansi kas digital.",
+    "Portal Resmi Masjid Sudalmiyah Rais Kampus 2 UMS - Model MasjidMu Percontohan Muhammadiyah. Jadwal shalat standar MASA Tarjih, ruang ibadah digital, warta persyarikatan, dan transparansi infaq.",
   authors: [{ name: "Takmir Masjid Sudalmiyah Rais UMS" }],
   keywords: [
     "Masjid Sudalmiyah Rais",
+    "MasjidMu Percontohan",
+    "Masjid Percontohan Muhammadiyah",
     "UMS",
     "Universitas Muhammadiyah Surakarta",
+    "Jadwal Shalat MASA",
     "Jadwal Shalat Surakarta",
     "Kajian Mahasiswa UMS",
     "Infaq Digital Masjid",

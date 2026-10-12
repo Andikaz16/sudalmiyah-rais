@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export interface ApiNewsItem {
   id: string;
-  source: "UMS" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
+  source: "MASJIDMU" | "UMS" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
   badge: string;
   badgeClass: string;
   timeAgo: string;
@@ -94,8 +94,65 @@ function calculateTimeAgo(dateString: string): string {
   }
 }
 
+const masjidMuArticles: ApiNewsItem[] = [
+  {
+    id: "masjidmu-1",
+    source: "MASJIDMU",
+    badge: "MASJIDMU PERCONTOHAN",
+    badgeClass: "bg-[#0D5C58] text-amber-200 border border-amber-300/40",
+    timeAgo: "1 jam lalu",
+    publishedAt: "2026-10-12T08:00:00Z",
+    sourceDomain: "masjidmu.or.id",
+    sourceUrl: "https://muhammadiyah.or.id",
+    title: "Masjid Sudalmiyah Rais Jadi Rujukan MasjidMu Percontohan Kampus Ramah Umat dan Digital",
+    excerpt: "SURAKARTA — Masjid Sudalmiyah Rais Kampus 2 UMS mengokohkan peran strategis sebagai percontohan nasional pengelolaan masjid ramah lansia, ramah difabel, hisab Tarjih MASA, dan tata kelola digital terbuka.",
+    content: [
+      "SURAKARTA — Masjid Sudalmiyah Rais Universitas Muhammadiyah Surakarta terus memperkuat perannya sebagai model MasjidMu Percontohan di lingkungan Perguruan Tinggi Muhammadiyah dan 'Aisyiyah (PTMA). Langkah ini selaras dengan arahan Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid (LPCR-PM) PP Muhammadiyah.",
+      "Melalui integrasi empat pilar utama—Idarah (tata kelola transparan berbasis sistem informasi), Imarah (shalat berjamaah berstandar Tarjih dan MASA, serta dakwah multi-generasi), Ri'ayah (sarana ramah difabel, eco-mosque ramah lingkungan, ruang ibadah sejuk), dan Pelayanan Sosial Keumatan—Masjid Sudalmiyah Rais membuktikan komitmen masjid yang 'Makmur dan Memakmurkan'.",
+      "Pimpinan Takmir menegaskan bahwa inovasi ruang ibadah digital, kalkulator zakat otomatis, serta transparansi infaq digital menjadi langkah konkret mewujudkan masjid modern yang mencerahkan peradaban."
+    ],
+    imageUrl: "/images/masjid-sudalmiyah.jpg",
+  },
+  {
+    id: "masjidmu-2",
+    source: "MASJIDMU",
+    badge: "MASJIDMU PERCONTOHAN",
+    badgeClass: "bg-[#0D5C58] text-amber-200 border border-amber-300/40",
+    timeAgo: "4 jam lalu",
+    publishedAt: "2026-10-12T05:00:00Z",
+    sourceDomain: "lpcrpm.muhammadiyah.or.id",
+    sourceUrl: "https://muhammadiyah.or.id",
+    title: "LPCR-PM PP Muhammadiyah Akselerasi Standardisasi MasjidMu Percontohan Nasional",
+    excerpt: "YOGYAKARTA — Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid (LPCR-PM) PP Muhammadiyah menggencarkan standardisasi MasjidMu Percontohan di seluruh cabang dan kampus persyarikatan se-Indonesia.",
+    content: [
+      "YOGYAKARTA — Pimpinan Pusat Muhammadiyah melalui LPCR-PM menegaskan bahwa keberadaan masjid bukan sekadar tempat ibadah mahdhah, melainkan episentrum peradaban dan kemakmuran umat secara menyeluruh.",
+      "Program MasjidMu Percontohan menetapkan kriteria ketat meliputi manajemen tata kelola transparan, kebersihan prima, pembinaan generasi muda, sarana inklusif bagi difabel dan lansia, serta pemberdayaan ekonomi jamaah sekitar.",
+      "Masjid-masjid kampus Muhammadiyah, termasuk Masjid Sudalmiyah Rais UMS, diharapkan menjadi lokomotif utama yang menginspirasi ribuan masjid ranting dan cabang Muhammadiyah di tanah air."
+    ],
+    imageUrl: "/images/news/news-sm-1.jpg",
+  },
+  {
+    id: "masjidmu-3",
+    source: "MASJIDMU",
+    badge: "MASJIDMU PERCONTOHAN",
+    badgeClass: "bg-[#0D5C58] text-amber-200 border border-amber-300/40",
+    timeAgo: "1 hari lalu",
+    publishedAt: "2026-10-11T10:00:00Z",
+    sourceDomain: "masjid.ums.ac.id",
+    sourceUrl: "https://news.ums.ac.id",
+    title: "Penerapan Konsep Eco-Mosque dan Digitalisasi Layanan Jamaah di Masjid Kampus Muhammadiyah",
+    excerpt: "SURAKARTA — Transformasi energi berkelanjutan, pengelolaan wudhu hemat air, dan fitur ramah lansia menjadi wujud ri'ayah berkemajuan di lingkungan Masjid Sudalmiyah Rais.",
+    content: [
+      "SURAKARTA — Masjid kampus kini dituntut bertransformasi menjawab tantangan ekologis dan digital. Implementasi konsep Eco-Mosque di Masjid Sudalmiyah Rais mengedepankan efisiensi listrik, pemanfaatan pencahayaan alami kubah, serta manajemen air wudhu berkelanjutan.",
+      "Di sisi lain, kehadiran portal digital mandiri yang menyajikan panduan shalat standar Tarjih, Al-Qur'an ramah lansia, hisab MASA, dan pelaporan keuangan real-time melengkapi ekosistem masjid modern berkemajuan."
+    ],
+    imageUrl: "/images/news/news-lensamu-1.jpg",
+  },
+];
+
 // Fallback articles in case any external site is down or slow
 const fallbackArticles: ApiNewsItem[] = [
+  ...masjidMuArticles,
   {
     id: "ums-1",
     source: "UMS",
@@ -354,11 +411,17 @@ export async function GET() {
     finalArticles = fallbackArticles;
   }
 
+  // Always prepend MasjidMu Percontohan articles at the top
+  const combinedArticles = [
+    ...masjidMuArticles,
+    ...finalArticles.filter((a) => a.source !== "MASJIDMU"),
+  ];
+
   return NextResponse.json(
     {
       success: true,
       updatedAt: new Date().toISOString(),
-      articles: finalArticles,
+      articles: combinedArticles,
     },
     {
       headers: {
