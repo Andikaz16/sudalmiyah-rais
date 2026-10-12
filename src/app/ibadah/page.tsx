@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -10,6 +11,7 @@ import TilawahIcon from "@/components/TilawahIcon";
 import DoaIcon from "@/components/DoaIcon";
 import KiblatIcon from "@/components/KiblatIcon";
 import KiblatCompass from "@/components/KiblatCompass";
+import AsmaulHusnaIcon from "@/components/AsmaulHusnaIcon";
 import {
   SURAH_LIST,
   JUZ_LIST,
@@ -200,6 +202,8 @@ export default function IbadahPage() {
                         <DoaIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : feat.id === "kiblat" ? (
                         <KiblatIcon className="w-7 h-7 sm:w-9 sm:h-9" />
+                      ) : feat.id === "asmaul-husna" ? (
+                        <AsmaulHusnaIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : (
                         <span className="leading-none select-none tracking-normal">
                           {feat.iconSymbol}
@@ -279,6 +283,9 @@ export default function IbadahPage() {
                         )}
                         {currentFeat?.id === "kiblat" && (
                           <KiblatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                        )}
+                        {currentFeat?.id === "asmaul-husna" && (
+                          <AsmaulHusnaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
                         )}
                         <span>{currentFeat?.title}</span>
                       </h1>
@@ -1804,7 +1811,32 @@ function AsmaulHusnaFeatureView() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Banner Pengantar dengan Ikon Bintang Segi Delapan Asmaul Husna */}
+      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#0D5C58]/10 via-[#0D5C58]/5 to-[#D4AF37]/10 border border-[#0D5C58]/20 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left shadow-2xs">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center p-1 rounded-2xl bg-white shadow-md border border-stone-200">
+          <Image
+            src="/images/icon-asmaul-husna.png"
+            alt="Asmaul Husna"
+            width={80}
+            height={80}
+            className="object-contain"
+          />
+        </div>
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0D5C58] text-white text-[11px] font-semibold">
+            <AsmaulHusnaIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>99 Nama Agung & Sifat Mulia Allah SWT</span>
+          </div>
+          <h3 className="text-lg sm:text-xl font-bold text-stone-900 font-serif">
+            Al-Asma' Al-Husna (الأسماء الحسنى)
+          </h3>
+          <p className="text-xs text-stone-600 leading-relaxed max-w-xl">
+            "Hanya milik Allah asma-ul husna, maka bermohonlah kepada-Nya dengan menyebut asma-ul husna itu..." (QS. Al-A'raf: 180). Lengkap dengan kaligrafi Arab, transliterasi latin, arti, dan tadabbur maknanya.
+          </p>
+        </div>
+      </div>
+
       <input
         type="text"
         value={search}
