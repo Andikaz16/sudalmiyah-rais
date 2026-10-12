@@ -15,6 +15,7 @@ import AsmaulHusnaIcon from "@/components/AsmaulHusnaIcon";
 import ZakatCalculator from "@/components/ZakatCalculator";
 import ZakatIcon from "@/components/ZakatIcon";
 import ShalatIcon from "@/components/ShalatIcon";
+import KalenderIcon from "@/components/KalenderIcon";
 import {
   SURAH_LIST,
   JUZ_LIST,
@@ -211,6 +212,8 @@ export default function IbadahPage() {
                         <ZakatIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : feat.id === "panduan-shalat" ? (
                         <ShalatIcon className="w-7 h-7 sm:w-9 sm:h-9" />
+                      ) : feat.id === "kalender" ? (
+                        <KalenderIcon className="w-7 h-7 sm:w-9 sm:h-9" />
                       ) : (
                         <span className="leading-none select-none tracking-normal">
                           {feat.iconSymbol}
@@ -299,6 +302,9 @@ export default function IbadahPage() {
                         )}
                         {currentFeat?.id === "panduan-shalat" && (
                           <ShalatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
+                        )}
+                        {currentFeat?.id === "kalender" && (
+                          <KalenderIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0D5C58] shrink-0" />
                         )}
                         <span>{currentFeat?.title}</span>
                       </h1>
@@ -1937,7 +1943,10 @@ function KalenderFeatureView() {
   return (
     <div className="space-y-5">
       {/* Current Date Card */}
-      <div className="p-5 rounded-3xl bg-gradient-to-r from-[#0D5C58] to-[#083E3B] text-white text-center space-y-1 shadow-md">
+      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-[#0D5C58] to-[#083E3B] text-white text-center space-y-2 shadow-md flex flex-col items-center">
+        <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center p-2 mb-1 shadow-inner">
+          <KalenderIcon className="w-7 h-7 text-[#D4AF37]" />
+        </div>
         <span className="text-[11px] text-[#D4AF37] uppercase font-bold tracking-wider">
           Penanggalan Hari Ini
         </span>
