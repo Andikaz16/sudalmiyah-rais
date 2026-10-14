@@ -211,21 +211,6 @@ export default function HeroSection() {
           </Link>
         </div>
 
-        {/* Slide Indicators */}
-        <div className="mt-7 flex items-center justify-center gap-2">
-          {HERO_SLIDES.map((slide, idx) => (
-            <button
-              key={slide.id}
-              onClick={() => setCurrentSlide(idx)}
-              aria-label={`Pindah ke slide ${slide.mosqueName}`}
-              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                idx === currentSlide
-                  ? "w-8 bg-gradient-to-r from-amber-300 to-amber-400 shadow-md shadow-amber-500/40"
-                  : "w-2.5 bg-white/30 hover:bg-white/60"
-              }`}
-            />
-          ))}
-        </div>
       </div>
 
       {/* Smooth Concave Dome Arch Bottom Divider into #FAF8F5 (matching signature curve) */}
