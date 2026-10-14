@@ -114,6 +114,10 @@ export default function Footer() {
             <span>Integritas</span>
             <span>Syariah</span>
             <span>Berkemajuan</span>
+            <span className="text-stone-500">•</span>
+            <Link href="/auth/login" className="hover:text-amber-300 transition-colors">
+              Akses Takmir
+            </Link>
           </div>
         </div>
       </div>

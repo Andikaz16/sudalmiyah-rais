@@ -31,7 +31,7 @@ export default function Navbar() {
     { href: "/", label: "Beranda" },
     { href: "/ibadah", label: "Ruang Ibadah" },
     { href: "/jadwal", label: "Jadwal Shalat" },
-    { href: "/agenda", label: "Agenda & Kajian" },
+    { href: "/layanan", label: "Layanan" },
     { href: "/donasi", label: "Infaq Digital" },
   ];
 
@@ -92,10 +92,10 @@ export default function Navbar() {
               </Link>
             ) : (
               <Link
-                href="/auth/login"
-                className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-semibold shadow-sm shadow-[#003B73]/15 transition-all hover:scale-[1.02]"
+                href="/agenda"
+                className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-semibold shadow-sm shadow-[#003B73]/15 transition-all hover:scale-[1.02] border border-amber-400/30"
               >
-                Portal Pengurus
+                Agenda Masjid
               </Link>
             )}
           </div>
@@ -144,11 +144,11 @@ export default function Navbar() {
               </Link>
             ) : (
               <Link
-                href="/auth/login"
+                href="/agenda"
                 onClick={() => setIsOpen(false)}
                 className="block text-center w-full px-4 py-3 rounded-full bg-[#003B73] text-white font-semibold text-sm shadow-md"
               >
-                Portal Pengurus
+                Agenda Masjid
               </Link>
             )}
           </div>
