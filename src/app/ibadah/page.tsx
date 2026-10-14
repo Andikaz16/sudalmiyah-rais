@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Sparkles, ExternalLink, CalendarDays, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -19,6 +19,7 @@ import ZakatIcon from "@/components/ZakatIcon";
 import ShalatIcon from "@/components/ShalatIcon";
 import KalenderIcon from "@/components/KalenderIcon";
 import HaditsIcon from "@/components/HaditsIcon";
+import { getMuhammadiyahCalendarDetails } from "@/lib/prayer-times";
 import {
   SURAH_LIST,
   JUZ_LIST,
@@ -79,15 +80,15 @@ const FEATURE_LIST: FeatureCard[] = [
   {
     id: "doa",
     title: "Doa & Dzikir Harian",
-    shortDesc: "Kumpulan doa shahih Hisnul Muslim dan dzikir pagi petang",
-    badge: "Hisnul Muslim",
+    shortDesc: "Kumpulan doa shahih Hisnul Muslim dan dzikir pagi petang standar MASA Tarjih",
+    badge: "Standar MASA",
     iconSymbol: "دعاء",
   },
   {
     id: "kiblat",
     title: "Arah Kiblat",
-    shortDesc: "Kompas azimut 294.3° Surakarta & Kampus UMS",
-    badge: "294.3° Barat Laut",
+    shortDesc: "Kompas azimut 294.3° hisab astronomis resmi MASA Tarjih Kampus UMS",
+    badge: "Hisab MASA Tarjih",
     iconSymbol: "القبلة",
   },
   {
@@ -106,16 +107,16 @@ const FEATURE_LIST: FeatureCard[] = [
   },
   {
     id: "kalender",
-    title: "Kalender Hijriyah",
-    shortDesc: "Penanggalan Islam & jadwal puasa sunnah Senin-Kamis",
-    badge: "Puasa Sunnah",
+    title: "Kalender Muhammadiyah (KHGT)",
+    shortDesc: "Penanggalan Hijriyah Global Tunggal & hisab puasa Majelis Tarjih PP Muhammadiyah",
+    badge: "Standar KHGT Tarjih",
     iconSymbol: "تقويم",
   },
   {
     id: "panduan-shalat",
-    title: "Panduan Shalat",
-    shortDesc: "Tuntunan wudhu & shalat sesuai Tarjih Muhammadiyah",
-    badge: "Tarjih HPT",
+    title: "Panduan Shalat Tarjih",
+    shortDesc: "Tuntunan wudhu & shalat berpedoman HPT sesuai database resmi MASA Muhammadiyah",
+    badge: "HPT via MASA",
     iconSymbol: "صلاة",
   },
   {
@@ -155,12 +156,54 @@ export default function IbadahPage() {
             {/* Hero Section */}
             <section className="bg-gradient-to-b from-white via-white to-[#FAF8F5] border-b border-stone-200/80 pt-10 pb-12 sm:pt-14 sm:pb-16 text-center">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Official MASA Badge */}
+                <div className="inline-flex items-center gap-2 bg-[#003B73]/10 border border-[#003B73]/25 px-4 py-1.5 rounded-full text-xs font-bold text-[#003B73] mb-4 shadow-xs animate-fade-down">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>Terintegrasi Standar MASA (Muhammadiyah Super App) & Majelis Tarjih PP Muhammadiyah</span>
+                </div>
+
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight animate-fade-up">
                   Ruang Ibadah <span className="text-[#003B73]">Digital</span>
                 </h1>
                 <p className="text-sm sm:text-base text-stone-600 mt-4 leading-relaxed max-w-2xl mx-auto font-sans animate-fade-up delay-150">
-                  Kumpulan piranti penunjang ibadah harian jamaah Masjid Sudalmiyah Rais Universitas Muhammadiyah Surakarta untuk memperkaya kedekatan spiritual setiap saat.
+                  Kumpulan piranti penunjang ibadah harian berpedoman resmi pada Himpunan Putusan Tarjih (HPT) dan ekosistem digital MASA (Muhammadiyah Super App) untuk memperkaya kedekatan spiritual sivitas akademika UMS dan jamaah.
                 </p>
+
+                {/* Banner Integrasi Resmi MASA Muhammadiyah */}
+                <div className="mt-8 bg-gradient-to-r from-[#003B73] via-[#002855] to-[#041222] text-white p-5 sm:p-6 rounded-3xl shadow-xl border border-amber-400/35 text-left relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-up delay-200">
+                  <div className="relative z-10 flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center shrink-0 shadow-inner text-[#D4AF37]">
+                      <Sparkles className="w-6 h-6 text-[#D4AF37]" />
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className="text-[10px] font-extrabold uppercase tracking-widest bg-[#D4AF37] text-stone-950 px-2.5 py-0.5 rounded-md font-mono">
+                          SUMBER RESMI PERSYARIKATAN
+                        </span>
+                        <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1 font-mono">
+                          ● MASA Sync Active
+                        </span>
+                      </div>
+                      <h3 className="text-base sm:text-lg font-bold font-serif text-white tracking-tight">
+                        Tuntunan Ibadah Selaras MASA (Muhammadiyah Super App)
+                      </h3>
+                      <p className="text-xs text-stone-200 mt-1 max-w-xl leading-relaxed">
+                        Seluruh hisab waktu shalat, arah kiblat (azimut 294.3°), bacaan shalat HPT, dan penanggalan Kalender Hijriyah Global Tunggal (KHGT) di Masjid Sudalmiyah Rais Kampus 2 UMS bersumber langsung dari standar resmi Majelis Tarjih & Tajdid Pimpinan Pusat Muhammadiyah.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="relative z-10 flex items-center gap-2 shrink-0 w-full md:w-auto justify-end">
+                    <a
+                      href="https://play.google.com/store/apps/details?id=org.muhammadiyah.masa"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2.5 rounded-xl bg-white text-[#003B73] hover:bg-stone-100 font-bold text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                    >
+                      <span>Aplikasi Resmi MASA</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -319,8 +362,12 @@ export default function IbadahPage() {
                     </div>
                   </div>
 
-                  <div className="hidden sm:flex items-center gap-3 text-xs text-stone-500">
-                    <span>Masjid Sudalmiyah Rais UMS</span>
+                  <div className="flex items-center gap-2">
+                    <span className="hidden md:inline text-[11px] text-stone-500">Masjid Sudalmiyah Rais UMS</span>
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] border border-[#003B73]/20 flex items-center gap-1.5 shadow-2xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      <span>Standar MASA Muhammadiyah</span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1973,6 +2020,7 @@ function ZakatFeatureView() {
 // -------------------------------------------------------------
 function KalenderFeatureView() {
   const [todayText, setTodayText] = useState("");
+  const [calendarInfo, setCalendarInfo] = useState<ReturnType<typeof getMuhammadiyahCalendarDetails> | null>(null);
 
   useEffect(() => {
     const d = new Date();
@@ -1984,7 +2032,41 @@ function KalenderFeatureView() {
         year: "numeric",
       })
     );
+    setCalendarInfo(getMuhammadiyahCalendarDetails(d));
   }, []);
+
+  const hariBesarMuhammadiyah = [
+    {
+      title: "Tahun Baru 1448 Hijriyah",
+      dateHijri: "1 Muharram 1448 H",
+      kategori: "Tahun Baru Islam",
+      desc: "Awal tahun penanggalan Hijriyah berdasar kriteria Kalender Hijriyah Global Tunggal (KHGT).",
+    },
+    {
+      title: "Milad Muhammadiyah ke-114",
+      dateHijri: "8 Dzulhijjah / 18 November",
+      kategori: "Persyarikatan",
+      desc: "Peringatan hari lahir Persyarikatan Muhammadiyah yang didirikan oleh KH. Ahmad Dahlan di Yogyakarta (1912 M / 1330 H).",
+    },
+    {
+      title: "Awal Ramadhan 1448 H",
+      dateHijri: "1 Ramadhan 1448 H",
+      kategori: "Ibadah Wajib",
+      desc: "Awal ibadah puasa Ramadhan mengacu Maklumat PP Muhammadiyah berdasar Hisab Hakiki Wujudul Hilal.",
+    },
+    {
+      title: "Hari Raya Idul Fitri 1448 H",
+      dateHijri: "1 Syawal 1448 H",
+      kategori: "Hari Raya",
+      desc: "Hari kemenangan umat Islam setelah menunaikan sebulan penuh ibadah puasa Ramadhan.",
+    },
+    {
+      title: "Hari Arafah & Idul Adha 1448 H",
+      dateHijri: "9 & 10 Dzulhijjah 1448 H",
+      kategori: "Hari Raya & Qurban",
+      desc: "Hari wukuf di Arafah (puasa sunnah Arafah) dilanjutkan Shalat Idul Adha dan penyembelihan hewan qurban.",
+    },
+  ];
 
   const puasaSchedule = [
     {
@@ -2010,21 +2092,101 @@ function KalenderFeatureView() {
   ];
 
   return (
-    <div className="space-y-5">
-      {/* Current Date Card */}
-      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-[#003B73] to-[#001F3F] text-white text-center space-y-2 shadow-md flex flex-col items-center">
-        <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center p-2 mb-1 shadow-inner">
-          <KalenderIcon className="w-7 h-7 text-[#D4AF37]" />
+    <div className="space-y-6">
+      {/* Current Date Card with MASA & KHGT Branding */}
+      <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-[#003B73] via-[#00274D] to-[#00172E] text-white shadow-xl relative overflow-hidden">
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#D4AF37]/15 rounded-full blur-2xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col items-center text-center space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/40 shadow-xs flex items-center gap-1.5">
+              <CalendarDays className="w-3.5 h-3.5" />
+              Kalender Hijriyah Global Tunggal (KHGT)
+            </span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-stone-200 border border-white/20">
+              MASA Muhammadiyah
+            </span>
+          </div>
+
+          <div className="space-y-1">
+            <div className="text-stone-300 text-xs sm:text-sm font-medium">
+              {todayText || "Memuat tanggal masehi..."}
+            </div>
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-serif text-[#D4AF37] tracking-tight">
+              {calendarInfo?.hijri || "Memuat Penanggalan Hijriyah..."}
+            </h3>
+            {calendarInfo?.pasaran && (
+              <div className="inline-block text-xs sm:text-sm font-semibold px-3 py-0.5 rounded-full bg-white/10 text-stone-200 border border-white/15">
+                Pasaran Jawa: <span className="text-white font-bold">{calendarInfo.pasaran}</span>
+              </div>
+            )}
+          </div>
+
+          <p className="text-[11px] sm:text-xs text-stone-300 max-w-md leading-relaxed border-t border-white/10 pt-3">
+            {calendarInfo?.authority || "Majelis Tarjih dan Tajdid Pimpinan Pusat Muhammadiyah"} • Terintegrasi dengan MASA (Muhammadiyah Super App).
+          </p>
         </div>
-        <span className="text-[11px] text-[#D4AF37] uppercase font-bold tracking-wider">
-          Penanggalan Hari Ini
-        </span>
-        <h3 className="text-xl sm:text-2xl font-bold font-serif">
-          {todayText || "Memuat tanggal..."}
-        </h3>
-        <p className="text-xs text-stone-300">
-          Tahun 1448 Hijriyah • Kalender Islam Terpadu
-        </p>
+      </div>
+
+      {/* Info MASA & Majelis Tarjih */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-300/60 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#003B73] text-[#D4AF37] flex items-center justify-center font-serif font-black text-xs shrink-0 shadow-sm">
+            MASA
+          </div>
+          <div>
+            <h4 className="text-xs sm:text-sm font-bold text-stone-900">
+              Sinkronisasi Ekosistem Digital MASA Muhammadiyah
+            </h4>
+            <p className="text-[11px] text-stone-600 leading-relaxed">
+              Penanggalan, hisab astronomi, dan jadwal ibadah diselaraskan dengan putusan Majelis Tarjih & Tajdid PP Muhammadiyah.
+            </p>
+          </div>
+        </div>
+        <a
+          href="https://muhammadiyah.or.id"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl bg-[#003B73] text-white hover:bg-[#002855] transition-colors shrink-0 shadow-xs"
+        >
+          <span>Akses Portal Resmi</span>
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      </div>
+
+      {/* Hari Besar Islam & Milad Persyarikatan (KHGT) */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h4 className="text-sm font-bold text-stone-900 font-serif flex items-center gap-2">
+            <span>Hari Besar Islam & Momentum Persyarikatan</span>
+          </h4>
+          <span className="text-[10px] font-semibold text-[#003B73] bg-[#003B73]/10 px-2 py-0.5 rounded-full">
+            Standar KHGT
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {hariBesarMuhammadiyah.map((item, idx) => (
+            <div
+              key={idx}
+              className="p-4 rounded-2xl bg-white border border-stone-200/90 hover:border-[#003B73]/30 transition-all shadow-xs space-y-1.5 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#003B73]/10 text-[#003B73]">
+                    {item.kategori}
+                  </span>
+                  <span className="text-[11px] font-mono font-bold text-[#B58A1E]">
+                    {item.dateHijri}
+                  </span>
+                </div>
+                <h5 className="font-bold text-stone-900 text-sm">{item.title}</h5>
+                <p className="text-xs text-stone-600 leading-relaxed mt-1">
+                  {item.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Sunnah Fasting Schedule */}
@@ -2037,7 +2199,7 @@ function KalenderFeatureView() {
           {puasaSchedule.map((p, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-2xl bg-white border border-stone-200 space-y-1"
+              className="p-4 rounded-2xl bg-white border border-stone-200 space-y-1 shadow-xs"
             >
               <div className="flex items-center justify-between">
                 <span className="font-bold text-stone-900 text-sm">
@@ -2055,18 +2217,37 @@ function KalenderFeatureView() {
         </div>
       </div>
 
-      {/* Niat Puasa Sunnah Card */}
-      <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs space-y-1.5">
-        <span className="font-bold text-[#003B73] block">Niat Puasa Sunnah:</span>
-        <p className="font-serif text-lg text-stone-800 text-right">
-          نَوَيْتُ صَوْمَ يَوْمِ الإِثْنَيْنِ / الخَمِيْسِ سُنَّةً لِلَّهِ تَعَالَى
-        </p>
-        <p className="text-[11px] text-stone-600 italic">
-          Nawaitu shauma yaumil itsnaini / al-khamisi sunnatan lillahi ta'ala.
-        </p>
-        <p className="text-[11px] text-stone-500">
-          "Saya niat berpuasa sunnah hari Senin / Kamis karena Allah Ta'ala."
-        </p>
+      {/* Niat & Doa Berbuka Puasa Sunnah Card Sesuai HPT Muhammadiyah */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs space-y-2">
+          <span className="font-bold text-[#003B73] block uppercase tracking-wider text-[11px]">
+            Niat Puasa Sunnah:
+          </span>
+          <p className="font-serif text-lg text-stone-800 text-right leading-loose">
+            نَوَيْتُ صَوْمَ يَوْمِ الإِثْنَيْنِ / الخَمِيْسِ سُنَّةً لِلَّهِ تَعَالَى
+          </p>
+          <p className="text-[11px] text-stone-600 italic">
+            Nawaitu shauma yaumil itsnaini / al-khamisi sunnatan lillahi ta'ala.
+          </p>
+          <p className="text-[11px] text-stone-500">
+            "Saya niat berpuasa sunnah hari Senin / Kamis karena Allah Ta'ala." (Cukup dihadirkan dalam hati).
+          </p>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs space-y-2">
+          <span className="font-bold text-[#003B73] block uppercase tracking-wider text-[11px]">
+            Doa Berbuka Puasa (Himpunan Putusan Tarjih):
+          </span>
+          <p className="font-serif text-lg text-stone-800 text-right leading-loose">
+            ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ
+          </p>
+          <p className="text-[11px] text-stone-600 italic">
+            Dzahabadh-dhama'u wabtallatil 'uruuqu wa tsabatal ajru in syaa Allah.
+          </p>
+          <p className="text-[11px] text-stone-500">
+            "Telah hilang dahaga, telah basah urat-urat, dan telah tetap pahala insya Allah." (HR. Abu Dawud).
+          </p>
+        </div>
       </div>
     </div>
   );

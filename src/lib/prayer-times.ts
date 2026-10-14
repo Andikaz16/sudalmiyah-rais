@@ -231,6 +231,16 @@ export function getNextPrayer(
   };
 }
 
+// Hitung Pasaran Jawa (Legi, Pahing, Pon, Wage, Kliwon)
+export function getPasaranJawa(date: Date = new Date()): string {
+  // Patokan astronomis: 1 Januari 2020 adalah Rabu Legi
+  const baseDate = new Date(2020, 0, 1);
+  const diffDays = Math.floor((date.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
+  const pasaran = ["Legi", "Pahing", "Pon", "Wage", "Kliwon"];
+  const index = ((diffDays % 5) + 5) % 5;
+  return pasaran[index];
+}
+
 // Convert Gregorian to approximate Hijri date
 export function getHijriDate(date: Date = new Date()): string {
   try {
@@ -244,3 +254,17 @@ export function getHijriDate(date: Date = new Date()): string {
     return "1448 H";
   }
 }
+
+// Rincian Kalender Hijriyah Resmi Muhammadiyah (KHGT)
+export function getMuhammadiyahCalendarDetails(date: Date = new Date()) {
+  const hijri = getHijriDate(date);
+  const pasaran = getPasaranJawa(date);
+  return {
+    hijri,
+    pasaran,
+    combined: `${hijri} (${pasaran})`,
+    standard: "Kalender Hijriyah Global Tunggal (KHGT)",
+    authority: "Majelis Tarjih & Tajdid PP Muhammadiyah",
+  };
+}
+
