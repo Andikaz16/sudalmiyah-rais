@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { Play, Pause, SkipBack, SkipForward, Sparkles, ExternalLink, CalendarDays, ShieldCheck } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, ExternalLink, CalendarDays, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -154,56 +154,14 @@ export default function IbadahPage() {
         {activeFeature === null ? (
           <div>
             {/* Hero Section */}
-            <section className="bg-gradient-to-b from-white via-white to-[#FAF8F5] border-b border-stone-200/80 pt-10 pb-12 sm:pt-14 sm:pb-16 text-center">
+            <section className="bg-gradient-to-b from-white via-white to-[#FAF8F5] border-b border-stone-200/80 pt-10 pb-12 sm:pt-14 sm:pb-14 text-center">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Official MASA Badge */}
-                <div className="inline-flex items-center gap-2 bg-[#003B73]/10 border border-[#003B73]/25 px-4 py-1.5 rounded-full text-xs font-bold text-[#003B73] mb-4 shadow-xs animate-fade-down">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>Terintegrasi Standar MASA (Muhammadiyah Super App) & Majelis Tarjih PP Muhammadiyah</span>
-                </div>
-
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight animate-fade-up">
                   Ruang Ibadah <span className="text-[#003B73]">Digital</span>
                 </h1>
                 <p className="text-sm sm:text-base text-stone-600 mt-4 leading-relaxed max-w-2xl mx-auto font-sans animate-fade-up delay-150">
-                  Kumpulan piranti penunjang ibadah harian berpedoman resmi pada Himpunan Putusan Tarjih (HPT) dan ekosistem digital MASA (Muhammadiyah Super App) untuk memperkaya kedekatan spiritual sivitas akademika UMS dan jamaah.
+                  Kumpulan piranti penunjang ibadah harian berpedoman resmi pada Himpunan Putusan Tarjih (HPT) untuk memperkaya kedekatan spiritual sivitas akademika UMS dan seluruh jamaah.
                 </p>
-
-                {/* Banner Integrasi Resmi MASA Muhammadiyah */}
-                <div className="mt-8 bg-gradient-to-r from-[#003B73] via-[#002855] to-[#041222] text-white p-5 sm:p-6 rounded-3xl shadow-xl border border-amber-400/35 text-left relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-up delay-200">
-                  <div className="relative z-10 flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center shrink-0 shadow-inner text-[#D4AF37]">
-                      <Sparkles className="w-6 h-6 text-[#D4AF37]" />
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest bg-[#D4AF37] text-stone-950 px-2.5 py-0.5 rounded-md font-mono">
-                          SUMBER RESMI PERSYARIKATAN
-                        </span>
-                        <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1 font-mono">
-                          ● MASA Sync Active
-                        </span>
-                      </div>
-                      <h3 className="text-base sm:text-lg font-bold font-serif text-white tracking-tight">
-                        Tuntunan Ibadah Selaras MASA (Muhammadiyah Super App)
-                      </h3>
-                      <p className="text-xs text-stone-200 mt-1 max-w-xl leading-relaxed">
-                        Seluruh hisab waktu shalat, arah kiblat (azimut 294.3°), bacaan shalat HPT, dan penanggalan Kalender Hijriyah Global Tunggal (KHGT) di Masjid Sudalmiyah Rais Kampus 2 UMS bersumber langsung dari standar resmi Majelis Tarjih & Tajdid Pimpinan Pusat Muhammadiyah.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="relative z-10 flex items-center gap-2 shrink-0 w-full md:w-auto justify-end">
-                    <a
-                      href="https://play.google.com/store/apps/details?id=org.muhammadiyah.masa"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2.5 rounded-xl bg-white text-[#003B73] hover:bg-stone-100 font-bold text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer"
-                    >
-                      <span>Aplikasi Resmi MASA</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-                </div>
               </div>
             </section>
 
