@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { Play, Pause, SkipBack, SkipForward, ExternalLink, CalendarDays, ShieldCheck } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, ExternalLink, CalendarDays, ShieldCheck, Sparkles, Bot } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -165,8 +165,48 @@ export default function IbadahPage() {
               </div>
             </section>
 
+            {/* Spotlight Banner: Inovasi Machine Learning Tanya Tarjih AI */}
+            <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-6 sm:pt-8 animate-fade-up">
+              <div className="bg-gradient-to-r from-[#003B73] via-[#002855] to-[#041222] text-white p-5 sm:p-6 rounded-3xl shadow-xl border border-amber-400/40 flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
+                <div className="flex items-start gap-4 z-10">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center shrink-0 text-amber-300 shadow-inner">
+                    <Sparkles className="w-6 h-6 text-amber-300" />
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest bg-amber-400 text-stone-950 px-2.5 py-0.5 rounded-md font-mono">
+                        AI &amp; Machine Learning UMS
+                      </span>
+                      <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1 font-mono">
+                        ● Sistem Aktif
+                      </span>
+                    </div>
+                    <h3 className="text-base sm:text-lg font-bold font-serif text-white tracking-tight">
+                      Asisten Cerdas Fiqih &amp; Fatwa Tarjih AI
+                    </h3>
+                    <p className="text-xs text-stone-200 mt-1 max-w-xl leading-relaxed">
+                      Layanan tanya jawab interaktif seputar ibadah harian, shalat jamak-qashar, hisab kalender, dan fatwa persyarikatan berpedoman pada Himpunan Putusan Tarjih (HPT) PP Muhammadiyah.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="z-10 shrink-0 w-full md:w-auto flex justify-end">
+                  <button
+                    onClick={() => {
+                      const trigger = document.querySelector('button[aria-label="Buka Tanya Tarjih AI"]') as HTMLButtonElement;
+                      if (trigger) trigger.click();
+                    }}
+                    className="w-full md:w-auto px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                  >
+                    <Bot className="w-4 h-4 text-stone-950" />
+                    <span>Mulai Tanya Tarjih AI</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* 10 Feature Tiles Section: 3 Columns on Mobile, 5 Columns on Laptop */}
-            <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-8 sm:pt-12">
+            <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-8 sm:pt-10">
               <div className="mb-5 sm:mb-7 px-1 animate-fade-up delay-200">
                 <h2 className="text-lg sm:text-2xl font-bold text-stone-900 font-serif">
                   Menu Layanan Ibadah
