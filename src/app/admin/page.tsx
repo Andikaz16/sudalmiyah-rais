@@ -255,7 +255,7 @@ export default function AdminDashboardPage() {
             <Link href="/" className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 p-1.5 flex items-center justify-center shadow-md shrink-0 hover:bg-white/20 transition-colors">
               <Image
                 src="/images/logo/logo-masjid-white.png"
-                alt="Logo Masjid Sudalmiyah"
+                alt="Logo Masjid UMS"
                 width={32}
                 height={32}
                 className="object-contain"

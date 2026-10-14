@@ -44,7 +44,7 @@ export default function Navbar() {
             <div className="w-11 h-11 rounded-2xl bg-white border border-stone-200/90 flex items-center justify-center shadow-sm group-hover:border-[#D4AF37]/70 group-hover:scale-105 transition-all duration-200 p-1.5 shrink-0">
               <Image
                 src="/images/logo/logo-masjid.png"
-                alt="Logo Masjid Sudalmiyah"
+                alt="Logo Masjid UMS"
                 width={36}
                 height={36}
                 className="object-contain"
@@ -52,8 +52,8 @@ export default function Navbar() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg sm:text-xl tracking-tight text-[#B58A1E] group-hover:text-[#9A7416] transition-colors font-serif">
-                Masjid Sudalmiyah
+              <span className="font-bold text-lg sm:text-xl tracking-tight text-[#003B73] group-hover:text-[#B58A1E] transition-colors font-serif">
+                Masjid UMS
               </span>
               <span className="text-[10px] text-stone-500 tracking-wider uppercase font-medium">
                 Universitas Muhammadiyah Surakarta

@@ -149,7 +149,7 @@ export default function LoginPage() {
           <div className="w-14 h-14 rounded-2xl bg-white border border-stone-200/90 flex items-center justify-center shadow-md p-2">
             <Image
               src="/images/logo/logo-masjid.png"
-              alt="Logo Masjid Sudalmiyah"
+              alt="Logo Masjid UMS"
               width={42}
               height={42}
               className="object-contain"
