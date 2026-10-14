@@ -13,11 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Masjid Sudalmiyah Rais | MasjidMu Percontohan UMS",
+  title: "Masjid UMS | Masjid Sudalmiyah Rais Kampus 2",
   description:
-    "Portal Resmi Masjid Sudalmiyah Rais Kampus 2 UMS - Model MasjidMu Percontohan Muhammadiyah. Jadwal shalat standar MASA Tarjih, ruang ibadah digital, warta persyarikatan, dan transparansi infaq.",
-  authors: [{ name: "Takmir Masjid Sudalmiyah Rais UMS" }],
+    "Portal Resmi Masjid UMS (Masjid Sudalmiyah Rais Kampus 2 UMS) - Model MasjidMu Percontohan Muhammadiyah. Jadwal shalat standar MASA Tarjih, ruang ibadah digital, warta persyarikatan, dan transparansi infaq.",
+  authors: [{ name: "Takmir Masjid UMS" }],
   keywords: [
+    "Masjid UMS",
     "Masjid Sudalmiyah Rais",
     "MasjidMu Percontohan",
     "Masjid Percontohan Muhammadiyah",
@@ -30,14 +31,17 @@ export const metadata: Metadata = {
   ],
   manifest: "/manifest.json",
   icons: {
-    icon: "/images/logo/logo-masjid.png",
+    icon: [
+      { url: "/images/logo/logo-masjid.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
     shortcut: "/images/logo/logo-masjid.png",
     apple: "/images/logo/logo-masjid.png",
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Masjid Sudalmiyah",
+    title: "Masjid UMS",
   },
 };
 

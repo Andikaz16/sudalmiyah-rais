@@ -1,11 +1,11 @@
 {
-  "name": "Masjid Sudalmiyah Rais UMS",
-  "short_name": "Sudalmiyah",
-  "description": "Sistem Informasi Terpadu Masjid Sudalmiyah Rais Kampus 2 UMS",
+  "name": "Masjid UMS - Sudalmiyah Rais",
+  "short_name": "Masjid UMS",
+  "description": "Sistem Informasi Terpadu Masjid UMS Kampus 2",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FAF8F5",
-  "theme_color": "#0D5C58",
+  "theme_color": "#003B73",
   "icons": [
     {
       "src": "/favicon.ico",
@@ -14,7 +14,7 @@
     },
     {
       "src": "/images/logo/logo-masjid.png",
-      "sizes": "192x192",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]

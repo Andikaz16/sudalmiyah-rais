@@ -18,13 +18,13 @@ export default function Footer() {
           {/* Identity */}
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-white/10 border border-white/20 p-2 flex items-center justify-center shadow-md shrink-0">
+              <div className="w-12 h-12 flex items-center justify-center shrink-0">
                 <Image
                   src="/images/logo/logo-masjid-white.png"
                   alt="Logo Masjid UMS"
-                  width={36}
-                  height={36}
-                  className="object-contain"
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-contain"
                 />
               </div>
               <div>

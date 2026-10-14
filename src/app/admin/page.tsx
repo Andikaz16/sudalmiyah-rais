@@ -252,13 +252,13 @@ export default function AdminDashboardPage() {
       <header className="bg-[#001F3F] border-b border-stone-800 text-white sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 p-1.5 flex items-center justify-center shadow-md shrink-0 hover:bg-white/20 transition-colors">
+            <Link href="/" className="w-11 h-11 flex items-center justify-center shrink-0 hover:scale-105 transition-transform">
               <Image
                 src="/images/logo/logo-masjid-white.png"
                 alt="Logo Masjid UMS"
-                width={32}
-                height={32}
-                className="object-contain"
+                width={44}
+                height={44}
+                className="w-full h-full object-contain"
               />
             </Link>
             <div>

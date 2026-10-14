@@ -146,13 +146,13 @@ export default function LoginPage() {
         </Link>
 
         <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="w-14 h-14 rounded-2xl bg-white border border-stone-200/90 flex items-center justify-center shadow-md p-2">
+          <div className="w-18 h-18 flex items-center justify-center">
             <Image
               src="/images/logo/logo-masjid.png"
               alt="Logo Masjid UMS"
-              width={42}
-              height={42}
-              className="object-contain"
+              width={72}
+              height={72}
+              className="w-full h-full object-contain"
               priority
             />
           </div>
