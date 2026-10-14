@@ -134,20 +134,22 @@ export default function HeroSection() {
       {/* Hero Content Overlay */}
       <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-10 sm:pt-16 pb-24 sm:pb-28">
         {/* Minimalist Mosque Badge */}
-        <div className="inline-flex items-center justify-center px-4 sm:px-5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-amber-300 text-xs sm:text-sm font-semibold tracking-wide mb-6 shadow-md transition-all duration-300">
+        <div className="inline-flex items-center justify-center px-4 sm:px-5 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-semibold tracking-wide mb-6 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all duration-300">
           <span>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</span>
         </div>
 
-        {/* Dynamic Grand Headline with Sharp Text Shadows for HD Background Legibility */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] font-serif [text-shadow:_0_3px_20px_rgba(0,0,0,0.95)] drop-shadow-2xl min-h-[115px] sm:min-h-[145px] lg:min-h-[165px] flex flex-col justify-center">
-          <span className="transition-opacity duration-300">{active.leadWord}</span>
-          <span className="block mt-2 sm:mt-3 bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent [filter:drop-shadow(0_3px_15px_rgba(0,0,0,0.95))] transition-opacity duration-300">
+        {/* Dynamic Grand Headline with Elegant Soft Golden Neon Glow */}
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] font-serif min-h-[115px] sm:min-h-[145px] lg:min-h-[165px] flex flex-col justify-center">
+          <span className="text-white [text-shadow:_0_0_16px_rgba(255,255,255,0.5),_0_2px_8px_rgba(0,0,0,0.85)] transition-opacity duration-300">
+            {active.leadWord}
+          </span>
+          <span className="block mt-2 sm:mt-3 text-[#FEF08A] [text-shadow:_0_0_12px_rgba(253,224,71,0.75),_0_0_24px_rgba(245,158,11,0.55),_0_0_40px_rgba(217,119,6,0.35),_0_2px_8px_rgba(0,0,0,0.9)] transition-opacity duration-300">
             {active.mosqueName}
           </span>
         </h1>
 
         {/* Dynamic Subtitle */}
-        <p className="mt-5 sm:mt-6 text-sm sm:text-base lg:text-lg text-white/95 max-w-2xl mx-auto leading-relaxed [text-shadow:_0_2px_14px_rgba(0,0,0,0.95)] min-h-[75px] sm:min-h-[60px] flex items-center justify-center transition-opacity duration-300">
+        <p className="mt-5 sm:mt-6 text-sm sm:text-base lg:text-lg text-stone-100 max-w-2xl mx-auto leading-relaxed [text-shadow:_0_1px_8px_rgba(0,0,0,0.95)] min-h-[75px] sm:min-h-[60px] flex items-center justify-center transition-opacity duration-300">
           {active.description}
         </p>
 
