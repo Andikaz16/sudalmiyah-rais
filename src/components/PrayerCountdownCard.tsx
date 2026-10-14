@@ -132,8 +132,8 @@ export default function PrayerCountdownCard() {
           </div>
         </div>
 
-        {/* Kolom Kanan: Live Countdown & Card Kalender Muhammadiyah di Bawah Jam */}
-        <div className="flex flex-col gap-2.5 w-full lg:w-auto lg:min-w-[360px]">
+        {/* Kolom Kanan: Live Countdown & 2 Kotak Kalender Muhammadiyah di Bawah Jam */}
+        <div className="flex flex-col gap-2.5 w-full lg:w-auto lg:min-w-[400px]">
           {/* Live Countdown Badge */}
           <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl p-3.5 sm:p-4 flex items-center gap-4 shadow-xs hover:shadow-md transition-shadow">
             <div className="p-3 rounded-xl bg-[#003B73]/10 text-[#003B73] shrink-0">
@@ -150,38 +150,65 @@ export default function PrayerCountdownCard() {
             </div>
           </div>
 
-          {/* DEDICATED KALENDER MUHAMMADIYAH CARD DI BAWAH JAM (Sesuai Permintaan Pak Dodi) */}
-          <div className="bg-gradient-to-r from-[#003B73]/5 via-[#D4AF37]/10 to-[#003B73]/5 border border-[#D4AF37]/45 rounded-2xl p-3 sm:p-3.5 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-[#D4AF37]/20 text-[#B58A1E] shrink-0 shadow-inner">
-                <CalendarDays className="w-5 h-5 text-[#B58A1E]" />
-              </div>
+          {/* 2 KOTAK KALENDER MUHAMMADIYAH DI BAWAH KOTAK JAM */}
+          <div className="grid grid-cols-2 gap-2.5">
+            {/* KOTAK 1: KALENDER HIJRIYAH (KHGT) */}
+            <div className="bg-gradient-to-br from-white via-[#FAF8F5] to-amber-50/40 border border-[#D4AF37]/50 rounded-2xl p-3 sm:p-3.5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#003B73] bg-[#003B73]/10 px-2 py-0.5 rounded-md">
-                    Kalender Muhammadiyah
-                  </span>
-                  <span className="text-[9px] font-bold text-[#B58A1E] bg-amber-100/90 border border-amber-300/70 px-1.5 py-0.5 rounded font-mono">
+                <div className="flex items-center justify-between gap-1 mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <div className="p-1 rounded-md bg-[#D4AF37]/20 text-[#B58A1E] shrink-0">
+                      <CalendarDays className="w-3.5 h-3.5 text-[#B58A1E]" />
+                    </div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#003B73]">
+                      Hijriyah
+                    </span>
+                  </div>
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-100/90 text-[#B58A1E] border border-amber-300/60">
                     KHGT
                   </span>
                 </div>
-                <div className="text-sm sm:text-base font-bold text-stone-900 tracking-tight mt-0.5 font-serif flex items-center gap-1.5">
-                  <span>{data.muhammadiyahCalendar.hijri}</span>
-                  <span className="text-xs font-sans text-stone-600 font-semibold">({data.muhammadiyahCalendar.pasaran})</span>
+                <div className="font-serif font-bold text-stone-900 text-sm sm:text-[15px] leading-snug mt-1.5">
+                  {data.muhammadiyahCalendar.hijri}
                 </div>
-                <div className="text-[10px] text-stone-500 font-medium">
-                  {data.muhammadiyahCalendar.authority}
-                </div>
+              </div>
+              <div className="text-[10px] text-stone-500 font-medium mt-2 pt-1.5 border-t border-stone-200/70 flex items-center justify-between">
+                <span className="truncate">Majelis Tarjih</span>
+                <span className="text-[9px] text-amber-700 font-semibold font-mono shrink-0">1448 H</span>
               </div>
             </div>
 
+            {/* KOTAK 2: PASARAN JAWA & MASA */}
             <a
               href="/ibadah"
-              className="inline-flex items-center gap-1 text-[11px] font-bold text-[#003B73] hover:text-[#002855] hover:underline shrink-0 bg-white border border-stone-200/90 px-3 py-1.5 rounded-xl shadow-xs transition-all hover:bg-stone-50"
-              title="Buka Ruang Ibadah & Kalender Muhammadiyah"
+              className="group bg-gradient-to-br from-white via-[#FAF8F5] to-blue-50/40 border border-[#003B73]/25 hover:border-[#003B73]/50 rounded-2xl p-3 sm:p-3.5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+              title="Buka Ruang Ibadah & Kalender MASA Muhammadiyah"
             >
-              <span>Ruang Ibadah</span>
-              <span className="text-xs">&rarr;</span>
+              <div>
+                <div className="flex items-center justify-between gap-1 mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <div className="p-1 rounded-md bg-[#003B73]/15 text-[#003B73] shrink-0">
+                      <Sparkles className="w-3.5 h-3.5 text-[#003B73]" />
+                    </div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#003B73]">
+                      Pasaran Jawa
+                    </span>
+                  </div>
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#003B73]/10 text-[#003B73] border border-[#003B73]/20">
+                    MASA
+                  </span>
+                </div>
+                <div className="font-serif font-bold text-stone-900 text-sm sm:text-[15px] leading-snug mt-1.5 flex items-center justify-between">
+                  <span>{data.formattedDate.split(",")[0]} {data.muhammadiyahCalendar.pasaran}</span>
+                  <span className="text-xs text-[#003B73] group-hover:translate-x-0.5 transition-transform font-sans font-bold">
+                    &rarr;
+                  </span>
+                </div>
+              </div>
+              <div className="text-[10px] text-[#003B73] font-semibold mt-2 pt-1.5 border-t border-stone-200/70 flex items-center justify-between group-hover:text-[#002855]">
+                <span className="truncate">Ruang Ibadah</span>
+                <span className="text-[9px] bg-[#003B73]/10 px-1.5 py-0.5 rounded font-bold shrink-0">Buka</span>
+              </div>
             </a>
           </div>
         </div>
