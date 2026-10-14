@@ -8,8 +8,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface HeroSlide {
   id: string;
   image: string;
-  badgeCategory: string;
-  badgeLocation: string;
   leadWord: string;
   mosqueName: string;
   description: string;
@@ -20,19 +18,15 @@ const HERO_SLIDES: HeroSlide[] = [
   {
     id: "sudalmiyah",
     image: "/images/masjid-sudalmiyah.jpg",
-    badgeCategory: "MasjidMu Percontohan",
-    badgeLocation: "Kampus 2 UMS",
     leadWord: "Kedamaian Ibadah di",
     mosqueName: "Masjid Sudalmiyah Rais",
     description:
-      "Pusat keteduhan ibadah dan teladan MasjidMu Percontohan yang makmur dan memakmurkan. Menghadirkan kekhusyukan spiritual, mempererat ukhuwah berkemajuan, serta mengabdi sebagai rumah kebaikan bagi sivitas akademika dan seluruh umat.",
+      "Pusat keteduhan ibadah dan teladan Masjid Percontohan yang makmur dan memakmurkan. Menghadirkan kekhusyukan spiritual, mempererat ukhuwah berkemajuan, serta mengabdi sebagai rumah kebaikan bagi sivitas akademika Kampus 2 UMS dan seluruh umat.",
     objectPosition: "object-[center_35%]",
   },
   {
     id: "fadhlurrahman",
     image: "/images/hero-fadhlurrahman.jpg",
-    badgeCategory: "Masjid Utama Kampus",
-    badgeLocation: "Kampus 1 UMS",
     leadWord: "Kesejukan Syiar di",
     mosqueName: "Masjid Fadhlurrahman",
     description:
@@ -42,19 +36,15 @@ const HERO_SLIDES: HeroSlide[] = [
   {
     id: "mas-mansur",
     image: "/images/hero-mas-mansur.jpg",
-    badgeCategory: "Pesantren Mahasiswa",
-    badgeLocation: "Kampus 4 UMS",
     leadWord: "Keteduhan Ruhani di",
     mosqueName: "Masjid KH. Mas Mansur",
     description:
-      "Sentra pembinaan adab, tahfidzul Qur'an, dan keilmuan berkemajuan santri Pesantren Mahasiswa KH. Mas Mansur UMS dalam meneguhkan integritas moral generasi bangsa.",
+      "Sentra pembinaan adab, tahfidzul Qur'an, dan keilmuan berkemajuan santri Pesantren Mahasiswa KH. Mas Mansur Kampus 4 UMS dalam meneguhkan integritas moral generasi bangsa.",
     objectPosition: "object-center",
   },
   {
     id: "mahad-abu-bakar",
     image: "/images/hero-mahad-abu-bakar.jpg",
-    badgeCategory: "Pendidikan Bahasa & Dirasat",
-    badgeLocation: "Kampus UMS",
     leadWord: "Keluhuran Ilmu & Adab di",
     mosqueName: "Masjid Ma'had Abu Bakar",
     description:
@@ -64,12 +54,10 @@ const HERO_SLIDES: HeroSlide[] = [
   {
     id: "ar-razi",
     image: "/images/hero-ar-razi.jpg",
-    badgeCategory: "Fakultas Kedokteran Gigi",
-    badgeLocation: "Kampus Penumping UMS",
     leadWord: "Keberkahan & Dedikasi di",
     mosqueName: "Masjid Ar-Razi FKG",
     description:
-      "Fasilitas peribadatan modern penopang spiritualitas dan etika profesi calon dokter gigi, tenaga medis, serta sivitas akademika Fakultas Kedokteran Gigi UMS.",
+      "Fasilitas peribadatan modern penopang spiritualitas dan etika profesi calon dokter gigi, tenaga medis, serta sivitas akademika Fakultas Kedokteran Gigi Penumping UMS.",
     objectPosition: "object-center",
   },
 ];
@@ -188,11 +176,9 @@ export default function HeroSection() {
 
       {/* Hero Content Overlay */}
       <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-10 sm:pt-16 pb-24 sm:pb-28">
-        {/* Mosque Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-amber-300/30 text-amber-300 text-xs sm:text-sm font-semibold tracking-wide uppercase mb-6 shadow-lg transition-all duration-300">
-          <span>{active.badgeCategory}</span>
-          <span className="text-white/40">•</span>
-          <span className="text-stone-200">{active.badgeLocation}</span>
+        {/* Unified Mosque Badge */}
+        <div className="inline-flex items-center justify-center px-4 sm:px-5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-amber-300/30 text-amber-300 text-xs sm:text-sm font-semibold tracking-wide mb-6 shadow-lg transition-all duration-300">
+          <span>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</span>
         </div>
 
         {/* Dynamic Grand Headline */}
