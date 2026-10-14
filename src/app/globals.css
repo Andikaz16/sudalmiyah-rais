@@ -225,3 +225,26 @@ html {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* -------------------------------------------------------------
+   Smooth Continuous Marquee Ticker
+   ------------------------------------------------------------- */
+@keyframes continuousMarquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-infinite {
+  display: flex;
+  width: max-content;
+  animation: continuousMarquee 38s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-infinite:hover {
+  animation-play-state: paused;
+}
