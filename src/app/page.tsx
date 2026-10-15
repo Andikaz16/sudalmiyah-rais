@@ -27,7 +27,7 @@ export default function Home() {
           </AnimatedSection>
         </section>
 
-        {/* Pilar & Keunggulan MasjidMu Percontohan */}
+        {/* Pilar & Keunggulan Masjid Percontohan AUM */}
         <AnimatedSection animation="fade-up" duration={700}>
           <MasjidMuSection />
         </AnimatedSection>

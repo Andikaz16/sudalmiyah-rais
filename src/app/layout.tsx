@@ -23,13 +23,13 @@ const amiri = Amiri({
 export const metadata: Metadata = {
   title: "Masjid UMS | Masjid Sudalmiyah Rais Kampus 2",
   description:
-    "Portal Resmi Masjid UMS (Masjid Sudalmiyah Rais Kampus 2 UMS) - Model MasjidMu Percontohan Muhammadiyah. Jadwal shalat standar MASA Tarjih, ruang ibadah digital, warta persyarikatan, dan transparansi infaq.",
+    "Portal Resmi Masjid UMS - Model Masjid Percontohan Amal Usaha Muhammadiyah (AUM). Jadwal shalat standar MASA Tarjih, ruang ibadah digital, warta persyarikatan, dan transparansi infaq.",
   authors: [{ name: "Takmir Masjid UMS" }],
   keywords: [
     "Masjid UMS",
+    "Masjid Percontohan AUM",
     "Masjid Sudalmiyah Rais",
-    "MasjidMu Percontohan",
-    "Masjid Percontohan Muhammadiyah",
+    "Amal Usaha Muhammadiyah",
     "UMS",
     "Universitas Muhammadiyah Surakarta",
     "Jadwal Shalat MASA",

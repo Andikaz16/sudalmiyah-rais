@@ -11,93 +11,92 @@ import {
   Users,
   Leaf,
   ChevronRight,
-  Sparkles,
 } from "lucide-react";
 
 export default function MasjidMuSection() {
   const pillars = [
     {
       code: "IDARAH",
-      title: "Tata Kelola & Manajemen Terbuka",
-      subtitle: "Manajemen Modern Berkemajuan",
+      title: "Tata Kelola & Manajemen AUM Berkemajuan",
+      subtitle: "Good Governance Institusi Persyarikatan",
       icon: ShieldCheck,
       color: "text-[#003B73]",
       bgBadge: "bg-[#003B73]/10 text-[#003B73] border-[#003B73]/20",
       description:
-        "Pengelolaan masjid berbasis transparansi digital dengan pencatatan audit log, transparansi keuangan infaq secara terbuka, serta tata administrasi profesional berstandar persyarikatan.",
+        "Standar manajemen kelembagaan masjid di lingkungan Amal Usaha Muhammadiyah (AUM) dengan tata kelola profesional, transparansi digital terverifikasi audit, kepengurusan terstruktur, dan akuntabilitas syariah.",
       points: [
-        "Laporan keuangan digital transparan real-time",
-        "SOP kepengurusan dan takmir profesional",
-        "Digitalisasi perizinan sarana dan fasilitas kampus",
+        "Integrasi tata kelola manajerial berstandar AUM & PTMA",
+        "Laporan keuangan infaq terbuka, teraudit & real-time",
+        "SOP takmir profesional dan digitalisasi layanan fasilitas",
       ],
     },
     {
       code: "IMARAH",
-      title: "Peribadatan & Dakwah Inklusif",
-      subtitle: "Kemakmuran Ibadah Berstandar Tarjih",
+      title: "Kemakmuran Ibadah & Episentrum AIK",
+      subtitle: "Dakwah Mencerahkan & Kaderisasi Persyarikatan",
       icon: Compass,
       color: "text-[#B58A1E]",
       bgBadge: "bg-[#B58A1E]/10 text-[#B58A1E] border-[#B58A1E]/20",
       description:
-        "Penyelenggaraan ibadah fardhu berlandaskan hisab astronomis resmi Munas Tarjih PP Muhammadiyah dan MASA, diiringi kajian keislaman tematik sivitas akademika.",
+        "Menggerakkan peribadatan berpedoman resmi HPT PP Muhammadiyah dan hisab MASA, sekaligus menjadi episentrum pembinaan Al-Islam dan Kemuhammadiyahan (AIK) bagi seluruh pimpinan, dosen, karyawan, dan mahasiswa.",
       points: [
-        "Jadwal shalat akurat selaras aplikasi resmi MASA",
-        "Ruang ibadah digital Al-Qur'an ramah lansia & himpunan hadits",
-        "Kajian ilmiah rutin mahasiswa, dosen, dan masyarakat umum",
+        "Pusat pembinaan ideologi AIK civitas akademika & pimpinan AUM",
+        "Jadwal shalat hisab astronomis standar Munas Tarjih & MASA",
+        "Kajian tematik ilmiah, fatwa tarjih, dan ruang ibadah digital",
       ],
     },
     {
       code: "RI'AYAH",
-      title: "Fasilitas Ramah Umat & Eco-Mosque",
-      subtitle: "Inklusif, Bersih & Ramah Lingkungan",
+      title: "Infrastruktur Unggul & Eco-Mosque",
+      subtitle: "Standar Sarana Representatif AUM",
       icon: Leaf,
       color: "text-emerald-700",
       bgBadge: "bg-emerald-50 text-emerald-700 border-emerald-200",
       description:
-        "Penyediaan infrastruktur ibadah yang nyaman, sarana ramah difabel dengan akses ramah kursi roda, efisiensi energi berkelanjutan, serta kebersihan lingkungan yang terjaga prima.",
+        "Pemeliharaan fisik, sanitasi, dan fasilitas masjid representatif standar kampus unggul. Mengedepankan prinsip Eco-Campus/Eco-Mosque ramah lingkungan, hemat energi, serta aksesibilitas inklusif ramah difabel dan lansia.",
       points: [
-        "Aksesibilitas ramah difabel dan ramah lanjut usia",
-        "Prinsip Eco-Mosque ramah lingkungan dan hemat energi",
-        "Kenyamanan ruang shalat utama berhawa sejuk dan suci",
+        "Standar sarana representatif bagi tamu, civitas, dan jamaah AUM",
+        "Aksesibilitas ramah kursi roda, disabilitas, dan ramah lansia",
+        "Penerapan prinsip Eco-Mosque, efisiensi energi & kebersihan prima",
       ],
     },
     {
       code: "SOSIAL",
-      title: "Pemberdayaan & Layanan Umat",
-      subtitle: "Masjid Makmur dan Memakmurkan",
+      title: "Pemberdayaan Umat & Sinergi Persyarikatan",
+      subtitle: "Masjid Makmur dan Memakmurkan Sekitar",
       icon: HeartHandshake,
       color: "text-[#003B73]",
       bgBadge: "bg-blue-50 text-[#003B73] border-blue-200",
       description:
-        "Wujud nyata kepedulian persyarikatan melalui optimalisasi infaq dan shadaqah untuk beasiswa, santunan sosial, serta fasilitas serbaguna bagi kegiatan kemahasiswaan kampus.",
+        "Wujud kepedulian sosial AUM melalui optimalisasi infaq digital untuk beasiswa mahasiswa, kemaslahatan masyarakat sekitar kampus, serta sinergi pengkaderan bersama Organisasi Otonom (Ortom) Muhammadiyah.",
       points: [
-        "Pemberdayaan sosial berbasis Infaq Digital QRIS",
-        "Dukungan penuh kegiatan organisasi otonom (IMM & IPM)",
-        "Pusat silaturahmi jamaah sivitas kampus dan warga Pabelan",
+        "Penyaluran infaq berkah untuk beasiswa dan santunan sosial",
+        "Sinergi aktif bersama Ortom (IMM, Tapak Suci, HW, & 'Aisyiyah)",
+        "Pelayanan umat dan kemitraan harmonis warga sekitar lingkungan AUM",
       ],
     },
   ];
 
   const highlights = [
     {
-      label: "Standar Hisab MASA",
-      desc: "Subuh -18°, Isya -18°, Ihtiyat +2 Menit",
+      label: "Episentrum AIK & Kader",
+      desc: "Penguatan Ideologi Civitas Akademika AUM",
+      icon: BookOpen,
+    },
+    {
+      label: "Standar Hisab MASA Tarjih",
+      desc: "Akurasi Waktu Ibadah & Pedoman HPT Resmi",
       icon: Compass,
     },
     {
-      label: "Inklusivitas Penuh",
-      desc: "Aksesibilitas Ramah Difabel & Lansia",
-      icon: Users,
-    },
-    {
-      label: "Transparansi Real-Time",
-      desc: "Laporan Infaq Terverifikasi & Diaudit",
+      label: "Tata Kelola & Audit Terbuka",
+      desc: "Transparansi Finansial Infaq & Good Governance",
       icon: ShieldCheck,
     },
     {
-      label: "Eco-Mosque Berkelanjutan",
-      desc: "Efisiensi Energi & Lingkungan Asri",
-      icon: Leaf,
+      label: "Fasilitas Unggul & Inklusif",
+      desc: "Aksesibilitas Difabel & Prinsip Eco-Campus",
+      icon: Users,
     },
   ];
 
@@ -110,12 +109,15 @@ export default function MasjidMuSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold bg-[#003B73]/10 text-[#003B73] border border-[#003B73]/20 uppercase tracking-widest font-mono mb-3">
+            Standar Rujukan Persyarikatan
+          </div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-            Pusat Inspirasi <span className="text-[#003B73]">MasjidMu Percontohan</span>
+            Masjid Percontohan <span className="text-[#003B73]">AUM</span>
           </h2>
 
           <p className="mt-4 text-sm sm:text-base text-stone-600 leading-relaxed">
-            Masjid Sudalmiyah Rais Universitas Muhammadiyah Surakarta hadir sebagai model <strong>Masjid Percontohan Muhammadiyah (MasjidMu Percontohan)</strong> di lingkungan Perguruan Tinggi Muhammadiyah dan &apos;Aisyiyah. Mengimplementasikan semangat <em>Makmur dan Memakmurkan</em> melalui keunggulan Idarah, Imarah, dan Ri&apos;ayah.
+            Masjid UMS hadir sebagai teladan dan standar <strong>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</strong> di lingkungan Perguruan Tinggi Muhammadiyah dan &apos;Aisyiyah (PTMA) serta institusi persyarikatan. Menjadi episentrum pembinaan spiritual, integrasi Al-Islam &amp; Kemuhammadiyahan (AIK), pengkaderan persyarikatan, serta tata kelola modern berbasis Idarah, Imarah, dan Ri&apos;ayah.
           </p>
         </div>
 
@@ -193,7 +195,7 @@ export default function MasjidMuSection() {
                 {/* Bottom link to related service */}
                 <div className="pt-2">
                   <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider flex items-center gap-1 group-hover:text-[#003B73] transition-colors">
-                    <span>Standar Terintegrasi Sudalmiyah</span>
+                    <span>Standar Keunggulan Masjid AUM UMS</span>
                     <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -206,10 +208,10 @@ export default function MasjidMuSection() {
         <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#002855] via-[#003B73] to-[#001F3F] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-blue-400/20">
           <div className="space-y-2 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-bold font-serif">
-              Mewujudkan Masjid yang Makmur dan Memakmurkan
+              Mewujudkan Standar Masjid Percontohan AUM Berkemajuan
             </h3>
             <p className="text-xs sm:text-sm text-stone-200 max-w-2xl leading-relaxed">
-              Dukung akselerasi MasjidMu Percontohan Kampus 2 UMS melalui partisipasi shalat berjamaah, menghadiri kajian ilmu, pemanfaatan ruang ibadah digital, serta saluran infaq berkah.
+              Dukung penguatan peran masjid di lingkungan Amal Usaha Muhammadiyah melalui partisipasi aktif ibadah berjamaah, penguatan kajian AIK, pemanfaatan ruang ibadah digital, serta saluran infaq berkah.
             </p>
           </div>
 

@@ -29,7 +29,7 @@ export default function Footer() {
               </div>
               <div>
                 <h3 className="font-bold text-white text-base font-serif">
-                  Masjid Sudalmiyah Rais
+                  Masjid UMS
                 </h3>
                 <p className="text-xs text-stone-300">
                   Universitas Muhammadiyah Surakarta
@@ -37,7 +37,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-stone-300 text-xs leading-relaxed max-w-md">
-              Pusat peribadatan dan teladan MasjidMu Percontohan (Masjid Percontohan Muhammadiyah) bagi civitas akademika UMS dan masyarakat luas. Mengimplementasikan standar Idarah, Imarah, dan Ri&apos;ayah yang makmur dan memakmurkan.
+              Pusat peribadatan dan teladan Masjid Percontohan Amal Usaha Muhammadiyah (AUM) bagi civitas akademika UMS dan masyarakat luas. Mengimplementasikan standar Idarah, Imarah, dan Ri&apos;ayah yang profesional, inklusif, makmur dan memakmurkan.
             </p>
             <div className="flex items-center gap-2 pt-1 text-[#FCD34D] text-xs font-medium">
               <ShieldCheck className="w-4 h-4 shrink-0" />
@@ -53,7 +53,7 @@ export default function Footer() {
             <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/#masjidmu" className="hover:text-[#FCD34D] transition-colors">
-                  Pilar MasjidMu Percontohan
+                  Pilar Masjid Percontohan AUM
                 </Link>
               </li>
               <li>
@@ -108,7 +108,7 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-400">
           <div>
-            Hak Cipta © 2026 Masjid Sudalmiyah Rais - Universitas Muhammadiyah Surakarta. Seluruh Hak Dilindungi.
+            Hak Cipta © 2026 Masjid UMS - Universitas Muhammadiyah Surakarta. Seluruh Hak Dilindungi.
           </div>
           <div className="flex items-center gap-4 text-[11px] text-stone-300">
             <span>Integritas</span>
