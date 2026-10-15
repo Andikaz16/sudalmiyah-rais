@@ -1,138 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, connection } from "next/server";
 import path from "path";
 import fs from "fs";
 import { getDb, saveDb, logSecurityEvent } from "@/lib/db";
 import { verifySessionToken } from "@/lib/security";
 import { PopupBanner } from "@/lib/types";
 
-// Heuristic keyword classifier for masjid announcement banners
-function classifyBannerFallback(filename: string, title?: string): { targetUrl: string; category: string; reasoning: string } {
-  const combined = `${filename} ${title || ""}`.toLowerCase();
-
-  if (/(infaq|sedekah|donasi|wakaf|qris|zakat|rekening|lazismu|pembangunan)/i.test(combined)) {
-    return {
-      targetUrl: "/donasi",
-      category: "Infaq & Donasi Digital",
-      reasoning: "Terdeteksi kata kunci terkait donasi, infaq, atau sedekah masjid.",
-    };
-  }
-
-  if (/(jadwal|waktu|shalat|khatib|imam|muadzin|jumat)/i.test(combined)) {
-    return {
-      targetUrl: "/jadwal",
-      category: "Jadwal Shalat & Petugas Jumat",
-      reasoning: "Terdeteksi informasi seputar waktu shalat atau jadwal petugas Jumat.",
-    };
-  }
-
-  if (/(tarjih|fatwa|hpt|fiqih|tanya|konsultasi|ibadah)/i.test(combined)) {
-    return {
-      targetUrl: "/ibadah",
-      category: "Tanya Tarjih & Fiqih Ibadah",
-      reasoning: "Terdeteksi topik fatwa Tarjih atau konsultasi fiqih Islam.",
-    };
-  }
-
-  if (/(aula|peminjaman|gedung|ruang|sarpras|fasilitas)/i.test(combined)) {
-    return {
-      targetUrl: "/layanan",
-      category: "Layanan Fasilitas & Peminjaman",
-      reasoning: "Terdeteksi pengumuman peminjaman fasilitas atau aula masjid.",
-    };
-  }
-
-  if (/(sejarah|profil|arsitektur|biografi|sudalmiyah)/i.test(combined)) {
-    return {
-      targetUrl: "/sejarah",
-      category: "Sejarah & Profil Masjid",
-      reasoning: "Terdeteksi konten profil sejarah Masjid Hj. Sudalmiyah Rais.",
-    };
-  }
-
-  // Default to Agenda & Kajian
-  return {
-    targetUrl: "/agenda",
-    category: "Agenda Kegiatan & Kajian",
-    reasoning: "Diarahkan ke agenda kegiatan dan kajian Masjid Sudalmiyah Rais.",
-  };
-}
-
-// Intelligent image reader using Gemini API
-async function analyzeBannerWithAI(buffer: Buffer, mimeType: string, filename: string): Promise<{
-  title: string;
-  category: string;
-  targetUrl: string;
-  reasoning: string;
-}> {
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  if (apiKey) {
-    try {
-      const { GoogleGenAI } = await import("@google/genai");
-      const ai = new GoogleGenAI({ apiKey });
-
-      const prompt = `Analisis gambar poster pengumuman masjid ini secara cermat.
-Tugas Anda:
-1. Ekstrak judul utama atau topik pengumuman kegiatan yang tertera pada poster.
-2. Identifikasi kategori utama pengumuman.
-3. Tentukan halaman tujuan internal (targetUrl) yang paling tepat saat pengunjung mengklik pop-up ini:
-   - Pilih '/agenda' jika poster tentang kajian, tabligh akbar, cinta subuh, shalat jumat, pembinaan mahasiswa, seminar, workshop, atau kegiatan masjid.
-   - Pilih '/donasi' jika poster tentang infaq, sedekah subuh, wakaf, zakat, penggalangan dana, atau QRIS masjid.
-   - Pilih '/jadwal' jika poster tentang jadwal shalat lima waktu atau petugas khatib/imam.
-   - Pilih '/ibadah' jika poster tentang tanya tarjih, fatwa fiqih, atau panduan ibadah.
-   - Pilih '/layanan' jika poster tentang peminjaman aula gedung atau fasilitas masjid.
-   - Pilih '/sejarah' jika poster tentang profil sejarah masjid Hj. Sudalmiyah Rais.
-Berikan respon HANYA berupa JSON valid tanpa markdown formatting:
-{
-  "title": "Judul poster",
-  "category": "Kategori kegiatan",
-  "targetUrl": "/agenda",
-  "reasoning": "Alasan singkat pemilihan halaman ini"
-}`;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: [
-          {
-            inlineData: {
-              data: buffer.toString("base64"),
-              mimeType,
-            },
-          },
-          prompt,
-        ],
-      });
-
-      const responseText = response.text || "";
-      const cleanedJson = responseText.replace(/```json/gi, "").replace(/```/g, "").trim();
-      const parsed = JSON.parse(cleanedJson);
-
-      if (parsed.targetUrl && typeof parsed.targetUrl === "string") {
-        return {
-          title: parsed.title || filename.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " "),
-          category: parsed.category || "Agenda Kegiatan",
-          targetUrl: parsed.targetUrl.startsWith("/") ? parsed.targetUrl : `/${parsed.targetUrl}`,
-          reasoning: parsed.reasoning || "Dianalisis secara cerdas oleh model Gemini Vision.",
-        };
-      }
-    } catch (err) {
-      console.warn("Gemini vision analysis fallback to heuristic:", err);
-    }
-  }
-
-  // Heuristic Fallback
-  const fallback = classifyBannerFallback(filename);
-  const cleanTitle = filename.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ").trim();
-  return {
-    title: cleanTitle.length > 3 ? cleanTitle : "Pengumuman Masjid Sudalmiyah",
-    category: fallback.category,
-    targetUrl: fallback.targetUrl,
-    reasoning: fallback.reasoning,
-  };
-}
-
 export async function GET(request: NextRequest) {
-  // Verify session
+  await connection();
+
   const token = request.cookies.get("sudalmiyah_session")?.value;
   if (!token) {
     return NextResponse.json({ error: "Otentikasi dibutuhkan." }, { status: 401 });
@@ -144,11 +19,17 @@ export async function GET(request: NextRequest) {
   }
 
   const db = getDb();
-  return NextResponse.json({ popup: db.popupBanner || null });
+  return NextResponse.json(
+    { popup: db.popupBanner || null },
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
+    }
+  );
 }
 
 export async function POST(request: NextRequest) {
-  // Verify session
   const token = request.cookies.get("sudalmiyah_session")?.value;
   if (!token) {
     return NextResponse.json({ error: "Otentikasi dibutuhkan." }, { status: 401 });
@@ -162,8 +43,10 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
-    const manualTargetUrl = (formData.get("targetUrl") as string | null)?.trim();
-    const manualTitle = (formData.get("title") as string | null)?.trim();
+    const rawTargetUrl = formData.get("targetUrl");
+    const rawTitle = formData.get("title");
+    const manualTargetUrl = typeof rawTargetUrl === "string" ? rawTargetUrl.trim() : "";
+    const manualTitle = typeof rawTitle === "string" ? rawTitle.trim() : "";
 
     if (!file) {
       return NextResponse.json({ error: "Berkas gambar pop-up tidak ditemukan." }, { status: 400 });
@@ -188,40 +71,31 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Save image to /public/uploads/popup/
-    let publicUrl = "";
+    // Optional archival write to /public/uploads/popup/ when local disk is writable
     try {
-      const uploadDir = path.join(process.cwd(), "public", "uploads", "popup");
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+      if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+        const uploadDir = path.join(process.cwd(), "public", "uploads", "popup");
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const ext = path.extname(file.name).toLowerCase() || ".jpg";
+        const safeFilename = `popup_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext}`;
+        const destinationPath = path.join(uploadDir, safeFilename);
+        fs.writeFileSync(destinationPath, buffer);
       }
-
-      const ext = path.extname(file.name).toLowerCase() || ".jpg";
-      const safeFilename = `popup_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext}`;
-      const destinationPath = path.join(uploadDir, safeFilename);
-
-      fs.writeFileSync(destinationPath, buffer);
-      publicUrl = `/uploads/popup/${safeFilename}`;
-    } catch (fsErr) {
-      // Fallback data URI
-      console.warn("Filesystem write fallback to data URI:", fsErr);
-      publicUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+    } catch {
+      // Ignore archival write error on read-only environments
     }
 
-    // Perform intelligent analysis on the image
-    const aiAnalysis = await analyzeBannerWithAI(buffer, file.type, file.name);
-
-    const finalTargetUrl = manualTargetUrl || aiAnalysis.targetUrl || "/agenda";
-    const finalTitle = manualTitle || aiAnalysis.title || "Pengumuman Masjid Sudalmiyah";
+    // Store as Data URI so it renders reliably across dev, production start, and serverless
+    const dataUriUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
 
     const db = getDb();
     const popupRecord: PopupBanner = {
       id: `popup-${Date.now().toString(36)}`,
-      imageUrl: publicUrl,
-      title: finalTitle,
-      targetUrl: finalTargetUrl,
-      detectedCategory: aiAnalysis.category,
-      aiReasoning: aiAnalysis.reasoning,
+      imageUrl: dataUriUrl,
+      title: manualTitle,
+      targetUrl: manualTargetUrl,
       isActive: true,
       updatedAt: new Date().toISOString(),
     };
@@ -235,12 +109,12 @@ export async function POST(request: NextRequest) {
       session.email,
       ip,
       "SUCCESS",
-      `Pop-up banner diunggah: [${finalTitle}] diarahkan ke [${finalTargetUrl}] via Smart Analyzer`
+      `Pop-up banner baru diunggah${manualTargetUrl ? ` dengan tautan [${manualTargetUrl}]` : " (tanpa tautan URL)"}`
     );
 
     return NextResponse.json({
       success: true,
-      message: "Pop-up banner berhasil diunggah dan dianalisis.",
+      message: "Pop-up banner berhasil diunggah.",
       popup: popupRecord,
     });
   } catch (error: any) {
@@ -253,7 +127,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  // Verify session
   const token = request.cookies.get("sudalmiyah_session")?.value;
   if (!token) {
     return NextResponse.json({ error: "Otentikasi dibutuhkan." }, { status: 401 });
@@ -300,7 +173,6 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  // Verify session
   const token = request.cookies.get("sudalmiyah_session")?.value;
   if (!token) {
     return NextResponse.json({ error: "Otentikasi dibutuhkan." }, { status: 401 });

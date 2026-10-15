@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { X, ArrowRight } from "lucide-react";
 import { PopupBanner } from "@/lib/types";
 
+export const POPUP_CACHE_KEY = "sudalmiyah_popup_cache";
+
 export default function AnnouncementPopup() {
   const [popup, setPopup] = useState<PopupBanner | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -12,21 +14,51 @@ export default function AnnouncementPopup() {
 
   useEffect(() => {
     const fetchPopup = async () => {
-      try {
-        const res = await fetch("/api/popup", { cache: "no-store" });
-        if (!res.ok) return;
-        const data = await res.json();
+      let serverPopup: PopupBanner | null = null;
 
-        if (data.popup && data.popup.isActive) {
-          // Check if dismissed in this browser session
-          const dismissedId = sessionStorage.getItem("sudalmiyah_popup_dismissed");
-          if (dismissedId !== data.popup.id) {
-            setPopup(data.popup);
-            setIsOpen(true);
+      try {
+        const res = await fetch(`/api/popup?t=${Date.now()}`, {
+          cache: "no-store",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.popup) {
+            serverPopup = data.popup;
           }
         }
       } catch (err) {
-        console.error("AnnouncementPopup error:", err);
+        console.error("AnnouncementPopup fetch error:", err);
+      }
+
+      // Check local cache sync (ensures instant consistency across serverless cold-starts)
+      let resolvedPopup: PopupBanner | null = serverPopup;
+      try {
+        const rawCache = localStorage.getItem(POPUP_CACHE_KEY);
+        if (rawCache) {
+          const parsedCache = JSON.parse(rawCache) as {
+            popup: PopupBanner | null;
+            updatedAt: string;
+          };
+          if (serverPopup && parsedCache.updatedAt) {
+            const serverTime = new Date(serverPopup.updatedAt).getTime();
+            const cacheTime = new Date(parsedCache.updatedAt).getTime();
+            if (cacheTime >= serverTime) {
+              resolvedPopup = parsedCache.popup;
+            }
+          } else if (!serverPopup && parsedCache.popup) {
+            resolvedPopup = parsedCache.popup;
+          }
+        }
+      } catch {
+        // Ignore storage parse errors
+      }
+
+      if (resolvedPopup && resolvedPopup.isActive) {
+        setPopup(resolvedPopup);
+        setIsOpen(true);
+      } else {
+        setPopup(null);
+        setIsOpen(false);
       }
     };
 
@@ -34,23 +66,24 @@ export default function AnnouncementPopup() {
   }, []);
 
   const handleClose = () => {
-    if (popup) {
-      sessionStorage.setItem("sudalmiyah_popup_dismissed", popup.id);
-    }
     setIsOpen(false);
   };
 
+  if (!isOpen || !popup) return null;
+
+  const cleanTargetUrl = popup.targetUrl?.trim() || "";
+  const hasTargetUrl = cleanTargetUrl.length > 0;
+  const cleanTitle = popup.title?.trim() || "";
+
   const handleClickBanner = () => {
-    if (!popup) return;
+    if (!hasTargetUrl) return;
     handleClose();
-    if (popup.targetUrl.startsWith("http://") || popup.targetUrl.startsWith("https://")) {
-      window.open(popup.targetUrl, "_blank", "noopener,noreferrer");
+    if (cleanTargetUrl.startsWith("http://") || cleanTargetUrl.startsWith("https://")) {
+      window.open(cleanTargetUrl, "_blank", "noopener,noreferrer");
     } else {
-      router.push(popup.targetUrl);
+      router.push(cleanTargetUrl.startsWith("/") ? cleanTargetUrl : `/${cleanTargetUrl}`);
     }
   };
-
-  if (!isOpen || !popup) return null;
 
   return (
     <div
@@ -77,53 +110,64 @@ export default function AnnouncementPopup() {
           </button>
         </div>
 
-        {/* Clickable Image Body */}
+        {/* Image Body (Clickable only if targetUrl is filled by admin) */}
         <div
-          onClick={handleClickBanner}
-          className="relative w-full overflow-y-auto cursor-pointer group bg-stone-950 flex flex-col items-center justify-center max-h-[65vh]"
-          title="Klik untuk membuka informasi pengumuman"
+          onClick={hasTargetUrl ? handleClickBanner : undefined}
+          className={`relative w-full overflow-y-auto bg-stone-950 flex flex-col items-center justify-center max-h-[68vh] ${
+            hasTargetUrl ? "cursor-pointer group" : "cursor-default"
+          }`}
+          title={hasTargetUrl ? "Klik untuk membuka tautan pengumuman" : cleanTitle || "Pengumuman Masjid"}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={popup.imageUrl}
-            alt={popup.title || "Pengumuman Masjid"}
-            className="w-full h-auto max-h-[65vh] object-contain group-hover:scale-[1.01] transition-transform duration-300"
+            alt={cleanTitle || "Pengumuman Masjid"}
+            className={`w-full h-auto max-h-[68vh] object-contain transition-transform duration-300 ${
+              hasTargetUrl ? "group-hover:scale-[1.01]" : ""
+            }`}
           />
 
-          {/* Hover Overlay Hint */}
-          <div className="absolute inset-0 bg-[#001F3F]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-            <div className="px-4 py-2 rounded-full bg-white text-[#001F3F] text-xs font-bold shadow-xl flex items-center gap-2">
-              <span>Buka Halaman Terkait</span>
-              <ArrowRight className="w-3.5 h-3.5 text-amber-500" />
+          {/* Hover Overlay Hint only when targetUrl is provided */}
+          {hasTargetUrl && (
+            <div className="absolute inset-0 bg-[#001F3F]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <div className="px-4 py-2 rounded-full bg-white text-[#001F3F] text-xs font-bold shadow-xl flex items-center gap-2">
+                <span>Buka Tautan Pengumuman</span>
+                <ArrowRight className="w-3.5 h-3.5 text-amber-500" />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Bottom Actions Bar */}
-        <div className="p-3.5 sm:p-4 bg-stone-50 border-t border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shrink-0">
+        <div className="p-3.5 sm:p-4 bg-stone-50 border-t border-stone-200 flex items-center justify-between gap-3 shrink-0">
           <div className="min-w-0 flex-1">
-            <h4 className="text-xs font-bold text-stone-900 truncate font-serif">
-              {popup.title}
-            </h4>
-            <p className="text-[11px] text-stone-500 truncate">
-              {popup.detectedCategory || "Klik untuk melihat rincian agenda"}
-            </p>
+            {cleanTitle ? (
+              <h4 className="text-xs font-bold text-stone-900 truncate font-serif">
+                {cleanTitle}
+              </h4>
+            ) : (
+              <span className="text-xs font-medium text-stone-600">
+                Informasi Resmi Takmir Masjid Hj. Sudalmiyah Rais
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={handleClose}
-              className="px-3.5 py-2 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
             >
               Tutup
             </button>
-            <button
-              onClick={handleClickBanner}
-              className="px-4 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
-            >
-              <span>Buka Info</span>
-              <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
-            </button>
+            {hasTargetUrl && (
+              <button
+                onClick={handleClickBanner}
+                className="px-4 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <span>Buka Tautan</span>
+                <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
+              </button>
+            )}
           </div>
         </div>
       </div>

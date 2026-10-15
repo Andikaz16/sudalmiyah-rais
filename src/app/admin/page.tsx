@@ -170,7 +170,7 @@ export default function AdminDashboardPage() {
         fetch("/api/agendas"),
         fetch("/api/friday-schedule"),
         fetch("/api/qris"),
-        fetch("/api/admin/popup"),
+        fetch(`/api/popup?admin=1&t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/documents"),
       ]);
 
@@ -205,10 +205,29 @@ export default function AdminDashboardPage() {
       }
       if (popupRes.ok) {
         const popupJson = await popupRes.json();
-        setPopupBanner(popupJson.popup || null);
-        if (popupJson.popup) {
-          setPopupTargetUrl(popupJson.popup.targetUrl || "");
-          setPopupTitle(popupJson.popup.title || "");
+        let resolvedPopup: PopupBanner | null = popupJson.popup || null;
+        try {
+          const rawCache = localStorage.getItem("sudalmiyah_popup_cache");
+          if (rawCache) {
+            const parsedCache = JSON.parse(rawCache) as {
+              popup: PopupBanner | null;
+              updatedAt: string;
+            };
+            if (resolvedPopup && parsedCache.updatedAt) {
+              if (new Date(parsedCache.updatedAt).getTime() >= new Date(resolvedPopup.updatedAt).getTime()) {
+                resolvedPopup = parsedCache.popup;
+              }
+            } else if (!resolvedPopup && parsedCache.popup) {
+              resolvedPopup = parsedCache.popup;
+            }
+          }
+        } catch {
+          // ignore storage errors
+        }
+        setPopupBanner(resolvedPopup);
+        if (resolvedPopup) {
+          setPopupTargetUrl(resolvedPopup.targetUrl || "");
+          setPopupTitle(resolvedPopup.title || "");
         }
       }
       if (docRes.ok) {
@@ -534,17 +553,39 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Upload and analyze popup banner with AI
+  const syncPopupLocalCache = (popup: PopupBanner | null) => {
+    try {
+      localStorage.setItem(
+        "sudalmiyah_popup_cache",
+        JSON.stringify({
+          popup,
+          updatedAt: popup?.updatedAt || new Date().toISOString(),
+        })
+      );
+      sessionStorage.removeItem("sudalmiyah_popup_dismissed");
+    } catch {
+      // ignore storage errors
+    }
+  };
+
+  // Upload popup banner image
   const handlePopupUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setUploadingPopup(true);
+    setPopupSaveSuccess(false);
     try {
       const fd = new FormData();
       fd.append("file", file);
+      if (popupTargetUrl.trim()) {
+        fd.append("targetUrl", popupTargetUrl.trim());
+      }
+      if (popupTitle.trim()) {
+        fd.append("title", popupTitle.trim());
+      }
 
-      const res = await fetch("/api/admin/popup", {
+      const res = await fetch("/api/popup", {
         method: "POST",
         body: fd,
       });
@@ -554,11 +595,14 @@ export default function AdminDashboardPage() {
       setPopupBanner(data.popup);
       setPopupTargetUrl(data.popup.targetUrl || "");
       setPopupTitle(data.popup.title || "");
-      alert(`Pop-up banner berhasil diunggah! Sistem AI mendeteksi rute tujuan: ${data.popup.targetUrl}`);
+      syncPopupLocalCache(data.popup);
+      setPopupSaveSuccess(true);
+      setTimeout(() => setPopupSaveSuccess(false), 3000);
     } catch (err: any) {
-      alert(err.message || "Gagal mengunggah dan menganalisis gambar pop-up.");
+      alert(err.message || "Gagal mengunggah gambar pop-up.");
     } finally {
       setUploadingPopup(false);
+      e.target.value = "";
     }
   };
 
@@ -566,7 +610,7 @@ export default function AdminDashboardPage() {
   const handleTogglePopupActive = async () => {
     if (!popupBanner) return;
     try {
-      const res = await fetch("/api/admin/popup", {
+      const res = await fetch("/api/popup", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !popupBanner.isActive }),
@@ -574,29 +618,31 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal mengubah status tayang.");
       setPopupBanner(data.popup);
+      syncPopupLocalCache(data.popup);
     } catch (err: any) {
       alert(err.message || "Gagal mengubah status pop-up banner.");
     }
   };
 
-  // Save popup settings (title, targetUrl)
+  // Save popup settings (title, optional targetUrl)
   const handleSavePopupSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!popupBanner) return;
     setSavingPopup(true);
     setPopupSaveSuccess(false);
     try {
-      const res = await fetch("/api/admin/popup", {
+      const res = await fetch("/api/popup", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: popupTitle,
-          targetUrl: popupTargetUrl,
+          title: popupTitle.trim(),
+          targetUrl: popupTargetUrl.trim(),
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan pengaturan.");
       setPopupBanner(data.popup);
+      syncPopupLocalCache(data.popup);
       setPopupSaveSuccess(true);
       setTimeout(() => setPopupSaveSuccess(false), 3000);
     } catch (err: any) {
@@ -612,7 +658,7 @@ export default function AdminDashboardPage() {
       return;
     }
     try {
-      const res = await fetch("/api/admin/popup", {
+      const res = await fetch("/api/popup", {
         method: "DELETE",
       });
       const data = await res.json();
@@ -620,6 +666,7 @@ export default function AdminDashboardPage() {
       setPopupBanner(null);
       setPopupTargetUrl("");
       setPopupTitle("");
+      syncPopupLocalCache(null);
       alert("Pop-up banner berhasil dihapus.");
     } catch (err: any) {
       alert(err.message || "Gagal menghapus pop-up banner.");
@@ -1895,7 +1942,7 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 6: POPUP BANNER (Banner Pop-up Pengumuman Cerdas) */}
+        {/* Tab 6: POPUP BANNER (Banner Pop-up Pengumuman Beranda) */}
         {activeTab === "POPUP_BANNER" && (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -1904,7 +1951,7 @@ export default function AdminDashboardPage() {
                   Kelola Pop-up Banner Pengumuman Beranda
                 </h2>
                 <p className="text-xs text-stone-500 mt-0.5">
-                  Unggah poster pengumuman penting. Sistem membaca konten gambar secara cerdas dan mengarahkan pengunjung ke halaman terkait secara otomatis saat diklik.
+                  Unggah poster pengumuman untuk ditampilkan sebagai pop-up saat pengunjung membuka beranda website. Tautan URL tujuan bersifat opsional (tidak wajib diisi).
                 </p>
               </div>
 
@@ -1943,15 +1990,15 @@ export default function AdminDashboardPage() {
                     Unggah Poster / Banner Baru
                   </h3>
                   <p className="text-xs text-stone-500 leading-relaxed">
-                    Sistem akan membaca isi poster (AI Vision) untuk mengenali apakah poster terkait Kajian/Agenda, Donasi/Infaq, Jadwal Shalat, atau Layanan Masjid, lalu menentukan rute tujuan klik secara otomatis.
+                    Pilih berkas gambar poster pengumuman yang ingin ditampilkan pada pop-up beranda. Setelah diunggah, pop-up akan langsung tayang dan Anda dapat mengatur URL tujuan (opsional) di sebelah kanan.
                   </p>
 
                   <label className="relative border-2 border-dashed border-stone-300 hover:border-[#003B73] rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors bg-stone-50/60 hover:bg-stone-50 group">
                     <div className="w-12 h-12 rounded-full bg-blue-50 text-[#003B73] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-                      <Sparkles className="w-6 h-6 text-amber-500" />
+                      <Plus className="w-6 h-6 text-[#003B73]" />
                     </div>
                     <span className="text-xs font-bold text-stone-800">
-                      {uploadingPopup ? "Menganalisis & Mengunggah Gambar..." : "Pilih Berkas Poster / Banner"}
+                      {uploadingPopup ? "Mengunggah Gambar Pop-up..." : "Pilih Berkas Poster / Banner"}
                     </span>
                     <span className="text-[11px] text-stone-500 mt-1 max-w-xs">
                       Format JPG, PNG, atau WEBP (Maksimal 5MB)
@@ -1968,14 +2015,14 @@ export default function AdminDashboardPage() {
                   {uploadingPopup && (
                     <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2.5">
                       <Clock className="w-4 h-4 text-amber-600 animate-spin shrink-0" />
-                      <span>Model AI sedang membaca teks pada poster dan mendeteksi rute tujuan...</span>
+                      <span>Sedang mengunggah gambar poster pop-up ke server...</span>
                     </div>
                   )}
 
                   <div className="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-100 text-xs text-blue-950 space-y-1">
                     <span className="font-bold block">Ketentuan Pop-up:</span>
                     <p className="text-[11px] text-stone-600">
-                      Jika admin tidak mengunggah gambar pop-up atau menonaktifkannya, maka tidak ada pop-up pengumuman yang muncul di halaman beranda.
+                      Jika admin tidak mengunggah gambar pop-up atau menonaktifkannya, maka tidak ada pop-up pengumuman yang muncul di halaman beranda. Tautan URL bersifat opsional (tidak wajib).
                     </p>
                   </div>
                 </div>
@@ -1988,7 +2035,7 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center justify-between border-b border-stone-100 pb-3">
                       <div>
                         <h3 className="text-sm font-bold text-stone-900 font-serif">
-                          Pratinjau Pop-up Aktif
+                          Pratinjau &amp; Pengaturan Pop-up Aktif
                         </h3>
                         <p className="text-[11px] text-stone-400">
                           Diperbarui pada {new Date(popupBanner.updatedAt).toLocaleString("id-ID")}
@@ -2009,77 +2056,71 @@ export default function AdminDashboardPage() {
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={popupBanner.imageUrl}
-                        alt={popupBanner.title}
+                        alt={popupBanner.title || "Poster Pop-up"}
                         className="w-full h-auto max-h-72 object-contain"
                       />
                     </div>
 
-                    {/* AI Reading Summary Box */}
-                    <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 text-xs space-y-2">
-                      <div className="flex items-center gap-1.5 font-bold text-[#003B73]">
-                        <Sparkles className="w-4 h-4 text-amber-500" />
-                        <span>Hasil Pembacaan Gambar Cerdas (AI Vision)</span>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
-                        <div>
-                          <span className="text-stone-500 block">Kategori Terdeteksi:</span>
-                          <span className="font-semibold text-stone-800">{popupBanner.detectedCategory || "Agenda Masjid"}</span>
-                        </div>
-                        <div>
-                          <span className="text-stone-500 block">Tujuan Pengalihan (Target URL):</span>
-                          <span className="font-mono font-bold text-[#003B73]">{popupBanner.targetUrl}</span>
-                        </div>
-                      </div>
-                      {popupBanner.aiReasoning && (
-                        <p className="text-[11px] text-stone-500 italic pt-1 border-t border-stone-200/60">
-                          &ldquo;{popupBanner.aiReasoning}&rdquo;
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Settings Form to Override Target Link or Title */}
+                    {/* Settings Form for Optional Title and Target Link */}
                     <form onSubmit={handleSavePopupSettings} className="space-y-4 pt-2 border-t border-stone-100">
                       <div>
                         <label className="block text-xs font-semibold text-stone-700 mb-1">
-                          Judul / Topik Pengumuman
+                          Judul / Topik Pengumuman <span className="text-stone-400 font-normal">(Opsional)</span>
                         </label>
                         <input
                           type="text"
-                          required
                           value={popupTitle}
                           onChange={(e) => setPopupTitle(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
-                          placeholder="Judul pengumuman pop-up"
+                          placeholder="Contoh: Kajian Akbar / Kosongkan jika hanya gambar poster"
                         />
                       </div>
 
                       <div>
                         <label className="block text-xs font-semibold text-stone-700 mb-1">
-                          Tautan Tujuan Saat Pop-up Diklik Pengunjung
+                          Tautan / URL Tujuan Saat Pop-up Diklik Pengunjung <span className="text-stone-400 font-normal">(Opsional / Tidak Wajib)</span>
                         </label>
                         <input
                           type="text"
-                          required
                           value={popupTargetUrl}
                           onChange={(e) => setPopupTargetUrl(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono focus:ring-2 focus:ring-[#003B73]"
-                          placeholder="Contoh: /agenda atau /donasi atau https://..."
+                          placeholder="Kosongkan jika tanpa URL, atau isi contoh: /agenda atau https://..."
                         />
+                        <p className="text-[11px] text-stone-500 mt-1">
+                          Jika dikosongkan, pop-up hanya menampilkan gambar poster tanpa mengarahkan pengunjung ke halaman lain.
+                        </p>
                         <div className="flex flex-wrap gap-1.5 mt-2">
                           <span className="text-[10px] text-stone-400 self-center">Pilihan Cepat:</span>
+                          <button
+                            type="button"
+                            onClick={() => setPopupTargetUrl("")}
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-colors cursor-pointer ${
+                              !popupTargetUrl.trim()
+                                ? "bg-[#003B73] text-white"
+                                : "bg-stone-100 hover:bg-stone-200 text-stone-700"
+                            }`}
+                          >
+                            Tanpa Tautan (Kosongkan)
+                          </button>
                           {[
                             { label: "Agenda & Kajian", url: "/agenda" },
                             { label: "Infaq & Donasi", url: "/donasi" },
                             { label: "Jadwal Shalat", url: "/jadwal" },
                             { label: "Tanya Tarjih", url: "/ibadah" },
                             { label: "Layanan Fasilitas", url: "/layanan" },
+                            { label: "Pusat Unduhan", url: "/layanan/unduhan" },
                             { label: "Sejarah Masjid", url: "/sejarah" },
                           ].map((quick) => (
                             <button
                               key={quick.url}
                               type="button"
                               onClick={() => setPopupTargetUrl(quick.url)}
-                              className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-[10px] font-medium transition-colors cursor-pointer"
+                              className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-colors cursor-pointer ${
+                                popupTargetUrl.trim() === quick.url
+                                  ? "bg-[#003B73] text-white"
+                                  : "bg-stone-100 hover:bg-stone-200 text-stone-700"
+                              }`}
                             >
                               {quick.label}
                             </button>
@@ -2091,7 +2132,7 @@ export default function AdminDashboardPage() {
                         {popupSaveSuccess && (
                           <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
                             <CheckCircle2 className="w-4 h-4" />
-                            <span>Pengaturan tersimpan!</span>
+                            <span>Pop-up tersimpan &amp; siap tampil di beranda!</span>
                           </span>
                         )}
                         <div className="ml-auto">
@@ -2100,7 +2141,7 @@ export default function AdminDashboardPage() {
                             disabled={savingPopup}
                             className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md disabled:opacity-50 cursor-pointer"
                           >
-                            {savingPopup ? "Menyimpan..." : "Simpan Perubahan Tautan"}
+                            {savingPopup ? "Menyimpan..." : "Simpan Pengaturan Pop-up"}
                           </button>
                         </div>
                       </div>

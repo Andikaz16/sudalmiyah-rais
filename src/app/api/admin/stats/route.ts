@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, connection } from "next/server";
 import { getDb } from "@/lib/db";
 
 export async function GET() {
+  await connection();
   const db = getDb();
 
   const totalAgendas = db.agendas.length;

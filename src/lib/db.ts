@@ -43,6 +43,7 @@ function getDbFilePath(): string {
 
 // In-memory cache for fast reads
 let memoryDb: DatabaseSchema | null = null;
+let lastDbMtimeMs = 0;
 
 function ensureDbDirectory(targetFilePath: string) {
   try {
@@ -522,8 +523,6 @@ function getInitialData(): DatabaseSchema {
 }
 
 export function getDb(): DatabaseSchema {
-  if (memoryDb) return memoryDb;
-
   const targetFile = getDbFilePath();
   const repoFile = path.join(process.cwd(), "data", "masjid_store.json");
 
@@ -545,6 +544,7 @@ export function getDb(): DatabaseSchema {
     : null;
 
   if (!fileToRead) {
+    if (memoryDb) return memoryDb;
     const initial = getInitialData();
     memoryDb = initial;
     saveDb(initial);
@@ -552,8 +552,13 @@ export function getDb(): DatabaseSchema {
   }
 
   try {
+    const stat = fs.statSync(fileToRead);
+    if (memoryDb && stat.mtimeMs === lastDbMtimeMs) {
+      return memoryDb;
+    }
     const content = fs.readFileSync(fileToRead, "utf-8");
     memoryDb = JSON.parse(content);
+    lastDbMtimeMs = stat.mtimeMs;
     if (!memoryDb?.fridaySchedules || memoryDb.fridaySchedules.length < 6) {
       const defaults = getDefaultFridaySchedules(memoryDb?.fridaySchedule);
       if (!memoryDb?.fridaySchedules || memoryDb.fridaySchedules.length === 0) {
@@ -593,6 +598,7 @@ export function getDb(): DatabaseSchema {
     return memoryDb as DatabaseSchema;
   } catch (err) {
     console.error("Database read error, falling back to initial data:", err);
+    if (memoryDb) return memoryDb;
     const fallback = getInitialData();
     memoryDb = fallback;
     return fallback;
@@ -605,6 +611,8 @@ export function saveDb(data: DatabaseSchema): void {
   try {
     ensureDbDirectory(targetFile);
     fs.writeFileSync(targetFile, JSON.stringify(data, null, 2), "utf-8");
+    const stat = fs.statSync(targetFile);
+    lastDbMtimeMs = stat.mtimeMs;
   } catch (err) {
     // Graceful fallback for read-only serverless filesystems
     console.warn("Notice: Could not persist to disk, keeping in memory cache:", err);
