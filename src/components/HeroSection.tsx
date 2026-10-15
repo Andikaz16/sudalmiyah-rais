@@ -21,7 +21,7 @@ const HERO_SLIDES: HeroSlide[] = [
     leadWord: "Kedamaian Ibadah di",
     mosqueName: "Masjid Sudalmiyah Rais",
     description:
-      "Pusat keteduhan ibadah dan teladan Masjid Percontohan yang makmur dan memakmurkan. Menghadirkan kekhusyukan spiritual, mempererat ukhuwah berkemajuan, serta mengabdi sebagai rumah kebaikan bagi sivitas akademika Kampus 2 UMS dan seluruh umat.",
+      "Masjid percontohan Amal Usaha Muhammadiyah (AUM) di tingkat PTMA sebagai pembinaan sivitas akademika UMS yang diproyeksikan menjadi masjid ramah aktivis dan lingkungan",
     objectPosition: "object-[center_35%]",
   },
   {
@@ -30,7 +30,7 @@ const HERO_SLIDES: HeroSlide[] = [
     leadWord: "Kesejukan Syiar di",
     mosqueName: "Masjid Fadhlurrahman",
     description:
-      "Pusat syiar dakwah Islamiyah, pengajian berkala sivitas akademika, dan denyut spiritual bersejarah di lingkungan Kampus 1 Universitas Muhammadiyah Surakarta.",
+      "Masjid pertama dan bersejarah yang menjadi ruh pembinaan Al-Islam dan Kemuhammadiyahan bagi civitas akademika UMS",
     objectPosition: "object-center",
   },
   {
@@ -39,7 +39,7 @@ const HERO_SLIDES: HeroSlide[] = [
     leadWord: "Keteduhan Ruhani di",
     mosqueName: "Masjid KH. Mas Mansur",
     description:
-      "Sentra pembinaan adab, tahfidzul Qur'an, dan keilmuan berkemajuan santri Pesantren Mahasiswa KH. Mas Mansur Kampus 4 UMS dalam meneguhkan integritas moral generasi bangsa.",
+      "Sentra pembinaan mahasiswa interdisipliner UMS dan International dalam pengembangan keilmuan yang berakhlak, berprestasi dan bermanfaat",
     objectPosition: "object-center",
   },
   {
@@ -48,7 +48,7 @@ const HERO_SLIDES: HeroSlide[] = [
     leadWord: "Keluhuran Ilmu & Adab di",
     mosqueName: "Masjid Ma'had Abu Bakar",
     description:
-      "Wahana ibadah dan pendalaman dirasat Islamiyah serta bahasa Arab Ma'had Abu Bakar Ash-Shiddiq UMS yang sarat keteladanan dan keberkahan sunnah.",
+      "Pusat dirasat Islamiyah dan bahasa Arab Ma'had Abu bakar Ash-Shiddiq yang sekarang statusnya menjadi Amal Usaha Muhammadiyah (AUM) di lingkungan UMS",
     objectPosition: "object-[center_40%]",
   },
   {
@@ -58,6 +58,15 @@ const HERO_SLIDES: HeroSlide[] = [
     mosqueName: "Masjid Ar-Razi FKG",
     description:
       "Fasilitas peribadatan modern penopang spiritualitas dan etika profesi calon dokter gigi, tenaga medis, serta sivitas akademika Fakultas Kedokteran Gigi Penumping UMS.",
+    objectPosition: "object-center",
+  },
+  {
+    id: "munajat-shabran",
+    image: "/images/hero-munajat-shabran.jpg",
+    leadWord: "Ghirah Perkaderan di",
+    mosqueName: "Masjid Munajat Shabran",
+    description:
+      "Pusat perkaderan mahasiswa utusan wilayah Muhammadiyah seluruh Indonesia yang diorbitkan menjadi kader intelek ulama', ulama' intelek.",
     objectPosition: "object-center",
   },
 ];
@@ -170,6 +179,21 @@ export default function HeroSection() {
           </Link>
         </div>
 
+        {/* Slide Indicators for 6 Campus Mosques */}
+        <div className="mt-7 flex items-center justify-center gap-2">
+          {HERO_SLIDES.map((slide, idx) => (
+            <button
+              key={slide.id}
+              onClick={() => setCurrentSlide(idx)}
+              aria-label={`Pindah ke ${slide.mosqueName}`}
+              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                idx === currentSlide
+                  ? "w-8 bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.8)]"
+                  : "w-2.5 bg-white/40 hover:bg-white/70"
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Smooth Concave Dome Arch Bottom Divider into #FAF8F5 (Clean Minimalist Signature Curve) */}
