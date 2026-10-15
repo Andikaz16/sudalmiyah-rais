@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Calendar,
   Clock,
@@ -12,7 +13,12 @@ import {
 import { Agenda, AgendaCategory } from "@/lib/types";
 import RegistrationModal from "./RegistrationModal";
 
-export default function AgendaSection() {
+interface AgendaSectionProps {
+  isHomePage?: boolean;
+  limit?: number;
+}
+
+export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaSectionProps) {
   const [agendas, setAgendas] = useState<Agenda[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>("ALL");
@@ -58,27 +64,29 @@ export default function AgendaSection() {
           </p>
         </div>
 
-        {/* Category Filter Tabs (Wrapping responsif agar semua terlihat utuh di mobile tanpa scrollbar) */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-8 sm:mb-10 px-1">
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setActiveCategory(c.id)}
-              className={`px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                activeCategory === c.id
-                  ? "bg-[#003B73] text-white shadow-md shadow-[#003B73]/15"
-                  : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100/70 shadow-2xs"
-              }`}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
+        {/* Category Filter Tabs (Hanya ditampilkan pada halaman utama Agenda /agenda) */}
+        {!isHomePage && (
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-8 sm:mb-10 px-1">
+            {categories.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setActiveCategory(c.id)}
+                className={`px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                  activeCategory === c.id
+                    ? "bg-[#003B73] text-white shadow-md shadow-[#003B73]/15"
+                    : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100/70 shadow-2xs"
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        )}
 
-        {/* Agenda Cards Grid (Matching reference 3-column card cards) */}
+        {/* Agenda Cards Grid */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {[...Array(3)].map((_, i) => (
+            {[...Array(isHomePage ? 3 : 6)].map((_, i) => (
               <div
                 key={i}
                 className="h-80 rounded-3xl bg-stone-100 border border-stone-200 animate-pulse"
@@ -91,7 +99,7 @@ export default function AgendaSection() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {agendas.map((item) => {
+            {(isHomePage ? agendas.slice(0, limit) : agendas).map((item) => {
               const quotaPercent = Math.min(
                 100,
                 Math.round((item.registeredCount / item.quota) * 100)
@@ -219,6 +227,19 @@ export default function AgendaSection() {
               </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Tombol Lihat Semua Agenda jika berada di Beranda */}
+        {isHomePage && (
+          <div className="text-center mt-10">
+            <Link
+              href="/agenda"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all"
+            >
+              <span>Lihat Semua Agenda &amp; Kajian</span>
+              <span className="text-amber-300">&rarr;</span>
+            </Link>
           </div>
         )}
       </div>

@@ -169,7 +169,6 @@ const initialNewsData: NewsItem[] = [
 export default function NewsSection() {
   const [newsList, setNewsList] = useState<NewsItem[]>(initialNewsData);
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<"ALL" | "UMS" | "SUARA_MUHAMMADIYAH" | "LENSAMU">("ALL");
   const [now, setNow] = useState<number | null>(null);
   const [mounted, setMounted] = useState<boolean>(false);
 
@@ -239,20 +238,13 @@ export default function NewsSection() {
     };
   }, []);
 
-  const filteredNews = newsList.filter((item) => {
-    if ((item.source as string) === "MASJIDMU") return false;
-    if (selectedCategory === "ALL") return true;
-    if (selectedCategory === "UMS") return item.source === "UMS";
-    if (selectedCategory === "SUARA_MUHAMMADIYAH") return item.source === "SUARA_MUHAMMADIYAH";
-    if (selectedCategory === "LENSAMU") return item.source === "LENSAMU";
-    return true;
-  });
+  const displayNews = newsList.filter((item) => (item.source as string) !== "MASJIDMU");
 
   return (
     <section id="berita" className="py-12 sm:py-18 bg-[#FAF8F5] text-stone-900 border-t border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
             Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
           </h2>
@@ -261,36 +253,14 @@ export default function NewsSection() {
           </p>
         </div>
 
-        {/* Category Filter Tabs - Exactly 3 News Sources */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10">
-          {[
-            { key: "ALL", label: "Semua Warta" },
-            { key: "UMS", label: "Warta Kampus UMS" },
-            { key: "SUARA_MUHAMMADIYAH", label: "Suara Muhammadiyah" },
-            { key: "LENSAMU", label: "Lensamu" },
-          ].map((cat) => (
-            <button
-              key={cat.key}
-              onClick={() => setSelectedCategory(cat.key as "ALL" | "UMS" | "SUARA_MUHAMMADIYAH" | "LENSAMU")}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
-                selectedCategory === cat.key
-                  ? "bg-[#003B73] text-white shadow-md scale-105"
-                  : "bg-white text-stone-600 border border-stone-200/90 hover:bg-stone-50 hover:text-stone-900"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
         {/* News Cards Grid */}
-        {filteredNews.length === 0 ? (
+        {displayNews.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-3xl border border-stone-200 p-8 max-w-xl mx-auto shadow-xs">
-            <p className="text-stone-500 text-sm">Belum ada warta untuk kategori ini.</p>
+            <p className="text-stone-500 text-sm">Belum ada warta saat ini.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-            {filteredNews.map((item) => (
+            {displayNews.map((item) => (
             <article
               key={item.id}
               className="bg-white border border-stone-200/90 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#D4AF37]/50 transition-all duration-300 flex flex-col justify-between group"

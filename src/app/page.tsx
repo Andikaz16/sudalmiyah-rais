@@ -39,9 +39,9 @@ export default function Home() {
           <MasjidMuSection />
         </AnimatedSection>
 
-        {/* Agendas Section */}
+        {/* Agendas Section (Maksimal 3 pada beranda, lengkap di /agenda) */}
         <AnimatedSection animation="fade-up" duration={700}>
-          <AgendaSection />
+          <AgendaSection isHomePage={true} limit={3} />
         </AnimatedSection>
 
         {/* Jadwal Petugas Shalat & Khatib Pekan Ini */}
