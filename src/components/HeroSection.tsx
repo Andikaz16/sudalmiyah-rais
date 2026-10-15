@@ -57,7 +57,7 @@ const HERO_SLIDES: HeroSlide[] = [
     leadWord: "Keberkahan & Dedikasi di",
     mosqueName: "Masjid Ar-Razi FKG",
     description:
-      "Fasilitas peribadatan modern penopang spiritualitas dan etika profesi calon dokter gigi, tenaga medis, serta sivitas akademika Fakultas Kedokteran Gigi Penumping UMS.",
+      "Masjid yang terinspirasi ilmuwan polimatik terkemuka dan ahli di beberapa bidang utama, terutama kedokteran, kimia dan filsafat yakni Abu Bakar Muhammad bin Zakariya al-Razi",
     objectPosition: "object-center",
   },
   {
