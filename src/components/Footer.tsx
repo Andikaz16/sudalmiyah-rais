@@ -29,7 +29,7 @@ export default function Footer() {
               </div>
               <div>
                 <h3 className="font-bold text-white text-base font-serif">
-                  Masjid UMS
+                  Masjid Kampus
                 </h3>
                 <p className="text-xs text-stone-300">
                   Universitas Muhammadiyah Surakarta
@@ -108,7 +108,7 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-400">
           <div>
-            Hak Cipta © 2026 Masjid UMS - Universitas Muhammadiyah Surakarta. Seluruh Hak Dilindungi.
+            Hak Cipta © 2026 Masjid Kampus - Universitas Muhammadiyah Surakarta. Seluruh Hak Dilindungi.
           </div>
           <div className="flex items-center gap-4 text-[11px] text-stone-300">
             <span>Integritas</span>

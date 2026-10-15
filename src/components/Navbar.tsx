@@ -53,7 +53,7 @@ export default function Navbar() {
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-lg sm:text-xl tracking-tight text-[#003B73] group-hover:text-[#B58A1E] transition-colors font-serif">
-                Masjid UMS
+                Masjid Kampus
               </span>
               <span className="text-[10px] text-stone-500 tracking-wider uppercase font-medium">
                 Universitas Muhammadiyah Surakarta
