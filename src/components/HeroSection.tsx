@@ -141,9 +141,23 @@ export default function HeroSection() {
       </button>
 
       {/* Hero Content Overlay */}
-      <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-10 sm:pt-16 pb-24 sm:pb-28">
-        {/* Minimalist Mosque Badge */}
-        <div className="inline-flex items-center justify-center px-4 sm:px-5 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-semibold tracking-wide mb-6 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all duration-300">
+      <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-8 sm:pt-12 lg:pt-14 pb-20 sm:pb-24">
+        {/* Logo LPCR-PM PP Muhammadiyah */}
+        <div className="flex justify-center mb-3 sm:mb-4">
+          <div className="relative w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 drop-shadow-[0_2px_14px_rgba(0,0,0,0.9)] hover:scale-105 transition-transform duration-300">
+            <Image
+              src="/images/logo/logo-lpcr.png"
+              alt="Logo LPCR-PM PP Muhammadiyah"
+              width={80}
+              height={80}
+              className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+              priority
+            />
+          </div>
+        </div>
+
+        {/* Minimalist Mosque Badge - Compact on mobile, enlarged on laptop */}
+        <div className="inline-flex items-center justify-center px-4 sm:px-6 lg:px-8 py-1.5 sm:py-2.5 lg:py-3 rounded-full bg-black/60 backdrop-blur-md border border-amber-400/50 text-amber-200 text-xs sm:text-base lg:text-lg font-semibold tracking-wide mb-5 sm:mb-7 shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all duration-300">
           <span>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</span>
         </div>
 
