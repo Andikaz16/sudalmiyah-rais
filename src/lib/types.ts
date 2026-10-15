@@ -83,6 +83,10 @@ export interface Registration {
   ticketCode: string;
   status: "CONFIRMED" | "ATTENDED" | "CANCELLED";
   registeredAt: string;
+  attendedAt?: string;
+  checkInMethod?: "QR_DYNAMIC" | "MANUAL_ADMIN" | "PRE_REGISTER";
+  participantRole?: "MAHASISWA" | "DOSEN_KARYAWAN" | "UMUM";
+  locationVerified?: boolean;
 }
 
 export type TransactionType = "INCOME" | "EXPENSE";

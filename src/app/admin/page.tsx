@@ -7,6 +7,7 @@ import Image from "next/image";
 import {
   Calendar,
   Users,
+  QrCode,
 } from "lucide-react";
 import { Agenda, FridayOfficerSchedule, QrisSettings, Registration } from "@/lib/types";
 
@@ -272,6 +273,14 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/agenda/presensi-live"
+              target="_blank"
+              className="text-xs font-semibold text-amber-300 hover:text-amber-200 px-3.5 py-1.5 rounded-full border border-amber-400/50 bg-amber-400/10 flex items-center gap-1.5 transition-colors"
+            >
+              <QrCode className="w-3.5 h-3.5 text-amber-400" />
+              <span>Layar Presensi Live</span>
+            </Link>
             <Link
               href="/"
               className="text-xs font-semibold text-stone-300 hover:text-white px-3.5 py-1.5 rounded-full border border-stone-600 hidden sm:block transition-colors"
