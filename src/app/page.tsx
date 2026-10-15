@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import PrayerCountdownCard from "@/components/PrayerCountdownCard";
+import MuhammadiyahCalendarWidget from "@/components/MuhammadiyahCalendarWidget";
 import AgendaSection from "@/components/AgendaSection";
 import MasjidMuSection from "@/components/MasjidMuSection";
 import FridayScheduleSection from "@/components/FridayScheduleSection";
@@ -26,6 +27,11 @@ export default function Home() {
             <PrayerCountdownCard />
           </AnimatedSection>
         </section>
+
+        {/* Dedicated Kalender Muhammadiyah (KHGT) Widget */}
+        <AnimatedSection animation="fade-up" duration={700}>
+          <MuhammadiyahCalendarWidget />
+        </AnimatedSection>
 
         {/* Pilar & Keunggulan Masjid Percontohan AUM */}
         <AnimatedSection animation="fade-up" duration={700}>
