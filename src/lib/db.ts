@@ -19,6 +19,7 @@ interface DatabaseSchema {
   users: User[];
   agendas: Agenda[];
   fridaySchedule: FridayOfficerSchedule;
+  fridaySchedules?: FridayOfficerSchedule[];
   qrisSettings: QrisSettings;
   registrations: Registration[];
   finances: FinancialRecord[];
@@ -50,9 +51,134 @@ function ensureDbDirectory(targetFilePath: string) {
   }
 }
 
+export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): FridayOfficerSchedule[] {
+  const sudalmiyah: FridayOfficerSchedule = {
+    id: primary?.id || "fri-sudalmiyah",
+    mosqueId: "sudalmiyah",
+    mosqueName: "Masjid Hj. Sudalmiyah Rais",
+    mosqueLocation: "Kampus 2 UMS",
+    date: primary?.date || "Jumat, 16 Oktober 2026",
+    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    khatibName: primary?.khatibName || "Prof. Dr. Sofyan Anif, M.Si.",
+    khatibTitle: primary?.khatibTitle || "Rektor Universitas Muhammadiyah Surakarta",
+    khatibPhotoUrl: primary?.khatibPhotoUrl || "/uploads/khatib/prof-sofyan-anif.jpg",
+    khutbahTheme: primary?.khutbahTheme || "Membangun Integritas Moral & Karakter Mahasiswa Muslim Berkemajuan di Era AI",
+    imamName: primary?.imamName || "Ustadz Muhammad Ridwan, Al-Hafizh",
+    imamRole: primary?.imamRole || "Imam Rawatib Masjid Sudalmiyah Rais",
+    muadzinName: primary?.muadzinName || "Bilal Ramadhan, S.Kom.",
+    muadzinRole: primary?.muadzinRole || "Muadzin Masjid Sudalmiyah Rais",
+    time: primary?.time || "11:35 WIB",
+    notes: primary?.notes || "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid, serta menata alas kaki dengan rapi di loker yang disediakan.",
+    updatedAt: primary?.updatedAt || new Date().toISOString(),
+  };
+
+  const fadhlurrahman: FridayOfficerSchedule = {
+    id: "fri-fadhlurrahman",
+    mosqueId: "fadhlurrahman",
+    mosqueName: "Masjid Fadhlurrahman",
+    mosqueLocation: "Kampus 1 UMS",
+    date: primary?.date || "Jumat, 16 Oktober 2026",
+    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    khatibName: "Dr. Syamsul Hidayat, M.Ag.",
+    khatibTitle: "Dekan FAI UMS / Majelis Tarjih",
+    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
+    khutbahTheme: "Meneladani Jejak Historis & Ruh Perjuangan Dakwah Islam Berkemajuan",
+    imamName: "Ustadz H. Ahmad Dahlan, S.Pd.I.",
+    imamRole: "Imam Rawatib Masjid Fadhlurrahman",
+    muadzinName: "Farhan Al-Ghifari",
+    muadzinRole: "Muadzin Masjid Fadhlurrahman",
+    time: "11:35 WIB",
+    notes: "Saf utama lantai 1 diprioritaskan bagi civitas akademika dan masyarakat sekitar. Harap parkir kendaraan dengan rapi.",
+    updatedAt: new Date().toISOString(),
+  };
+
+  const masMansur: FridayOfficerSchedule = {
+    id: "fri-mas-mansur",
+    mosqueId: "mas-mansur",
+    mosqueName: "Masjid KH. Mas Mansur",
+    mosqueLocation: "Kampus 4 UMS (Pesma)",
+    date: primary?.date || "Jumat, 16 Oktober 2026",
+    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    khatibName: "Drs. Dahlan Rais, M.Hum.",
+    khatibTitle: "Ketua BPH UMS / PP Muhammadiyah",
+    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
+    khutbahTheme: "Ukhuwah Islamiyah & Penguatan Karakter Mahasantri Berwawasan Global",
+    imamName: "Ustadz Mu'tashim Billah, Lc.",
+    imamRole: "Imam & Pembina Pesma KH. Mas Mansur",
+    muadzinName: "Zaidan Ilham, S.Ag.",
+    muadzinRole: "Muadzin Pesma KH. Mas Mansur",
+    time: "11:35 WIB",
+    notes: "Mahasantri Pesma wajib mengisi saf dari depan secara tertib. Dilarang membawa barang berharga tanpa pengawasan.",
+    updatedAt: new Date().toISOString(),
+  };
+
+  const mahadAbuBakar: FridayOfficerSchedule = {
+    id: "fri-mahad-abu-bakar",
+    mosqueId: "mahad-abu-bakar",
+    mosqueName: "Masjid Ma'had Abu Bakar",
+    mosqueLocation: "Kampus 2 UMS",
+    date: primary?.date || "Jumat, 16 Oktober 2026",
+    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    khatibName: "Dr. Mirwan Akhmad Taufiq, M.S.I.",
+    khatibTitle: "Direktur Ma'had Abu Bakar Ash-Shiddiq",
+    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
+    khutbahTheme: "Urgensi Bahasa Al-Qur'an dan Keluhuran Adab dalam Menuntut Ilmu",
+    imamName: "Syaikh Hasan Al-Yamani, Lc.",
+    imamRole: "Imam Ma'had Abu Bakar",
+    muadzinName: "Abdullah Azzam",
+    muadzinRole: "Muadzin Ma'had Abu Bakar",
+    time: "11:35 WIB",
+    notes: "Khutbah disampaikan dengan pengantar bahasa Arab fusha dan terjemah ringkas. Jamaah diharapkan menjaga ketenangan.",
+    updatedAt: new Date().toISOString(),
+  };
+
+  const arRazi: FridayOfficerSchedule = {
+    id: "fri-ar-razi",
+    mosqueId: "ar-razi",
+    mosqueName: "Masjid Ar-Razi FKG",
+    mosqueLocation: "Kampus 4 UMS (FKG)",
+    date: primary?.date || "Jumat, 16 Oktober 2026",
+    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    khatibName: "drg. Morita Sari, Sp.KG., Ph.D.",
+    khatibTitle: "Dosen FKG UMS / Praktisi Kesehatan Islam",
+    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
+    khutbahTheme: "Kesehatan Jasmani dan Ruhani sebagai Amanah Dakwah Kedokteran Islam",
+    imamName: "Ustadz Fathurrahman Al-Hafizh",
+    imamRole: "Imam Masjid Ar-Razi",
+    muadzinName: "Ilham Ramadhan, S.KG.",
+    muadzinRole: "Muadzin Masjid Ar-Razi",
+    time: "11:35 WIB",
+    notes: "Disediakan tempat wudhu higienis di sayap timur dan barat. Jamaah diimbau membawa sajadah pribadi.",
+    updatedAt: new Date().toISOString(),
+  };
+
+  const munajatShabran: FridayOfficerSchedule = {
+    id: "fri-munajat-shabran",
+    mosqueId: "munajat-shabran",
+    mosqueName: "Masjid Munajat Shabran",
+    mosqueLocation: "Makamhaji (Pondok Shabran)",
+    date: primary?.date || "Jumat, 16 Oktober 2026",
+    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    khatibName: "Nurul Huda, M.Ag.",
+    khatibTitle: "Mudir Pondok Hajjah Nuriyah Shabran",
+    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
+    khutbahTheme: "Menyiapkan Ulama Intelek dan Intelek Ulama untuk Kepemimpinan Umat",
+    imamName: "Ustadz Saifuddin, M.Ag.",
+    imamRole: "Imam Masjid Munajat Shabran",
+    muadzinName: "Ibrahim Maulana",
+    muadzinRole: "Muadzin Kader Shabran",
+    time: "11:35 WIB",
+    notes: "Shalat Jumat terbuka bagi santri, asatidz, dan masyarakat Makamhaji sekitarnya.",
+    updatedAt: new Date().toISOString(),
+  };
+
+  return [sudalmiyah, fadhlurrahman, masMansur, mahadAbuBakar, arRazi, munajatShabran];
+}
+
 function getInitialData(): DatabaseSchema {
   const adminPasswordHash = bcrypt.hashSync("AdminSudalmiyah2026!", 10);
   const studentPasswordHash = bcrypt.hashSync("MahasiswaUMS2026!", 10);
+  const defaultSchedules = getDefaultFridaySchedules();
 
   return {
     users: [
@@ -169,22 +295,8 @@ function getInitialData(): DatabaseSchema {
         createdAt: new Date().toISOString(),
       },
     ],
-    fridaySchedule: {
-      id: "fri-01",
-      date: "Jumat, 16 Oktober 2026",
-      hijriDate: "5 Rabiul Akhir 1448 H",
-      khatibName: "Prof. Dr. Sofyan Anif, M.Si.",
-      khatibTitle: "Rektor Universitas Muhammadiyah Surakarta",
-      khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
-      khutbahTheme: "Membangun Integritas Moral & Karakter Mahasiswa Muslim Berkemajuan di Era AI",
-      imamName: "Ustadz Muhammad Ridwan, Al-Hafizh",
-      imamRole: "Imam Rawatib Masjid Sudalmiyah Rais",
-      muadzinName: "Bilal Ramadhan, S.Kom.",
-      muadzinRole: "Muadzin Masjid Sudalmiyah Rais",
-      time: "11:35 WIB",
-      notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid, serta menata alas kaki dengan rapi di loker yang disediakan.",
-      updatedAt: new Date().toISOString(),
-    },
+    fridaySchedule: defaultSchedules[0],
+    fridaySchedules: defaultSchedules,
     qrisSettings: {
       id: "qris-01",
       imageUrl: "/images/qris-sudalmiyah.png",
@@ -410,8 +522,20 @@ export function getDb(): DatabaseSchema {
   try {
     const content = fs.readFileSync(fileToRead, "utf-8");
     memoryDb = JSON.parse(content);
+    if (!memoryDb?.fridaySchedules || memoryDb.fridaySchedules.length < 6) {
+      const defaults = getDefaultFridaySchedules(memoryDb?.fridaySchedule);
+      if (!memoryDb?.fridaySchedules || memoryDb.fridaySchedules.length === 0) {
+        memoryDb!.fridaySchedules = defaults;
+      } else {
+        const existingMap = new Map(memoryDb.fridaySchedules.map((s) => [s.mosqueId || s.id, s]));
+        memoryDb!.fridaySchedules = defaults.map((d) => {
+          const key = d.mosqueId || d.id;
+          return existingMap.get(key) || d;
+        });
+      }
+    }
     if (!memoryDb?.fridaySchedule) {
-      memoryDb!.fridaySchedule = getInitialData().fridaySchedule;
+      memoryDb!.fridaySchedule = memoryDb!.fridaySchedules[0];
     }
     if (!memoryDb?.qrisSettings) {
       memoryDb!.qrisSettings = getInitialData().qrisSettings;

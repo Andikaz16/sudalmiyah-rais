@@ -34,6 +34,15 @@ import {
   FeedbackStatus,
 } from "@/lib/types";
 
+const ADMIN_MOSQUES = [
+  { id: "sudalmiyah", name: "Masjid Hj. Sudalmiyah Rais", location: "Kampus 2 UMS" },
+  { id: "fadhlurrahman", name: "Masjid Fadhlurrahman", location: "Kampus 1 UMS" },
+  { id: "mas-mansur", name: "Masjid KH. Mas Mansur", location: "Kampus 4 UMS (Pesma)" },
+  { id: "mahad-abu-bakar", name: "Masjid Ma'had Abu Bakar", location: "Kampus 2 UMS" },
+  { id: "ar-razi", name: "Masjid Ar-Razi FKG", location: "Kampus 4 UMS (FKG)" },
+  { id: "munajat-shabran", name: "Masjid Munajat Shabran", location: "Makamhaji (Pondok Shabran)" },
+];
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
@@ -74,11 +83,14 @@ export default function AdminDashboardPage() {
   const [adminResponseStatus, setAdminResponseStatus] = useState<FeedbackStatus>("DITINDAKLANJUTI");
   const [savingFeedbackResponse, setSavingFeedbackResponse] = useState(false);
 
-  // Friday officer schedule state
+  // Friday officer schedule state (6 Mosques)
   const [fridaySchedule, setFridaySchedule] = useState<FridayOfficerSchedule | null>(null);
+  const [fridaySchedules, setFridaySchedules] = useState<FridayOfficerSchedule[]>([]);
+  const [selectedMosqueId, setSelectedMosqueId] = useState<string>("sudalmiyah");
   const [savingFriday, setSavingFriday] = useState(false);
   const [uploadingKhatibPhoto, setUploadingKhatibPhoto] = useState(false);
   const [fridaySaveSuccess, setFridaySaveSuccess] = useState(false);
+  const activeMosqueMeta = ADMIN_MOSQUES.find((m) => m.id === selectedMosqueId) || ADMIN_MOSQUES[0];
 
   // QRIS Infaq state
   const [qrisSettings, setQrisSettings] = useState<QrisSettings | null>(null);
@@ -126,8 +138,18 @@ export default function AdminDashboardPage() {
       setStats(statsJson.stats);
       setAgendas(agendaJson.agendas || []);
       setRegistrations(statsJson.recentRegistrations || []);
-      if (fridayJson.success && fridayJson.schedule) {
-        setFridaySchedule(fridayJson.schedule);
+      if (fridayJson.success) {
+        if (Array.isArray(fridayJson.schedules) && fridayJson.schedules.length > 0) {
+          setFridaySchedules(fridayJson.schedules);
+          const current =
+            fridayJson.schedules.find(
+              (s: FridayOfficerSchedule) => (s.mosqueId || s.id) === selectedMosqueId
+            ) || fridayJson.schedules[0];
+          setFridaySchedule(current);
+        } else if (fridayJson.schedule) {
+          setFridaySchedule(fridayJson.schedule);
+          setFridaySchedules([fridayJson.schedule]);
+        }
       }
       if (qrisJson.success && qrisJson.qris) {
         setQrisSettings(qrisJson.qris);
@@ -250,6 +272,36 @@ export default function AdminDashboardPage() {
     router.refresh();
   };
 
+  const handleSelectMosque = (mosqueId: string) => {
+    setSelectedMosqueId(mosqueId);
+    const found = fridaySchedules.find((s) => (s.mosqueId || s.id) === mosqueId);
+    if (found) {
+      setFridaySchedule(found);
+    } else {
+      const meta = ADMIN_MOSQUES.find((m) => m.id === mosqueId);
+      const newSchedule: FridayOfficerSchedule = {
+        id: `fri-${mosqueId}`,
+        mosqueId: mosqueId,
+        mosqueName: meta?.name || "Masjid Kampus UMS",
+        mosqueLocation: meta?.location,
+        date: "Jumat, 16 Oktober 2026",
+        hijriDate: "5 Rabiul Akhir 1448 H",
+        khatibName: "",
+        khatibTitle: "",
+        khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
+        khutbahTheme: "",
+        imamName: "",
+        imamRole: `Imam ${meta?.name || "Masjid"}`,
+        muadzinName: "",
+        muadzinRole: `Muadzin ${meta?.name || "Masjid"}`,
+        time: "11:35 WIB",
+        notes: "",
+        updatedAt: new Date().toISOString(),
+      };
+      setFridaySchedule(newSchedule);
+    }
+  };
+
   // Upload Khatib Photo from Media file
   const handleKhatibPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -268,7 +320,11 @@ export default function AdminDashboardPage() {
       if (!res.ok) throw new Error(data.error || "Gagal mengunggah foto khatib.");
 
       if (fridaySchedule) {
-        setFridaySchedule({ ...fridaySchedule, khatibPhotoUrl: data.url });
+        const updated = { ...fridaySchedule, khatibPhotoUrl: data.url };
+        setFridaySchedule(updated);
+        setFridaySchedules((prev) =>
+          prev.map((s) => ((s.mosqueId || s.id) === selectedMosqueId ? updated : s))
+        );
       }
     } catch (err: any) {
       alert(err.message || "Gagal mengunggah foto khatib.");
@@ -284,13 +340,32 @@ export default function AdminDashboardPage() {
     setSavingFriday(true);
     setFridaySaveSuccess(false);
     try {
+      const currentMeta = ADMIN_MOSQUES.find((m) => m.id === selectedMosqueId);
+      const payload: FridayOfficerSchedule = {
+        ...fridaySchedule,
+        mosqueId: selectedMosqueId,
+        mosqueName: fridaySchedule.mosqueName || currentMeta?.name || "Masjid Kampus UMS",
+        mosqueLocation: fridaySchedule.mosqueLocation || currentMeta?.location,
+      };
+
       const res = await fetch("/api/friday-schedule", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fridaySchedule),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan jadwal jumat.");
+
+      if (data.schedule) {
+        setFridaySchedule(data.schedule);
+      }
+      if (Array.isArray(data.schedules) && data.schedules.length > 0) {
+        setFridaySchedules(data.schedules);
+      } else {
+        setFridaySchedules((prev) =>
+          prev.map((s) => ((s.mosqueId || s.id) === selectedMosqueId ? data.schedule || payload : s))
+        );
+      }
 
       setFridaySaveSuccess(true);
       setTimeout(() => setFridaySaveSuccess(false), 3000);
@@ -678,27 +753,87 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 2: PETUGAS SHALAT & KHATIB JUMAT */}
+        {/* Tab 2: PETUGAS SHALAT & KHATIB JUMAT (6 MASJID KAMPUS UMS) */}
         {activeTab === "PETUGAS_JUMAT" && (
           <div className="space-y-6">
             <div>
               <h2 className="text-lg font-bold text-stone-900 font-serif">
-                Pengaturan Petugas Shalat & Khatib Pekan Ini
+                Pengaturan Petugas Shalat & Khatib 6 Masjid Kampus UMS
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
-                Perbarui nama khatib, unggah foto khatib dari media perangkat, serta sesuaikan tema khutbah, imam, dan muadzin.
+                Pilih salah satu dari 6 masjid kampus di bawah ini untuk melihat dan menyesuaikan jadwal petugas jumat, nama khatib, foto, tema khutbah, imam, dan muadzin.
               </p>
+            </div>
+
+            {/* Mosque Selector Grid */}
+            <div className="bg-stone-50 p-4 rounded-3xl border border-stone-200/90 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-stone-700 uppercase tracking-wider">
+                  Pilih Masjid yang Dikelola:
+                </span>
+                <span className="text-[11px] font-semibold text-[#003B73]">
+                  Sedang Mengedit: <strong>{activeMosqueMeta.name}</strong>
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                {ADMIN_MOSQUES.map((m) => {
+                  const isSelected = m.id === selectedMosqueId;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => handleSelectMosque(m.id)}
+                      className={`p-3 rounded-2xl text-left border transition-all duration-200 flex flex-col justify-between ${
+                        isSelected
+                          ? "bg-[#003B73] text-white border-[#003B73] shadow-md shadow-[#003B73]/20 ring-2 ring-[#003B73]/20"
+                          : "bg-white text-stone-700 border-stone-200 hover:bg-stone-100 hover:border-stone-300"
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span
+                          className={`w-2 h-2 rounded-full shrink-0 ${
+                            isSelected ? "bg-[#D4AF37]" : "bg-stone-300"
+                          }`}
+                        />
+                        <span className="text-xs font-bold truncate leading-snug">
+                          {m.name}
+                        </span>
+                      </div>
+                      <span
+                        className={`text-[10px] truncate ${
+                          isSelected ? "text-white/80" : "text-stone-400"
+                        }`}
+                      >
+                        {m.location}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {fridaySaveSuccess && (
               <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
-                Perubahan jadwal petugas shalat dan khatib berhasil disimpan dan langsung tayang di beranda.
+                Perubahan jadwal petugas shalat dan khatib untuk {activeMosqueMeta.name} berhasil disimpan dan langsung tayang di beranda.
               </div>
             )}
 
             {fridaySchedule ? (
               <form onSubmit={handleUpdateFridaySchedule} className="bg-white rounded-3xl border border-stone-200 shadow-sm p-6 sm:p-8 space-y-6">
                 
+                {/* Active Mosque Badge Banner */}
+                <div className="px-4 py-3 rounded-2xl bg-[#003B73]/5 border border-[#003B73]/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#003B73]" />
+                    <span className="text-xs font-bold text-[#003B73]">
+                      Form Jadwal: {activeMosqueMeta.name}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-stone-500 font-medium">
+                    Lokasi: {activeMosqueMeta.location}
+                  </span>
+                </div>
+
                 {/* Photo & Khatib Highlight */}
                 <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-stone-200/80 flex flex-col sm:flex-row items-center sm:items-start gap-6">
                   {/* Photo Preview & Upload Button */}
@@ -893,13 +1028,16 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Submit Action */}
-                <div className="flex justify-end pt-2">
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-xs text-stone-500">
+                    Menyimpan perubahan untuk <strong>{activeMosqueMeta.name}</strong>
+                  </span>
                   <button
                     type="submit"
                     disabled={savingFriday}
                     className="px-8 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50"
                   >
-                    {savingFriday ? "Menyimpan Perubahan..." : "Simpan Perubahan Jadwal Jumat"}
+                    {savingFriday ? "Menyimpan Perubahan..." : `Simpan Jadwal (${activeMosqueMeta.name})`}
                   </button>
                 </div>
               </form>

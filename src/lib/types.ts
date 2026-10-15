@@ -55,6 +55,9 @@ export interface Agenda {
 
 export interface FridayOfficerSchedule {
   id: string;
+  mosqueId?: string;
+  mosqueName?: string;
+  mosqueLocation?: string;
   date: string;
   hijriDate: string;
   khatibName: string;
@@ -69,6 +72,7 @@ export interface FridayOfficerSchedule {
   notes?: string;
   updatedAt: string;
 }
+
 
 export interface Registration {
   id: string;

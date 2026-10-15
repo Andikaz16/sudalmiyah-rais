@@ -5,6 +5,10 @@ import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { FridayOfficerSchedule } from "@/lib/types";
 
 const updateFridaySchema = z.object({
+  id: z.string().optional(),
+  mosqueId: z.string().optional(),
+  mosqueName: z.string().optional(),
+  mosqueLocation: z.string().optional(),
   date: z.string().min(3).max(100),
   hijriDate: z.string().min(3).max(100),
   khatibName: z.string().min(3).max(150),
@@ -19,11 +23,20 @@ const updateFridaySchema = z.object({
   notes: z.string().max(1000).optional(),
 });
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const db = getDb();
+  const { searchParams } = new URL(request.url);
+  const mosqueId = searchParams.get("mosqueId");
+
+  const schedules = db.fridaySchedules || [];
+  const activeSchedule = mosqueId
+    ? schedules.find((s) => (s.mosqueId || s.id) === mosqueId) || db.fridaySchedule
+    : db.fridaySchedule || schedules[0];
+
   return NextResponse.json({
     success: true,
-    schedule: db.fridaySchedule,
+    schedule: activeSchedule,
+    schedules: schedules,
   });
 }
 
@@ -51,9 +64,21 @@ export async function PUT(request: NextRequest) {
 
     const data = parseResult.data;
     const db = getDb();
+    if (!db.fridaySchedules) {
+      db.fridaySchedules = [];
+    }
+
+    const targetMosqueId = data.mosqueId || "sudalmiyah";
+    const existingIndex = db.fridaySchedules.findIndex(
+      (s) => (s.mosqueId || s.id) === targetMosqueId
+    );
+    const existing = existingIndex >= 0 ? db.fridaySchedules[existingIndex] : null;
 
     const updatedSchedule: FridayOfficerSchedule = {
-      id: db.fridaySchedule?.id || `fri-${Date.now()}`,
+      id: data.id || existing?.id || `fri-${targetMosqueId}`,
+      mosqueId: targetMosqueId,
+      mosqueName: data.mosqueName ? sanitizeString(data.mosqueName) : (existing?.mosqueName || "Masjid Kampus UMS"),
+      mosqueLocation: data.mosqueLocation ? sanitizeString(data.mosqueLocation) : existing?.mosqueLocation,
       date: sanitizeString(data.date),
       hijriDate: sanitizeString(data.hijriDate),
       khatibName: sanitizeString(data.khatibName),
@@ -69,7 +94,16 @@ export async function PUT(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     };
 
-    db.fridaySchedule = updatedSchedule;
+    if (existingIndex >= 0) {
+      db.fridaySchedules[existingIndex] = updatedSchedule;
+    } else {
+      db.fridaySchedules.push(updatedSchedule);
+    }
+
+    if (targetMosqueId === "sudalmiyah") {
+      db.fridaySchedule = updatedSchedule;
+    }
+
     saveDb(db);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
@@ -78,17 +112,19 @@ export async function PUT(request: NextRequest) {
       session.email,
       ip,
       "SUCCESS",
-      `Jadwal Shalat Jumat diperbarui: Khatib ${updatedSchedule.khatibName}`
+      `Jadwal Shalat Jumat diperbarui untuk ${updatedSchedule.mosqueName || targetMosqueId}: Khatib ${updatedSchedule.khatibName}`
     );
 
     return NextResponse.json({
       success: true,
       schedule: updatedSchedule,
+      schedules: db.fridaySchedules,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : "Gagal memperbarui jadwal jumat.";
     console.error("Error updating friday schedule:", err);
     return NextResponse.json(
-      { error: err.message || "Gagal memperbarui jadwal jumat." },
+      { error: errorMsg },
       { status: 500 }
     );
   }
