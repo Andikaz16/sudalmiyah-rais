@@ -88,7 +88,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/#berita" className="hover:text-[#FCD34D] transition-colors">
-                  Kabar MasjidMu &amp; Persyarikatan
+                  Warta Kampus &amp; Persyarikatan
                 </Link>
               </li>
             </ul>
