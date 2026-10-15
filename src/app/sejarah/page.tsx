@@ -59,7 +59,6 @@ interface DocumentSK {
 
 export default function SejarahPage() {
   const [selectedDoc, setSelectedDoc] = useState<DocumentSK | null>(null);
-  const [activeTab, setActiveTab] = useState<"semua" | "sudalmiyah" | "sk" | "jejaring">("semua");
 
   const documents: DocumentSK[] = [
     {
@@ -214,76 +213,42 @@ export default function SejarahPage() {
       <Navbar />
 
       <main className="flex-1 pb-16">
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-b from-[#002855] via-[#003B73] to-[#001F3F] text-white pt-12 pb-20 sm:pb-28 overflow-hidden">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#D4AF37_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#D4AF37]/20 rounded-full blur-3xl pointer-events-none" />
+        {/* Hero Section dengan Background Kolase 6 Masjid Kampus */}
+        <section className="relative text-white pt-14 pb-24 sm:pb-32 overflow-hidden">
+          {/* Background Image: Kolase 6 Masjid Kampus UMS */}
+          <div className="absolute inset-0">
+            <Image
+              src="/images/banner-sejarah-6-masjid.jpg"
+              alt="Kolase 6 Masjid Kampus Universitas Muhammadiyah Surakarta"
+              fill
+              className="object-cover object-center scale-105"
+              priority
+            />
+            {/* Multi-layer gradient overlay untuk kontras dan estetika arsitektural */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#001F3F]/95 via-[#002855]/90 to-[#001F3F]/80" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#FAF8F5] via-transparent to-[#001F3F]/75" />
+          </div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#FCD34D] text-xs font-semibold uppercase tracking-wider mb-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/25 text-[#FCD34D] text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Dokumentasi Sejarah & Arsip Legalitas</span>
+                <span>Dokumentasi Sejarah &amp; Arsip Legalitas</span>
               </div>
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-serif tracking-tight text-white leading-tight">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-serif tracking-tight text-white leading-tight drop-shadow-md">
                 Sejarah Masjid Kampus UMS
               </h1>
-              <p className="mt-4 text-stone-200 text-sm sm:text-base lg:text-lg leading-relaxed font-light">
-                Menelusuri jejak perintisan dakwah, penetapan nama pejuang & tokoh persyarikatan, 
+              <p className="mt-4 text-stone-200 text-sm sm:text-base lg:text-lg leading-relaxed font-light max-w-2xl drop-shadow-sm">
+                Menelusuri jejak perintisan dakwah, penetapan nama pejuang &amp; tokoh persyarikatan, 
                 serta arsip Surat Keputusan (SK) resmi pengelolaan masjid percontohan di lingkungan 
                 Universitas Muhammadiyah Surakarta.
               </p>
-
-              {/* Navigation Quick Filter */}
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-8">
-                <button
-                  onClick={() => setActiveTab("semua")}
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                    activeTab === "semua"
-                      ? "bg-[#D4AF37] text-stone-900 shadow-md font-bold"
-                      : "bg-white/10 hover:bg-white/20 text-white"
-                  }`}
-                >
-                  Semua Ulasan
-                </button>
-                <button
-                  onClick={() => setActiveTab("sudalmiyah")}
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                    activeTab === "sudalmiyah"
-                      ? "bg-[#D4AF37] text-stone-900 shadow-md font-bold"
-                      : "bg-white/10 hover:bg-white/20 text-white"
-                  }`}
-                >
-                  Masjid Hj. Sudalmiyah
-                </button>
-                <button
-                  onClick={() => setActiveTab("sk")}
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                    activeTab === "sk"
-                      ? "bg-[#D4AF37] text-stone-900 shadow-md font-bold"
-                      : "bg-white/10 hover:bg-white/20 text-white"
-                  }`}
-                >
-                  Surat Keputusan (SK)
-                </button>
-                <button
-                  onClick={() => setActiveTab("jejaring")}
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                    activeTab === "jejaring"
-                      ? "bg-[#D4AF37] text-stone-900 shadow-md font-bold"
-                      : "bg-white/10 hover:bg-white/20 text-white"
-                  }`}
-                >
-                  5 Masjid Kampus Lainnya
-                </button>
-              </div>
             </div>
           </div>
         </section>
 
         {/* SECTION 1: SEJARAH UTAMA - MASJID HJ. SUDALMIYAH SUHUD RAIS */}
-        {(activeTab === "semua" || activeTab === "sudalmiyah") && (
-          <section className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-16 mb-16">
+        <section className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-16 mb-16">
             <div className="bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-xl">
               {/* Badge & Title */}
               <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-stone-200">
@@ -406,11 +371,9 @@ export default function SejarahPage() {
               </div>
             </div>
           </section>
-        )}
 
         {/* SECTION 2: SURAT KEPUTUSAN (SK) & DOKUMEN LEGALITAS RESMI */}
-        {(activeTab === "semua" || activeTab === "sk") && (
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
             <div className="bg-[#FAF8F5] border border-stone-200 rounded-3xl p-6 sm:p-10 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-stone-200">
                 <div>
@@ -557,11 +520,9 @@ export default function SejarahPage() {
               </div>
             </div>
           </section>
-        )}
 
         {/* SECTION 3: SEJARAH JEJARING MASJID KAMPUS UMS LAINNYA */}
-        {(activeTab === "semua" || activeTab === "jejaring") && (
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
             <div className="text-center max-w-3xl mx-auto mb-10">
               <span className="text-xs font-bold text-[#B58A1E] uppercase tracking-wider">
                 Jejaring Peribadatan Kampus
@@ -637,7 +598,6 @@ export default function SejarahPage() {
               ))}
             </div>
           </section>
-        )}
 
         {/* SECTION 4: GARIS WAKTU PERKEMBANGAN DAKWAH KAMPUS */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
