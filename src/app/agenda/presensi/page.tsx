@@ -649,16 +649,14 @@ function PresensiContent() {
             {/* Digital Pass Card */}
             <div className="p-5 rounded-2xl bg-gradient-to-br from-[#002855] via-[#001F3F] to-[#001428] text-white text-left space-y-3.5 shadow-lg border border-amber-400/50">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <div>
-                  <div className="text-[10px] text-amber-300 font-mono font-bold uppercase">
-                    KODE TIKET PRESENSI
-                  </div>
-                  <div className="text-lg font-extrabold font-mono text-white tracking-wider">
-                    {attendanceResult.ticketCode}
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <div className="text-xs text-emerald-300 font-bold tracking-wide uppercase">
+                    Presensi Berhasil Dicatat
                   </div>
                 </div>
                 <div className="text-right text-[11px] text-stone-300">
-                  <div className="text-[10px] text-stone-400">WAKTU CHECK-IN</div>
+                  <div className="text-[10px] text-stone-400">WAKTU HADIR</div>
                   <div className="font-mono text-emerald-400 font-bold">
                     {attendanceResult.attendedAt
                       ? new Date(attendanceResult.attendedAt).toLocaleTimeString("id-ID", {
@@ -743,8 +741,8 @@ function PresensiContent() {
 
             <div className="p-4 rounded-2xl bg-[#001F3F] text-white text-left text-xs space-y-2 font-mono">
               <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                <span className="text-stone-400">Kode Tiket:</span>
-                <span className="text-base font-bold text-amber-400">{attendanceResult.ticketCode}</span>
+                <span className="text-stone-400">Status Kehadiran:</span>
+                <span className="text-xs font-bold text-emerald-400">Sudah Melakukan Presensi</span>
               </div>
               <div className="flex items-center gap-3 pt-1">
                 {attendanceResult.photoUrl && (

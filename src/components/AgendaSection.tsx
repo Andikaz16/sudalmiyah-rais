@@ -134,8 +134,8 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                             Wajib Registrasi
                           </span>
                         ) : (
-                          <span className="text-[10px] text-white bg-blue-700 font-semibold px-2.5 py-1 rounded-full shadow-sm">
-                            Terbuka Umum
+                          <span className="text-[10px] text-white bg-emerald-700 font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                            Hadir Langsung di Masjid
                           </span>
                         )}
                       </div>
@@ -219,8 +219,9 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                       {isFull ? "Kuota Penuh" : "Daftar Presensi Tiket"}
                     </button>
                   ) : (
-                    <div className="text-center py-2.5 text-xs text-stone-500 font-medium bg-[#FAF8F5] rounded-full border border-stone-200">
-                      Silakan Hadir Langsung di Masjid
+                    <div className="text-center py-2.5 px-3 text-xs text-stone-700 font-medium bg-[#FAF8F5] rounded-full border border-stone-200 flex items-center justify-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                      <span>Hadir Langsung di Lokasi (Presensi QR di Masjid)</span>
                     </div>
                   )}
                 </div>

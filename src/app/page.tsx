@@ -12,10 +12,14 @@ import NewsSection from "@/components/NewsSection";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import AnimatedSection from "@/components/AnimatedSection";
+import AnnouncementPopup from "@/components/AnnouncementPopup";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col font-sans selection:bg-[#C59B27] selection:text-white">
+      {/* Pop-up Banner Pengumuman Cerdas */}
+      <AnnouncementPopup />
+
       <Navbar />
 
       <main className="flex-1">

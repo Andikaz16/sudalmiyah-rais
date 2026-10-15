@@ -114,7 +114,7 @@ export default function RegistrationModal({
         <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FAF8F5]">
           <div>
             <span className="text-[11px] font-semibold text-[#003B73] uppercase tracking-wider">
-              {ticketResult ? "Tiket Presensi Resmi" : "Formulir Pendaftaran Kegiatan"}
+              {ticketResult ? "Bukti Pendaftaran Resmi" : "Formulir Pendaftaran Kegiatan"}
             </span>
             <h3 className="text-base sm:text-lg font-bold text-stone-900 line-clamp-1 font-serif">
               {agenda.title}
@@ -136,11 +136,11 @@ export default function RegistrationModal({
               <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
                 <div className="text-xs sm:text-sm text-emerald-800 font-medium">
-                  Pendaftaran terkonfirmasi. Simpan kode tiket ini untuk verifikasi presensi di lokasi masjid.
+                  Pendaftaran terkonfirmasi. Data kehadiran Anda telah tercatat dalam sistem presensi kegiatan.
                 </div>
               </div>
 
-              {/* Digital Boarding Ticket Card */}
+              {/* Digital Boarding Card */}
               <div className="border-2 border-[#D4AF37]/50 rounded-3xl bg-[#FAF8F5] p-5 sm:p-6 shadow-md relative overflow-hidden">
                 <div className="flex items-center justify-between pb-4 border-b border-dashed border-stone-300">
                   <div>
@@ -177,13 +177,14 @@ export default function RegistrationModal({
                   </div>
                 </div>
 
-                {/* Ticket Code Display */}
+                {/* Status Terdaftar */}
                 <div className="pt-4 flex flex-col items-center text-center">
                   <span className="text-[10px] text-stone-500 uppercase tracking-wider mb-1 font-semibold">
-                    Kode Tiket Presensi Digital
+                    Status Presensi Terkonfirmasi
                   </span>
-                  <div className="font-mono text-xl sm:text-2xl font-black text-[#003B73] tracking-wider bg-white px-5 py-2 rounded-xl border border-stone-200 shadow-sm">
-                    {ticketResult.ticketCode}
+                  <div className="inline-flex items-center gap-2 text-emerald-700 bg-emerald-50 border border-emerald-200 font-bold px-4 py-2 rounded-xl text-xs sm:text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Terdaftar Resmi di Sistem Masjid</span>
                   </div>
                 </div>
               </div>
@@ -194,7 +195,7 @@ export default function RegistrationModal({
                   onClick={() => window.print()}
                   className="flex-1 text-center px-5 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white font-bold text-sm shadow-md transition-colors"
                 >
-                  Cetak / Unduh Tiket
+                  Cetak / Unduh Bukti
                 </button>
                 <button
                   type="button"

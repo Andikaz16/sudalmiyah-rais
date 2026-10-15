@@ -23,6 +23,7 @@ import {
   AlertCircle,
   Phone,
   MessageCircle,
+  Sparkles,
 } from "lucide-react";
 import {
   Agenda,
@@ -32,6 +33,7 @@ import {
   MosqueFeedback,
   FeedbackCategory,
   FeedbackStatus,
+  PopupBanner,
 } from "@/lib/types";
 
 const ADMIN_MOSQUES = [
@@ -46,7 +48,7 @@ const ADMIN_MOSQUES = [
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "FEEDBACK"
+    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "FEEDBACK" | "POPUP_BANNER"
   >("AGENDAS");
   const [stats, setStats] = useState<{
     totalAgendas: number;
@@ -109,20 +111,29 @@ export default function AdminDashboardPage() {
     time: "16:00 - 17:30 WIB",
     location: "Aula Serbaguna Lantai 1, Masjid Sudalmiyah Rais",
     description: "",
-    quota: 200,
-    requiresRegistration: true,
+    quota: 1000,
+    requiresRegistration: false,
     bannerUrl: "/uploads/agendas/agenda-jumat.jpg",
   });
   const [uploadingAgendaThumbnail, setUploadingAgendaThumbnail] = useState(false);
   const [savingAgenda, setSavingAgenda] = useState(false);
 
+  // Pop-up Banner State
+  const [popupBanner, setPopupBanner] = useState<PopupBanner | null>(null);
+  const [uploadingPopup, setUploadingPopup] = useState(false);
+  const [savingPopup, setSavingPopup] = useState(false);
+  const [popupTargetUrl, setPopupTargetUrl] = useState("");
+  const [popupTitle, setPopupTitle] = useState("");
+  const [popupSaveSuccess, setPopupSaveSuccess] = useState(false);
+
   const loadData = async () => {
     try {
-      const [statsRes, agendaRes, fridayRes, qrisRes] = await Promise.all([
+      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch("/api/agendas"),
         fetch("/api/friday-schedule"),
         fetch("/api/qris"),
+        fetch("/api/admin/popup"),
       ]);
 
       if (statsRes.status === 401 || statsRes.status === 403) {
@@ -153,6 +164,14 @@ export default function AdminDashboardPage() {
       }
       if (qrisJson.success && qrisJson.qris) {
         setQrisSettings(qrisJson.qris);
+      }
+      if (popupRes.ok) {
+        const popupJson = await popupRes.json();
+        setPopupBanner(popupJson.popup || null);
+        if (popupJson.popup) {
+          setPopupTargetUrl(popupJson.popup.targetUrl || "");
+          setPopupTitle(popupJson.popup.title || "");
+        }
       }
     } catch (e) {
       console.error(e);
@@ -473,6 +492,98 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Upload and analyze popup banner with AI
+  const handlePopupUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingPopup(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+
+      const res = await fetch("/api/admin/popup", {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal mengunggah pop-up banner.");
+
+      setPopupBanner(data.popup);
+      setPopupTargetUrl(data.popup.targetUrl || "");
+      setPopupTitle(data.popup.title || "");
+      alert(`Pop-up banner berhasil diunggah! Sistem AI mendeteksi rute tujuan: ${data.popup.targetUrl}`);
+    } catch (err: any) {
+      alert(err.message || "Gagal mengunggah dan menganalisis gambar pop-up.");
+    } finally {
+      setUploadingPopup(false);
+    }
+  };
+
+  // Toggle active status of popup banner
+  const handleTogglePopupActive = async () => {
+    if (!popupBanner) return;
+    try {
+      const res = await fetch("/api/admin/popup", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !popupBanner.isActive }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal mengubah status tayang.");
+      setPopupBanner(data.popup);
+    } catch (err: any) {
+      alert(err.message || "Gagal mengubah status pop-up banner.");
+    }
+  };
+
+  // Save popup settings (title, targetUrl)
+  const handleSavePopupSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!popupBanner) return;
+    setSavingPopup(true);
+    setPopupSaveSuccess(false);
+    try {
+      const res = await fetch("/api/admin/popup", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: popupTitle,
+          targetUrl: popupTargetUrl,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menyimpan pengaturan.");
+      setPopupBanner(data.popup);
+      setPopupSaveSuccess(true);
+      setTimeout(() => setPopupSaveSuccess(false), 3000);
+    } catch (err: any) {
+      alert(err.message || "Gagal menyimpan pengaturan pop-up banner.");
+    } finally {
+      setSavingPopup(false);
+    }
+  };
+
+  // Delete popup banner
+  const handleDeletePopup = async () => {
+    if (!confirm("Hapus pop-up banner ini? Tidak akan ada pop-up pengumuman yang muncul di beranda pengunjung.")) {
+      return;
+    }
+    try {
+      const res = await fetch("/api/admin/popup", {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus pop-up.");
+      setPopupBanner(null);
+      setPopupTargetUrl("");
+      setPopupTitle("");
+      alert("Pop-up banner berhasil dihapus.");
+    } catch (err: any) {
+      alert(err.message || "Gagal menghapus pop-up banner.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans pb-16">
       {/* Top Admin Header */}
@@ -631,7 +742,7 @@ export default function AdminDashboardPage() {
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
-            Presensi & Tiket Jamaah
+            Presensi Kehadiran Jamaah
           </button>
           <button
             onClick={() => setActiveTab("FEEDBACK")}
@@ -646,6 +757,20 @@ export default function AdminDashboardPage() {
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-none">
                 {feedbackCounts.baru}
               </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("POPUP_BANNER")}
+            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "POPUP_BANNER"
+                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
+                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span>Pop-up Banner Beranda</span>
+            {popupBanner && popupBanner.isActive && (
+              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
             )}
           </button>
         </div>
@@ -713,17 +838,30 @@ export default function AdminDashboardPage() {
                         sizes="320px"
                         className="object-cover"
                       />
-                      <div className="absolute top-2.5 left-2.5">
+                      <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1">
                         <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/90 backdrop-blur-sm text-[#003B73] border border-stone-200">
                           {item.category.replace(/_/g, " ")}
                         </span>
+                        {item.requiresRegistration === false ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/95 text-white">
+                            Hadir Langsung
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600/95 text-white">
+                            Pendaftaran Online
+                          </span>
+                        )}
                       </div>
                     </div>
 
                     <div className="p-5 space-y-2">
                       <div className="flex justify-between items-center text-xs text-stone-500">
                         <span className="font-mono">{item.date}</span>
-                        <span>{item.registeredCount} / {item.quota} Jamaah</span>
+                        {item.requiresRegistration === false ? (
+                          <span className="text-amber-700 font-semibold text-[11px]">Hadir Langsung di Lokasi</span>
+                        ) : (
+                          <span>{item.registeredCount} / {item.quota} Jamaah</span>
+                        )}
                       </div>
                       <h3 className="font-bold text-stone-900 text-sm line-clamp-2 font-serif">{item.title}</h3>
                       <div className="text-xs text-stone-700 pt-1">
@@ -1218,10 +1356,9 @@ export default function AdminDashboardPage() {
                   <thead>
                     <tr className="border-b border-stone-200 text-stone-500 uppercase text-[10px] tracking-wider bg-[#FAF8F5]">
                       <th className="py-3.5 px-4 font-semibold">Foto Presensi</th>
-                      <th className="py-3.5 px-4 font-semibold">Kode Tiket</th>
                       <th className="py-3.5 px-4 font-semibold">Nama Jamaah</th>
                       <th className="py-3.5 px-4 font-semibold">Status Sivitas</th>
-                      <th className="py-3.5 px-4 font-semibold">Agenda</th>
+                      <th className="py-3.5 px-4 font-semibold">Agenda Kegiatan</th>
                       <th className="py-3.5 px-4 font-semibold">Waktu Presensi</th>
                       <th className="py-3.5 px-4 text-center font-semibold">Status</th>
                     </tr>
@@ -1229,7 +1366,7 @@ export default function AdminDashboardPage() {
                   <tbody className="divide-y divide-stone-100 font-medium">
                     {registrations.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="py-8 text-center text-stone-400 text-xs">
+                        <td colSpan={6} className="py-8 text-center text-stone-400 text-xs">
                           Belum ada data presensi jamaah yang tercatat.
                         </td>
                       </tr>
@@ -1253,9 +1390,6 @@ export default function AdminDashboardPage() {
                                 -
                               </div>
                             )}
-                          </td>
-                          <td className="py-3.5 px-4 font-mono font-bold text-[#003B73]">
-                            {reg.ticketCode}
                           </td>
                           <td className="py-3.5 px-4 text-stone-900 font-semibold">{reg.fullName}</td>
                           <td className="py-3.5 px-4 text-stone-700">
@@ -1586,6 +1720,235 @@ export default function AdminDashboardPage() {
             )}
           </div>
         )}
+
+        {/* Tab 6: POPUP BANNER (Banner Pop-up Pengumuman Cerdas) */}
+        {activeTab === "POPUP_BANNER" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold text-stone-900 font-serif">
+                  Kelola Pop-up Banner Pengumuman Beranda
+                </h2>
+                <p className="text-xs text-stone-500 mt-0.5">
+                  Unggah poster pengumuman penting. Sistem membaca konten gambar secara cerdas dan mengarahkan pengunjung ke halaman terkait secara otomatis saat diklik.
+                </p>
+              </div>
+
+              {popupBanner && (
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={handleTogglePopupActive}
+                    className={`px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer ${
+                      popupBanner.isActive
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        : "bg-stone-300 hover:bg-stone-400 text-stone-700"
+                    }`}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${popupBanner.isActive ? "bg-white animate-pulse" : "bg-stone-500"}`} />
+                    <span>{popupBanner.isActive ? "Status: Tayang (Aktif)" : "Status: Dinonaktifkan"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleDeletePopup}
+                    className="px-3.5 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Hapus Pop-up</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Upload New Banner */}
+              <div className="lg:col-span-5 space-y-4">
+                <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-sm space-y-4">
+                  <h3 className="text-sm font-bold text-stone-900 font-serif">
+                    Unggah Poster / Banner Baru
+                  </h3>
+                  <p className="text-xs text-stone-500 leading-relaxed">
+                    Sistem akan membaca isi poster (AI Vision) untuk mengenali apakah poster terkait Kajian/Agenda, Donasi/Infaq, Jadwal Shalat, atau Layanan Masjid, lalu menentukan rute tujuan klik secara otomatis.
+                  </p>
+
+                  <label className="relative border-2 border-dashed border-stone-300 hover:border-[#003B73] rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors bg-stone-50/60 hover:bg-stone-50 group">
+                    <div className="w-12 h-12 rounded-full bg-blue-50 text-[#003B73] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                      <Sparkles className="w-6 h-6 text-amber-500" />
+                    </div>
+                    <span className="text-xs font-bold text-stone-800">
+                      {uploadingPopup ? "Menganalisis & Mengunggah Gambar..." : "Pilih Berkas Poster / Banner"}
+                    </span>
+                    <span className="text-[11px] text-stone-500 mt-1 max-w-xs">
+                      Format JPG, PNG, atau WEBP (Maksimal 5MB)
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/jpg"
+                      onChange={handlePopupUpload}
+                      disabled={uploadingPopup}
+                      className="sr-only"
+                    />
+                  </label>
+
+                  {uploadingPopup && (
+                    <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2.5">
+                      <Clock className="w-4 h-4 text-amber-600 animate-spin shrink-0" />
+                      <span>Model AI sedang membaca teks pada poster dan mendeteksi rute tujuan...</span>
+                    </div>
+                  )}
+
+                  <div className="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-100 text-xs text-blue-950 space-y-1">
+                    <span className="font-bold block">Ketentuan Pop-up:</span>
+                    <p className="text-[11px] text-stone-600">
+                      Jika admin tidak mengunggah gambar pop-up atau menonaktifkannya, maka tidak ada pop-up pengumuman yang muncul di halaman beranda.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Active Banner Preview & Settings */}
+              <div className="lg:col-span-7 space-y-4">
+                {popupBanner ? (
+                  <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-sm space-y-5">
+                    <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+                      <div>
+                        <h3 className="text-sm font-bold text-stone-900 font-serif">
+                          Pratinjau Pop-up Aktif
+                        </h3>
+                        <p className="text-[11px] text-stone-400">
+                          Diperbarui pada {new Date(popupBanner.updatedAt).toLocaleString("id-ID")}
+                        </p>
+                      </div>
+
+                      <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${
+                        popupBanner.isActive
+                          ? "bg-emerald-100 text-emerald-800"
+                          : "bg-stone-100 text-stone-600"
+                      }`}>
+                        {popupBanner.isActive ? "Tayang di Beranda" : "Tidak Ditampilkan"}
+                      </span>
+                    </div>
+
+                    {/* Banner Image Preview Container */}
+                    <div className="relative rounded-2xl overflow-hidden bg-stone-950 border border-stone-200 shadow-inner flex items-center justify-center max-h-72">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={popupBanner.imageUrl}
+                        alt={popupBanner.title}
+                        className="w-full h-auto max-h-72 object-contain"
+                      />
+                    </div>
+
+                    {/* AI Reading Summary Box */}
+                    <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 text-xs space-y-2">
+                      <div className="flex items-center gap-1.5 font-bold text-[#003B73]">
+                        <Sparkles className="w-4 h-4 text-amber-500" />
+                        <span>Hasil Pembacaan Gambar Cerdas (AI Vision)</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
+                        <div>
+                          <span className="text-stone-500 block">Kategori Terdeteksi:</span>
+                          <span className="font-semibold text-stone-800">{popupBanner.detectedCategory || "Agenda Masjid"}</span>
+                        </div>
+                        <div>
+                          <span className="text-stone-500 block">Tujuan Pengalihan (Target URL):</span>
+                          <span className="font-mono font-bold text-[#003B73]">{popupBanner.targetUrl}</span>
+                        </div>
+                      </div>
+                      {popupBanner.aiReasoning && (
+                        <p className="text-[11px] text-stone-500 italic pt-1 border-t border-stone-200/60">
+                          &ldquo;{popupBanner.aiReasoning}&rdquo;
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Settings Form to Override Target Link or Title */}
+                    <form onSubmit={handleSavePopupSettings} className="space-y-4 pt-2 border-t border-stone-100">
+                      <div>
+                        <label className="block text-xs font-semibold text-stone-700 mb-1">
+                          Judul / Topik Pengumuman
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={popupTitle}
+                          onChange={(e) => setPopupTitle(e.target.value)}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                          placeholder="Judul pengumuman pop-up"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-stone-700 mb-1">
+                          Tautan Tujuan Saat Pop-up Diklik Pengunjung
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={popupTargetUrl}
+                          onChange={(e) => setPopupTargetUrl(e.target.value)}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono focus:ring-2 focus:ring-[#003B73]"
+                          placeholder="Contoh: /agenda atau /donasi atau https://..."
+                        />
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          <span className="text-[10px] text-stone-400 self-center">Pilihan Cepat:</span>
+                          {[
+                            { label: "Agenda & Kajian", url: "/agenda" },
+                            { label: "Infaq & Donasi", url: "/donasi" },
+                            { label: "Jadwal Shalat", url: "/jadwal" },
+                            { label: "Tanya Tarjih", url: "/ibadah" },
+                            { label: "Layanan Fasilitas", url: "/layanan" },
+                            { label: "Sejarah Masjid", url: "/sejarah" },
+                          ].map((quick) => (
+                            <button
+                              key={quick.url}
+                              type="button"
+                              onClick={() => setPopupTargetUrl(quick.url)}
+                              className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-[10px] font-medium transition-colors cursor-pointer"
+                            >
+                              {quick.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2">
+                        {popupSaveSuccess && (
+                          <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span>Pengaturan tersimpan!</span>
+                          </span>
+                        )}
+                        <div className="ml-auto">
+                          <button
+                            type="submit"
+                            disabled={savingPopup}
+                            className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md disabled:opacity-50 cursor-pointer"
+                          >
+                            {savingPopup ? "Menyimpan..." : "Simpan Perubahan Tautan"}
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="p-10 text-center rounded-3xl bg-white border border-stone-200 shadow-sm space-y-3">
+                    <div className="w-14 h-14 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
+                      <AlertCircle className="w-6 h-6" />
+                    </div>
+                    <h4 className="text-sm font-bold text-stone-800 font-serif">
+                      Belum Ada Pop-up Banner yang Aktif
+                    </h4>
+                    <p className="text-xs text-stone-500 max-w-sm mx-auto leading-relaxed">
+                      Saat ini tidak ada banner pop-up pengumuman yang tampil pada beranda website. Silakan unggah gambar poster baru melalui form di sebelah kiri.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Modal Responding to Feedback */}
@@ -1709,6 +2072,53 @@ export default function AdminDashboardPage() {
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  Model Pendaftaran &amp; Kehadiran
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setNewAgenda({ ...newAgenda, requiresRegistration: false })}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      !newAgenda.requiresRegistration
+                        ? "bg-emerald-50 border-emerald-500 text-emerald-950 shadow-xs"
+                        : "bg-white border-stone-200 text-stone-600 hover:bg-stone-50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold text-xs text-stone-900">Wajib Hadir / Langsung</span>
+                      {!newAgenda.requiresRegistration && (
+                        <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-stone-500 leading-snug">
+                      Tanpa tombol daftar online. Cocok untuk kajian wajib mahasiswa/umum yang hadir langsung di masjid.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewAgenda({ ...newAgenda, requiresRegistration: true })}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      newAgenda.requiresRegistration
+                        ? "bg-emerald-50 border-emerald-500 text-emerald-950 shadow-xs"
+                        : "bg-white border-stone-200 text-stone-600 hover:bg-stone-50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold text-xs text-stone-900">Pendaftaran Online Mandiri</span>
+                      {newAgenda.requiresRegistration && (
+                        <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-stone-500 leading-snug">
+                      Menampilkan tombol pendaftaran online mandiri dan penghitung kuota peserta di halaman web.
+                    </p>
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-stone-700 mb-1">Kategori</label>
@@ -1725,7 +2135,9 @@ export default function AdminDashboardPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">Kapasitas Kuota</label>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    {newAgenda.requiresRegistration ? "Kapasitas Kuota Pendaftar" : "Estimasi Kapasitas Jamaah"}
+                  </label>
                   <input
                     type="number"
                     required
@@ -1733,6 +2145,11 @@ export default function AdminDashboardPage() {
                     onChange={(e) => setNewAgenda({ ...newAgenda, quota: Number(e.target.value) })}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
                   />
+                  <p className="text-[10px] text-stone-400 mt-0.5">
+                    {newAgenda.requiresRegistration
+                      ? "Batas maksimal peserta yang dapat mendaftar tiket online."
+                      : "Kapasitas ruangan masjid untuk presensi langsung."}
+                  </p>
                 </div>
               </div>
 

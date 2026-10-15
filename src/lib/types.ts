@@ -84,7 +84,7 @@ export interface Registration {
   isUmsStudent: boolean;
   nim?: string;
   faculty?: string;
-  ticketCode: string;
+  ticketCode?: string;
   status: "CONFIRMED" | "ATTENDED" | "CANCELLED";
   registeredAt: string;
   attendedAt?: string;
@@ -92,6 +92,17 @@ export interface Registration {
   participantRole?: "MAHASISWA" | "DOSEN_KARYAWAN" | "UMUM";
   locationVerified?: boolean;
   photoUrl?: string;
+}
+
+export interface PopupBanner {
+  id: string;
+  imageUrl: string;
+  title: string;
+  targetUrl: string;
+  detectedCategory?: string;
+  aiReasoning?: string;
+  isActive: boolean;
+  updatedAt: string;
 }
 
 export type TransactionType = "INCOME" | "EXPENSE";

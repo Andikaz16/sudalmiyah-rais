@@ -13,6 +13,7 @@ import {
   User,
   QrisSettings,
   MosqueFeedback,
+  PopupBanner,
 } from "./types";
 
 interface DatabaseSchema {
@@ -27,6 +28,7 @@ interface DatabaseSchema {
   facilityBookings: FacilityBooking[];
   auditLogs: SecurityAuditLog[];
   feedbacks: MosqueFeedback[];
+  popupBanner?: PopupBanner | null;
 }
 
 function getDbFilePath(): string {
@@ -218,7 +220,7 @@ function getInitialData(): DatabaseSchema {
         quota: 1000,
         registeredCount: 0,
         isOpen: true,
-        requiresRegistration: true,
+        requiresRegistration: false,
         bannerUrl: "/uploads/agendas/cinta-subuh-harun-joko.png",
         createdAt: "2026-10-15T15:45:00.000Z",
       },
@@ -236,7 +238,7 @@ function getInitialData(): DatabaseSchema {
         quota: 1000,
         registeredCount: 0,
         isOpen: true,
-        requiresRegistration: true,
+        requiresRegistration: false,
         bannerUrl: "/uploads/agendas/cinta-subuh-mutohharun-jinan.png",
         createdAt: "2026-10-15T15:45:00.000Z",
       },
@@ -252,6 +254,7 @@ function getInitialData(): DatabaseSchema {
       updatedAt: new Date().toISOString(),
     },
     registrations: [],
+    popupBanner: null,
     finances: [
       {
         id: "fin-01",

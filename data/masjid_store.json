@@ -35,7 +35,7 @@
       "quota": 1000,
       "registeredCount": 0,
       "isOpen": true,
-      "requiresRegistration": true,
+      "requiresRegistration": false,
       "createdAt": "2026-10-15T15:45:00.000Z",
       "bannerUrl": "/uploads/agendas/cinta-subuh-harun-joko.png"
     },
@@ -52,7 +52,7 @@
       "quota": 1000,
       "registeredCount": 0,
       "isOpen": true,
-      "requiresRegistration": true,
+      "requiresRegistration": false,
       "createdAt": "2026-10-15T15:45:00.000Z",
       "bannerUrl": "/uploads/agendas/cinta-subuh-mutohharun-jinan.png"
     }
@@ -319,5 +319,6 @@
       "status": "BARU",
       "createdAt": "2026-10-15T11:20:00Z"
     }
-  ]
+  ],
+  "popupBanner": null
 }
