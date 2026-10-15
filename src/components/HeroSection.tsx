@@ -142,25 +142,28 @@ export default function HeroSection() {
 
       {/* Hero Content Overlay */}
       <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-8 sm:pt-12 lg:pt-14 pb-20 sm:pb-24">
-        {/* Emblem Logo LPCR-PM PP Muhammadiyah - Enlarged & High Contrast */}
-        <div className="flex justify-center mb-4 sm:mb-5">
-          <div className="p-2.5 sm:p-3.5 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_35px_rgba(0,0,0,0.6)] border-2 border-amber-400/70 hover:scale-105 transition-all duration-300">
-            <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36">
+        {/* Logo LPCR-PM & Lencana AUM - Khusus Slide Masjid Sudalmiyah */}
+        {active.id === "sudalmiyah" ? (
+          <div className="flex flex-col items-center justify-center animate-fade-up">
+            {/* Logo LPCR-PM (Transparan, tanpa kotak background) */}
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mb-3 drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] hover:scale-105 transition-transform duration-300">
               <Image
                 src="/images/logo/logo-lpcr.png"
                 alt="Logo LPCR-PM PP Muhammadiyah"
                 fill
-                className="object-contain"
+                className="object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]"
                 priority
               />
             </div>
-          </div>
-        </div>
 
-        {/* Minimalist Mosque Badge - Compact on mobile, enlarged on laptop */}
-        <div className="inline-flex items-center justify-center px-4 sm:px-7 lg:px-9 py-1.5 sm:py-2.5 lg:py-3 rounded-full bg-black/65 backdrop-blur-md border border-amber-400/50 text-amber-200 text-xs sm:text-base lg:text-lg font-semibold tracking-wide mb-5 sm:mb-7 shadow-[0_0_25px_rgba(245,158,11,0.35)] transition-all duration-300">
-          <span>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</span>
-        </div>
+            {/* Lencana AUM Minimalis & Pas */}
+            <div className="inline-flex items-center justify-center px-4 sm:px-5 py-1 sm:py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-semibold tracking-wide mb-6 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all duration-300">
+              <span>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</span>
+            </div>
+          </div>
+        ) : (
+          <div className="h-6 sm:h-8" />
+        )}
 
         {/* Dynamic Grand Headline with Elegant Soft Golden Neon Glow */}
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] font-serif min-h-[115px] sm:min-h-[145px] lg:min-h-[165px] flex flex-col justify-center">
