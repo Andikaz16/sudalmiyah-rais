@@ -5,6 +5,16 @@ import { getDb, saveDb, logSecurityEvent } from "@/lib/db";
 import { verifySessionToken } from "@/lib/security";
 import { PopupBanner } from "@/lib/types";
 
+function getPopupsList(db: ReturnType<typeof getDb>): PopupBanner[] {
+  if (Array.isArray(db.popupBanners) && db.popupBanners.length > 0) {
+    return db.popupBanners;
+  }
+  if (db.popupBanner) {
+    return [db.popupBanner];
+  }
+  return [];
+}
+
 export async function GET(request: NextRequest) {
   await connection();
 
@@ -19,8 +29,12 @@ export async function GET(request: NextRequest) {
   }
 
   const db = getDb();
+  const popups = getPopupsList(db);
   return NextResponse.json(
-    { popup: db.popupBanner || null },
+    {
+      popup: popups[0] || null,
+      popups,
+    },
     {
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate",
@@ -44,9 +58,9 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const rawTargetUrl = formData.get("targetUrl");
-    const rawTitle = formData.get("title");
+    const rawReplaceId = formData.get("replaceId");
     const manualTargetUrl = typeof rawTargetUrl === "string" ? rawTargetUrl.trim() : "";
-    const manualTitle = typeof rawTitle === "string" ? rawTitle.trim() : "";
+    const replaceId = typeof rawReplaceId === "string" ? rawReplaceId.trim() : "";
 
     if (!file) {
       return NextResponse.json({ error: "Berkas gambar pop-up tidak ditemukan." }, { status: 400 });
@@ -87,20 +101,38 @@ export async function POST(request: NextRequest) {
       // Ignore archival write error on read-only environments
     }
 
-    // Store as Data URI so it renders reliably across dev, production start, and serverless
     const dataUriUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
 
     const db = getDb();
+    const existingList = getPopupsList(db);
+
     const popupRecord: PopupBanner = {
-      id: `popup-${Date.now().toString(36)}`,
+      id: replaceId || `popup-${Date.now().toString(36)}`,
       imageUrl: dataUriUrl,
-      title: manualTitle,
+      title: "",
       targetUrl: manualTargetUrl,
       isActive: true,
       updatedAt: new Date().toISOString(),
     };
 
-    db.popupBanner = popupRecord;
+    let updatedList: PopupBanner[];
+    if (replaceId && existingList.some((p) => p.id === replaceId)) {
+      updatedList = existingList.map((p) =>
+        p.id === replaceId
+          ? {
+              ...p,
+              imageUrl: dataUriUrl,
+              targetUrl: manualTargetUrl !== "" ? manualTargetUrl : p.targetUrl,
+              updatedAt: popupRecord.updatedAt,
+            }
+          : p
+      );
+    } else {
+      updatedList = [popupRecord, ...existingList];
+    }
+
+    db.popupBanners = updatedList;
+    db.popupBanner = updatedList[0] || null;
     saveDb(db);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
@@ -115,7 +147,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Pop-up banner berhasil diunggah.",
-      popup: popupRecord,
+      popup: db.popupBanner,
+      popups: updatedList,
     });
   } catch (error: any) {
     console.error("Admin Popup Upload Error:", error);
@@ -140,28 +173,43 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const db = getDb();
+    const list = getPopupsList(db);
 
-    if (!db.popupBanner) {
+    if (list.length === 0) {
       return NextResponse.json({ error: "Belum ada pop-up banner yang tersimpan." }, { status: 404 });
     }
 
-    if (body.isActive !== undefined) {
-      db.popupBanner.isActive = Boolean(body.isActive);
-    }
-    if (body.targetUrl !== undefined && typeof body.targetUrl === "string") {
-      db.popupBanner.targetUrl = body.targetUrl.trim();
-    }
-    if (body.title !== undefined && typeof body.title === "string") {
-      db.popupBanner.title = body.title.trim();
-    }
-    db.popupBanner.updatedAt = new Date().toISOString();
+    const targetId = typeof body.id === "string" && body.id.trim() ? body.id.trim() : list[0].id;
+    const nowIso = new Date().toISOString();
 
+    const updatedList = list.map((item) => {
+      if (item.id !== targetId) return item;
+      return {
+        ...item,
+        isActive: body.isActive !== undefined ? Boolean(body.isActive) : item.isActive,
+        targetUrl:
+          body.targetUrl !== undefined && typeof body.targetUrl === "string"
+            ? body.targetUrl.trim()
+            : item.targetUrl,
+        title:
+          body.title !== undefined && typeof body.title === "string"
+            ? body.title.trim()
+            : item.title,
+        updatedAt: nowIso,
+      };
+    });
+
+    db.popupBanners = updatedList;
+    db.popupBanner = updatedList[0] || null;
     saveDb(db);
+
+    const updatedItem = updatedList.find((p) => p.id === targetId) || updatedList[0];
 
     return NextResponse.json({
       success: true,
       message: "Pengaturan pop-up banner berhasil diperbarui.",
-      popup: db.popupBanner,
+      popup: updatedItem,
+      popups: updatedList,
     });
   } catch (error: any) {
     console.error("Admin Popup Patch Error:", error);
@@ -185,7 +233,13 @@ export async function DELETE(request: NextRequest) {
 
   try {
     const db = getDb();
-    db.popupBanner = null;
+    const idParam = request.nextUrl.searchParams.get("id")?.trim();
+    const list = getPopupsList(db);
+
+    const updatedList = idParam ? list.filter((p) => p.id !== idParam) : [];
+
+    db.popupBanners = updatedList;
+    db.popupBanner = updatedList[0] || null;
     saveDb(db);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
@@ -194,12 +248,14 @@ export async function DELETE(request: NextRequest) {
       session.email,
       ip,
       "SUCCESS",
-      "Pop-up banner dinonaktifkan dan dihapus oleh admin takmir."
+      "Pop-up banner dihapus oleh admin takmir."
     );
 
     return NextResponse.json({
       success: true,
-      message: "Pop-up banner berhasil dihapus. Tidak ada pop-up yang akan tampil bagi pengguna.",
+      message: "Pop-up banner berhasil dihapus.",
+      popup: db.popupBanner,
+      popups: updatedList,
     });
   } catch (error: any) {
     console.error("Admin Popup Delete Error:", error);

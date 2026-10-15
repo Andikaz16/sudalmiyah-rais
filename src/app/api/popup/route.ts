@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import { getDb } from "@/lib/db";
+import { PopupBanner } from "@/lib/types";
 import { POST as adminPost, PATCH as adminPatch, DELETE as adminDelete } from "@/app/api/admin/popup/route";
 
 export async function GET(request: NextRequest) {
@@ -9,14 +10,21 @@ export async function GET(request: NextRequest) {
     const db = getDb();
     const isAdminQuery = request.nextUrl.searchParams.get("admin") === "1";
 
-    const popup = isAdminQuery
-      ? db.popupBanner || null
-      : db.popupBanner && db.popupBanner.isActive
-      ? db.popupBanner
-      : null;
+    let allPopups: PopupBanner[] = [];
+    if (Array.isArray(db.popupBanners) && db.popupBanners.length > 0) {
+      allPopups = db.popupBanners;
+    } else if (db.popupBanner) {
+      allPopups = [db.popupBanner];
+    }
+
+    const filteredPopups = isAdminQuery ? allPopups : allPopups.filter((p) => p.isActive);
+    const primaryPopup = filteredPopups[0] || null;
 
     return NextResponse.json(
-      { popup },
+      {
+        popup: primaryPopup,
+        popups: filteredPopups,
+      },
       {
         headers: {
           "Cache-Control": "no-store, no-cache, must-revalidate",
@@ -25,7 +33,7 @@ export async function GET(request: NextRequest) {
     );
   } catch (error: any) {
     console.error("Popup fetch error:", error);
-    return NextResponse.json({ popup: null }, { status: 500 });
+    return NextResponse.json({ popup: null, popups: [] }, { status: 500 });
   }
 }
 

@@ -30,6 +30,7 @@ interface DatabaseSchema {
   auditLogs: SecurityAuditLog[];
   feedbacks: MosqueFeedback[];
   popupBanner?: PopupBanner | null;
+  popupBanners?: PopupBanner[];
   documents?: DownloadDocument[];
 }
 

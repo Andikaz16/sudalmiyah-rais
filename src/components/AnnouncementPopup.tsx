@@ -2,19 +2,19 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { X, ArrowRight } from "lucide-react";
+import { X } from "lucide-react";
 import { PopupBanner } from "@/lib/types";
 
 export const POPUP_CACHE_KEY = "sudalmiyah_popup_cache";
 
 export default function AnnouncementPopup() {
-  const [popup, setPopup] = useState<PopupBanner | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [popups, setPopups] = useState<PopupBanner[]>([]);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchPopup = async () => {
-      let serverPopup: PopupBanner | null = null;
+    const fetchPopups = async () => {
+      let serverPopups: PopupBanner[] = [];
+      let serverLatestTime = 0;
 
       try {
         const res = await fetch(`/api/popup?t=${Date.now()}`, {
@@ -22,154 +22,152 @@ export default function AnnouncementPopup() {
         });
         if (res.ok) {
           const data = await res.json();
-          if (data.popup) {
-            serverPopup = data.popup;
+          if (Array.isArray(data.popups) && data.popups.length > 0) {
+            serverPopups = data.popups.filter((p: PopupBanner) => p.isActive);
+          } else if (data.popup && data.popup.isActive) {
+            serverPopups = [data.popup];
+          }
+          if (serverPopups.length > 0) {
+            serverLatestTime = Math.max(
+              ...serverPopups.map((p) => new Date(p.updatedAt).getTime() || 0)
+            );
           }
         }
       } catch (err) {
         console.error("AnnouncementPopup fetch error:", err);
       }
 
-      // Check local cache sync (ensures instant consistency across serverless cold-starts)
-      let resolvedPopup: PopupBanner | null = serverPopup;
+      let resolvedPopups: PopupBanner[] = serverPopups;
+
+      // Sync with localStorage cache to guarantee immediate appearance even on serverless cold starts
       try {
         const rawCache = localStorage.getItem(POPUP_CACHE_KEY);
         if (rawCache) {
           const parsedCache = JSON.parse(rawCache) as {
-            popup: PopupBanner | null;
+            popup?: PopupBanner | null;
+            popups?: PopupBanner[];
             updatedAt: string;
           };
-          if (serverPopup && parsedCache.updatedAt) {
-            const serverTime = new Date(serverPopup.updatedAt).getTime();
-            const cacheTime = new Date(parsedCache.updatedAt).getTime();
-            if (cacheTime >= serverTime) {
-              resolvedPopup = parsedCache.popup;
+          const cacheTime = new Date(parsedCache.updatedAt || 0).getTime();
+          const cachedList = Array.isArray(parsedCache.popups)
+            ? parsedCache.popups.filter((p) => p && p.isActive)
+            : parsedCache.popup && parsedCache.popup.isActive
+            ? [parsedCache.popup]
+            : [];
+
+          if (serverPopups.length > 0 && parsedCache.updatedAt) {
+            if (cacheTime >= serverLatestTime) {
+              resolvedPopups = cachedList;
             }
-          } else if (!serverPopup && parsedCache.popup) {
-            resolvedPopup = parsedCache.popup;
+          } else if (serverPopups.length === 0 && cachedList.length > 0) {
+            resolvedPopups = cachedList;
           }
         }
       } catch {
         // Ignore storage parse errors
       }
 
-      if (resolvedPopup && resolvedPopup.isActive) {
-        setPopup(resolvedPopup);
-        setIsOpen(true);
-      } else {
-        setPopup(null);
-        setIsOpen(false);
-      }
+      setPopups(resolvedPopups);
     };
 
-    fetchPopup();
+    fetchPopups();
   }, []);
 
-  const handleClose = () => {
-    setIsOpen(false);
+  const handleCloseOne = (id: string) => {
+    setPopups((prev) => prev.filter((item) => item.id !== id));
   };
 
-  if (!isOpen || !popup) return null;
-
-  const cleanTargetUrl = popup.targetUrl?.trim() || "";
-  const hasTargetUrl = cleanTargetUrl.length > 0;
-  const cleanTitle = popup.title?.trim() || "";
-
-  const handleClickBanner = () => {
-    if (!hasTargetUrl) return;
-    handleClose();
-    if (cleanTargetUrl.startsWith("http://") || cleanTargetUrl.startsWith("https://")) {
-      window.open(cleanTargetUrl, "_blank", "noopener,noreferrer");
-    } else {
-      router.push(cleanTargetUrl.startsWith("/") ? cleanTargetUrl : `/${cleanTargetUrl}`);
+  const handleBackdropClick = () => {
+    // Close the top-most popup when clicking the dark backdrop
+    if (popups.length > 0) {
+      handleCloseOne(popups[0].id);
     }
   };
+
+  if (popups.length === 0) return null;
+
+  // Render popups stacked: index 0 is the front-most popup, subsequent items sit behind it
+  const stackedOrder = [...popups].reverse();
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-md animate-fade-in"
+      onClick={handleBackdropClick}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 animate-fade-in"
     >
-      <div className="relative w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl border-2 border-amber-400/80 animate-scale-up flex flex-col max-h-[92vh]">
-        {/* Header Bar */}
-        <div className="bg-[#001F3F] text-white px-4 py-3 flex items-center justify-between border-b border-blue-900 shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-            <span className="text-xs font-bold font-serif tracking-wide text-amber-300 uppercase">
-              Pengumuman &amp; Warta Masjid UMS
-            </span>
-          </div>
+      <div className="relative flex items-center justify-center w-full h-full pointer-events-none">
+        {stackedOrder.map((item, idx) => {
+          const isTop = idx === stackedOrder.length - 1;
+          const cleanUrl = item.targetUrl?.trim() || "";
+          const hasUrl = cleanUrl.length > 0;
+          const isExternal =
+            cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://");
+          const normalizedHref = hasUrl
+            ? isExternal
+              ? cleanUrl
+              : cleanUrl.startsWith("/")
+              ? cleanUrl
+              : `/${cleanUrl}`
+            : undefined;
 
-          <button
-            onClick={handleClose}
-            aria-label="Tutup Pengumuman"
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-stone-200 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+          const handleImageClick = (e: React.MouseEvent) => {
+            if (!hasUrl) return;
+            e.preventDefault();
+            handleCloseOne(item.id);
+            if (isExternal) {
+              window.open(cleanUrl, "_blank", "noopener,noreferrer");
+            } else if (normalizedHref) {
+              router.push(normalizedHref);
+            }
+          };
 
-        {/* Image Body (Clickable only if targetUrl is filled by admin) */}
-        <div
-          onClick={hasTargetUrl ? handleClickBanner : undefined}
-          className={`relative w-full overflow-y-auto bg-stone-950 flex flex-col items-center justify-center max-h-[68vh] ${
-            hasTargetUrl ? "cursor-pointer group" : "cursor-default"
-          }`}
-          title={hasTargetUrl ? "Klik untuk membuka tautan pengumuman" : cleanTitle || "Pengumuman Masjid"}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={popup.imageUrl}
-            alt={cleanTitle || "Pengumuman Masjid"}
-            className={`w-full h-auto max-h-[68vh] object-contain transition-transform duration-300 ${
-              hasTargetUrl ? "group-hover:scale-[1.01]" : ""
-            }`}
-          />
-
-          {/* Hover Overlay Hint only when targetUrl is provided */}
-          {hasTargetUrl && (
-            <div className="absolute inset-0 bg-[#001F3F]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-              <div className="px-4 py-2 rounded-full bg-white text-[#001F3F] text-xs font-bold shadow-xl flex items-center gap-2">
-                <span>Buka Tautan Pengumuman</span>
-                <ArrowRight className="w-3.5 h-3.5 text-amber-500" />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Bottom Actions Bar */}
-        <div className="p-3.5 sm:p-4 bg-stone-50 border-t border-stone-200 flex items-center justify-between gap-3 shrink-0">
-          <div className="min-w-0 flex-1">
-            {cleanTitle ? (
-              <h4 className="text-xs font-bold text-stone-900 truncate font-serif">
-                {cleanTitle}
-              </h4>
-            ) : (
-              <span className="text-xs font-medium text-stone-600">
-                Informasi Resmi Takmir Masjid Hj. Sudalmiyah Rais
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={handleClose}
-              className="px-4 py-2 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+          return (
+            <div
+              key={item.id}
+              onClick={(e) => e.stopPropagation()}
+              className={`pointer-events-auto inline-block rounded-2xl overflow-hidden shadow-2xl bg-white transition-all duration-200 ${
+                isTop
+                  ? "relative z-20 opacity-100 scale-100"
+                  : "absolute z-10 opacity-60 scale-[0.97]"
+              }`}
             >
-              Tutup
-            </button>
-            {hasTargetUrl && (
+              {/* Top-Right Close Button [X] matching LPPIK UMS style */}
               <button
-                onClick={handleClickBanner}
-                className="px-4 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+                type="button"
+                onClick={() => handleCloseOne(item.id)}
+                aria-label="Tutup Pop-up"
+                className="absolute top-2.5 right-2.5 z-30 w-7 h-7 bg-white/95 hover:bg-white text-stone-800 border border-stone-400 flex items-center justify-center shadow-md transition-transform hover:scale-105 cursor-pointer"
               >
-                <span>Buka Tautan</span>
-                <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
+                <X className="w-4 h-4 stroke-[2.2]" />
               </button>
-            )}
-          </div>
-        </div>
+
+              {hasUrl ? (
+                <a
+                  href={normalizedHref}
+                  onClick={handleImageClick}
+                  className="block cursor-pointer"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.imageUrl}
+                    alt="Pengumuman Masjid"
+                    className="block w-auto h-auto max-w-[92vw] sm:max-w-xl md:max-w-2xl max-h-[85vh] object-contain select-none"
+                  />
+                </a>
+              ) : (
+                <div className="block">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.imageUrl}
+                    alt="Pengumuman Masjid"
+                    className="block w-auto h-auto max-w-[92vw] sm:max-w-xl md:max-w-2xl max-h-[85vh] object-contain select-none"
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

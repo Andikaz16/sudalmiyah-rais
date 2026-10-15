@@ -578,11 +578,11 @@ export default function AdminDashboardPage() {
     try {
       const fd = new FormData();
       fd.append("file", file);
+      if (popupBanner?.id) {
+        fd.append("replaceId", popupBanner.id);
+      }
       if (popupTargetUrl.trim()) {
         fd.append("targetUrl", popupTargetUrl.trim());
-      }
-      if (popupTitle.trim()) {
-        fd.append("title", popupTitle.trim());
       }
 
       const res = await fetch("/api/popup", {
@@ -2052,30 +2052,22 @@ export default function AdminDashboardPage() {
                     </div>
 
                     {/* Banner Image Preview Container */}
-                    <div className="relative rounded-2xl overflow-hidden bg-stone-950 border border-stone-200 shadow-inner flex items-center justify-center max-h-72">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={popupBanner.imageUrl}
-                        alt={popupBanner.title || "Poster Pop-up"}
-                        className="w-full h-auto max-h-72 object-contain"
-                      />
-                    </div>
-
-                    {/* Settings Form for Optional Title and Target Link */}
-                    <form onSubmit={handleSavePopupSettings} className="space-y-4 pt-2 border-t border-stone-100">
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-700 mb-1">
-                          Judul / Topik Pengumuman <span className="text-stone-400 font-normal">(Opsional)</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={popupTitle}
-                          onChange={(e) => setPopupTitle(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
-                          placeholder="Contoh: Kajian Akbar / Kosongkan jika hanya gambar poster"
+                    <div className="relative rounded-2xl overflow-hidden bg-stone-900/10 border border-stone-200 shadow-inner flex items-center justify-center p-4">
+                      <div className="relative inline-block rounded-2xl overflow-hidden shadow-xl bg-white">
+                        <span className="absolute top-2 right-2 z-10 w-6 h-6 bg-white/95 text-stone-800 border border-stone-400 flex items-center justify-center text-xs font-bold shadow-xs">
+                          &times;
+                        </span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={popupBanner.imageUrl}
+                          alt="Poster Pop-up"
+                          className="block w-auto h-auto max-h-72 object-contain"
                         />
                       </div>
+                    </div>
 
+                    {/* Settings Form for Optional Target Link */}
+                    <form onSubmit={handleSavePopupSettings} className="space-y-4 pt-2 border-t border-stone-100">
                       <div>
                         <label className="block text-xs font-semibold text-stone-700 mb-1">
                           Tautan / URL Tujuan Saat Pop-up Diklik Pengunjung <span className="text-stone-400 font-normal">(Opsional / Tidak Wajib)</span>
