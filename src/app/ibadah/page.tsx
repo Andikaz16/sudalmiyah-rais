@@ -287,85 +287,79 @@ export default function IbadahPage() {
             {/* Header In-Page Navigation Bar */}
             <section className="bg-white border-b border-stone-200/90 py-4 sm:py-5 sticky top-16 z-30 shadow-xs animate-fade-down">
               <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10">
-                <div className="flex items-center justify-between gap-3">
-                  {/* Back button (Arrow Icon) + Title */}
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => {
-                        setActiveFeature(null);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="w-10 h-10 rounded-xl bg-stone-100 hover:bg-stone-200 active:scale-95 text-stone-700 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-stone-200 shrink-0"
-                      title="Kembali ke Menu Ruang Ibadah"
-                      aria-label="Kembali ke Menu Ruang Ibadah"
+                <div className="flex items-center gap-3">
+                  {/* Back button (Arrow Icon) */}
+                  <button
+                    onClick={() => {
+                      setActiveFeature(null);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="w-10 h-10 rounded-xl bg-stone-100 hover:bg-stone-200 active:scale-95 text-stone-700 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-stone-200 shrink-0"
+                    title="Kembali ke Menu Ruang Ibadah"
+                    aria-label="Kembali ke Menu Ruang Ibadah"
+                  >
+                    <svg
+                      className="w-5 h-5 text-stone-700"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.2}
                     >
-                      <svg
-                        className="w-5 h-5 text-stone-700"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2.2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-                        />
-                      </svg>
-                    </button>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+                      />
+                    </svg>
+                  </button>
 
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider">
-                          Ruang Ibadah
-                        </span>
-                        <span className="text-stone-300">•</span>
-                        <span className="text-[11px] font-semibold text-[#003B73]">
-                          {currentFeat?.badge}
-                        </span>
-                      </div>
-                      <h1 className="text-base sm:text-xl font-bold text-stone-900 font-serif leading-tight flex items-center gap-2">
-                        {currentFeat?.id === "quran" && (
-                          <QuranIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
-                        )}
-                        {currentFeat?.id === "tasbih" && (
-                          <TasbihIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
-                        )}
-                        {currentFeat?.id === "tilawah" && (
-                          <TilawahIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
-                        )}
-                        {currentFeat?.id === "doa" && (
-                          <DoaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
-                        )}
-                        {currentFeat?.id === "kiblat" && (
-                          <KiblatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
-                        )}
-                        {currentFeat?.id === "asmaul-husna" && (
-                          <AsmaulHusnaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
-                        )}
-                        {currentFeat?.id === "zakat" && (
-                          <ZakatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
-                        )}
-                        {currentFeat?.id === "panduan-shalat" && (
-                          <ShalatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
-                        )}
-                        {currentFeat?.id === "kalender" && (
-                          <KalenderIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
-                        )}
-                        {currentFeat?.id === "hadits" && (
-                          <HaditsIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
-                        )}
-                        <span>{currentFeat?.title}</span>
-                      </h1>
+                  {/* Title & Category Info - Clean & Roomy for Mobile */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 text-[11px] text-stone-500 font-medium leading-none mb-1">
+                      <span>Ruang Ibadah</span>
+                      <span className="text-stone-300">•</span>
+                      <span className="text-[#003B73] font-semibold truncate">
+                        {currentFeat?.badge}
+                      </span>
                     </div>
+                    <h1 className="text-base sm:text-xl font-bold text-stone-900 font-serif leading-tight flex items-center gap-2 truncate">
+                      {currentFeat?.id === "quran" && (
+                        <QuranIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
+                      )}
+                      {currentFeat?.id === "tasbih" && (
+                        <TasbihIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
+                      )}
+                      {currentFeat?.id === "tilawah" && (
+                        <TilawahIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
+                      )}
+                      {currentFeat?.id === "doa" && (
+                        <DoaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
+                      )}
+                      {currentFeat?.id === "kiblat" && (
+                        <KiblatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
+                      )}
+                      {currentFeat?.id === "asmaul-husna" && (
+                        <AsmaulHusnaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
+                      )}
+                      {currentFeat?.id === "zakat" && (
+                        <ZakatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
+                      )}
+                      {currentFeat?.id === "panduan-shalat" && (
+                        <ShalatIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
+                      )}
+                      {currentFeat?.id === "kalender" && (
+                        <KalenderIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
+                      )}
+                      {currentFeat?.id === "hadits" && (
+                        <HaditsIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#003B73] shrink-0" />
+                      )}
+                      <span className="truncate">{currentFeat?.title}</span>
+                    </h1>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="hidden md:inline text-[11px] text-stone-500">Masjid Sudalmiyah Rais UMS</span>
-                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] border border-[#003B73]/20 flex items-center gap-1.5 shadow-2xs">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                      <span>Standar MASA Muhammadiyah</span>
-                    </span>
+                  {/* Desktop Only Subtitle Info */}
+                  <div className="hidden sm:flex items-center text-xs text-stone-500 shrink-0">
+                    <span>Masjid Sudalmiyah Rais UMS</span>
                   </div>
                 </div>
               </div>

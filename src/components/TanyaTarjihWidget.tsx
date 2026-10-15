@@ -103,13 +103,13 @@ export default function TanyaTarjihWidget() {
 
   return (
     <>
-      {/* Floating Action Trigger Button */}
-      <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50">
+      {/* Floating Action Trigger Button - positioned above MobileBottomNav on small screens */}
+      <div className="fixed bottom-20 right-3.5 sm:bottom-6 sm:right-6 z-40">
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}
             aria-label="Buka Tanya Tarjih AI"
-            className="flex items-center gap-2.5 px-4 sm:px-5 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white font-semibold text-xs sm:text-sm shadow-2xl border border-amber-400/50 hover:border-amber-300 transition-all hover:scale-105 active:scale-95 group cursor-pointer"
+            className="flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white font-semibold text-xs sm:text-sm shadow-xl border border-amber-400/50 hover:border-amber-300 transition-all hover:scale-105 active:scale-95 group cursor-pointer"
           >
             <div className="relative w-7 h-7 rounded-full bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-300 group-hover:rotate-12 transition-transform">
               <Sparkles className="w-4 h-4 text-amber-300" />
