@@ -214,31 +214,30 @@ export default function SejarahPage() {
 
       <main className="flex-1 pb-16">
         {/* Hero Section dengan Background Kolase 6 Masjid Kampus */}
-        <section className="relative text-white pt-14 pb-24 sm:pb-32 overflow-hidden">
+        <section className="relative text-white py-14 sm:py-20 overflow-hidden border-b-2 border-stone-300/80">
           {/* Background Image: Kolase 6 Masjid Kampus UMS */}
           <div className="absolute inset-0">
             <Image
               src="/images/banner-sejarah-6-masjid.jpg"
               alt="Kolase 6 Masjid Kampus Universitas Muhammadiyah Surakarta"
               fill
-              className="object-cover object-center scale-105"
+              className="object-cover object-center"
               priority
             />
-            {/* Multi-layer gradient overlay untuk kontras dan estetika arsitektural */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#001F3F]/95 via-[#002855]/90 to-[#001F3F]/80" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#FAF8F5] via-transparent to-[#001F3F]/75" />
+            {/* Penyamar halus merata tanpa gradasi mengganggu agar foto 6 masjid terlihat jelas */}
+            <div className="absolute inset-0 bg-black/45" />
           </div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/25 text-[#FCD34D] text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
+            <div className="max-w-2xl bg-black/40 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-white/20 shadow-2xl">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/50 border border-white/30 text-[#FCD34D] text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>Dokumentasi Sejarah &amp; Arsip Legalitas</span>
               </div>
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-serif tracking-tight text-white leading-tight drop-shadow-md">
                 Sejarah Masjid Kampus UMS
               </h1>
-              <p className="mt-4 text-stone-200 text-sm sm:text-base lg:text-lg leading-relaxed font-light max-w-2xl drop-shadow-sm">
+              <p className="mt-4 text-stone-100 text-sm sm:text-base lg:text-lg leading-relaxed font-normal drop-shadow-sm">
                 Menelusuri jejak perintisan dakwah, penetapan nama pejuang &amp; tokoh persyarikatan, 
                 serta arsip Surat Keputusan (SK) resmi pengelolaan masjid percontohan di lingkungan 
                 Universitas Muhammadiyah Surakarta.
@@ -248,7 +247,7 @@ export default function SejarahPage() {
         </section>
 
         {/* SECTION 1: SEJARAH UTAMA - MASJID HJ. SUDALMIYAH SUHUD RAIS */}
-        <section className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-16 mb-16">
+        <section className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 mb-16">
             <div className="bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-xl">
               {/* Badge & Title */}
               <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-stone-200">
