@@ -109,9 +109,6 @@ export default function MasjidMuSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold bg-[#003B73]/10 text-[#003B73] border border-[#003B73]/20 uppercase tracking-widest font-mono mb-3">
-            Standar Rujukan Persyarikatan
-          </div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
             Masjid Percontohan <span className="text-[#003B73]">AUM</span>
           </h2>
