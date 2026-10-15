@@ -145,13 +145,13 @@ export default function HeroSection() {
         {/* Logo LPCR-PM & Lencana AUM - Khusus Slide Masjid Sudalmiyah */}
         {active.id === "sudalmiyah" ? (
           <div className="flex flex-col items-center justify-center animate-fade-up">
-            {/* Logo LPCR-PM (Transparan, tanpa kotak background) */}
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mb-3 drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] hover:scale-105 transition-transform duration-300">
+            {/* Logo LPCR-PM (Transparan, ukuran diperbesar dan proporsional) */}
+            <div className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 xl:w-44 xl:h-44 mb-3 sm:mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)] hover:scale-105 transition-transform duration-300">
               <Image
                 src="/images/logo/logo-lpcr.png"
                 alt="Logo LPCR-PM PP Muhammadiyah"
                 fill
-                className="object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]"
+                className="object-contain filter drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
                 priority
               />
             </div>
