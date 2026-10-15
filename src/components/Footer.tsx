@@ -82,6 +82,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/#kotak-saran" className="hover:text-[#FCD34D] transition-colors">
+                  Kotak Saran &amp; Aspirasi
+                </Link>
+              </li>
+              <li>
                 <Link href="/#berita" className="hover:text-[#FCD34D] transition-colors">
                   Kabar MasjidMu &amp; Persyarikatan
                 </Link>

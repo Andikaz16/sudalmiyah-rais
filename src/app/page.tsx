@@ -7,6 +7,7 @@ import AgendaSection from "@/components/AgendaSection";
 import MasjidMuSection from "@/components/MasjidMuSection";
 import FridayScheduleSection from "@/components/FridayScheduleSection";
 import DonationSection from "@/components/DonationSection";
+import FeedbackSection from "@/components/FeedbackSection";
 import NewsSection from "@/components/NewsSection";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -51,6 +52,11 @@ export default function Home() {
         {/* Infaq Digital & QRIS Section */}
         <AnimatedSection animation="fade-up" duration={700}>
           <DonationSection />
+        </AnimatedSection>
+
+        {/* Kotak Saran & Aspirasi Jamaah Masjid Kampus UMS */}
+        <AnimatedSection animation="fade-up" duration={700}>
+          <FeedbackSection />
         </AnimatedSection>
 
         {/* Kabar Persyarikatan & Warta Kampus (UMS, Suara Muhammadiyah, Lensamu) */}

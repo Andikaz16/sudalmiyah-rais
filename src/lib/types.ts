@@ -148,3 +148,30 @@ export interface QrisSettings {
   institution: string;
   updatedAt: string;
 }
+
+export type FeedbackCategory =
+  | "IDARAH"
+  | "IMARAH"
+  | "RIAYAH"
+  | "RAMAH_DIFABEL"
+  | "ECO_MOSQUE"
+  | "KEAMANAN"
+  | "LAINNYA";
+
+export type FeedbackStatus = "BARU" | "DITINJAU" | "DITINDAKLANJUTI" | "DIARSIPKAN";
+
+export interface MosqueFeedback {
+  id: string;
+  name: string;
+  isAnonymous: boolean;
+  contact?: string;
+  targetMosque: string;
+  category: FeedbackCategory;
+  rating: number;
+  message: string;
+  status: FeedbackStatus;
+  adminResponse?: string;
+  respondedAt?: string;
+  respondedBy?: string;
+  createdAt: string;
+}

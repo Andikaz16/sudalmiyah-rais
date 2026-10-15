@@ -18,6 +18,10 @@ export async function GET() {
 
   const currentBalance = totalIncome - totalExpense;
 
+  const feedbacks = db.feedbacks || [];
+  const totalFeedbacks = feedbacks.length;
+  const pendingFeedbacks = feedbacks.filter((f) => f.status === "BARU").length;
+
   return NextResponse.json({
     stats: {
       totalAgendas,
@@ -26,10 +30,13 @@ export async function GET() {
       totalIncome,
       totalExpense,
       currentBalance,
+      totalFeedbacks,
+      pendingFeedbacks,
     },
     recentAgendas: db.agendas.slice(0, 5),
     recentRegistrations: db.registrations.slice(0, 10),
     recentBookings: db.facilityBookings.slice(0, 5),
     recentAuditLogs: db.auditLogs.slice(0, 10),
+    recentFeedbacks: feedbacks.slice(0, 10),
   });
 }

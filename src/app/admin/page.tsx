@@ -10,12 +10,35 @@ import {
   QrCode,
   Tv,
   ExternalLink,
+  MessageSquare,
+  Star,
+  Trash2,
+  Search,
+  Filter,
+  CheckCircle2,
+  Clock,
+  Check,
+  Reply,
+  Building2,
+  AlertCircle,
+  Phone,
+  MessageCircle,
 } from "lucide-react";
-import { Agenda, FridayOfficerSchedule, QrisSettings, Registration } from "@/lib/types";
+import {
+  Agenda,
+  FridayOfficerSchedule,
+  QrisSettings,
+  Registration,
+  MosqueFeedback,
+  FeedbackCategory,
+  FeedbackStatus,
+} from "@/lib/types";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS">("AGENDAS");
+  const [activeTab, setActiveTab] = useState<
+    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "FEEDBACK"
+  >("AGENDAS");
   const [stats, setStats] = useState<{
     totalAgendas: number;
     totalRegistrations: number;
@@ -23,10 +46,33 @@ export default function AdminDashboardPage() {
     totalIncome: number;
     totalExpense: number;
     currentBalance: number;
+    totalFeedbacks?: number;
+    pendingFeedbacks?: number;
   } | null>(null);
 
   const [agendas, setAgendas] = useState<Agenda[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+
+  // Feedback & Saran Jamaah State
+  const [feedbacks, setFeedbacks] = useState<MosqueFeedback[]>([]);
+  const [loadingFeedbacks, setLoadingFeedbacks] = useState(false);
+  const [feedbackCounts, setFeedbackCounts] = useState({
+    total: 0,
+    baru: 0,
+    ditinjau: 0,
+    ditindaklanjuti: 0,
+    diarsipkan: 0,
+  });
+  const [feedbackSearch, setFeedbackSearch] = useState("");
+  const [feedbackFilterMosque, setFeedbackFilterMosque] = useState("ALL");
+  const [feedbackFilterCategory, setFeedbackFilterCategory] = useState("ALL");
+  const [feedbackFilterStatus, setFeedbackFilterStatus] = useState("ALL");
+
+  // Responding feedback modal state
+  const [respondingFeedback, setRespondingFeedback] = useState<MosqueFeedback | null>(null);
+  const [adminResponseText, setAdminResponseText] = useState("");
+  const [adminResponseStatus, setAdminResponseStatus] = useState<FeedbackStatus>("DITINDAKLANJUTI");
+  const [savingFeedbackResponse, setSavingFeedbackResponse] = useState(false);
 
   // Friday officer schedule state
   const [fridaySchedule, setFridaySchedule] = useState<FridayOfficerSchedule | null>(null);
@@ -91,9 +137,112 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const loadAdminFeedbacks = async () => {
+    setLoadingFeedbacks(true);
+    try {
+      const params = new URLSearchParams();
+      if (feedbackFilterStatus !== "ALL") params.append("status", feedbackFilterStatus);
+      if (feedbackFilterMosque !== "ALL") params.append("mosque", feedbackFilterMosque);
+      if (feedbackFilterCategory !== "ALL") params.append("category", feedbackFilterCategory);
+      if (feedbackSearch.trim()) params.append("search", feedbackSearch.trim());
+
+      const res = await fetch(`/api/admin/feedback?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setFeedbacks(data.feedbacks || []);
+        if (data.counts) setFeedbackCounts(data.counts);
+      }
+    } catch (e) {
+      console.error("Error loading feedbacks:", e);
+    } finally {
+      setLoadingFeedbacks(false);
+    }
+  };
+
   useEffect(() => {
     loadData();
+    loadAdminFeedbacks();
   }, []);
+
+  useEffect(() => {
+    loadAdminFeedbacks();
+  }, [feedbackFilterStatus, feedbackFilterMosque, feedbackFilterCategory]);
+
+  const handleSearchFeedbackSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    loadAdminFeedbacks();
+  };
+
+  const handleUpdateFeedbackStatus = async (id: string, newStatus: FeedbackStatus) => {
+    try {
+      const res = await fetch("/api/admin/feedback", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gagal memperbarui status.");
+      }
+      loadAdminFeedbacks();
+      loadData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal memperbarui status.");
+    }
+  };
+
+  const handleOpenResponseModal = (fb: MosqueFeedback) => {
+    setRespondingFeedback(fb);
+    setAdminResponseText(fb.adminResponse || "");
+    setAdminResponseStatus(fb.status === "BARU" ? "DITINDAKLANJUTI" : fb.status);
+  };
+
+  const handleSaveFeedbackResponse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!respondingFeedback) return;
+    setSavingFeedbackResponse(true);
+    try {
+      const res = await fetch("/api/admin/feedback", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: respondingFeedback.id,
+          status: adminResponseStatus,
+          adminResponse: adminResponseText,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gagal menyimpan respon.");
+      }
+      setRespondingFeedback(null);
+      loadAdminFeedbacks();
+      loadData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menyimpan respon.");
+    } finally {
+      setSavingFeedbackResponse(false);
+    }
+  };
+
+  const handleDeleteFeedback = async (id: string) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus masukan ini? Tindakan ini tidak dapat dibatalkan.")) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/feedback?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gagal menghapus masukan.");
+      }
+      loadAdminFeedbacks();
+      loadData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menghapus masukan.");
+    }
+  };
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -302,7 +451,7 @@ export default function AdminDashboardPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         {/* Metric Cards Row */}
         {stats && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             {/* Total Agenda */}
             <div className="p-5 rounded-3xl bg-white border border-stone-200 shadow-sm flex items-center justify-between">
               <div>
@@ -338,10 +487,36 @@ export default function AdminDashboardPage() {
                 <Users className="w-5 h-5" />
               </div>
             </div>
+
+            {/* Total Feedbacks & Suggestions */}
+            <div
+              onClick={() => setActiveTab("FEEDBACK")}
+              className="p-5 rounded-3xl bg-white border border-stone-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-[#003B73]/40 transition-colors"
+            >
+              <div>
+                <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                  Aspirasi &amp; Saran
+                </span>
+                <div className="text-2xl font-black text-stone-900 mt-1 font-mono flex items-center gap-2">
+                  <span>{feedbackCounts.total || stats.totalFeedbacks || 0}</span>
+                  {feedbackCounts.baru > 0 && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200 font-sans">
+                      {feedbackCounts.baru} Baru
+                    </span>
+                  )}
+                </div>
+                <div className="text-[10px] text-stone-400 mt-0.5">
+                  {feedbackCounts.ditindaklanjuti} telah ditindaklanjuti
+                </div>
+              </div>
+              <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600">
+                <MessageSquare className="w-5 h-5" />
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Tab Controls - Pure Text without Icons */}
+        {/* Tab Controls - Pure Text with Badges */}
         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 border-b border-stone-200 no-scrollbar">
           <button
             onClick={() => setActiveTab("AGENDAS")}
@@ -382,6 +557,21 @@ export default function AdminDashboardPage() {
             }`}
           >
             Presensi & Tiket Jamaah
+          </button>
+          <button
+            onClick={() => setActiveTab("FEEDBACK")}
+            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "FEEDBACK"
+                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
+                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+            }`}
+          >
+            <span>Kotak Saran & Aspirasi</span>
+            {feedbackCounts.baru > 0 && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-none">
+                {feedbackCounts.baru}
+              </span>
+            )}
           </button>
         </div>
 
@@ -932,7 +1122,370 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Tab 5: FEEDBACK (Kotak Saran & Aspirasi Jamaah) */}
+        {activeTab === "FEEDBACK" && (
+          <div className="space-y-6">
+            {/* Header & Status Filter Pills */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-stone-900 font-serif">
+                  Kotak Saran &amp; Aspirasi Jamaah Masjid
+                </h2>
+                <p className="text-xs text-stone-500 mt-0.5">
+                  Tinjau masukan konstruktif, beri respon resmi takmir, dan kelola status perbaikan 6 masjid kampus UMS
+                </p>
+              </div>
+
+              {/* Status Filter Buttons */}
+              <div className="flex flex-wrap items-center gap-1.5 bg-white p-1 rounded-2xl border border-stone-200">
+                {[
+                  { key: "ALL", label: "Semua", count: feedbackCounts.total },
+                  { key: "BARU", label: "Baru", count: feedbackCounts.baru, highlight: true },
+                  { key: "DITINJAU", label: "Ditinjau", count: feedbackCounts.ditinjau },
+                  { key: "DITINDAKLANJUTI", label: "Ditindaklanjuti", count: feedbackCounts.ditindaklanjuti },
+                  { key: "DIARSIPKAN", label: "Arsip", count: feedbackCounts.diarsipkan },
+                ].map((s) => (
+                  <button
+                    key={s.key}
+                    onClick={() => setFeedbackFilterStatus(s.key)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                      feedbackFilterStatus === s.key
+                        ? "bg-[#003B73] text-white shadow-xs"
+                        : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+                    }`}
+                  >
+                    <span>{s.label}</span>
+                    <span
+                      className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                        feedbackFilterStatus === s.key
+                          ? "bg-white/20 text-white"
+                          : s.highlight && s.count > 0
+                          ? "bg-rose-100 text-rose-700 font-bold"
+                          : "bg-stone-100 text-stone-600"
+                      }`}
+                    >
+                      {s.count}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Filter Bar: Search, Mosque Filter, Category Filter */}
+            <div className="bg-white p-4 rounded-3xl border border-stone-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center gap-3">
+              {/* Search Box */}
+              <form onSubmit={handleSearchFeedbackSubmit} className="relative flex-1">
+                <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-3" />
+                <input
+                  type="text"
+                  value={feedbackSearch}
+                  onChange={(e) => setFeedbackSearch(e.target.value)}
+                  placeholder="Cari kata kunci, nama jamaah, kontak, atau masjid..."
+                  className="w-full pl-10 pr-20 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#003B73]"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-1.5 top-1.5 px-3 py-1 rounded-lg bg-[#003B73] text-white text-[11px] font-semibold hover:bg-[#002855]"
+                >
+                  Cari
+                </button>
+              </form>
+
+              {/* Filter Masjid */}
+              <div className="w-full md:w-56 shrink-0">
+                <select
+                  value={feedbackFilterMosque}
+                  onChange={(e) => setFeedbackFilterMosque(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#003B73]"
+                >
+                  <option value="ALL">Semua Masjid Kampus</option>
+                  <option value="Masjid Hj. Sudalmiyah Rais (Kampus 2)">Masjid Hj. Sudalmiyah Rais</option>
+                  <option value="Masjid Fadhlurrahman (Kampus 1)">Masjid Fadhlurrahman</option>
+                  <option value="Masjid KH. Mas Mansur (Kampus 4)">Masjid KH. Mas Mansur</option>
+                  <option value="Masjid Ma'had Abu Bakar (Kampus 2)">Masjid Ma'had Abu Bakar</option>
+                  <option value="Masjid Ar-Razi FKG (Kampus 4)">Masjid Ar-Razi FKG</option>
+                  <option value="Masjid Munajat Shabran (Makamhaji)">Masjid Munajat Shabran</option>
+                  <option value="Semua Masjid Kampus (Saran Umum)">Saran Umum Seluruh Masjid</option>
+                </select>
+              </div>
+
+              {/* Filter Kategori */}
+              <div className="w-full md:w-52 shrink-0">
+                <select
+                  value={feedbackFilterCategory}
+                  onChange={(e) => setFeedbackFilterCategory(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#003B73]"
+                >
+                  <option value="ALL">Semua Kategori</option>
+                  <option value="RIAYAH">Ri'ayah (Fasilitas/Sarpras)</option>
+                  <option value="IMARAH">Imarah (Ibadah/Kajian)</option>
+                  <option value="IDARAH">Idarah (Pelayanan)</option>
+                  <option value="RAMAH_DIFABEL">Ramah Difabel &amp; Lansia</option>
+                  <option value="ECO_MOSQUE">Eco-Mosque (Lingkungan)</option>
+                  <option value="KEAMANAN">Keamanan &amp; Parkir</option>
+                  <option value="LAINNYA">Lainnya</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Feedbacks Content List */}
+            {loadingFeedbacks ? (
+              <div className="p-12 text-center bg-white rounded-3xl border border-stone-200">
+                <div className="w-8 h-8 border-3 border-[#003B73]/20 border-t-[#003B73] rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-xs text-stone-500">Memuat data masukan jamaah...</p>
+              </div>
+            ) : feedbacks.length === 0 ? (
+              <div className="p-12 text-center bg-white rounded-3xl border border-stone-200 max-w-lg mx-auto">
+                <MessageSquare className="w-10 h-10 text-stone-300 mx-auto mb-3" />
+                <h4 className="text-base font-bold text-stone-800 font-serif">Tidak Ada Data Masukan</h4>
+                <p className="text-xs text-stone-500 mt-1">
+                  Belum ada aspirasi jamaah yang cocok dengan filter yang dipilih.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {feedbacks.map((fb) => (
+                  <div
+                    key={fb.id}
+                    className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200 shadow-xs hover:border-[#003B73]/30 transition-all space-y-4"
+                  >
+                    {/* Top Row: Mosque, Category, Rating & Status */}
+                    <div className="flex flex-wrap items-center justify-between gap-2.5 pb-3 border-b border-stone-100">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#003B73]/10 text-[#003B73]">
+                          <Building2 className="w-3.5 h-3.5 text-[#003B73]" />
+                          <span>{fb.targetMosque}</span>
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-700">
+                          {fb.category}
+                        </span>
+                        <div className="flex items-center gap-0.5 ml-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`w-3.5 h-3.5 ${
+                                star <= fb.rating
+                                  ? "fill-amber-400 text-amber-400"
+                                  : "text-stone-200"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Status Badges */}
+                      <div>
+                        {fb.status === "BARU" && (
+                          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                            Masukan Baru
+                          </span>
+                        )}
+                        {fb.status === "DITINJAU" && (
+                          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                            Sedang Ditinjau
+                          </span>
+                        )}
+                        {fb.status === "DITINDAKLANJUTI" && (
+                          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            Telah Ditindaklanjuti
+                          </span>
+                        )}
+                        {fb.status === "DIARSIPKAN" && (
+                          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-stone-100 text-stone-600 border border-stone-200">
+                            Diarsipkan
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Sender Info Row */}
+                    <div className="flex flex-wrap items-center justify-between text-xs text-stone-500 gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center font-bold text-stone-700 font-mono text-xs">
+                          {fb.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <span className="font-bold text-stone-900">{fb.name}</span>
+                          {fb.isAnonymous && (
+                            <span className="ml-2 text-[10px] text-stone-400">(Anonim)</span>
+                          )}
+                        </div>
+                        {fb.contact && (
+                          <div className="ml-3 pl-3 border-l border-stone-200 flex items-center gap-2">
+                            <span className="text-stone-600 font-mono">{fb.contact}</span>
+                            {/^[0-9+]+$/.test(fb.contact.replace(/\s+/g, "")) && (
+                              <a
+                                href={`https://wa.me/${fb.contact.replace(/[^0-9]/g, "").replace(/^0/, "62")}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold text-[10px] transition-colors"
+                              >
+                                <MessageCircle className="w-3 h-3 text-emerald-600" />
+                                <span>Hubungi WA</span>
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="text-[11px] text-stone-400">
+                        {new Date(fb.createdAt).toLocaleString("id-ID", {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Feedback Message */}
+                    <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200/80 text-stone-800 text-xs sm:text-sm leading-relaxed">
+                      &ldquo;{fb.message}&rdquo;
+                    </div>
+
+                    {/* Takmir Response if any */}
+                    {fb.adminResponse && (
+                      <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs space-y-1">
+                        <div className="flex items-center justify-between text-emerald-800 font-bold">
+                          <span className="inline-flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            Tanggapan Resmi Takmir ({fb.respondedBy || "Takmir"})
+                          </span>
+                          {fb.respondedAt && (
+                            <span className="text-[10px] text-emerald-600 font-normal">
+                              {new Date(fb.respondedAt).toLocaleString("id-ID", {
+                                dateStyle: "medium",
+                                timeStyle: "short",
+                              })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-stone-700 leading-relaxed italic">
+                          {fb.adminResponse}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Actions Toolbar */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-stone-100">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          onClick={() => handleOpenResponseModal(fb)}
+                          className="px-4 py-1.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors"
+                        >
+                          <Reply className="w-3.5 h-3.5" />
+                          <span>{fb.adminResponse ? "Edit Tanggapan" : "Beri Tanggapan Takmir"}</span>
+                        </button>
+
+                        {fb.status !== "DITINDAKLANJUTI" && (
+                          <button
+                            onClick={() => handleUpdateFeedbackStatus(fb.id, "DITINDAKLANJUTI")}
+                            className="px-3.5 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                          >
+                            <Check className="w-3.5 h-3.5 text-emerald-700" />
+                            <span>Tandai Ditindaklanjuti</span>
+                          </button>
+                        )}
+
+                        {fb.status !== "DIARSIPKAN" && (
+                          <button
+                            onClick={() => handleUpdateFeedbackStatus(fb.id, "DIARSIPKAN")}
+                            className="px-3.5 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors"
+                          >
+                            <span>Arsipkan</span>
+                          </button>
+                        )}
+                      </div>
+
+                      <div>
+                        <button
+                          onClick={() => handleDeleteFeedback(fb.id)}
+                          className="px-3 py-1.5 rounded-full hover:bg-rose-50 text-rose-600 text-xs font-semibold flex items-center gap-1 transition-colors"
+                          title="Hapus masukan"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Hapus</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </main>
+
+      {/* Modal Responding to Feedback */}
+      {respondingFeedback && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-y-auto max-h-[90vh]">
+            <h3 className="text-lg font-bold text-stone-900 mb-2 font-serif">
+              Tanggapan Resmi Takmir Masjid
+            </h3>
+            <p className="text-xs text-stone-500 mb-4">
+              Respon ini akan disimpan dan dapat ditampilkan pada daftar transparansi aspirasi jamaah.
+            </p>
+
+            {/* Original Feedback Quote */}
+            <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 mb-4 text-xs space-y-1">
+              <div className="flex items-center justify-between text-stone-500">
+                <span className="font-bold text-stone-800">{respondingFeedback.targetMosque}</span>
+                <span>{respondingFeedback.name}</span>
+              </div>
+              <p className="text-stone-700 italic">&ldquo;{respondingFeedback.message}&rdquo;</p>
+            </div>
+
+            <form onSubmit={handleSaveFeedbackResponse} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-stone-800 mb-1.5">
+                  Status Penanganan
+                </label>
+                <select
+                  value={adminResponseStatus}
+                  onChange={(e) => setAdminResponseStatus(e.target.value as FeedbackStatus)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                >
+                  <option value="DITINDAKLANJUTI">Telah Ditindaklanjuti (Selesai)</option>
+                  <option value="DITINJAU">Sedang Ditinjau / Dalam Proses Pembahasan</option>
+                  <option value="BARU">Tetap Status Masukan Baru</option>
+                  <option value="DIARSIPKAN">Arsipkan Masukan</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-800 mb-1.5">
+                  Pesan Tanggapan Resmi Takmir
+                </label>
+                <textarea
+                  rows={4}
+                  required
+                  value={adminResponseText}
+                  onChange={(e) => setAdminResponseText(e.target.value)}
+                  placeholder="Tuliskan apresiasi, penjelasan takmir, atau langkah konkret yang telah/akan dilakukan (contoh: Jazakallahu khair, takmir telah berkoordinasi dengan bagian sarpras untuk perbaikan kran tersebut per tanggal 16 Oktober 2026)..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73] leading-relaxed"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setRespondingFeedback(null)}
+                  className="px-5 py-2 rounded-full bg-stone-100 text-stone-700 text-xs font-semibold hover:bg-stone-200 transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingFeedbackResponse}
+                  className="px-6 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-colors disabled:opacity-50"
+                >
+                  {savingFeedbackResponse ? "Menyimpan..." : "Kirim & Simpan Tanggapan"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Modal Add New Agenda */}
       {isNewAgendaOpen && (
