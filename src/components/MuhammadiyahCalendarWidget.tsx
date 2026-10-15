@@ -264,7 +264,7 @@ export default function MuhammadiyahCalendarWidget() {
         <div className="mt-6 pt-5 border-t border-stone-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-600 relative z-10">
           <div className="flex flex-wrap items-center gap-3">
             <span className="font-bold text-stone-800">
-              Masjid Hj. Sudalmiyah Suhud UMS:
+              Masjid Hj. Sudalmiyah Rais UMS:
             </span>
             <span className="text-stone-600">
               Pusat percontohan integrasi hisab astronomis MASA & KHGT di lingkungan perguruan tinggi Muhammadiyah.

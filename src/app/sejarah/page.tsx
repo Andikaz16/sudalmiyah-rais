@@ -247,7 +247,7 @@ export default function SejarahPage() {
           </div>
         </section>
 
-        {/* SECTION 1: SEJARAH UTAMA - MASJID HJ. SUDALMIYAH SUHUD RAIS */}
+        {/* SECTION 1: SEJARAH UTAMA - MASJID HJ. SUDALMIYAH RAIS */}
         <section className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 mb-16">
             <div className="bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-xl">
               {/* Badge & Title */}
@@ -258,7 +258,7 @@ export default function SejarahPage() {
                     <span>Masjid Utama & Pusat Percontohan AUM</span>
                   </div>
                   <h2 className="text-2xl sm:text-4xl font-black font-serif text-stone-900 tracking-tight">
-                    Masjid Hj. Sudalmiyah Suhud Rais
+                    Masjid Hj. Sudalmiyah Rais
                   </h2>
                   <p className="text-xs sm:text-sm text-stone-500 mt-1 flex items-center gap-2">
                     <MapPin className="w-3.5 h-3.5 text-[#B58A1E]" />
@@ -280,7 +280,7 @@ export default function SejarahPage() {
                   <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-md border border-stone-200">
                     <Image
                       src="/images/masjid-sudalmiyah.jpg"
-                      alt="Masjid Hj. Sudalmiyah Suhud Rais UMS"
+                      alt="Masjid Hj. Sudalmiyah Rais UMS"
                       fill
                       className="object-cover hover:scale-105 transition-transform duration-500"
                       priority
@@ -297,10 +297,10 @@ export default function SejarahPage() {
                   <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl p-5">
                     <h4 className="font-serif font-bold text-stone-900 text-sm sm:text-base flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-[#B58A1E]" />
-                      <span>Sosok Hj. Sudalmiyah Suhud Rais</span>
+                      <span>Sosok Hj. Sudalmiyah Rais</span>
                     </h4>
                     <p className="text-xs text-stone-600 mt-2 leading-relaxed">
-                      Almarhumah <strong>Hj. Sudalmiyah Suhud Rais</strong> adalah figur pejuang perempuan &lsquo;Aisyiyah, 
+                      Almarhumah <strong>Hj. Sudalmiyah Rais</strong> adalah figur pejuang perempuan &lsquo;Aisyiyah, 
                       pendidik teladan, serta ibunda dari tokoh bangsa Prof. Dr. M. Amien Rais, M.A. dan 
                       Drs. H. A. Dahlan Rais, M.Hum. Keteladanan beliau dalam keikhlasan beramal, mendidik generasi berintegritas, 
                       serta membesarkan dakwah Islam di Surakarta diabadikan sebagai nama masjid kebanggaan kampus ini.
@@ -321,7 +321,7 @@ export default function SejarahPage() {
                       bagi puluhan ribu mahasiswa, dosen, serta karyawan.
                     </p>
                     <p className="mt-2">
-                      Penamaan <strong>Hj. Sudalmiyah Suhud Rais</strong> merupakan keputusan penuh makna dari Pimpinan 
+                      Penamaan <strong>Hj. Sudalmiyah Rais</strong> merupakan keputusan penuh makna dari Pimpinan 
                       Universitas dan Badan Pembina Harian (BPH) UMS untuk mematrikan inspirasi dedikasi keibuan dan 
                       keikhlasan aktivis dakwah &lsquo;Aisyiyah yang tak pernah surut dalam membela amar ma&lsquo;ruf nahi munkar.
                     </p>
