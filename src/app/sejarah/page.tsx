@@ -297,13 +297,14 @@ export default function SejarahPage() {
                   <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl p-5">
                     <h4 className="font-serif font-bold text-stone-900 text-sm sm:text-base flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-[#B58A1E]" />
-                      <span>Sosok Hj. Sudalmiyah Rais</span>
+                      <span>Sosok Hj. Sudalmiyah Suhud Rais</span>
                     </h4>
                     <p className="text-xs text-stone-600 mt-2 leading-relaxed">
-                      Almarhumah <strong>Hj. Sudalmiyah Rais</strong> adalah figur pejuang perempuan &lsquo;Aisyiyah, 
-                      pendidik teladan, serta ibunda dari tokoh bangsa Prof. Dr. M. Amien Rais, M.A. dan 
-                      Drs. H. A. Dahlan Rais, M.Hum. Keteladanan beliau dalam keikhlasan beramal, mendidik generasi berintegritas, 
-                      serta membesarkan dakwah Islam di Surakarta diabadikan sebagai nama masjid kebanggaan kampus ini.
+                      Secara historis, nama masjid ini diabadikan dari figur perintis berdirinya UMS, yaitu 
+                      <strong> Hj. Sudalmiyah Suhud Rais</strong> (istri dari Bapak Suhud Rais, aktivis Muhammadiyah Surakarta, 
+                      serta ibunda dari tokoh nasional Prof. Dr. M. Amien Rais, M.A. dan Drs. H. A. Dahlan Rais, M.Hum.). 
+                      Beliau adalah muballighah &lsquo;Aisyiyah yang gigih, pendidik berintegritas tinggi, dan teladan keikhlasan dakwah 
+                      yang jasanya diabadikan sebagai nama masjid utama ini.
                     </p>
                   </div>
                 </div>
@@ -315,15 +316,16 @@ export default function SejarahPage() {
                       Latar Belakang & Tonggak Pendirian
                     </h3>
                     <p className="mt-2">
-                      Seiring dengan perkembangan pesat Universitas Muhammadiyah Surakarta sebagai salah satu kampus 
-                      unggulan berkelas dunia, pembangunan masjid kampus berdaya tampung besar di Kampus 2 Pabelan 
-                      menjadi langkah strategis persyarikatan. Masjid ini dirancang menjadi pusat gravitasi spiritual 
-                      bagi puluhan ribu mahasiswa, dosen, serta karyawan.
+                      Nama <strong>Hj. Sudalmiyah Suhud Rais</strong> memiliki kedudukan yang sangat istimewa dalam sejarah 
+                      Universitas Muhammadiyah Surakarta. Pada 18 September 1958, beliau tercatat sebagai salah satu dari lima 
+                      tokoh perintis utama yang mendirikan IKIP Muhammadiyah Cabang Surakarta—yang kini telah bertransformasi 
+                      menjadi universitas unggulan berkelas dunia (UMS).
                     </p>
                     <p className="mt-2">
-                      Penamaan <strong>Hj. Sudalmiyah Rais</strong> merupakan keputusan penuh makna dari Pimpinan 
-                      Universitas dan Badan Pembina Harian (BPH) UMS untuk mematrikan inspirasi dedikasi keibuan dan 
-                      keikhlasan aktivis dakwah &lsquo;Aisyiyah yang tak pernah surut dalam membela amar ma&lsquo;ruf nahi munkar.
+                      Dalam penamaan resmi dan administrasi persyarikatan (sebagaimana tertuang dalam SK LPCR-PM PP Muhammadiyah), 
+                      nama masjid umumnya diringkas menjadi <strong>Masjid Hj. Sudalmiyah Rais</strong> agar ringkas dan selaras 
+                      dengan identitas keluarga besar Rais. Namun secara silsilah dan catatan sejarah pendiri kampus, nama lengkap 
+                      beliau adalah <strong>Hj. Sudalmiyah Suhud Rais</strong>.
                     </p>
                   </div>
 
