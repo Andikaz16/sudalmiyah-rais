@@ -23,7 +23,6 @@ import {
   CheckCircle2,
   X,
   FileCheck,
-  FolderOpen,
   Eye,
   UserCheck,
 } from "lucide-react";
@@ -429,8 +428,8 @@ export default function SejarahPage() {
                 </div>
 
                 <div className="flex items-center gap-2 text-xs text-stone-600 bg-white px-3.5 py-2 rounded-xl border border-stone-200 shrink-0 shadow-2xs">
-                  <FolderOpen className="w-4 h-4 text-[#B58A1E]" />
-                  <span>Direktori Berkas: <code className="font-mono text-stone-800 font-semibold">/public/dokumen/</code></span>
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span>Dokumen Terverifikasi &amp; Sah</span>
                 </div>
               </div>
 
@@ -555,17 +554,6 @@ export default function SejarahPage() {
                     </div>
                   </div>
                 ))}
-              </div>
-
-              {/* Notice Petunjuk Berkas */}
-              <div className="mt-6 p-4 rounded-2xl bg-amber-50/80 border border-amber-200/90 flex items-start gap-3 text-xs text-amber-900">
-                <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-                <div className="leading-relaxed">
-                  <strong>Arsip Tersinkronisasi Otomatis:</strong> Berkas PDF resmi telah tersimpan aman pada folder 
-                  arsip <code className="font-mono bg-white/80 px-1.5 py-0.5 rounded border border-amber-300">/dokumen/</code> dan 
-                  <code className="font-mono bg-white/80 px-1.5 py-0.5 rounded border border-amber-300">/public/dokumen/</code>. 
-                  Sivitas akademika dan masyarakat luas dapat mengunduh serta memverifikasi keabsahan dokumen kepengurusan takmir kapan saja secara transparan.
-                </div>
               </div>
             </div>
           </section>
