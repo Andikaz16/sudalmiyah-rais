@@ -11,8 +11,9 @@ const presensiSchema = z.object({
   participantRole: z.enum(["MAHASISWA", "DOSEN_KARYAWAN", "UMUM"]).default("MAHASISWA"),
   nim: z.string().max(25).optional(),
   faculty: z.string().max(100).optional(),
-  phone: z.string().min(8, "Nomor telepon/WA minimal 8 digit").max(20),
-  email: z.string().email("Format email tidak valid").max(100).optional().or(z.literal("")),
+  photoUrl: z.string().min(1, "Foto kehadiran peserta wajib diunggah"),
+  phone: z.string().max(30).optional().default("-"),
+  email: z.string().max(100).optional().default(""),
   userLat: z.number().optional(),
   userLng: z.number().optional(),
   deviceId: z.string().max(100).optional(),
@@ -71,16 +72,20 @@ export async function POST(request: NextRequest) {
     }
 
     const cleanNim = data.nim ? sanitizeString(data.nim).toUpperCase().trim() : undefined;
-    const cleanEmail = data.email ? data.email.toLowerCase().trim() : undefined;
-    const cleanPhone = sanitizeString(data.phone);
+    const cleanEmail = data.email && data.email.trim() !== ""
+      ? data.email.toLowerCase().trim()
+      : (cleanNim ? `${cleanNim.toLowerCase()}@student.ums.ac.id` : `peserta_${Date.now()}@presensi.ums.ac.id`);
+    const cleanPhone = data.phone ? sanitizeString(data.phone) : "-";
     const cleanFullName = sanitizeString(data.fullName);
     const cleanFaculty = data.faculty ? sanitizeString(data.faculty) : undefined;
+    const photoUrl = data.photoUrl;
 
     // Validasi duplikasi kehadiran: cek apakah peserta sudah presensi (status ATTENDED) pada agenda ini
     const existingAttended = db.registrations.find((r) => {
       if (r.agendaId !== agendaId || r.status !== "ATTENDED") return false;
       if (cleanNim && r.nim && r.nim.toUpperCase() === cleanNim) return true;
       if (cleanEmail && r.email && r.email.toLowerCase() === cleanEmail) return true;
+      if (!cleanNim && r.fullName.toLowerCase() === cleanFullName.toLowerCase()) return true;
       return false;
     });
 
@@ -95,12 +100,13 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         {
-          error: `Peserta dengan ${cleanNim ? `NIM ${cleanNim}` : "data ini"} sudah tercatat hadir pada pukul ${jamHadir} WIB. Presensi hanya dapat dilakukan 1 kali.`,
+          error: `Peserta dengan ${cleanNim ? `NIM ${cleanNim}` : "nama ini"} sudah tercatat hadir pada pukul ${jamHadir} WIB. Presensi hanya dapat dilakukan 1 kali.`,
           isDuplicate: true,
           attendance: {
             ticketCode: existingAttended.ticketCode,
             fullName: existingAttended.fullName,
             nim: existingAttended.nim,
+            photoUrl: existingAttended.photoUrl,
             agendaTitle: existingAttended.agendaTitle,
             attendedAt: existingAttended.attendedAt,
           },
@@ -123,6 +129,7 @@ export async function POST(request: NextRequest) {
       if (r.agendaId !== agendaId) return false;
       if (cleanNim && r.nim && r.nim.toUpperCase() === cleanNim) return true;
       if (cleanEmail && r.email && r.email.toLowerCase() === cleanEmail) return true;
+      if (!cleanNim && r.fullName.toLowerCase() === cleanFullName.toLowerCase()) return true;
       return false;
     });
 
@@ -136,6 +143,7 @@ export async function POST(request: NextRequest) {
       existingRegistration.checkInMethod = "QR_DYNAMIC";
       existingRegistration.participantRole = data.participantRole;
       existingRegistration.locationVerified = locationVerified;
+      existingRegistration.photoUrl = photoUrl;
       if (cleanFaculty) existingRegistration.faculty = cleanFaculty;
       finalRecord = existingRegistration;
     } else {
@@ -146,11 +154,12 @@ export async function POST(request: NextRequest) {
         agendaId: agenda.id,
         agendaTitle: agenda.title,
         fullName: cleanFullName,
-        email: cleanEmail || `${cleanNim || Date.now()}@presensi.ums.ac.id`,
+        email: cleanEmail,
         phone: cleanPhone,
         isUmsStudent: data.participantRole === "MAHASISWA",
         nim: cleanNim,
         faculty: cleanFaculty,
+        photoUrl,
         ticketCode,
         status: "ATTENDED",
         registeredAt: nowIso,
@@ -184,6 +193,7 @@ export async function POST(request: NextRequest) {
           fullName: finalRecord.fullName,
           nim: finalRecord.nim,
           faculty: finalRecord.faculty,
+          photoUrl: finalRecord.photoUrl,
           agendaTitle: agenda.title,
           speaker: agenda.speaker,
           location: agenda.location,

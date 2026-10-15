@@ -91,6 +91,7 @@ export interface Registration {
   checkInMethod?: "QR_DYNAMIC" | "MANUAL_ADMIN" | "PRE_REGISTER";
   participantRole?: "MAHASISWA" | "DOSEN_KARYAWAN" | "UMUM";
   locationVerified?: boolean;
+  photoUrl?: string;
 }
 
 export type TransactionType = "INCOME" | "EXPENSE";

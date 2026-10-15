@@ -1217,43 +1217,78 @@ export default function AdminDashboardPage() {
                 <table className="w-full text-left text-xs">
                   <thead>
                     <tr className="border-b border-stone-200 text-stone-500 uppercase text-[10px] tracking-wider bg-[#FAF8F5]">
+                      <th className="py-3.5 px-4 font-semibold">Foto Presensi</th>
                       <th className="py-3.5 px-4 font-semibold">Kode Tiket</th>
                       <th className="py-3.5 px-4 font-semibold">Nama Jamaah</th>
                       <th className="py-3.5 px-4 font-semibold">Status Sivitas</th>
                       <th className="py-3.5 px-4 font-semibold">Agenda</th>
-                      <th className="py-3.5 px-4 font-semibold">Kontak</th>
+                      <th className="py-3.5 px-4 font-semibold">Waktu Presensi</th>
                       <th className="py-3.5 px-4 text-center font-semibold">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-100 font-medium">
-                    {registrations.map((reg) => (
-                      <tr key={reg.id} className="hover:bg-stone-50">
-                        <td className="py-3.5 px-4 font-mono font-bold text-[#003B73]">
-                          {reg.ticketCode}
-                        </td>
-                        <td className="py-3.5 px-4 text-stone-900">{reg.fullName}</td>
-                        <td className="py-3.5 px-4 text-stone-700">
-                          {reg.isUmsStudent ? (
-                            <span className="text-sky-700 font-semibold">
-                              Mahasiswa ({reg.nim})
-                            </span>
-                          ) : (
-                            <span className="text-stone-500">Jamaah Umum</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-stone-600 max-w-xs truncate">
-                          {reg.agendaTitle}
-                        </td>
-                        <td className="py-3.5 px-4 text-stone-500 font-mono">
-                          {reg.phone}
-                        </td>
-                        <td className="py-3.5 px-4 text-center">
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
-                            Terkonfirmasi
-                          </span>
+                    {registrations.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="py-8 text-center text-stone-400 text-xs">
+                          Belum ada data presensi jamaah yang tercatat.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      registrations.map((reg) => (
+                        <tr key={reg.id} className="hover:bg-stone-50">
+                          <td className="py-3 px-4">
+                            {reg.photoUrl ? (
+                              <a
+                                href={reg.photoUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block w-10 h-10 rounded-xl overflow-hidden border border-stone-200 shadow-2xs hover:scale-105 transition-transform bg-stone-100 shrink-0"
+                                title="Lihat foto presensi ukuran penuh"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={reg.photoUrl} alt={reg.fullName} className="w-full h-full object-cover" />
+                              </a>
+                            ) : (
+                              <div className="w-10 h-10 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center text-[10px] text-stone-400 font-medium">
+                                -
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono font-bold text-[#003B73]">
+                            {reg.ticketCode}
+                          </td>
+                          <td className="py-3.5 px-4 text-stone-900 font-semibold">{reg.fullName}</td>
+                          <td className="py-3.5 px-4 text-stone-700">
+                            {reg.isUmsStudent ? (
+                              <span className="text-sky-700 font-semibold">
+                                Mahasiswa ({reg.nim})
+                              </span>
+                            ) : (
+                              <span className="text-stone-500">Jamaah Umum</span>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 text-stone-600 max-w-xs truncate">
+                            {reg.agendaTitle}
+                          </td>
+                          <td className="py-3.5 px-4 text-stone-500 font-mono text-[11px]">
+                            {reg.attendedAt
+                              ? new Date(reg.attendedAt).toLocaleTimeString("id-ID", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  timeZone: "Asia/Jakarta",
+                                }) + " WIB"
+                              : reg.registeredAt
+                              ? new Date(reg.registeredAt).toLocaleDateString("id-ID")
+                              : "-"}
+                          </td>
+                          <td className="py-3.5 px-4 text-center">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                              Hadir
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

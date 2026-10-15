@@ -14,12 +14,13 @@ import {
   RefreshCw,
   User,
   GraduationCap,
-  Phone,
-  Mail,
   Building,
   Navigation,
   ArrowRight,
-  Sparkles,
+  Camera,
+  UploadCloud,
+  X,
+  ImageIcon,
 } from "lucide-react";
 
 interface AgendaInfo {
@@ -40,6 +41,7 @@ interface AttendanceResult {
   fullName: string;
   nim?: string;
   faculty?: string;
+  photoUrl?: string;
   agendaTitle: string;
   speaker?: string;
   location?: string;
@@ -65,8 +67,10 @@ function PresensiContent() {
   const [fullName, setFullName] = useState<string>("");
   const [nim, setNim] = useState<string>("");
   const [faculty, setFaculty] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [photoUrl, setPhotoUrl] = useState<string>("");
+  const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [uploadingPhoto, setUploadingPhoto] = useState<boolean>(false);
+  const [photoError, setPhotoError] = useState<string>("");
   const [userLat, setUserLat] = useState<number | undefined>(undefined);
   const [userLng, setUserLng] = useState<number | undefined>(undefined);
   const [locationState, setLocationState] = useState<"IDLE" | "CHECKING" | "LOCATED" | "DENIED">("IDLE");
@@ -114,6 +118,61 @@ function PresensiContent() {
     verifyToken();
   }, [token]);
 
+  // Handler Unggah Foto Presensi
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setPhotoError("");
+    const validMimes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!validMimes.includes(file.type)) {
+      setPhotoError("Format berkas harus gambar JPG, PNG, atau WEBP.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setPhotoError("Ukuran foto maksimal 5MB.");
+      return;
+    }
+
+    // Buat pratinjau lokal
+    const previewUrl = URL.createObjectURL(file);
+    setPhotoPreview(previewUrl);
+
+    setUploadingPhoto(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/presensi/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (res.ok && data.url) {
+        setPhotoUrl(data.url);
+      } else {
+        setPhotoError(data.error || "Gagal mengunggah foto. Silakan coba lagi.");
+        setPhotoPreview("");
+        setPhotoUrl("");
+      }
+    } catch (err) {
+      console.error("Photo upload error:", err);
+      setPhotoError("Terjadi kendala jaringan saat mengunggah foto.");
+      setPhotoPreview("");
+      setPhotoUrl("");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setPhotoUrl("");
+    setPhotoPreview("");
+    setPhotoError("");
+  };
+
   // Deteksi lokasi koordinat pengguna (opsional)
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
@@ -149,8 +208,8 @@ function PresensiContent() {
       return;
     }
 
-    if (!phone.trim()) {
-      alert("Nomor telepon/WhatsApp wajib diisi.");
+    if (!photoUrl) {
+      alert("Foto diri atau bukti kehadiran fisik wajib diunggah.");
       return;
     }
 
@@ -166,8 +225,7 @@ function PresensiContent() {
           participantRole,
           nim: participantRole === "MAHASISWA" ? nim.trim().toUpperCase() : undefined,
           faculty: faculty.trim() || undefined,
-          phone: phone.trim(),
-          email: email.trim() || undefined,
+          photoUrl,
           userLat,
           userLng,
         }),
@@ -445,39 +503,87 @@ function PresensiContent() {
                   </div>
                 </div>
 
-                {/* Nomor Telepon / WA */}
+                {/* Upload Foto Mahasiswa / Jamaah (Wajib) */}
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
-                    Nomor WhatsApp / HP Aktif <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="tel"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Contoh: 081234567890"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#003B73] focus:border-transparent bg-stone-50/50"
-                    />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-semibold text-stone-700">
+                      Foto Diri / Presensi di Lokasi <span className="text-rose-500 font-bold">* (Wajib)</span>
+                    </label>
+                    <span className="text-[10px] text-stone-500 font-medium">Maks 5MB (JPG/PNG/WEBP)</span>
                   </div>
-                </div>
 
-                {/* Email (Opsional) */}
-                <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
-                    Email Mahasiswa / Pribadi <span className="text-stone-400">(Opsional)</span>
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="alamat.email@student.ums.ac.id"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#003B73] focus:border-transparent bg-stone-50/50"
-                    />
-                  </div>
+                  {!photoPreview ? (
+                    <label className="relative border-2 border-dashed border-stone-300 hover:border-[#003B73] rounded-2xl p-5 flex flex-col items-center justify-center text-center cursor-pointer transition-colors bg-stone-50/60 hover:bg-stone-50 group">
+                      <div className="w-12 h-12 rounded-full bg-blue-50 text-[#003B73] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                        <Camera className="w-6 h-6" />
+                      </div>
+                      <span className="text-xs font-bold text-stone-800">
+                        Ambil Foto Kamera / Pilih Berkas
+                      </span>
+                      <span className="text-[11px] text-stone-500 mt-1 max-w-xs">
+                        Foto selfie langsung di lokasi kegiatan Masjid Hj. Sudalmiyah Rais Kampus 2 UMS
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="user"
+                        onChange={handlePhotoChange}
+                        disabled={uploadingPhoto}
+                        className="sr-only"
+                      />
+                    </label>
+                  ) : (
+                    <div className="relative rounded-2xl border border-stone-200 overflow-hidden bg-stone-900 shadow-inner p-2.5 flex items-center gap-3.5">
+                      <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-white/20 bg-stone-800">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photoPreview}
+                          alt="Foto Presensi"
+                          className="w-full h-full object-cover"
+                        />
+                        {uploadingPhoto && (
+                          <div className="absolute inset-0 bg-stone-950/70 flex items-center justify-center">
+                            <RefreshCw className="w-5 h-5 text-white animate-spin" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0 pr-2">
+                        {uploadingPhoto ? (
+                          <div className="text-xs text-amber-300 font-medium flex items-center gap-1.5">
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Mengunggah foto kehadiran...</span>
+                          </div>
+                        ) : photoUrl ? (
+                          <div className="space-y-1">
+                            <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                              <span>Foto Berhasil Diunggah</span>
+                            </div>
+                            <p className="text-[11px] text-stone-300 truncate">
+                              Siap untuk konfirmasi presensi
+                            </p>
+                          </div>
+                        ) : null}
+
+                        <button
+                          type="button"
+                          onClick={handleRemovePhoto}
+                          disabled={uploadingPhoto}
+                          className="mt-2 text-[11px] text-rose-400 hover:text-rose-300 underline font-medium cursor-pointer"
+                        >
+                          Ganti / Hapus Foto
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {photoError && (
+                    <p className="text-xs text-rose-600 mt-1.5 font-medium flex items-center gap-1">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{photoError}</span>
+                    </p>
+                  )}
                 </div>
 
                 {/* Geolocation Button */}
@@ -566,22 +672,43 @@ function PresensiContent() {
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <div className="text-base font-bold text-white font-serif">
-                  {attendanceResult.fullName}
-                </div>
-                {attendanceResult.nim && (
-                  <div className="text-xs font-mono font-bold text-amber-300">
-                    NIM: {attendanceResult.nim} {attendanceResult.faculty ? `• ${attendanceResult.faculty}` : ""}
+              {/* Attendee Info with Photo */}
+              <div className="flex items-center gap-3.5">
+                {attendanceResult.photoUrl ? (
+                  <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md shrink-0 bg-stone-900">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={attendanceResult.photoUrl}
+                      alt={attendanceResult.fullName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0 text-white">
+                    <User className="w-6 h-6" />
                   </div>
                 )}
+                <div className="space-y-0.5 min-w-0">
+                  <div className="text-base font-bold text-white font-serif truncate">
+                    {attendanceResult.fullName}
+                  </div>
+                  {attendanceResult.nim && (
+                    <div className="text-xs font-mono font-bold text-amber-300">
+                      NIM: {attendanceResult.nim} {attendanceResult.faculty ? `• ${attendanceResult.faculty}` : ""}
+                    </div>
+                  )}
+                  <div className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 shrink-0" />
+                    <span>Foto Kehadiran Terverifikasi</span>
+                  </div>
+                </div>
               </div>
 
               <div className="pt-2 border-t border-white/10 text-xs text-stone-300 space-y-1">
                 <div className="font-semibold text-white">{attendanceResult.agendaTitle}</div>
                 <div className="text-[11px] text-stone-400 flex items-center gap-1.5">
                   <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
-                  <span>Masjid Sudalmiyah Rais Kampus 2 UMS</span>
+                  <span>Masjid Hj. Sudalmiyah Rais Kampus 2 UMS</span>
                 </div>
               </div>
             </div>
@@ -614,10 +741,27 @@ function PresensiContent() {
               {errorMessage || "Data presensi dengan identitas ini sudah tercatat sebelumnya pada agenda ini."}
             </p>
 
-            <div className="p-4 rounded-2xl bg-[#001F3F] text-white text-left text-xs space-y-1 font-mono">
-              <div className="text-stone-400">Kode Tiket:</div>
-              <div className="text-base font-bold text-amber-400">{attendanceResult.ticketCode}</div>
-              <div className="text-stone-300">{attendanceResult.fullName} ({attendanceResult.nim || "Umum"})</div>
+            <div className="p-4 rounded-2xl bg-[#001F3F] text-white text-left text-xs space-y-2 font-mono">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <span className="text-stone-400">Kode Tiket:</span>
+                <span className="text-base font-bold text-amber-400">{attendanceResult.ticketCode}</span>
+              </div>
+              <div className="flex items-center gap-3 pt-1">
+                {attendanceResult.photoUrl && (
+                  <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/20 shrink-0 bg-stone-800">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={attendanceResult.photoUrl}
+                      alt={attendanceResult.fullName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div>
+                  <div className="font-sans font-bold text-white">{attendanceResult.fullName}</div>
+                  <div className="text-[11px] text-stone-300">{attendanceResult.nim ? `NIM ${attendanceResult.nim}` : "Umum"}</div>
+                </div>
+              </div>
             </div>
 
             <Link

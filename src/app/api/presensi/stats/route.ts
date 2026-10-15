@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
         nim: r.nim ? `${r.nim.substring(0, 4)}***${r.nim.slice(-2)}` : null, // Masked NIM for privacy on big screen
         faculty: r.faculty,
         attendedAt: r.attendedAt,
+        photoUrl: r.photoUrl,
       }));
 
     return NextResponse.json(

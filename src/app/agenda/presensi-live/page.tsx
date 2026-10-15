@@ -49,6 +49,7 @@ interface LatestAttendee {
   nim: string | null;
   faculty?: string;
   attendedAt?: string;
+  photoUrl?: string;
 }
 
 export default function PresensiLivePage() {
@@ -369,14 +370,26 @@ export default function PresensiLivePage() {
                   <div className="text-[11px] text-stone-400 mb-1 font-semibold">
                     Presensi Terakhir Masuk:
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     {latestAttendees.slice(0, 3).map((item, idx) => (
                       <div
                         key={item.id || idx}
-                        className="flex items-center justify-between text-[11px] text-stone-300 bg-white/5 px-2 py-1 rounded"
+                        className="flex items-center justify-between text-[11px] text-stone-300 bg-white/5 px-2.5 py-1.5 rounded-xl gap-2 border border-white/5"
                       >
-                        <span className="font-medium truncate max-w-[150px]">{item.name}</span>
-                        <span className="text-stone-400 font-mono text-[10px]">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {item.photoUrl ? (
+                            <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-amber-400/60 bg-stone-800">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={item.photoUrl} alt={item.name} className="w-full h-full object-cover" />
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-white/10 shrink-0 flex items-center justify-center text-[10px] text-emerald-400 font-bold">
+                              OK
+                            </div>
+                          )}
+                          <span className="font-medium truncate max-w-[140px] text-white">{item.name}</span>
+                        </div>
+                        <span className="text-stone-400 font-mono text-[10px] shrink-0">
                           {item.nim || "Umum"}
                         </span>
                       </div>
