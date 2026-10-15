@@ -8,6 +8,8 @@ import {
   Calendar,
   Users,
   QrCode,
+  Tv,
+  ExternalLink,
 } from "lucide-react";
 import { Agenda, FridayOfficerSchedule, QrisSettings, Registration } from "@/lib/types";
 
@@ -278,8 +280,8 @@ export default function AdminDashboardPage() {
               target="_blank"
               className="text-xs font-semibold text-amber-300 hover:text-amber-200 px-3.5 py-1.5 rounded-full border border-amber-400/50 bg-amber-400/10 flex items-center gap-1.5 transition-colors"
             >
-              <QrCode className="w-3.5 h-3.5 text-amber-400" />
-              <span>Layar Presensi Live</span>
+              <Tv className="w-3.5 h-3.5 text-amber-400" />
+              <span>Layar Proyektor (QR Dinamis)</span>
             </Link>
             <Link
               href="/"
@@ -385,7 +387,7 @@ export default function AdminDashboardPage() {
 
         {/* Tab 1: AGENDAS */}
         {activeTab === "AGENDAS" && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg font-bold text-stone-900 font-serif">Daftar Agenda Masjid</h2>
@@ -397,6 +399,36 @@ export default function AdminDashboardPage() {
               >
                 Tambah Agenda Baru
               </button>
+            </div>
+
+            {/* Layar Proyektor Presensi Live (Anti-Joki QR Dinamis 10 Detik) */}
+            <div className="rounded-3xl bg-gradient-to-r from-[#001F3F] via-[#002855] to-[#003B73] text-white p-5 sm:p-6 border border-amber-400/30 shadow-lg relative overflow-hidden">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
+                <div className="space-y-1.5 max-w-2xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                    <Tv className="w-3 h-3 text-amber-300" />
+                    <span>Layar Proyektor Takmir</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white font-serif">
+                    Layar Presensi Live Proyektor (QR Dinamis 10 Detik)
+                  </h3>
+                  <p className="text-xs text-stone-300 leading-relaxed">
+                    Tampilkan kode QR di layar proyektor aula atau TV masjid untuk acara seperti Cinta Subuh (Cinsub), Tabligh Akbar, dan Kajian Rutin. Kode QR berganti otomatis setiap 10 detik dengan token terenkripsi untuk mencegah joki / titip absen.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 shrink-0">
+                  <Link
+                    href="/agenda/presensi-live"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 text-xs font-bold shadow-md hover:shadow-lg transition-all active:scale-95 whitespace-nowrap"
+                  >
+                    <Tv className="w-3.5 h-3.5 text-stone-950" />
+                    <span>Buka Layar Proyektor</span>
+                    <ExternalLink className="w-3 h-3 text-stone-900" />
+                  </Link>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -436,8 +468,19 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
 
-                  <div className="px-5 pb-5 pt-2 text-[11px] text-stone-400 border-t border-stone-100">
-                    {item.time} • {item.location}
+                  <div className="px-5 pb-5 pt-3 text-[11px] text-stone-500 border-t border-stone-100 flex flex-col gap-2.5">
+                    <div className="text-stone-400">
+                      {item.time} • {item.location}
+                    </div>
+                    <Link
+                      href={`/agenda/presensi-live?agendaId=${item.id}`}
+                      target="_blank"
+                      className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-bold text-[#003B73] bg-[#003B73]/10 hover:bg-[#003B73]/15 border border-[#003B73]/20 transition-all active:scale-[0.98]"
+                    >
+                      <Tv className="w-3.5 h-3.5 text-[#003B73]" />
+                      <span>Mode Proyektor QR Acara Ini</span>
+                      <ExternalLink className="w-3 h-3 text-[#003B73]/70" />
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -826,9 +869,20 @@ export default function AdminDashboardPage() {
         {/* Tab 3: REGISTRATIONS */}
         {activeTab === "REGISTRATIONS" && (
           <div className="space-y-4">
-            <div>
-              <h2 className="text-lg font-bold text-stone-900 font-serif">Data Jamaah Terdaftar (Presensi E-Ticket)</h2>
-              <p className="text-xs text-stone-500 mt-0.5">Daftar mahasiswa dan jamaah yang memegang tiket barcode kegiatan</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold text-stone-900 font-serif">Data Jamaah Terdaftar (Presensi E-Ticket)</h2>
+                <p className="text-xs text-stone-500 mt-0.5">Daftar mahasiswa dan jamaah yang memegang tiket barcode kegiatan</p>
+              </div>
+              <Link
+                href="/agenda/presensi-live"
+                target="_blank"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-sm transition-colors whitespace-nowrap self-start sm:self-auto"
+              >
+                <Tv className="w-3.5 h-3.5 text-amber-400" />
+                <span>Buka Layar Proyektor Presensi</span>
+                <ExternalLink className="w-3 h-3 text-stone-300" />
+              </Link>
             </div>
             <div className="rounded-3xl bg-white border border-stone-200 overflow-hidden shadow-sm">
               <div className="overflow-x-auto">

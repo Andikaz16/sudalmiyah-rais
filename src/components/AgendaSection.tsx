@@ -2,16 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   Calendar,
   Clock,
   MapPin,
   User,
   Users,
-  ArrowRight,
-  QrCode,
-  Sparkles,
 } from "lucide-react";
 import { Agenda, AgendaCategory } from "@/lib/types";
 import RegistrationModal from "./RegistrationModal";
@@ -60,20 +56,6 @@ export default function AgendaSection() {
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
             Ikuti kegiatan ibadah berjamaah, kajian tematik mahasiswa berkemajuan, serta kelas bimbingan tahsin Al-Qur&apos;an di lingkungan Kampus 2 UMS.
           </p>
-
-          {/* Banner Layar Presensi Live QR Dinamis */}
-          <div className="flex justify-center mt-5">
-            <Link
-              href="/agenda/presensi-live"
-              className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#002855] via-[#003B73] to-[#001F3F] text-white text-xs sm:text-sm font-bold shadow-lg border border-amber-400/40 hover:scale-105 active:scale-95 transition-all group"
-            >
-              <div className="w-6 h-6 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-300">
-                <QrCode className="w-3.5 h-3.5 text-amber-300" />
-              </div>
-              <span>Layar Presensi Live (Mode Proyektor QR Dinamis 10s)</span>
-              <ArrowRight className="w-3.5 h-3.5 text-stone-300 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
         </div>
 
         {/* Category Filter Tabs (Wrapping responsif agar semua terlihat utuh di mobile tanpa scrollbar) */}
@@ -215,7 +197,7 @@ export default function AgendaSection() {
                 </div>
 
                 {/* Action Button */}
-                <div className="p-6 pt-0 space-y-2">
+                <div className="p-6 pt-0">
                   {item.requiresRegistration ? (
                     <button
                       onClick={() => setSelectedAgenda(item)}
@@ -233,14 +215,6 @@ export default function AgendaSection() {
                       Silakan Hadir Langsung di Masjid
                     </div>
                   )}
-
-                  <Link
-                    href={`/agenda/presensi-live?agendaId=${item.id}`}
-                    className="flex items-center justify-center gap-1.5 w-full py-2 rounded-full text-xs font-semibold text-[#003B73] bg-[#003B73]/10 hover:bg-[#003B73]/15 border border-[#003B73]/20 transition-colors"
-                  >
-                    <QrCode className="w-3.5 h-3.5 text-[#003B73]" />
-                    <span>Layar QR Presensi Acara</span>
-                  </Link>
                 </div>
               </div>
               );

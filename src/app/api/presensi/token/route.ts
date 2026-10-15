@@ -70,7 +70,10 @@ export async function GET(request: NextRequest) {
         },
       }
     );
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.digest === "NEXT_PRERENDER_INTERRUPTED") {
+      throw error;
+    }
     console.error("Presensi Token Error:", error);
     return NextResponse.json(
       { error: "Gagal membuat token presensi dinamis." },

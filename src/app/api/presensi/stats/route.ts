@@ -51,7 +51,10 @@ export async function GET(request: NextRequest) {
         },
       }
     );
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.digest === "NEXT_PRERENDER_INTERRUPTED") {
+      throw error;
+    }
     console.error("Presensi Stats Error:", error);
     return NextResponse.json(
       { error: "Gagal mengambil statistik presensi." },

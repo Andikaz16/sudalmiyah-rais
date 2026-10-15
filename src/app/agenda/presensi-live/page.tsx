@@ -222,11 +222,11 @@ export default function PresensiLivePage() {
       <header className="bg-[#001F3F]/90 border-b border-blue-900/60 backdrop-blur-md px-6 py-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <Link
-            href="/agenda"
+            href="/admin"
             className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-stone-200 text-xs font-semibold border border-white/10 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Kembali ke Agenda</span>
+            <span>Kembali ke Dashboard Admin</span>
           </Link>
 
           <div className="flex items-center gap-3 pl-2">
