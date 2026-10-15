@@ -26,23 +26,33 @@ export async function POST(request: NextRequest) {
     }
 
     // Sanitize folder
-    const allowedFolders = ["khatib", "agendas", "qris", "general"];
+    const allowedFolders = ["khatib", "agendas", "qris", "general", "documents"];
     const folder = allowedFolders.includes(rawFolder) ? rawFolder : "general";
 
     // Validate MIME type
-    const validMimes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    const validMimes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/jpg",
+      "application/pdf",
+    ];
     if (!validMimes.includes(file.type)) {
       return NextResponse.json(
-        { error: "Format berkas tidak didukung. Harap gunakan format JPG, PNG, atau WEBP." },
+        { error: "Format berkas tidak didukung. Harap gunakan format JPG, PNG, WEBP, atau PDF." },
         { status: 400 }
       );
     }
 
-    // Validate size (max 5MB)
-    const MAX_SIZE = 5 * 1024 * 1024;
+    // Validate size (max 25MB for PDF, 5MB for images)
+    const MAX_SIZE = file.type === "application/pdf" ? 25 * 1024 * 1024 : 5 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
-        { error: "Ukuran berkas terlalu besar. Maksimal ukuran adalah 5MB." },
+        {
+          error: `Ukuran berkas terlalu besar. Maksimal ukuran adalah ${
+            file.type === "application/pdf" ? "25MB" : "5MB"
+          }.`,
+        },
         { status: 400 }
       );
     }

@@ -322,5 +322,97 @@
       "createdAt": "2026-10-15T11:20:00Z"
     }
   ],
-  "popupBanner": null
+  "popupBanner": null,
+  "documents": [
+    {
+      "id": "doc-01",
+      "title": "Himpunan Putusan Tarjih (HPT) Muhammadiyah",
+      "category": "TARJIH_FIQIH",
+      "categoryLabel": "Tarjih & Fiqih",
+      "description": "Kumpulan fatwa, tuntunan ibadah praktis, dan putusan resmi Majelis Tarjih dan Tajdid Pimpinan Pusat Muhammadiyah sebagai pedoman pengamalan ajaran Islam berdasar Al-Qur'an dan As-Sunnah ash-Shahihah.",
+      "author": "Majelis Tarjih dan Tajdid PP Muhammadiyah",
+      "fileUrl": "/documents/hpt-muhammadiyah.pdf",
+      "fileName": "hpt-muhammadiyah.pdf",
+      "fileSize": "1.9 MB",
+      "fileFormat": "PDF",
+      "downloadCount": 342,
+      "publishedYear": "Cetakan Resmi",
+      "createdAt": "2026-10-15T10:00:00.000Z"
+    },
+    {
+      "id": "doc-02",
+      "title": "Pedoman Hidup Islami Warga Muhammadiyah (PHIWM)",
+      "category": "IDEOLOGI",
+      "categoryLabel": "Ideologi & Akhlak",
+      "description": "Pedoman komprehensif bagi warga Muhammadiyah dalam mengimplementasikan nilai-nilai Islam dalam kehidupan pribadi, keluarga, bermasyarakat, berorganisasi, serta mengelola amal usaha dan lingkungan.",
+      "author": "Pimpinan Pusat Muhammadiyah",
+      "fileUrl": "/documents/phiwm-pedoman-hidup-islami.pdf",
+      "fileName": "phiwm-pedoman-hidup-islami.pdf",
+      "fileSize": "1.9 MB",
+      "fileFormat": "PDF",
+      "downloadCount": 278,
+      "publishedYear": "Muktamar ke-44",
+      "createdAt": "2026-10-15T10:00:00.000Z"
+    },
+    {
+      "id": "doc-03",
+      "title": "Tanya Jawab Agama Islam Majelis Tarjih",
+      "category": "TARJIH_FIQIH",
+      "categoryLabel": "Konsultasi Ibadah",
+      "description": "Himpunan tanya jawab fatwa keagamaan terhadap problematika kontemporer, fiqih ibadah harian, muamalah maliyah, dan hukum keluarga Islam.",
+      "author": "Majelis Tarjih dan Tajdid PP Muhammadiyah",
+      "fileUrl": "/documents/tanya-jawab-agama-tarjih.pdf",
+      "fileName": "tanya-jawab-agama-tarjih.pdf",
+      "fileSize": "1.9 MB",
+      "fileFormat": "PDF",
+      "downloadCount": 195,
+      "publishedYear": "Kompilasi Fatwa",
+      "createdAt": "2026-10-15T10:00:00.000Z"
+    },
+    {
+      "id": "doc-04",
+      "title": "12 Langkah K.H. Ahmad Dahlan",
+      "category": "KEMUHAMMADIYAHAN",
+      "categoryLabel": "Kemuhammadiyahan",
+      "description": "Dokumen bersejarah intisari pedoman kepemimpinan, keikhlasan beramal, keteladanan perjuangan, dan pembinaan jiwa aktivis dakwah Muhammadiyah yang dirumuskan oleh pendiri persyarikatan.",
+      "author": "K.H. Ahmad Dahlan (HB Muhammadiyah)",
+      "fileUrl": "/documents/12-langkah-kh-ahmad-dahlan.pdf",
+      "fileName": "12-langkah-kh-ahmad-dahlan.pdf",
+      "fileSize": "1.9 MB",
+      "fileFormat": "PDF",
+      "downloadCount": 215,
+      "publishedYear": "Dokumen Historis",
+      "createdAt": "2026-10-15T10:00:00.000Z"
+    },
+    {
+      "id": "doc-05",
+      "title": "Risalah Islam Berkemajuan",
+      "category": "DOKUMEN_MUKTAMAR",
+      "categoryLabel": "Dokumen Muktamar",
+      "description": "Dokumen pandangan resmi persyarikatan hasil Muktamar ke-48 di Surakarta mengenai konsepsi gerakan pencerahan, praksis keumatan, kebangsaan, dan kemanusiaan universal abad kedua Muhammadiyah.",
+      "author": "Pimpinan Pusat Muhammadiyah",
+      "fileUrl": "/documents/risalah-islam-berkemajuan.pdf",
+      "fileName": "risalah-islam-berkemajuan.pdf",
+      "fileSize": "1.9 MB",
+      "fileFormat": "PDF",
+      "downloadCount": 389,
+      "publishedYear": "Muktamar ke-48 Surakarta",
+      "createdAt": "2026-10-15T10:00:00.000Z"
+    },
+    {
+      "id": "doc-06",
+      "title": "Buku Panduan Standar Masjid Percontohan Muhammadiyah",
+      "category": "PANDUAN_MASJID",
+      "categoryLabel": "Panduan Takmir",
+      "description": "Panduan tata kelola, arsitektur, pemakmuran, dan standardisasi Masjid Ramah Aktivis, Ramah Lingkungan, Ramah Anak, dan Ramah Difabel yang diterbitkan oleh LPCR-PM PP Muhammadiyah.",
+      "author": "LPCR-PM Pimpinan Pusat Muhammadiyah",
+      "fileUrl": "/documents/panduan-masjid-percontohan.pdf",
+      "fileName": "panduan-masjid-percontohan.pdf",
+      "fileSize": "2.0 MB",
+      "fileFormat": "PDF",
+      "downloadCount": 420,
+      "publishedYear": "Edisi LPCR-PM PP Muhammadiyah",
+      "createdAt": "2026-10-15T10:00:00.000Z"
+    }
+  ]
 }

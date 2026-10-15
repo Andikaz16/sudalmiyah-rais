@@ -24,6 +24,11 @@ import {
   Phone,
   MessageCircle,
   Sparkles,
+  FileText,
+  BookOpen,
+  Download,
+  Plus,
+  Edit2,
 } from "lucide-react";
 import {
   Agenda,
@@ -34,6 +39,8 @@ import {
   FeedbackCategory,
   FeedbackStatus,
   PopupBanner,
+  DownloadDocument,
+  DocumentCategory,
 } from "@/lib/types";
 
 const ADMIN_MOSQUES = [
@@ -45,10 +52,19 @@ const ADMIN_MOSQUES = [
   { id: "munajat-shabran", name: "Masjid Munajat Shabran", location: "Makamhaji (Pondok Shabran)" },
 ];
 
+const DOCUMENT_CATEGORIES: { value: DocumentCategory; label: string }[] = [
+  { value: "TARJIH_FIQIH", label: "Tarjih & Fiqih" },
+  { value: "IDEOLOGI", label: "Ideologi & Akhlak" },
+  { value: "KEMUHAMMADIYAHAN", label: "Kemuhammadiyahan" },
+  { value: "DOKUMEN_MUKTAMAR", label: "Dokumen Muktamar" },
+  { value: "PANDUAN_MASJID", label: "Panduan Takmir" },
+  { value: "UMUM", label: "Lainnya / Umum" },
+];
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "FEEDBACK" | "POPUP_BANNER"
+    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS"
   >("AGENDAS");
   const [stats, setStats] = useState<{
     totalAgendas: number;
@@ -127,14 +143,35 @@ export default function AdminDashboardPage() {
   const [popupTitle, setPopupTitle] = useState("");
   const [popupSaveSuccess, setPopupSaveSuccess] = useState(false);
 
+  // Document Management State
+  const [documents, setDocuments] = useState<DownloadDocument[]>([]);
+  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [isDocModalOpen, setIsDocModalOpen] = useState(false);
+  const [editingDocId, setEditingDocId] = useState<string | null>(null);
+  const [uploadingDocFile, setUploadingDocFile] = useState(false);
+  const [savingDoc, setSavingDoc] = useState(false);
+  const [docForm, setDocForm] = useState({
+    title: "",
+    category: "TARJIH_FIQIH" as DocumentCategory,
+    categoryLabel: "Tarjih & Fiqih",
+    description: "",
+    author: "",
+    fileUrl: "",
+    fileName: "",
+    fileSize: "1.9 MB",
+    fileFormat: "PDF",
+    publishedYear: "",
+  });
+
   const loadData = async () => {
     try {
-      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes] = await Promise.all([
+      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch("/api/agendas"),
         fetch("/api/friday-schedule"),
         fetch("/api/qris"),
         fetch("/api/admin/popup"),
+        fetch("/api/documents"),
       ]);
 
       if (statsRes.status === 401 || statsRes.status === 403) {
@@ -173,6 +210,10 @@ export default function AdminDashboardPage() {
           setPopupTargetUrl(popupJson.popup.targetUrl || "");
           setPopupTitle(popupJson.popup.title || "");
         }
+      }
+      if (docRes.ok) {
+        const docJson = await docRes.json();
+        setDocuments(docJson.documents || []);
       }
     } catch (e) {
       console.error(e);
@@ -585,6 +626,117 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Document Management Handlers
+  const handleOpenNewDocModal = () => {
+    setEditingDocId(null);
+    setDocForm({
+      title: "",
+      category: "TARJIH_FIQIH",
+      categoryLabel: "Tarjih & Fiqih",
+      description: "",
+      author: "Pimpinan Pusat Muhammadiyah",
+      fileUrl: "",
+      fileName: "",
+      fileSize: "1.9 MB",
+      fileFormat: "PDF",
+      publishedYear: "",
+    });
+    setIsDocModalOpen(true);
+  };
+
+  const handleOpenEditDocModal = (doc: DownloadDocument) => {
+    setEditingDocId(doc.id);
+    setDocForm({
+      title: doc.title,
+      category: doc.category,
+      categoryLabel: doc.categoryLabel || "",
+      description: doc.description,
+      author: doc.author,
+      fileUrl: doc.fileUrl,
+      fileName: doc.fileName,
+      fileSize: doc.fileSize || "1.9 MB",
+      fileFormat: doc.fileFormat || "PDF",
+      publishedYear: doc.publishedYear || "",
+    });
+    setIsDocModalOpen(true);
+  };
+
+  const handleDocFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingDocFile(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "documents");
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal mengunggah berkas dokumen.");
+
+      const sizeKb = file.size / 1024;
+      const sizeStr = sizeKb >= 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${Math.round(sizeKb)} KB`;
+
+      setDocForm((prev) => ({
+        ...prev,
+        fileUrl: data.url,
+        fileName: file.name,
+        fileSize: sizeStr,
+        title: prev.title || file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " "),
+      }));
+    } catch (err: any) {
+      alert(err.message || "Gagal mengunggah berkas dokumen.");
+    } finally {
+      setUploadingDocFile(false);
+    }
+  };
+
+  const handleSaveDoc = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!docForm.fileUrl) {
+      alert("Harap pilih atau unggah berkas dokumen PDF terlebih dahulu.");
+      return;
+    }
+    setSavingDoc(true);
+    try {
+      const method = editingDocId ? "PUT" : "POST";
+      const payload = editingDocId ? { id: editingDocId, ...docForm } : docForm;
+
+      const res = await fetch("/api/admin/documents", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menyimpan dokumen.");
+
+      setIsDocModalOpen(false);
+      loadData();
+    } catch (err: any) {
+      alert(err.message || "Gagal menyimpan dokumen.");
+    } finally {
+      setSavingDoc(false);
+    }
+  };
+
+  const handleDeleteDoc = async (id: string, title: string) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus dokumen "${title}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/documents?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus dokumen.");
+      loadData();
+    } catch (err: any) {
+      alert(err.message || "Gagal menghapus dokumen.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans pb-16">
       {/* Top Admin Header */}
@@ -772,6 +924,22 @@ export default function AdminDashboardPage() {
             <span>Pop-up Banner Beranda</span>
             {popupBanner && popupBanner.isActive && (
               <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("DOCUMENTS")}
+            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "DOCUMENTS"
+                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
+                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5 text-amber-500" />
+            <span>Pustaka &amp; Dokumen</span>
+            {documents.length > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
+                {documents.length}
+              </span>
             )}
           </button>
         </div>
@@ -1955,6 +2123,154 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Tab 7: DOCUMENTS */}
+        {activeTab === "DOCUMENTS" && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-stone-200 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-stone-900 font-serif">
+                    Pusat Unduhan & Pustaka Dokumen
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Kelola berkas PDF resmi, HPT, PHIWM, Fatwa Tarjih, Risalah Islam Berkemajuan, Panduan Masjid, dan literatur dakwah lainnya.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/layanan/unduhan"
+                  target="_blank"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Lihat Halaman Publik</span>
+                </Link>
+                <button
+                  onClick={handleOpenNewDocModal}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah Dokumen Baru</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Document list table */}
+            <div className="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-stone-200 flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-stone-900 font-serif">
+                    Daftar Dokumen Digital ({documents.length})
+                  </h4>
+                  <p className="text-xs text-stone-500">
+                    Dokumen ini dapat diunduh langsung oleh jamaah, mahasiswa, dan masyarakat umum di menu Layanan.
+                  </p>
+                </div>
+              </div>
+
+              {documents.length === 0 ? (
+                <div className="p-12 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-sm font-bold text-stone-800 font-serif">Belum Ada Dokumen</h4>
+                  <p className="text-xs text-stone-500 max-w-sm mx-auto">
+                    Belum ada berkas PDF pustaka yang terdaftar. Silakan klik tombol &quot;Tambah Dokumen Baru&quot; untuk menambahkan dokumen pertama.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-stone-600">
+                    <thead className="bg-stone-50 text-stone-500 font-semibold border-b border-stone-200 uppercase tracking-wider text-[11px]">
+                      <tr>
+                        <th className="py-3.5 px-4">Dokumen</th>
+                        <th className="py-3.5 px-4">Kategori</th>
+                        <th className="py-3.5 px-4">Penerbit / Penulis</th>
+                        <th className="py-3.5 px-4 text-center">Ukuran / Format</th>
+                        <th className="py-3.5 px-4 text-center">Total Unduhan</th>
+                        <th className="py-3.5 px-4 text-right">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-100">
+                      {documents.map((doc) => (
+                        <tr key={doc.id} className="hover:bg-stone-50/70 transition-colors">
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-start gap-3 max-w-md">
+                              <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
+                                <FileText className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <p className="font-bold text-stone-900 text-sm leading-snug">
+                                  {doc.title}
+                                </p>
+                                <p className="text-[11px] text-stone-500 line-clamp-1 mt-0.5">
+                                  {doc.description}
+                                </p>
+                                <p className="text-[10px] text-stone-400 font-mono mt-0.5">
+                                  Berkas: {doc.fileName || doc.fileUrl}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                              {doc.categoryLabel || doc.category}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <p className="font-medium text-stone-800">{doc.author}</p>
+                            {doc.publishedYear && (
+                              <p className="text-[11px] text-stone-400 font-sans">Tahun: {doc.publishedYear}</p>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                            <span className="font-bold text-stone-800">{doc.fileSize || "1.9 MB"}</span>
+                            <span className="text-stone-400 ml-1">({doc.fileFormat || "PDF"})</span>
+                          </td>
+                          <td className="py-3.5 px-4 text-center whitespace-nowrap font-bold text-emerald-700">
+                            {doc.downloadCount || 0}x
+                          </td>
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <a
+                                href={doc.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
+                                title="Buka Berkas PDF"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                              <button
+                                onClick={() => handleOpenEditDocModal(doc)}
+                                className="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#003B73] transition-colors"
+                                title="Edit Data Dokumen"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteDoc(doc.id, doc.title)}
+                                className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
+                                title="Hapus Dokumen"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Modal Responding to Feedback */}
@@ -2275,6 +2591,166 @@ export default function AdminDashboardPage() {
                   className="px-6 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-colors disabled:opacity-50"
                 >
                   {savingAgenda ? "Menyimpan..." : "Simpan Agenda"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Dokumen (Tambah / Edit) */}
+      {isDocModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-y-auto max-h-[90vh]">
+            <h3 className="text-lg font-bold text-stone-900 mb-1 font-serif">
+              {editingDocId ? "Edit Dokumen & Risalah" : "Tambah Dokumen / Risalah Baru"}
+            </h3>
+            <p className="text-xs text-stone-500 mb-5">
+              Kelola berkas publikasi PDF, fatwa, dan panduan resmi yang dapat diunduh oleh jamaah.
+            </p>
+
+            <form onSubmit={handleSaveDoc} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-stone-800 mb-1.5">
+                  Judul Dokumen *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Himpunan Putusan Tarjih (HPT)"
+                  value={docForm.title}
+                  onChange={(e) => setDocForm({ ...docForm, title: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-stone-800 mb-1.5">
+                    Kategori Dokumen *
+                  </label>
+                  <select
+                    value={docForm.category}
+                    onChange={(e) => {
+                      const val = e.target.value as DocumentCategory;
+                      const cat = DOCUMENT_CATEGORIES.find((c) => c.value === val);
+                      setDocForm({
+                        ...docForm,
+                        category: val,
+                        categoryLabel: cat?.label || "Lainnya",
+                      });
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  >
+                    {DOCUMENT_CATEGORIES.map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-800 mb-1.5">
+                    Tahun Terbit / Edisi
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: 2024"
+                    value={docForm.publishedYear || ""}
+                    onChange={(e) => setDocForm({ ...docForm, publishedYear: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-800 mb-1.5">
+                  Penulis / Penerbit *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Majelis Tarjih dan Tajdid PP Muhammadiyah"
+                  value={docForm.author}
+                  onChange={(e) => setDocForm({ ...docForm, author: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-800 mb-1.5">
+                  Deskripsi / Ringkasan Dokumen *
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  placeholder="Jelaskan secara singkat isi dan kegunaan dokumen ini bagi jamaah..."
+                  value={docForm.description}
+                  onChange={(e) => setDocForm({ ...docForm, description: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-800 mb-1.5">
+                  Berkas Dokumen PDF *
+                </label>
+                <div className="space-y-2">
+                  <input
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onChange={handleDocFileUpload}
+                    disabled={uploadingDocFile}
+                    className="w-full text-xs text-stone-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 cursor-pointer"
+                  />
+                  {uploadingDocFile && (
+                    <p className="text-xs text-blue-600 font-semibold animate-pulse">
+                      Mengunggah berkas PDF ke server...
+                    </p>
+                  )}
+                  {docForm.fileUrl ? (
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-stone-50 border border-stone-200 text-xs">
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <FileText className="w-4 h-4 text-red-600 shrink-0" />
+                        <span className="font-semibold text-stone-800 truncate">
+                          {docForm.fileName || docForm.fileUrl}
+                        </span>
+                        <span className="text-stone-400 text-[11px] shrink-0">
+                          ({docForm.fileSize || "PDF"})
+                        </span>
+                      </div>
+                      <a
+                        href={docForm.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#003B73] hover:underline shrink-0 text-xs font-semibold ml-2 inline-flex items-center gap-1"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Buka</span>
+                      </a>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-amber-700 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                      Silakan unggah berkas PDF baru atau isi URL berkas jika sudah tersedia di server.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setIsDocModalOpen(false)}
+                  className="px-5 py-2 rounded-full bg-stone-100 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingDoc || uploadingDocFile}
+                  className="px-6 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  {savingDoc ? "Menyimpan..." : editingDocId ? "Simpan Perubahan" : "Tambahkan Dokumen"}
                 </button>
               </div>
             </form>

@@ -192,3 +192,28 @@ export interface MosqueFeedback {
   respondedBy?: string;
   createdAt: string;
 }
+
+export type DocumentCategory =
+  | "TARJIH_FIQIH"
+  | "IDEOLOGI"
+  | "KEMUHAMMADIYAHAN"
+  | "DOKUMEN_MUKTAMAR"
+  | "PANDUAN_MASJID"
+  | "UMUM";
+
+export interface DownloadDocument {
+  id: string;
+  title: string;
+  category: DocumentCategory;
+  categoryLabel?: string;
+  description: string;
+  author: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize?: string;
+  fileFormat: string;
+  downloadCount: number;
+  publishedYear?: string;
+  createdAt: string;
+  updatedAt?: string;
+}

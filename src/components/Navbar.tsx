@@ -7,10 +7,14 @@ import { usePathname } from "next/navigation";
 import {
   Menu,
   X,
+  ChevronDown,
+  Building2,
+  BookOpen,
 } from "lucide-react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [layananDropdownOpen, setLayananDropdownOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const pathname = usePathname();
 
@@ -27,12 +31,12 @@ export default function Navbar() {
       .catch(() => setUser(null));
   }, [pathname]);
 
-  const navLinks = [
+  const navLinks: Array<{ href: string; label: string; isDropdown?: boolean }> = [
     { href: "/", label: "Beranda" },
     { href: "/sejarah", label: "Sejarah" },
     { href: "/ibadah", label: "Ruang Ibadah" },
     { href: "/jadwal", label: "Jadwal Shalat" },
-    { href: "/layanan", label: "Layanan" },
+    { href: "/layanan", label: "Layanan", isDropdown: true },
     { href: "/donasi", label: "Infaq Digital" },
   ];
 
@@ -65,6 +69,84 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1 lg:space-x-3">
             {navLinks.map((link) => {
+              if (link.isDropdown) {
+                const isLayananActive = pathname.startsWith("/layanan");
+                return (
+                  <div
+                    key="layanan-dropdown"
+                    className="relative"
+                    onMouseEnter={() => setLayananDropdownOpen(true)}
+                    onMouseLeave={() => setLayananDropdownOpen(false)}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setLayananDropdownOpen(!layananDropdownOpen)}
+                      className={`px-3.5 py-2 rounded-full text-sm font-medium transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${
+                        isLayananActive
+                          ? "text-[#003B73] font-semibold bg-[#003B73]/10"
+                          : "text-stone-600 hover:text-[#003B73] hover:bg-stone-100/60"
+                      }`}
+                    >
+                      <span>Layanan</span>
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          layananDropdownOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {/* Dropdown Menu Box */}
+                    {layananDropdownOpen && (
+                      <div className="absolute top-full left-0 mt-1 w-72 rounded-2xl bg-white border border-stone-200/90 shadow-2xl p-2 z-50 animate-fade-in space-y-1">
+                        <Link
+                          href="/layanan"
+                          onClick={() => setLayananDropdownOpen(false)}
+                          className={`p-2.5 rounded-xl flex items-start gap-3 transition-colors ${
+                            pathname === "/layanan"
+                              ? "bg-stone-100 text-[#003B73]"
+                              : "hover:bg-stone-50 text-stone-800"
+                          }`}
+                        >
+                          <div className="p-2 rounded-lg bg-[#003B73]/10 text-[#003B73] shrink-0 mt-0.5">
+                            <Building2 className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold leading-tight">
+                              Formulir Peminjaman
+                            </div>
+                            <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
+                              Peminjaman aula, ruang serbaguna, dan fasilitas masjid
+                            </div>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/layanan/unduhan"
+                          onClick={() => setLayananDropdownOpen(false)}
+                          className={`p-2.5 rounded-xl flex items-start gap-3 transition-colors ${
+                            pathname === "/layanan/unduhan"
+                              ? "bg-stone-100 text-[#003B73]"
+                              : "hover:bg-stone-50 text-stone-800"
+                          }`}
+                        >
+                          <div className="p-2 rounded-lg bg-amber-500/10 text-amber-800 shrink-0 mt-0.5">
+                            <BookOpen className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold leading-tight">
+                              Pusat Unduhan Dokumen
+                            </div>
+                            <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
+                              E-Book HPT, PHIWM, Risalah Islam Berkemajuan, &amp; panduan
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
               const isActive = pathname === link.href;
               return (
                 <Link
@@ -105,7 +187,7 @@ export default function Navbar() {
           <div className="flex md:hidden items-center gap-2">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-xl text-stone-700 hover:text-stone-900 hover:bg-stone-200/50 focus:outline-none"
+              className="p-2 rounded-xl text-stone-700 hover:text-stone-900 hover:bg-stone-200/50 focus:outline-none cursor-pointer"
               aria-label="Toggle menu"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -117,23 +199,80 @@ export default function Navbar() {
       {/* Mobile Drawer */}
       {isOpen && (
         <div className="md:hidden border-b border-stone-200 bg-[#FAF8F5] px-4 pt-2 pb-6 space-y-2 shadow-lg">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                className={`flex items-center px-4 py-3 rounded-xl text-sm font-medium ${
-                  isActive
-                    ? "bg-[#003B73]/10 text-[#003B73] font-bold"
-                    : "text-stone-700 hover:bg-stone-100"
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
+          <Link
+            href="/"
+            onClick={() => setIsOpen(false)}
+            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium ${
+              pathname === "/" ? "bg-[#003B73]/10 text-[#003B73] font-bold" : "text-stone-700 hover:bg-stone-100"
+            }`}
+          >
+            Beranda
+          </Link>
+          <Link
+            href="/sejarah"
+            onClick={() => setIsOpen(false)}
+            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium ${
+              pathname === "/sejarah" ? "bg-[#003B73]/10 text-[#003B73] font-bold" : "text-stone-700 hover:bg-stone-100"
+            }`}
+          >
+            Sejarah
+          </Link>
+          <Link
+            href="/ibadah"
+            onClick={() => setIsOpen(false)}
+            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium ${
+              pathname === "/ibadah" ? "bg-[#003B73]/10 text-[#003B73] font-bold" : "text-stone-700 hover:bg-stone-100"
+            }`}
+          >
+            Ruang Ibadah
+          </Link>
+          <Link
+            href="/jadwal"
+            onClick={() => setIsOpen(false)}
+            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium ${
+              pathname === "/jadwal" ? "bg-[#003B73]/10 text-[#003B73] font-bold" : "text-stone-700 hover:bg-stone-100"
+            }`}
+          >
+            Jadwal Shalat
+          </Link>
+
+          {/* Layanan Group in Mobile */}
+          <div className="p-2.5 rounded-2xl bg-stone-100 border border-stone-200 space-y-1">
+            <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block px-2 py-0.5">
+              Layanan Masjid
+            </span>
+            <Link
+              href="/layanan"
+              onClick={() => setIsOpen(false)}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold ${
+                pathname === "/layanan" ? "bg-[#003B73] text-white" : "text-stone-800 hover:bg-white"
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Formulir Peminjaman Fasilitas</span>
+            </Link>
+            <Link
+              href="/layanan/unduhan"
+              onClick={() => setIsOpen(false)}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold ${
+                pathname === "/layanan/unduhan" ? "bg-[#003B73] text-white" : "text-stone-800 hover:bg-white"
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Pusat Unduhan Dokumen &amp; E-Book</span>
+            </Link>
+          </div>
+
+          <Link
+            href="/donasi"
+            onClick={() => setIsOpen(false)}
+            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium ${
+              pathname === "/donasi" ? "bg-[#003B73]/10 text-[#003B73] font-bold" : "text-stone-700 hover:bg-stone-100"
+            }`}
+          >
+            Infaq Digital
+          </Link>
+
           <div className="pt-3 border-t border-stone-200">
             {user ? (
               <Link
