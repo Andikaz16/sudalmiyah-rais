@@ -2,7 +2,16 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { ShieldCheck, ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import {
+  ShieldCheck,
+  ChevronLeft,
+  ChevronRight,
+  Quote,
+  Share2,
+  Copy,
+  Check,
+  X,
+} from "lucide-react";
 import { QrisSettings } from "@/lib/types";
 
 interface InfaqHadith {
@@ -156,6 +165,97 @@ export default function DonationSection() {
 
   const currentHadith = INFAQ_HADITHS[currentHadithIndex];
 
+  // Share Modal State
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [selectedHadithId, setSelectedHadithId] = useState<number>(1);
+  const [customShareText, setCustomShareText] = useState<string>("");
+  const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+
+  const formatHadithShareText = (hadith: InfaqHadith) => {
+    return `MUTIARA HADITS: ${hadith.theme}
+
+${hadith.arabic}
+
+"${hadith.translation}"
+
+(${hadith.source} — ${hadith.fadhilah})
+
+Disiarkan oleh Masjid Sudalmiyah Rais - Universitas Muhammadiyah Surakarta
+Infaq Digital: https://masjidsudalmiyah.ums.ac.id/#donasi`;
+  };
+
+  const handleOpenShare = (hadithIndex?: number) => {
+    const targetIdx = typeof hadithIndex === "number" ? hadithIndex : currentHadithIndex;
+    const targetHadith = INFAQ_HADITHS[targetIdx] || INFAQ_HADITHS[0];
+    setSelectedHadithId(targetHadith.id);
+    setCustomShareText(formatHadithShareText(targetHadith));
+    setIsShareModalOpen(true);
+    setIsHadithPaused(true);
+  };
+
+  const handleHadithSelectChange = (newId: number) => {
+    setSelectedHadithId(newId);
+    const targetHadith = INFAQ_HADITHS.find((h) => h.id === newId) || INFAQ_HADITHS[0];
+    setCustomShareText(formatHadithShareText(targetHadith));
+  };
+
+  const handleResetText = () => {
+    const targetHadith = INFAQ_HADITHS.find((h) => h.id === selectedHadithId) || INFAQ_HADITHS[0];
+    setCustomShareText(formatHadithShareText(targetHadith));
+  };
+
+  const handleCopyText = async (platformName?: string) => {
+    try {
+      await navigator.clipboard.writeText(customShareText);
+      const msg = platformName
+        ? `Teks hadits disalin! Silakan tempel pada ${platformName}.`
+        : "Teks hadits berhasil disalin ke clipboard!";
+      setCopyFeedback(msg);
+      setTimeout(() => setCopyFeedback(null), 3500);
+    } catch {
+      setCopyFeedback("Gagal menyalin teks.");
+      setTimeout(() => setCopyFeedback(null), 3000);
+    }
+  };
+
+  const handleShareWA = () => {
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(customShareText)}`;
+    window.open(url, "_blank");
+  };
+
+  const handleShareFB = () => {
+    const pageUrl = typeof window !== "undefined" ? window.location.href : "https://masjidsudalmiyah.ums.ac.id/#donasi";
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}&quote=${encodeURIComponent(customShareText)}`;
+    window.open(url, "_blank");
+  };
+
+  const handleShareIG = async () => {
+    await handleCopyText("Instagram Story / Feed");
+    window.open("https://www.instagram.com/", "_blank");
+  };
+
+  const handleShareTikTok = async () => {
+    await handleCopyText("TikTok Caption / Video");
+    window.open("https://www.tiktok.com/", "_blank");
+  };
+
+  const handleNativeShare = async () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        const targetHadith = INFAQ_HADITHS.find((h) => h.id === selectedHadithId) || INFAQ_HADITHS[0];
+        await navigator.share({
+          title: `Mutiara Hadits: ${targetHadith.theme}`,
+          text: customShareText,
+          url: typeof window !== "undefined" ? window.location.href : undefined,
+        });
+      } catch {
+        // User cancelled or aborted
+      }
+    } else {
+      handleCopyText();
+    }
+  };
+
   return (
     <section id="donasi" className="py-12 sm:py-16 bg-[#FAF8F5] text-stone-900 border-t border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -195,6 +295,14 @@ export default function DonationSection() {
             </div>
 
             <div className="flex items-center gap-2 text-xs font-mono text-amber-300/90">
+              <button
+                onClick={() => handleOpenShare(currentHadithIndex)}
+                className="px-3 py-1 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 border border-amber-400/40 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Bagikan Mutiara Hadits Ini"
+              >
+                <Share2 className="w-3.5 h-3.5 text-amber-300" />
+                <span className="hidden sm:inline">Bagikan</span>
+              </button>
               <span className="px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15">
                 {currentHadithIndex + 1} / {INFAQ_HADITHS.length}
               </span>
@@ -224,37 +332,32 @@ export default function DonationSection() {
             </div>
           </div>
 
-          {/* Navigation Controls: Arrows and Dots */}
+          {/* Navigation Controls: Arrows and Share Button */}
           <div className="flex items-center justify-between pt-6 border-t border-white/10 mt-5">
             <button
               onClick={prevHadith}
               aria-label="Hadits Sebelumnya"
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+              className="p-2 sm:px-3.5 sm:py-2 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
             >
               <ChevronLeft className="w-5 h-5" />
+              <span className="hidden sm:inline">Sebelumnya</span>
             </button>
 
-            {/* 8 Dots Pagination */}
-            <div className="flex items-center gap-1.5">
-              {INFAQ_HADITHS.map((h, idx) => (
-                <button
-                  key={h.id}
-                  onClick={() => setCurrentHadithIndex(idx)}
-                  aria-label={`Pindah ke hadits ${idx + 1}`}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                    idx === currentHadithIndex
-                      ? "w-7 bg-gradient-to-r from-amber-300 to-amber-400 shadow-sm"
-                      : "w-2 bg-white/30 hover:bg-white/60"
-                  }`}
-                />
-              ))}
-            </div>
+            {/* Bagikan Mutiara Hadits Button */}
+            <button
+              onClick={() => handleOpenShare(currentHadithIndex)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 active:scale-95 text-stone-950 text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
+            >
+              <Share2 className="w-4 h-4 text-stone-950" />
+              <span>Bagikan Mutiara Hadits</span>
+            </button>
 
             <button
               onClick={nextHadith}
               aria-label="Hadits Berikutnya"
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+              className="p-2 sm:px-3.5 sm:py-2 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
             >
+              <span className="hidden sm:inline">Berikutnya</span>
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -403,8 +506,163 @@ export default function DonationSection() {
 
           </div>
         </div>
-
       </div>
+
+      {/* Share Mutiara Hadits Modal Dialog */}
+      {isShareModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-lg bg-white rounded-3xl border border-stone-200 shadow-2xl p-6 sm:p-7 overflow-hidden text-stone-900">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-4 border-b border-stone-100">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-stone-900 font-serif">
+                  Bagikan Mutiara Hadits
+                </h3>
+                <p className="text-xs text-stone-500 mt-0.5">
+                  Pilih kata-kata atau sesuaikan pesan sebelum dibagikan ke media sosial
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsShareModalOpen(false)}
+                className="p-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 transition-colors cursor-pointer"
+                aria-label="Tutup"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="py-4 space-y-4">
+              {/* Dropdown to pick which Hadith */}
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  Pilih Mutiara Hadits yang Ingin Dibagikan:
+                </label>
+                <select
+                  value={selectedHadithId}
+                  onChange={(e) => handleHadithSelectChange(Number(e.target.value))}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-stone-300 text-xs font-medium text-stone-900 focus:outline-hidden focus:ring-2 focus:ring-[#003B73]/20"
+                >
+                  {INFAQ_HADITHS.map((h) => (
+                    <option key={h.id} value={h.id}>
+                      {h.id}. {h.theme} ({h.source})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Editable Textarea for Custom Text */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-stone-700">
+                    Teks Pesan / Kata-Kata Hadits:
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleResetText}
+                    className="text-[11px] text-[#003B73] hover:underline font-semibold cursor-pointer"
+                  >
+                    Reset ke Teks Asli
+                  </button>
+                </div>
+                <textarea
+                  rows={6}
+                  value={customShareText}
+                  onChange={(e) => setCustomShareText(e.target.value)}
+                  className="w-full p-3.5 rounded-2xl bg-[#FAF8F5] border border-stone-200 text-xs text-stone-800 leading-relaxed font-sans focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#003B73]/20"
+                  placeholder="Tulis atau sesuaikan kata-kata yang ingin dibagikan..."
+                />
+              </div>
+
+              {/* Toast / Feedback Notice */}
+              {copyFeedback && (
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{copyFeedback}</span>
+                </div>
+              )}
+
+              {/* Share Buttons Grid */}
+              <div>
+                <span className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2.5">
+                  Pilih Media Sosial Tujuan:
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {/* WhatsApp */}
+                  <button
+                    type="button"
+                    onClick={handleShareWA}
+                    className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                    </svg>
+                    <span>WhatsApp</span>
+                  </button>
+
+                  {/* Instagram */}
+                  <button
+                    type="button"
+                    onClick={handleShareIG}
+                    className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] hover:opacity-90 text-white text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    <span>Instagram</span>
+                  </button>
+
+                  {/* Facebook */}
+                  <button
+                    type="button"
+                    onClick={handleShareFB}
+                    className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <span>Facebook</span>
+                  </button>
+
+                  {/* TikTok */}
+                  <button
+                    type="button"
+                    onClick={handleShareTikTok}
+                    className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl bg-black hover:bg-stone-800 text-white text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
+                      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.99v9.19c.02 1.48-.41 2.97-1.25 4.19-1.07 1.56-2.77 2.61-4.64 2.89-1.87.28-3.82-.18-5.35-1.28-1.53-1.1-2.55-2.79-2.79-4.7-.24-1.91.27-3.85 1.42-5.35 1.15-1.5 2.87-2.48 4.74-2.69.45-.05.9-.04 1.35.03v4.06c-.49-.15-1.02-.17-1.52-.06-.82.17-1.54.72-1.91 1.46-.37.74-.35 1.63.05 2.36.4.73 1.15 1.22 1.98 1.29.83.07 1.65-.29 2.17-.95.42-.53.62-1.2.6-1.89V.02h.67z"/>
+                    </svg>
+                    <span>TikTok</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Copy & Native Share Row */}
+              <div className="pt-2 flex flex-col sm:flex-row gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleCopyText()}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                >
+                  <Copy className="w-4 h-4 text-stone-600" />
+                  <span>Salin Teks Hadits</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleNativeShare}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
+                >
+                  <Share2 className="w-4 h-4 text-white" />
+                  <span>Bagikan Menu HP</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
