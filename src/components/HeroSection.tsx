@@ -178,22 +178,6 @@ export default function HeroSection() {
             Salurkan Infaq Digital
           </Link>
         </div>
-
-        {/* Slide Indicators for 6 Campus Mosques */}
-        <div className="mt-7 flex items-center justify-center gap-2">
-          {HERO_SLIDES.map((slide, idx) => (
-            <button
-              key={slide.id}
-              onClick={() => setCurrentSlide(idx)}
-              aria-label={`Pindah ke ${slide.mosqueName}`}
-              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                idx === currentSlide
-                  ? "w-8 bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.8)]"
-                  : "w-2.5 bg-white/40 hover:bg-white/70"
-              }`}
-            />
-          ))}
-        </div>
       </div>
 
       {/* Smooth Concave Dome Arch Bottom Divider into #FAF8F5 (Clean Minimalist Signature Curve) */}
