@@ -137,6 +137,7 @@ export default function AdminDashboardPage() {
 
   // Pop-up Banner State
   const [popupBanner, setPopupBanner] = useState<PopupBanner | null>(null);
+  const [popupBanners, setPopupBanners] = useState<PopupBanner[]>([]);
   const [uploadingPopup, setUploadingPopup] = useState(false);
   const [savingPopup, setSavingPopup] = useState(false);
   const [popupTargetUrl, setPopupTargetUrl] = useState("");
@@ -206,25 +207,34 @@ export default function AdminDashboardPage() {
       if (popupRes.ok) {
         const popupJson = await popupRes.json();
         let resolvedPopup: PopupBanner | null = popupJson.popup || null;
+        let resolvedList: PopupBanner[] = Array.isArray(popupJson.popups)
+          ? popupJson.popups
+          : popupJson.popup
+          ? [popupJson.popup]
+          : [];
+
         try {
           const rawCache = localStorage.getItem("sudalmiyah_popup_cache");
           if (rawCache) {
             const parsedCache = JSON.parse(rawCache) as {
-              popup: PopupBanner | null;
+              popup?: PopupBanner | null;
+              popups?: PopupBanner[];
               updatedAt: string;
             };
-            if (resolvedPopup && parsedCache.updatedAt) {
-              if (new Date(parsedCache.updatedAt).getTime() >= new Date(resolvedPopup.updatedAt).getTime()) {
-                resolvedPopup = parsedCache.popup;
-              }
-            } else if (!resolvedPopup && parsedCache.popup) {
+            if (Array.isArray(parsedCache.popups) && parsedCache.popups.length > 0) {
+              resolvedList = parsedCache.popups;
+              resolvedPopup = resolvedList[0] || null;
+            } else if (parsedCache.popup) {
               resolvedPopup = parsedCache.popup;
+              resolvedList = [parsedCache.popup];
             }
           }
         } catch {
           // ignore storage errors
         }
+
         setPopupBanner(resolvedPopup);
+        setPopupBanners(resolvedList);
         if (resolvedPopup) {
           setPopupTargetUrl(resolvedPopup.targetUrl || "");
           setPopupTitle(resolvedPopup.title || "");
@@ -553,13 +563,15 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const syncPopupLocalCache = (popup: PopupBanner | null) => {
+  const syncPopupLocalCache = (popup: PopupBanner | null, list?: PopupBanner[]) => {
     try {
+      const fullList = list !== undefined ? list : popup ? [popup] : [];
       localStorage.setItem(
         "sudalmiyah_popup_cache",
         JSON.stringify({
           popup,
-          updatedAt: popup?.updatedAt || new Date().toISOString(),
+          popups: fullList,
+          updatedAt: new Date().toISOString(),
         })
       );
       sessionStorage.removeItem("sudalmiyah_popup_dismissed");
@@ -568,8 +580,11 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Upload popup banner image
-  const handlePopupUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload popup banner image (supports adding or replacing)
+  const handlePopupUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    replaceId?: string
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -578,8 +593,8 @@ export default function AdminDashboardPage() {
     try {
       const fd = new FormData();
       fd.append("file", file);
-      if (popupBanner?.id) {
-        fd.append("replaceId", popupBanner.id);
+      if (replaceId) {
+        fd.append("replaceId", replaceId);
       }
       if (popupTargetUrl.trim()) {
         fd.append("targetUrl", popupTargetUrl.trim());
@@ -592,10 +607,15 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal mengunggah pop-up banner.");
 
-      setPopupBanner(data.popup);
-      setPopupTargetUrl(data.popup.targetUrl || "");
-      setPopupTitle(data.popup.title || "");
-      syncPopupLocalCache(data.popup);
+      const updatedList: PopupBanner[] = Array.isArray(data.popups)
+        ? data.popups
+        : data.popup
+        ? [data.popup]
+        : [];
+      setPopupBanner(data.popup || updatedList[0] || null);
+      setPopupBanners(updatedList);
+      setPopupTargetUrl(data.popup?.targetUrl || "");
+      syncPopupLocalCache(data.popup || updatedList[0] || null, updatedList);
       setPopupSaveSuccess(true);
       setTimeout(() => setPopupSaveSuccess(false), 3000);
     } catch (err: any) {
@@ -607,42 +627,66 @@ export default function AdminDashboardPage() {
   };
 
   // Toggle active status of popup banner
-  const handleTogglePopupActive = async () => {
-    if (!popupBanner) return;
+  const handleTogglePopupActive = async (id?: string) => {
+    const targetId = id || popupBanner?.id;
+    if (!targetId) return;
+    const target = popupBanners.find((p) => p.id === targetId) || popupBanner;
+    if (!target) return;
+
     try {
       const res = await fetch("/api/popup", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: !popupBanner.isActive }),
+        body: JSON.stringify({ id: targetId, isActive: !target.isActive }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal mengubah status tayang.");
-      setPopupBanner(data.popup);
-      syncPopupLocalCache(data.popup);
+      const updatedList: PopupBanner[] = Array.isArray(data.popups)
+        ? data.popups
+        : data.popup
+        ? [data.popup]
+        : [];
+      const primary = updatedList[0] || null;
+      setPopupBanner(primary);
+      setPopupBanners(updatedList);
+      syncPopupLocalCache(primary, updatedList);
     } catch (err: any) {
       alert(err.message || "Gagal mengubah status pop-up banner.");
     }
   };
 
-  // Save popup settings (title, optional targetUrl)
-  const handleSavePopupSettings = async (e: React.FormEvent) => {
+  // Save popup settings (optional targetUrl)
+  const handleSavePopupSettings = async (
+    e: React.FormEvent,
+    id?: string,
+    customUrl?: string
+  ) => {
     e.preventDefault();
-    if (!popupBanner) return;
+    const targetId = id || popupBanner?.id;
+    if (!targetId) return;
     setSavingPopup(true);
     setPopupSaveSuccess(false);
     try {
+      const urlToSave = customUrl !== undefined ? customUrl : popupTargetUrl;
       const res = await fetch("/api/popup", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: popupTitle.trim(),
-          targetUrl: popupTargetUrl.trim(),
+          id: targetId,
+          targetUrl: urlToSave.trim(),
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan pengaturan.");
-      setPopupBanner(data.popup);
-      syncPopupLocalCache(data.popup);
+      const updatedList: PopupBanner[] = Array.isArray(data.popups)
+        ? data.popups
+        : data.popup
+        ? [data.popup]
+        : [];
+      const primary = updatedList[0] || null;
+      setPopupBanner(primary);
+      setPopupBanners(updatedList);
+      syncPopupLocalCache(primary, updatedList);
       setPopupSaveSuccess(true);
       setTimeout(() => setPopupSaveSuccess(false), 3000);
     } catch (err: any) {
@@ -653,20 +697,27 @@ export default function AdminDashboardPage() {
   };
 
   // Delete popup banner
-  const handleDeletePopup = async () => {
-    if (!confirm("Hapus pop-up banner ini? Tidak akan ada pop-up pengumuman yang muncul di beranda pengunjung.")) {
+  const handleDeletePopup = async (id?: string) => {
+    if (!confirm("Hapus pop-up banner ini?")) {
       return;
     }
     try {
-      const res = await fetch("/api/popup", {
+      const url = id ? `/api/popup?id=${encodeURIComponent(id)}` : "/api/popup";
+      const res = await fetch(url, {
         method: "DELETE",
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal menghapus pop-up.");
-      setPopupBanner(null);
-      setPopupTargetUrl("");
-      setPopupTitle("");
-      syncPopupLocalCache(null);
+      const updatedList: PopupBanner[] = Array.isArray(data.popups)
+        ? data.popups
+        : data.popup
+        ? [data.popup]
+        : [];
+      const primary = updatedList[0] || null;
+      setPopupBanner(primary);
+      setPopupBanners(updatedList);
+      setPopupTargetUrl(primary?.targetUrl || "");
+      syncPopupLocalCache(primary, updatedList);
       alert("Pop-up banner berhasil dihapus.");
     } catch (err: any) {
       alert(err.message || "Gagal menghapus pop-up banner.");
@@ -1959,7 +2010,7 @@ export default function AdminDashboardPage() {
                 <div className="flex items-center gap-2 self-start sm:self-auto">
                   <button
                     type="button"
-                    onClick={handleTogglePopupActive}
+                    onClick={() => handleTogglePopupActive()}
                     className={`px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer ${
                       popupBanner.isActive
                         ? "bg-emerald-600 hover:bg-emerald-700 text-white"
@@ -1972,7 +2023,7 @@ export default function AdminDashboardPage() {
 
                   <button
                     type="button"
-                    onClick={handleDeletePopup}
+                    onClick={() => handleDeletePopup()}
                     className="px-3.5 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -2028,117 +2079,126 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* Right Column: Active Banner Preview & Settings */}
-              <div className="lg:col-span-7 space-y-4">
-                {popupBanner ? (
-                  <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-sm space-y-5">
-                    <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-                      <div>
-                        <h3 className="text-sm font-bold text-stone-900 font-serif">
-                          Pratinjau &amp; Pengaturan Pop-up Aktif
-                        </h3>
-                        <p className="text-[11px] text-stone-400">
-                          Diperbarui pada {new Date(popupBanner.updatedAt).toLocaleString("id-ID")}
-                        </p>
-                      </div>
+              {/* Right Column: Active Banners Preview & Settings */}
+              <div className="lg:col-span-7 space-y-6">
+                {popupBanners.length > 0 ? (
+                  popupBanners.map((item, idx) => (
+                    <div
+                      key={item.id}
+                      className="p-6 rounded-3xl bg-white border border-stone-200 shadow-sm space-y-5"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-[#003B73] text-white flex items-center justify-center text-xs font-bold font-mono">
+                            {idx + 1}
+                          </span>
+                          <div>
+                            <h3 className="text-sm font-bold text-stone-900 font-serif">
+                              Pop-up #{idx + 1}{" "}
+                              <span className="text-xs font-normal text-stone-500">
+                                {idx === 0
+                                  ? "(Tampil Paling Depan)"
+                                  : "(Lapisan Kedua - Tampil Setelah Pop-up 1 Ditutup)"}
+                              </span>
+                            </h3>
+                            <p className="text-[11px] text-stone-400">
+                              Diperbarui pada {new Date(item.updatedAt).toLocaleString("id-ID")}
+                            </p>
+                          </div>
+                        </div>
 
-                      <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${
-                        popupBanner.isActive
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-stone-100 text-stone-600"
-                      }`}>
-                        {popupBanner.isActive ? "Tayang di Beranda" : "Tidak Ditampilkan"}
-                      </span>
-                    </div>
-
-                    {/* Banner Image Preview Container */}
-                    <div className="relative rounded-2xl overflow-hidden bg-stone-900/10 border border-stone-200 shadow-inner flex items-center justify-center p-4">
-                      <div className="relative inline-block rounded-2xl overflow-hidden shadow-xl bg-white">
-                        <span className="absolute top-2 right-2 z-10 w-6 h-6 bg-white/95 text-stone-800 border border-stone-400 flex items-center justify-center text-xs font-bold shadow-xs">
-                          &times;
-                        </span>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={popupBanner.imageUrl}
-                          alt="Poster Pop-up"
-                          className="block w-auto h-auto max-h-72 object-contain"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Settings Form for Optional Target Link */}
-                    <form onSubmit={handleSavePopupSettings} className="space-y-4 pt-2 border-t border-stone-100">
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-700 mb-1">
-                          Tautan / URL Tujuan Saat Pop-up Diklik Pengunjung <span className="text-stone-400 font-normal">(Opsional / Tidak Wajib)</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={popupTargetUrl}
-                          onChange={(e) => setPopupTargetUrl(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono focus:ring-2 focus:ring-[#003B73]"
-                          placeholder="Kosongkan jika tanpa URL, atau isi contoh: /agenda atau https://..."
-                        />
-                        <p className="text-[11px] text-stone-500 mt-1">
-                          Jika dikosongkan, pop-up hanya menampilkan gambar poster tanpa mengarahkan pengunjung ke halaman lain.
-                        </p>
-                        <div className="flex flex-wrap gap-1.5 mt-2">
-                          <span className="text-[10px] text-stone-400 self-center">Pilihan Cepat:</span>
+                        <div className="flex items-center gap-2 self-start sm:self-auto">
                           <button
                             type="button"
-                            onClick={() => setPopupTargetUrl("")}
-                            className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-colors cursor-pointer ${
-                              !popupTargetUrl.trim()
-                                ? "bg-[#003B73] text-white"
-                                : "bg-stone-100 hover:bg-stone-200 text-stone-700"
+                            onClick={() => handleTogglePopupActive(item.id)}
+                            className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
+                              item.isActive
+                                ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
+                                : "bg-stone-200 text-stone-600 hover:bg-stone-300"
                             }`}
                           >
-                            Tanpa Tautan (Kosongkan)
-                          </button>
-                          {[
-                            { label: "Agenda & Kajian", url: "/agenda" },
-                            { label: "Infaq & Donasi", url: "/donasi" },
-                            { label: "Jadwal Shalat", url: "/jadwal" },
-                            { label: "Tanya Tarjih", url: "/ibadah" },
-                            { label: "Layanan Fasilitas", url: "/layanan" },
-                            { label: "Pusat Unduhan", url: "/layanan/unduhan" },
-                            { label: "Sejarah Masjid", url: "/sejarah" },
-                          ].map((quick) => (
-                            <button
-                              key={quick.url}
-                              type="button"
-                              onClick={() => setPopupTargetUrl(quick.url)}
-                              className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-colors cursor-pointer ${
-                                popupTargetUrl.trim() === quick.url
-                                  ? "bg-[#003B73] text-white"
-                                  : "bg-stone-100 hover:bg-stone-200 text-stone-700"
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                item.isActive ? "bg-emerald-600 animate-pulse" : "bg-stone-400"
                               }`}
-                            >
-                              {quick.label}
-                            </button>
-                          ))}
+                            />
+                            <span>{item.isActive ? "Tayang di Beranda" : "Dinonaktifkan"}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeletePopup(item.id)}
+                            className="p-1.5 rounded-full hover:bg-rose-50 text-rose-600 transition-colors cursor-pointer"
+                            title="Hapus Pop-up ini"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2">
-                        {popupSaveSuccess && (
-                          <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                            <CheckCircle2 className="w-4 h-4" />
-                            <span>Pop-up tersimpan &amp; siap tampil di beranda!</span>
+                      {/* Banner Image Preview Container */}
+                      <div className="relative rounded-2xl overflow-hidden bg-stone-900/10 border border-stone-200 shadow-inner flex items-center justify-center p-4">
+                        <div className="relative inline-block rounded-2xl overflow-hidden shadow-xl bg-white border border-stone-200">
+                          <span className="absolute top-2 right-2 z-10 w-6 h-6 bg-white/95 text-stone-900 border border-stone-800 flex items-center justify-center text-xs font-bold shadow-xs rounded-sm">
+                            &times;
                           </span>
-                        )}
-                        <div className="ml-auto">
-                          <button
-                            type="submit"
-                            disabled={savingPopup}
-                            className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md disabled:opacity-50 cursor-pointer"
-                          >
-                            {savingPopup ? "Menyimpan..." : "Simpan Pengaturan Pop-up"}
-                          </button>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={item.imageUrl}
+                            alt={`Poster Pop-up #${idx + 1}`}
+                            className="block w-auto h-auto max-h-72 object-contain"
+                          />
                         </div>
                       </div>
-                    </form>
-                  </div>
+
+                      {/* Settings Form for Optional Target Link */}
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          const inputEl = e.currentTarget.elements.namedItem(
+                            `url-${item.id}`
+                          ) as HTMLInputElement;
+                          handleSavePopupSettings(e, item.id, inputEl?.value || "");
+                        }}
+                        className="space-y-3 pt-2 border-t border-stone-100"
+                      >
+                        <div>
+                          <label className="block text-xs font-semibold text-stone-700 mb-1">
+                            Tautan / URL Tujuan Saat Pop-up #{idx + 1} Diklik{" "}
+                            <span className="text-stone-400 font-normal">(Opsional / Tidak Wajib)</span>
+                          </label>
+                          <input
+                            type="text"
+                            name={`url-${item.id}`}
+                            defaultValue={item.targetUrl || ""}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono focus:ring-2 focus:ring-[#003B73]"
+                            placeholder="Kosongkan jika tanpa URL, atau isi contoh: https://whatsapp.com/... atau /agenda"
+                          />
+                          <p className="text-[11px] text-stone-500 mt-1">
+                            Jika dikosongkan, pop-up hanya berupa gambar poster tanpa link pengalihan.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1">
+                          {popupSaveSuccess && (
+                            <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                              <CheckCircle2 className="w-4 h-4" />
+                              <span>Pengaturan tersimpan!</span>
+                            </span>
+                          )}
+                          <div className="ml-auto">
+                            <button
+                              type="submit"
+                              disabled={savingPopup}
+                              className="px-5 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md disabled:opacity-50 cursor-pointer"
+                            >
+                              {savingPopup ? "Menyimpan..." : "Simpan Tautan Pop-up"}
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  ))
                 ) : (
                   <div className="p-10 text-center rounded-3xl bg-white border border-stone-200 shadow-sm space-y-3">
                     <div className="w-14 h-14 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">

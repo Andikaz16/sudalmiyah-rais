@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { PopupBanner } from "@/lib/types";
@@ -8,95 +8,96 @@ import { PopupBanner } from "@/lib/types";
 export const POPUP_CACHE_KEY = "sudalmiyah_popup_cache";
 
 export default function AnnouncementPopup() {
-  const [popups, setPopups] = useState<PopupBanner[]>([]);
+  // Synchronous initialization from local cache for instant 0ms appearance
+  const [popups, setPopups] = useState<PopupBanner[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const rawCache = localStorage.getItem(POPUP_CACHE_KEY);
+      if (rawCache) {
+        const parsed = JSON.parse(rawCache);
+        if (Array.isArray(parsed.popups) && parsed.popups.length > 0) {
+          return parsed.popups.filter((p: PopupBanner) => p && p.isActive);
+        }
+        if (parsed.popup && parsed.popup.isActive) {
+          return [parsed.popup];
+        }
+      }
+    } catch {
+      // fallback
+    }
+    return [];
+  });
+
   const router = useRouter();
 
+  const handleCloseOne = useCallback((id: string) => {
+    setPopups((prev) => prev.filter((item) => item.id !== id));
+  }, []);
+
+  // Background fetch to sync with latest takmir updates
   useEffect(() => {
     const fetchPopups = async () => {
-      let serverPopups: PopupBanner[] = [];
-      let serverLatestTime = 0;
-
       try {
         const res = await fetch(`/api/popup?t=${Date.now()}`, {
           cache: "no-store",
         });
         if (res.ok) {
           const data = await res.json();
+          let serverList: PopupBanner[] = [];
           if (Array.isArray(data.popups) && data.popups.length > 0) {
-            serverPopups = data.popups.filter((p: PopupBanner) => p.isActive);
+            serverList = data.popups.filter((p: PopupBanner) => p.isActive);
           } else if (data.popup && data.popup.isActive) {
-            serverPopups = [data.popup];
+            serverList = [data.popup];
           }
-          if (serverPopups.length > 0) {
-            serverLatestTime = Math.max(
-              ...serverPopups.map((p) => new Date(p.updatedAt).getTime() || 0)
+
+          // Update local cache
+          try {
+            localStorage.setItem(
+              POPUP_CACHE_KEY,
+              JSON.stringify({
+                popup: serverList[0] || null,
+                popups: serverList,
+                updatedAt: new Date().toISOString(),
+              })
             );
+          } catch {
+            // ignore storage errors
           }
+
+          setPopups(serverList);
         }
       } catch (err) {
-        console.error("AnnouncementPopup fetch error:", err);
+        console.error("AnnouncementPopup sync error:", err);
       }
-
-      let resolvedPopups: PopupBanner[] = serverPopups;
-
-      // Sync with localStorage cache to guarantee immediate appearance even on serverless cold starts
-      try {
-        const rawCache = localStorage.getItem(POPUP_CACHE_KEY);
-        if (rawCache) {
-          const parsedCache = JSON.parse(rawCache) as {
-            popup?: PopupBanner | null;
-            popups?: PopupBanner[];
-            updatedAt: string;
-          };
-          const cacheTime = new Date(parsedCache.updatedAt || 0).getTime();
-          const cachedList = Array.isArray(parsedCache.popups)
-            ? parsedCache.popups.filter((p) => p && p.isActive)
-            : parsedCache.popup && parsedCache.popup.isActive
-            ? [parsedCache.popup]
-            : [];
-
-          if (serverPopups.length > 0 && parsedCache.updatedAt) {
-            if (cacheTime >= serverLatestTime) {
-              resolvedPopups = cachedList;
-            }
-          } else if (serverPopups.length === 0 && cachedList.length > 0) {
-            resolvedPopups = cachedList;
-          }
-        }
-      } catch {
-        // Ignore storage parse errors
-      }
-
-      setPopups(resolvedPopups);
     };
 
     fetchPopups();
   }, []);
 
-  const handleCloseOne = (id: string) => {
-    setPopups((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleBackdropClick = () => {
-    // Close the top-most popup when clicking the dark backdrop
-    if (popups.length > 0) {
-      handleCloseOne(popups[0].id);
-    }
-  };
+  // Listen to Escape key to close the front popup
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && popups.length > 0) {
+        handleCloseOne(popups[0].id);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [popups, handleCloseOne]);
 
   if (popups.length === 0) return null;
 
-  // Render popups stacked: index 0 is the front-most popup, subsequent items sit behind it
+  // Stacked display: popups[0] is front-most, subsequent items are in the background
   const stackedOrder = [...popups].reverse();
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 animate-fade-in"
+      onClick={() => handleCloseOne(popups[0].id)}
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-start pt-24 sm:pt-28 pb-8 px-4 bg-black/75 backdrop-blur-[2px] overflow-y-auto animate-fade-in"
     >
-      <div className="relative flex items-center justify-center w-full h-full pointer-events-none">
+      <div className="relative flex items-center justify-center w-full max-w-2xl my-auto pointer-events-none">
         {stackedOrder.map((item, idx) => {
           const isTop = idx === stackedOrder.length - 1;
           const cleanUrl = item.targetUrl?.trim() || "";
@@ -126,20 +127,21 @@ export default function AnnouncementPopup() {
             <div
               key={item.id}
               onClick={(e) => e.stopPropagation()}
-              className={`pointer-events-auto inline-block rounded-2xl overflow-hidden shadow-2xl bg-white transition-all duration-200 ${
+              className={`pointer-events-auto inline-block rounded-2xl overflow-hidden shadow-2xl bg-white transition-all duration-200 border-2 border-stone-200/90 ${
                 isTop
                   ? "relative z-20 opacity-100 scale-100"
                   : "absolute z-10 opacity-60 scale-[0.97]"
               }`}
             >
-              {/* Top-Right Close Button [X] matching LPPIK UMS style */}
+              {/* Close Button [X] clearly positioned and never covered by navbar */}
               <button
                 type="button"
                 onClick={() => handleCloseOne(item.id)}
                 aria-label="Tutup Pop-up"
-                className="absolute top-2.5 right-2.5 z-30 w-7 h-7 bg-white/95 hover:bg-white text-stone-800 border border-stone-400 flex items-center justify-center shadow-md transition-transform hover:scale-105 cursor-pointer"
+                className="absolute top-3 right-3 z-30 w-8 h-8 rounded-lg bg-white/95 hover:bg-white text-stone-900 border-2 border-stone-800 shadow-xl flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                title="Tutup (Esc)"
               >
-                <X className="w-4 h-4 stroke-[2.2]" />
+                <X className="w-5 h-5 stroke-[2.5]" />
               </button>
 
               {hasUrl ? (
@@ -152,7 +154,7 @@ export default function AnnouncementPopup() {
                   <img
                     src={item.imageUrl}
                     alt="Pengumuman Masjid"
-                    className="block w-auto h-auto max-w-[92vw] sm:max-w-xl md:max-w-2xl max-h-[85vh] object-contain select-none"
+                    className="block w-auto h-auto max-w-[90vw] sm:max-w-lg md:max-w-xl max-h-[72vh] sm:max-h-[75vh] object-contain select-none"
                   />
                 </a>
               ) : (
@@ -161,7 +163,7 @@ export default function AnnouncementPopup() {
                   <img
                     src={item.imageUrl}
                     alt="Pengumuman Masjid"
-                    className="block w-auto h-auto max-w-[92vw] sm:max-w-xl md:max-w-2xl max-h-[85vh] object-contain select-none"
+                    className="block w-auto h-auto max-w-[90vw] sm:max-w-lg md:max-w-xl max-h-[72vh] sm:max-h-[75vh] object-contain select-none"
                   />
                 </div>
               )}
