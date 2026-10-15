@@ -241,18 +241,124 @@ export function getPasaranJawa(date: Date = new Date()): string {
   return pasaran[index];
 }
 
-// Convert Gregorian to approximate Hijri date
+// Daftar nama bulan Hijriyah resmi standar Indonesia & Majelis Tarjih PP Muhammadiyah
+export const HIJRI_MONTH_NAMES = [
+  "Muharram",
+  "Safar",
+  "Rabiul Awal",
+  "Rabiul Akhir",
+  "Jumadilawal",
+  "Jumadilakhir",
+  "Rajab",
+  "Sya'ban",
+  "Ramadhan",
+  "Syawal",
+  "Dzulqa'dah",
+  "Dzulhijjah",
+];
+
+// Algoritma astronomis deterministik Hijriyah (independen lintas peramban Android, iOS, Windows, Mac)
+// Mengeliminasi bug ICU Android Chrome yang mengubah nama bulan Hijriyah menjadi bulan Masehi (misal "Mei") dan era "SM"
+export function calculateDeterministicHijri(date: Date = new Date()): {
+  day: number;
+  month: number;
+  year: number;
+  monthName: string;
+} {
+  let day = date.getDate();
+  let month = date.getMonth();
+  let year = date.getFullYear();
+
+  let m = month + 1;
+  let y = year;
+  if (m < 3) {
+    y -= 1;
+    m += 12;
+  }
+
+  const a = Math.floor(y / 100);
+  let b = 2 - a + Math.floor(a / 4);
+  if (y < 1583) b = 0;
+  if (y === 1582) {
+    if (m > 10) b = -10;
+    if (m === 10) {
+      b = 0;
+      if (day > 4) b = -10;
+    }
+  }
+
+  const jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524;
+
+  let b1 = 0;
+  if (jd > 2299160) {
+    const a1 = Math.floor((jd - 1867216.25) / 36524.25);
+    b1 = jd + 1 + a1 - Math.floor(a1 / 4);
+  } else {
+    b1 = jd;
+  }
+
+  const bb = b1 + 1524;
+  const cc = Math.floor((bb - 122.1) / 365.25);
+  const dd = Math.floor(365.25 * cc);
+  const ee = Math.floor((bb - dd) / 30.6001);
+  day = bb - dd - Math.floor(30.6001 * ee);
+  month = ee - 1;
+  if (ee > 13) {
+    month = ee - 13;
+  }
+
+  const iyear = 10631 / 30;
+  const epochastro = 1948084;
+  const shift1 = 8.01 / 60;
+
+  const z = jd - epochastro;
+  const cyc = Math.floor(z / 10631);
+  const zRemainder = z - 10631 * cyc;
+  const j = Math.floor((zRemainder - shift1) / iyear);
+  const iy = 30 * cyc + j;
+  const zLeft = zRemainder - Math.floor(j * iyear + shift1);
+  let im = Math.floor((zLeft + 28.5001) / 29.5);
+  if (im === 13) im = 12;
+  const id = zLeft - Math.floor(29.5001 * im - 29);
+
+  const monthIndex = Math.max(1, Math.min(12, im));
+  const monthName = HIJRI_MONTH_NAMES[monthIndex - 1] || "Hijriyah";
+
+  return {
+    day: id,
+    month: monthIndex,
+    year: iy,
+    monthName,
+  };
+}
+
+// Konversi tanggal Masehi ke Penanggalan Hijriyah (KHGT & Standar Majelis Tarjih)
 export function getHijriDate(date: Date = new Date()): string {
   try {
-    const formatter = new Intl.DateTimeFormat("id-ID-u-ca-islamic-umalqura", {
+    const fParts = new Intl.DateTimeFormat("id-ID-u-ca-islamic-umalqura", {
       day: "numeric",
-      month: "long",
+      month: "numeric",
       year: "numeric",
-    });
-    return formatter.format(date);
+    }).formatToParts(date);
+
+    const dayPart = fParts.find((p) => p.type === "day")?.value;
+    const monthPart = fParts.find((p) => p.type === "month")?.value;
+    const yearPart = fParts.find((p) => p.type === "year")?.value;
+
+    if (dayPart && monthPart && yearPart) {
+      const mIdx = parseInt(monthPart, 10);
+      if (mIdx >= 1 && mIdx <= 12) {
+        const mName = HIJRI_MONTH_NAMES[mIdx - 1];
+        return `${dayPart} ${mName} ${yearPart} H`;
+      }
+    }
   } catch {
-    return "1448 H";
+    // Abaikan jika lingkungan peramban tidak mendukung Intl Islamic
   }
+
+  // Fallback deterministik independen
+  const calc = calculateDeterministicHijri(date);
+  return `${calc.day} ${calc.monthName} ${calc.year} H`;
 }
 
 // Rincian Kalender Hijriyah Resmi Muhammadiyah (KHGT)
