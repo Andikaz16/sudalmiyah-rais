@@ -248,3 +248,16 @@ html {
 .animate-marquee-infinite:hover {
   animation-play-state: paused;
 }
+
+/* -------------------------------------------------------------
+   Authentic Classical Quranic Calligraphy Font (Responsive & Mobile-ready)
+   ------------------------------------------------------------- */
+.font-quran,
+.font-arabic {
+  font-family: var(--font-amiri), 'Amiri Quran', 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Traditional Arabic', serif !important;
+  direction: rtl;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv01" on, "cv02" on;
+}

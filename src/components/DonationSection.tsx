@@ -204,7 +204,7 @@ export default function DonationSection() {
           {/* Hadith Content */}
           <div className="min-h-[160px] sm:min-h-[140px] flex flex-col justify-center text-center space-y-4">
             {/* Arabic Text */}
-            <p className="font-serif text-lg sm:text-2xl text-amber-200 font-semibold leading-relaxed tracking-normal px-2 sm:px-6">
+            <p lang="ar" dir="rtl" className="font-quran text-xl sm:text-3xl text-amber-200 font-semibold leading-relaxed tracking-normal px-2 sm:px-6">
               {currentHadith.arabic}
             </p>
 

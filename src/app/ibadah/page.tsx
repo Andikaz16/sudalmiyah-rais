@@ -739,7 +739,7 @@ function QuranFeatureView() {
               {/* Basmalah Banner */}
               {juzContext && juzContext.startAyah > 1 ? (
                 <div className="p-4 sm:p-5 rounded-2xl bg-[#003B73]/5 border border-[#003B73]/15 text-center mb-6 space-y-1">
-                  <p className="font-serif text-xl sm:text-2xl text-[#003B73]">
+                  <p lang="ar" dir="rtl" className="font-quran text-2xl sm:text-3xl text-[#003B73]">
                     أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ • بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيْمِ
                   </p>
                   <p className="text-xs text-stone-500 font-sans">
@@ -748,7 +748,7 @@ function QuranFeatureView() {
                 </div>
               ) : surahDetail.nomor !== 1 && surahDetail.nomor !== 9 ? (
                 <div className="p-4 sm:p-5 rounded-2xl bg-[#003B73]/5 border border-[#003B73]/15 text-center mb-6">
-                  <p className="font-serif text-2xl sm:text-3xl text-[#003B73]">
+                  <p lang="ar" dir="rtl" className="font-quran text-3xl sm:text-4xl text-[#003B73]">
                     بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيْمِ
                   </p>
                   <p className="text-xs text-stone-500 mt-1 font-sans">
@@ -788,9 +788,11 @@ function QuranFeatureView() {
                         </span>
                       </div>
 
-                      {/* Teks Arab dengan Ukuran Font Dinamis */}
+                      {/* Teks Arab dengan Font Al-Qur'an Standar Mushaf & Ukuran Dinamis */}
                       <p
-                        className={`font-serif text-right text-stone-900 tracking-normal pt-2 ${getArabicClass()}`}
+                        lang="ar"
+                        dir="rtl"
+                        className={`font-quran text-right text-stone-900 tracking-normal pt-2 select-text ${getArabicClass()}`}
                       >
                         {ayah.teksArab}
                       </p>
@@ -1537,7 +1539,7 @@ function TasbihFeatureView() {
 
       {/* Dzikir display box */}
       <div className="p-4 sm:p-5 rounded-2xl bg-[#003B73]/5 border border-[#003B73]/20 w-full max-w-md">
-        <p className="font-serif text-3xl sm:text-4xl text-[#003B73] mb-1">
+        <p lang="ar" dir="rtl" className="font-quran text-3xl sm:text-4xl text-[#003B73] mb-1">
           {currentDzikir.arab}
         </p>
         <p className="text-sm font-bold text-stone-800">{currentDzikir.title}</p>
@@ -1901,7 +1903,7 @@ function DoaFeatureView() {
               {doa.title}
             </h3>
 
-            <p className="font-serif text-2xl text-right text-stone-900 leading-relaxed pt-1">
+            <p lang="ar" dir="rtl" className="font-quran text-2xl sm:text-3xl text-right text-stone-900 leading-relaxed pt-1">
               {doa.arabic}
             </p>
 
