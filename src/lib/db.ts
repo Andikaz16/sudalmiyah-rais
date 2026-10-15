@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 import bcrypt from "bcryptjs";
 import {
   Agenda,
@@ -27,15 +28,25 @@ interface DatabaseSchema {
   feedbacks: MosqueFeedback[];
 }
 
-const DB_DIR = path.join(process.cwd(), "data");
-const DB_FILE = path.join(DB_DIR, "masjid_store.json");
+function getDbFilePath(): string {
+  // If running in Vercel or read-only serverless environment, use writable /tmp directory
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join(os.tmpdir(), "masjid_store.json");
+  }
+  return path.join(process.cwd(), "data", "masjid_store.json");
+}
 
 // In-memory cache for fast reads
 let memoryDb: DatabaseSchema | null = null;
 
-function ensureDbDirectory() {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
+function ensureDbDirectory(targetFilePath: string) {
+  try {
+    const dir = path.dirname(targetFilePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  } catch (err) {
+    console.warn("Notice: Could not create directory:", err);
   }
 }
 
@@ -369,55 +380,76 @@ function getInitialData(): DatabaseSchema {
 export function getDb(): DatabaseSchema {
   if (memoryDb) return memoryDb;
 
-  ensureDbDirectory();
+  const targetFile = getDbFilePath();
+  const repoFile = path.join(process.cwd(), "data", "masjid_store.json");
 
-  if (!fs.existsSync(DB_FILE)) {
+  // In serverless (Vercel), seed /tmp/masjid_store.json from the bundled repo file if it exists
+  if (targetFile !== repoFile && !fs.existsSync(targetFile) && fs.existsSync(repoFile)) {
+    try {
+      const initialSeed = fs.readFileSync(repoFile, "utf-8");
+      ensureDbDirectory(targetFile);
+      fs.writeFileSync(targetFile, initialSeed, "utf-8");
+    } catch (seedErr) {
+      console.warn("Notice: Could not copy initial db file to tmp:", seedErr);
+    }
+  }
+
+  const fileToRead = fs.existsSync(targetFile)
+    ? targetFile
+    : fs.existsSync(repoFile)
+    ? repoFile
+    : null;
+
+  if (!fileToRead) {
     const initial = getInitialData();
-    fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), "utf-8");
     memoryDb = initial;
+    saveDb(initial);
     return initial;
   }
 
   try {
-    const content = fs.readFileSync(DB_FILE, "utf-8");
+    const content = fs.readFileSync(fileToRead, "utf-8");
     memoryDb = JSON.parse(content);
     if (!memoryDb?.fridaySchedule) {
       memoryDb!.fridaySchedule = getInitialData().fridaySchedule;
-      saveDb(memoryDb!);
     }
     if (!memoryDb?.qrisSettings) {
       memoryDb!.qrisSettings = getInitialData().qrisSettings;
-      saveDb(memoryDb!);
     }
     if (!memoryDb?.feedbacks) {
       memoryDb!.feedbacks = getInitialData().feedbacks || [];
-      saveDb(memoryDb!);
     }
     if (memoryDb?.agendas) {
-      let modified = false;
       const initial = getInitialData();
       memoryDb.agendas.forEach((a) => {
         if (!a.bannerUrl) {
           const match = initial.agendas.find((ia) => ia.id === a.id);
           a.bannerUrl = match?.bannerUrl || "/uploads/agendas/agenda-jumat.jpg";
-          modified = true;
         }
       });
-      if (modified) saveDb(memoryDb);
+    }
+    if (!memoryDb?.users || memoryDb.users.length === 0) {
+      memoryDb!.users = getInitialData().users;
     }
     return memoryDb as DatabaseSchema;
-  } catch {
+  } catch (err) {
+    console.error("Database read error, falling back to initial data:", err);
     const fallback = getInitialData();
-    fs.writeFileSync(DB_FILE, JSON.stringify(fallback, null, 2), "utf-8");
     memoryDb = fallback;
     return fallback;
   }
 }
 
 export function saveDb(data: DatabaseSchema): void {
-  ensureDbDirectory();
   memoryDb = data;
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), "utf-8");
+  const targetFile = getDbFilePath();
+  try {
+    ensureDbDirectory(targetFile);
+    fs.writeFileSync(targetFile, JSON.stringify(data, null, 2), "utf-8");
+  } catch (err) {
+    // Graceful fallback for read-only serverless filesystems
+    console.warn("Notice: Could not persist to disk, keeping in memory cache:", err);
+  }
 }
 
 export function logSecurityEvent(
@@ -427,19 +459,24 @@ export function logSecurityEvent(
   status: "SUCCESS" | "WARNING" | "BLOCKED",
   details: string
 ): void {
-  const db = getDb();
-  const log: SecurityAuditLog = {
-    id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-    timestamp: new Date().toISOString(),
-    ipAddress: ip,
-    action,
-    actor,
-    status,
-    details,
-  };
-  db.auditLogs.unshift(log);
-  if (db.auditLogs.length > 200) {
-    db.auditLogs = db.auditLogs.slice(0, 200);
+  try {
+    const db = getDb();
+    if (!db.auditLogs) db.auditLogs = [];
+    const log: SecurityAuditLog = {
+      id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      timestamp: new Date().toISOString(),
+      ipAddress: ip,
+      action,
+      actor,
+      status,
+      details,
+    };
+    db.auditLogs.unshift(log);
+    if (db.auditLogs.length > 200) {
+      db.auditLogs = db.auditLogs.slice(0, 200);
+    }
+    saveDb(db);
+  } catch (err) {
+    console.warn("Security event logging error ignored:", err);
   }
-  saveDb(db);
 }
