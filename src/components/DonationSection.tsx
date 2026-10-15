@@ -108,8 +108,8 @@ const MARQUEE_QUOTES = [
 const fallbackQris: QrisSettings = {
   id: "qris-01",
   imageUrl: "/images/qris-sudalmiyah.png",
-  merchantName: "MASJID SUDALMIYAH RAIS UMS",
-  nmid: "ID1020260389100",
+  merchantName: "LAZ UMS-MSJD SUDALMIYAH",
+  nmid: "ID2024353816125",
   institution: "Universitas Muhammadiyah Surakarta",
   updatedAt: new Date().toISOString(),
 };
@@ -276,37 +276,16 @@ export default function DonationSection() {
             
             {/* Left Column: Official QRIS Stand Card (5 Cols) */}
             <div className="lg:col-span-5 flex flex-col items-center">
-              <div className="w-full max-w-sm rounded-3xl bg-[#FAF8F5] border-2 border-stone-200 p-5 sm:p-6 shadow-inner text-center">
-                {/* Official QRIS Header */}
-                <div className="bg-rose-700 text-white rounded-xl py-2 px-4 shadow-sm mb-4">
-                  <div className="font-extrabold text-xl tracking-wider">QRIS</div>
-                  <div className="text-[9px] uppercase tracking-wider opacity-90">
-                    Quick Response Code Indonesian Standard
-                  </div>
-                </div>
-
-                {/* Merchant Name & NMID */}
-                <div className="mb-4">
-                  <h3 className="font-bold text-stone-900 text-base font-serif">
-                    {qris.merchantName || "MASJID SUDALMIYAH RAIS UMS"}
-                  </h3>
-                  <div className="text-[11px] text-stone-500 font-mono mt-0.5">
-                    NMID: {qris.nmid || "ID1020260389100"}
-                  </div>
-                  <div className="text-[10px] text-stone-400">
-                    {qris.institution || "Universitas Muhammadiyah Surakarta"}
-                  </div>
-                </div>
-
-                {/* QRIS Image Container */}
-                <div className="relative w-full aspect-[3/4] max-h-[380px] rounded-2xl overflow-hidden border border-stone-200 bg-white shadow-sm flex items-center justify-center p-2">
+              <div className="w-full max-w-sm rounded-3xl bg-white border border-stone-200 p-4 sm:p-5 shadow-xl text-center">
+                {/* Official QRIS Poster Image */}
+                <div className="relative w-full aspect-[1/1.414] rounded-2xl overflow-hidden border border-stone-200 bg-white shadow-inner flex items-center justify-center p-1">
                   <Image
                     src={qris.imageUrl || "/images/qris-sudalmiyah.png"}
-                    alt={`QRIS ${qris.merchantName}`}
+                    alt={`QRIS ${qris.merchantName || "LAZ UMS-MSJD SUDALMIYAH"}`}
                     fill
                     unoptimized
                     priority
-                    className="object-contain p-2"
+                    className="object-contain"
                   />
                 </div>
 
@@ -315,14 +294,14 @@ export default function DonationSection() {
                   <button
                     type="button"
                     onClick={handleDownloadQRIS}
-                    className="w-full text-center px-4 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-sm active:scale-[0.99]"
+                    className="w-full text-center px-4 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/15 active:scale-[0.99]"
                   >
                     Unduh Gambar QRIS
                   </button>
                 </div>
 
                 {/* Supported Apps List */}
-                <div className="mt-4 pt-3 border-t border-stone-200/80 text-[10px] text-stone-500 leading-relaxed">
+                <div className="mt-4 pt-3 border-t border-stone-100 text-[10px] text-stone-500 leading-relaxed">
                   Mendukung BCA, Mandiri, BSI, BRI, BNI, GoPay, OVO, ShopeePay, DANA, LinkAja, dan seluruh aplikasi perbankan berstandar QRIS.
                 </div>
               </div>

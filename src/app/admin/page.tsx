@@ -814,7 +814,7 @@ export default function AdminDashboardPage() {
                       value={qrisSettings.merchantName}
                       onChange={(e) => setQrisSettings({ ...qrisSettings, merchantName: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-semibold"
-                      placeholder="Contoh: MASJID SUDALMIYAH RAIS UMS"
+                      placeholder="Contoh: LAZ UMS-MSJD SUDALMIYAH"
                     />
                   </div>
 
@@ -828,7 +828,7 @@ export default function AdminDashboardPage() {
                       value={qrisSettings.nmid}
                       onChange={(e) => setQrisSettings({ ...qrisSettings, nmid: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono"
-                      placeholder="Contoh: ID1020260389100"
+                      placeholder="Contoh: ID2024353816125"
                     />
                   </div>
 

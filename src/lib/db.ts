@@ -175,8 +175,8 @@ function getInitialData(): DatabaseSchema {
     qrisSettings: {
       id: "qris-01",
       imageUrl: "/images/qris-sudalmiyah.png",
-      merchantName: "MASJID SUDALMIYAH RAIS UMS",
-      nmid: "ID1020260389100",
+      merchantName: "LAZ UMS-MSJD SUDALMIYAH",
+      nmid: "ID2024353816125",
       institution: "Universitas Muhammadiyah Surakarta",
       updatedAt: new Date().toISOString(),
     },
