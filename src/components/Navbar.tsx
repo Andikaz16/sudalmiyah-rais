@@ -29,6 +29,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: "/", label: "Beranda" },
+    { href: "/sejarah", label: "Sejarah" },
     { href: "/ibadah", label: "Ruang Ibadah" },
     { href: "/jadwal", label: "Jadwal Shalat" },
     { href: "/layanan", label: "Layanan" },

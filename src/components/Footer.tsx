@@ -52,6 +52,11 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
+                <Link href="/sejarah" className="hover:text-[#FCD34D] transition-colors">
+                  Sejarah Masjid Kampus
+                </Link>
+              </li>
+              <li>
                 <Link href="/#masjidmu" className="hover:text-[#FCD34D] transition-colors">
                   Pilar Masjid Percontohan AUM
                 </Link>
