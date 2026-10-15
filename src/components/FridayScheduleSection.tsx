@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { FridayOfficerSchedule } from "@/lib/types";
 
@@ -170,10 +170,7 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
 export default function FridayScheduleSection() {
   const [schedules, setSchedules] = useState<FridayOfficerSchedule[]>(fallbackSchedules);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
-
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch schedules from API
   useEffect(() => {
@@ -204,34 +201,13 @@ export default function FridayScheduleSection() {
     setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
   }, [totalSlides]);
 
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  // Auto-slide effect (6 seconds interval, pauses on hover or touch)
-  useEffect(() => {
-    if (isPaused) return;
-
-    timerRef.current = setInterval(() => {
-      nextSlide();
-    }, 6000);
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isPaused, nextSlide]);
-
   // Touch swipe support for mobile
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStartX(e.touches[0].clientX);
-    setIsPaused(true);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX === null) {
-      setIsPaused(false);
-      return;
-    }
+    if (touchStartX === null) return;
     const touchEndX = e.changedTouches[0].clientX;
     const diff = touchStartX - touchEndX;
 
@@ -243,7 +219,6 @@ export default function FridayScheduleSection() {
       }
     }
     setTouchStartX(null);
-    setIsPaused(false);
   };
 
   // Find schedule for active mosque
@@ -262,56 +237,21 @@ export default function FridayScheduleSection() {
         
         {/* Section Heading & Subtitle */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#003B73]/10 border border-[#003B73]/20 text-[#003B73] text-xs font-bold tracking-wider uppercase mb-3">
-            <span>6 Masjid Kampus UMS</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#003B73]" />
-            <span>Rotasi Otomatis</span>
-          </div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
             Petugas Shalat &amp; Khatib <span className="text-[#003B73]">Pekan Ini</span>
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-2.5 leading-relaxed">
-            Susunan khidmat khatib, imam, dan muadzin Shalat Jumat di 6 masjid lingkungan Universitas Muhammadiyah Surakarta. Geser atau pilih masjid untuk melihat jadwal lengkap.
+            Susunan khidmat khatib, imam, dan muadzin Shalat Jumat di 6 masjid lingkungan Universitas Muhammadiyah Surakarta. Gunakan tombol panah untuk melihat jadwal masjid lainnya.
           </p>
         </div>
 
-        {/* Mosque Selector Tabs (Manual Click / Swipe Navigation) */}
-        <div className="mb-8">
-          <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-3 pt-1 scrollbar-none px-1">
-            {MOSQUE_LIST.map((mosque, idx) => {
-              const isActive = idx === currentIndex;
-              return (
-                <button
-                  key={mosque.id}
-                  onClick={() => goToSlide(idx)}
-                  className={`px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-300 flex items-center gap-2 shrink-0 border ${
-                    isActive
-                      ? "bg-[#003B73] text-white border-[#003B73] shadow-md shadow-[#003B73]/20 font-bold scale-[1.02]"
-                      : "bg-white text-stone-700 border-stone-200/90 hover:bg-stone-50 hover:border-stone-300"
-                  }`}
-                  aria-label={`Pilih ${mosque.name}`}
-                >
-                  <span
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      isActive ? "bg-[#D4AF37]" : "bg-stone-300"
-                    }`}
-                  />
-                  <span>{mosque.shortName}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Carousel Container with Hover Pause & Touch Events */}
+        {/* Carousel Container */}
         <div
           className="relative"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Active Mosque Badge Header */}
+          {/* Active Mosque Badge Header with Left/Right Arrows */}
           <div className="bg-gradient-to-r from-[#003B73] via-[#004B8D] to-[#002855] text-white rounded-t-3xl px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm border border-[#003B73]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center font-bold text-white text-sm shrink-0">
@@ -327,11 +267,11 @@ export default function FridayScheduleSection() {
               </div>
             </div>
 
-            {/* Navigation Controls: Prev, Play/Pause Indicator, Next */}
+            {/* Navigation Controls: Prev & Next Arrow Buttons */}
             <div className="flex items-center gap-2 self-end sm:self-auto">
               <button
                 onClick={prevSlide}
-                className="p-2 sm:p-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/20 text-white transition-all flex items-center gap-1.5 text-xs font-semibold"
                 title="Masjid Sebelumnya"
                 aria-label="Masjid Sebelumnya"
               >
@@ -348,26 +288,20 @@ export default function FridayScheduleSection() {
                     d="M15 19l-7-7 7-7"
                   />
                 </svg>
+                <span className="hidden sm:inline">Sebelumnya</span>
               </button>
 
-              <button
-                onClick={() => setIsPaused((prev) => !prev)}
-                className={`px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${
-                  isPaused
-                    ? "bg-[#D4AF37] text-stone-900 border-[#D4AF37]"
-                    : "bg-white/10 text-white border-white/20 hover:bg-white/20"
-                }`}
-                title={isPaused ? "Klik untuk mengaktifkan geser otomatis" : "Jeda geser otomatis"}
-              >
-                {isPaused ? "Dijeda" : "Auto Geser"}
-              </button>
+              <span className="text-xs text-white/80 font-mono font-bold px-1.5">
+                {currentIndex + 1} / {totalSlides}
+              </span>
 
               <button
                 onClick={nextSlide}
-                className="p-2 sm:p-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/20 text-white transition-all flex items-center gap-1.5 text-xs font-semibold"
                 title="Masjid Berikutnya"
                 aria-label="Masjid Berikutnya"
               >
+                <span className="hidden sm:inline">Berikutnya</span>
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -507,24 +441,6 @@ export default function FridayScheduleSection() {
               </div>
 
             </div>
-          </div>
-
-          {/* Dot Indicators */}
-          <div className="flex items-center justify-center gap-2 mt-6">
-            {MOSQUE_LIST.map((mosque, idx) => {
-              const isActive = idx === currentIndex;
-              return (
-                <button
-                  key={mosque.id}
-                  onClick={() => goToSlide(idx)}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${
-                    isActive ? "w-8 bg-[#003B73]" : "w-2.5 bg-stone-300 hover:bg-stone-400"
-                  }`}
-                  aria-label={`Buka slide masjid ${mosque.name}`}
-                  title={mosque.name}
-                />
-              );
-            })}
           </div>
         </div>
 
