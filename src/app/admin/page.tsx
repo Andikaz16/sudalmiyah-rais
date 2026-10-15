@@ -113,6 +113,7 @@ export default function AdminDashboardPage() {
     description: "",
     quota: 1000,
     requiresRegistration: false,
+    targetAudience: "",
     bannerUrl: "/uploads/agendas/agenda-jumat.jpg",
   });
   const [uploadingAgendaThumbnail, setUploadingAgendaThumbnail] = useState(false);
@@ -864,6 +865,11 @@ export default function AdminDashboardPage() {
                         )}
                       </div>
                       <h3 className="font-bold text-stone-900 text-sm line-clamp-2 font-serif">{item.title}</h3>
+                      {item.targetAudience && (
+                        <div className="p-2 rounded-xl bg-amber-50 border border-amber-200 text-[11px] font-bold text-amber-900 leading-snug">
+                          {item.targetAudience}
+                        </div>
+                      )}
                       <div className="text-xs text-stone-700 pt-1">
                         <div><strong>Pemateri:</strong> {item.speaker}</div>
                         <div className="text-[11px] text-stone-500">{item.speakerRole}</div>
@@ -2150,6 +2156,40 @@ export default function AdminDashboardPage() {
                       ? "Batas maksimal peserta yang dapat mendaftar tiket online."
                       : "Kapasitas ruangan masjid untuk presensi langsung."}
                   </p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  Fakultas / Peserta Terjadwal (Opsional)
+                </label>
+                <input
+                  type="text"
+                  value={newAgenda.targetAudience}
+                  onChange={(e) => setNewAgenda({ ...newAgenda, targetAudience: e.target.value })}
+                  placeholder="Contoh: Fakultas Terjadwal: FIK, FK, FKG"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
+                />
+                <p className="text-[10px] text-stone-400 mt-1">
+                  Cantumkan fakultas atau kelompok mahasiswa yang diwajibkan / dijadwalkan hadir.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  {[
+                    "Fakultas Terjadwal: FIK, FK, FKG",
+                    "Fakultas Terjadwal: FHIP, FKI, FPSI",
+                    "Fakultas Terjadwal: FT, FEB, FAI",
+                    "Fakultas Terjadwal: FKIP, FF, Geografi",
+                    "Terbuka untuk Seluruh Mahasiswa UMS",
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setNewAgenda({ ...newAgenda, targetAudience: preset })}
+                      className="px-2 py-0.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-[10px] font-medium transition-colors"
+                    >
+                      {preset}
+                    </button>
+                  ))}
                 </div>
               </div>
 

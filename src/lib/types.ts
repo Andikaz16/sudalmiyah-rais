@@ -50,6 +50,7 @@ export interface Agenda {
   isOpen: boolean;
   requiresRegistration: boolean;
   bannerUrl?: string;
+  targetAudience?: string;
   createdAt: string;
 }
 

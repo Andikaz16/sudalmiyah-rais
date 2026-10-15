@@ -9,9 +9,13 @@ import {
   MapPin,
   User,
   Users,
+  GraduationCap,
+  Eye,
+  ArrowRight,
 } from "lucide-react";
 import { Agenda, AgendaCategory } from "@/lib/types";
 import RegistrationModal from "./RegistrationModal";
+import AgendaDetailModal from "./AgendaDetailModal";
 
 interface AgendaSectionProps {
   isHomePage?: boolean;
@@ -23,6 +27,7 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>("ALL");
   const [selectedAgenda, setSelectedAgenda] = useState<Agenda | null>(null);
+  const [viewingDetailAgenda, setViewingDetailAgenda] = useState<Agenda | null>(null);
 
   const fetchAgendas = async (cat: string) => {
     setLoading(true);
@@ -113,7 +118,11 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                 >
                   <div>
                     {/* Thumbnail Image Container */}
-                    <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-stone-100">
+                    <div
+                      onClick={() => setViewingDetailAgenda(item)}
+                      className="relative h-44 sm:h-48 w-full overflow-hidden bg-stone-100 cursor-pointer group/thumb"
+                      title="Klik untuk melihat detail kegiatan"
+                    >
                       <Image
                         src={item.bannerUrl || "/uploads/agendas/agenda-jumat.jpg"}
                         alt={item.title}
@@ -139,14 +148,41 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                           </span>
                         )}
                       </div>
+
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                        <span className="px-3.5 py-1.5 rounded-full bg-white text-[#003B73] text-xs font-bold shadow-lg flex items-center gap-1.5">
+                          <Eye className="w-3.5 h-3.5 text-[#003B73]" />
+                          <span>Buka Detail</span>
+                        </span>
+                      </div>
                     </div>
 
                     {/* Card Content Body */}
                     <div className="p-6">
                       {/* Title */}
-                      <h3 className="text-base sm:text-lg font-bold text-stone-900 group-hover:text-[#003B73] transition-colors line-clamp-2 mb-3 font-serif">
+                      <h3
+                        onClick={() => setViewingDetailAgenda(item)}
+                        className="text-base sm:text-lg font-bold text-stone-900 group-hover:text-[#003B73] transition-colors line-clamp-2 mb-3 font-serif cursor-pointer"
+                        title={item.title}
+                      >
                         {item.title}
                       </h3>
+
+                      {/* Target Audience / Fakultas Terjadwal Callout */}
+                      {item.targetAudience && (
+                        <div className="p-3 rounded-2xl bg-amber-50/90 border border-amber-300 mb-4 flex items-start gap-2.5">
+                          <GraduationCap className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wider block">
+                              Fakultas Terjadwal (Wajib):
+                            </span>
+                            <span className="text-xs font-bold text-stone-900 leading-snug line-clamp-2 block">
+                              {item.targetAudience}
+                            </span>
+                          </div>
+                        </div>
+                      )}
 
                     {/* Speaker Info */}
                     <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-stone-200/80 mb-4 flex items-start gap-3">
@@ -204,24 +240,45 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                   </div>
                 </div>
 
-                {/* Action Button */}
-                <div className="p-6 pt-0">
+                {/* Action Buttons */}
+                <div className="p-6 pt-0 space-y-2.5">
                   {item.requiresRegistration ? (
-                    <button
-                      onClick={() => setSelectedAgenda(item)}
-                      disabled={isFull || !item.isOpen}
-                      className={`w-full text-center px-4 py-3 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                        isFull
-                          ? "bg-stone-200 text-stone-400 cursor-not-allowed"
-                          : "bg-[#003B73] hover:bg-[#002855] text-white shadow-md shadow-[#003B73]/15"
-                      }`}
-                    >
-                      {isFull ? "Kuota Penuh" : "Daftar Presensi Tiket"}
-                    </button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setViewingDetailAgenda(item)}
+                        className="w-full text-center py-2.5 px-3 rounded-full text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-800 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-stone-600" />
+                        <span>Rincian</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedAgenda(item)}
+                        disabled={isFull || !item.isOpen}
+                        className={`w-full text-center py-2.5 px-3 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          isFull
+                            ? "bg-stone-200 text-stone-400 cursor-not-allowed"
+                            : "bg-[#003B73] hover:bg-[#002855] text-white shadow-xs"
+                        }`}
+                      >
+                        {isFull ? "Penuh" : "Daftar Tiket"}
+                      </button>
+                    </div>
                   ) : (
-                    <div className="text-center py-2.5 px-3 text-xs text-stone-700 font-medium bg-[#FAF8F5] rounded-full border border-stone-200 flex items-center justify-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                      <span>Hadir Langsung di Lokasi (Presensi QR di Masjid)</span>
+                    <button
+                      type="button"
+                      onClick={() => setViewingDetailAgenda(item)}
+                      className="w-full text-center px-4 py-3 rounded-full text-xs sm:text-sm font-bold bg-[#003B73] hover:bg-[#002855] text-white shadow-md shadow-[#003B73]/15 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] group/btn"
+                    >
+                      <Eye className="w-4 h-4 text-amber-300" />
+                      <span>Lihat Detail Kegiatan</span>
+                      <ArrowRight className="w-4 h-4 text-amber-300 group-hover/btn:translate-x-1 transition-transform" />
+                    </button>
+                  )}
+                  {!item.requiresRegistration && (
+                    <div className="text-center text-[11px] text-stone-500 font-medium">
+                      Hadir Langsung di Lokasi • Presensi QR di Masjid
                     </div>
                   )}
                 </div>
@@ -244,6 +301,16 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
           </div>
         )}
       </div>
+
+      {/* Event Detail Modal */}
+      <AgendaDetailModal
+        agenda={viewingDetailAgenda}
+        onClose={() => setViewingDetailAgenda(null)}
+        onRegisterClick={(agenda) => {
+          setViewingDetailAgenda(null);
+          setSelectedAgenda(agenda);
+        }}
+      />
 
       {/* Registration Modal Dialog */}
       <RegistrationModal

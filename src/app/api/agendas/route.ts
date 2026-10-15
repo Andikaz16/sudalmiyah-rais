@@ -15,6 +15,7 @@ const createAgendaSchema = z.object({
   description: z.string().min(10).max(1000),
   quota: z.number().int().positive().max(5000),
   requiresRegistration: z.boolean(),
+  targetAudience: z.string().max(250).optional(),
   bannerUrl: z.string().optional(),
 });
 
@@ -74,6 +75,7 @@ export async function POST(request: NextRequest) {
       registeredCount: 0,
       isOpen: true,
       requiresRegistration: data.requiresRegistration,
+      targetAudience: data.targetAudience ? sanitizeString(data.targetAudience) : undefined,
       bannerUrl: data.bannerUrl ? sanitizeString(data.bannerUrl) : "/uploads/agendas/agenda-jumat.jpg",
       createdAt: new Date().toISOString(),
     };

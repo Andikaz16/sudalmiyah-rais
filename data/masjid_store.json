@@ -31,11 +31,12 @@
       "date": "2026-10-10",
       "time": "03.00 - Selesai WIB",
       "location": "Masjid Hj. Sudalmiyah Rais Kampus 2 UMS",
-      "description": "Program pembinaan Cinta Subuh LPPIK & Koordinator Mentoring Pusat UMS bersama Rektor UMS. Fakultas terjadwal: FIK, FK, FKG. Catatan: Wajib membawa tumbler masing-masing.",
+      "description": "Program pembinaan keagamaan Cinta Subuh LPPIK & Koordinator Mentoring Pusat UMS bersama Rektor UMS Prof. Dr. Harun Joko Prayitno, M.Hum. Kegiatan diawali qiyamul lail/tahajud, shalat subuh berjamaah, dan tausiyah pencerahan sivitas akademika UMS. Ketentuan: Seluruh mahasiswa fakultas terjadwal wajib hadir, membawa tumbler masing-masing untuk isi ulang air minum, dan berbusana muslim rapi.",
       "quota": 1000,
       "registeredCount": 0,
       "isOpen": true,
       "requiresRegistration": false,
+      "targetAudience": "Fakultas Terjadwal: FIK, FK, FKG",
       "createdAt": "2026-10-15T15:45:00.000Z",
       "bannerUrl": "/uploads/agendas/cinta-subuh-harun-joko.png"
     },
@@ -48,11 +49,12 @@
       "date": "2026-10-17",
       "time": "03.00 - Selesai WIB",
       "location": "Masjid Hj. Sudalmiyah Rais Kampus 2 UMS",
-      "description": "Program pembinaan Cinta Subuh LPPIK & Koordinator Mentoring Pusat UMS bersama Dr. Mutohharun Jinan, M.Ag. Fakultas terjadwal: FHIP, FKI, FPSI. Catatan: *Wajib membawa tumbler masing-masing.",
+      "description": "Program pembinaan keagamaan Cinta Subuh LPPIK & Koordinator Mentoring Pusat UMS bersama Dr. Mutohharun Jinan, M.Ag. Kegiatan diawali shalat tahajud bersama, shalat subuh berjamaah, dan kajian tematik penguatan aqidah dan akhlak islami. Ketentuan: Seluruh mahasiswa fakultas terjadwal wajib hadir, membawa tumbler masing-masing, dan presensi mandiri via scan QR di lokasi.",
       "quota": 1000,
       "registeredCount": 0,
       "isOpen": true,
       "requiresRegistration": false,
+      "targetAudience": "Fakultas Terjadwal: FHIP, FKI, FPSI",
       "createdAt": "2026-10-15T15:45:00.000Z",
       "bannerUrl": "/uploads/agendas/cinta-subuh-mutohharun-jinan.png"
     }
