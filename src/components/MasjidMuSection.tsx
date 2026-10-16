@@ -79,8 +79,8 @@ export default function MasjidMuSection() {
 
   const highlights = [
     {
-      label: "Episentrum AIK & Kader",
-      desc: "Penguatan Ideologi Civitas Akademika AUM",
+      label: "Penguatan AIK",
+      desc: "Pembinaan Ideologi Civitas Akademika UMS",
       icon: BookOpen,
     },
     {
