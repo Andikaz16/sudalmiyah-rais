@@ -242,7 +242,6 @@ export default function NewsSection() {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
-  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   const displayNews = newsList.filter((item) => (item.source as string) !== "MASJIDMU");
 
@@ -251,13 +250,7 @@ export default function NewsSection() {
     const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
     setCanScrollLeft(scrollLeft > 15);
     setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 15);
-
-    const firstCard = sliderRef.current.firstElementChild as HTMLElement | null;
-    const cardWidth = firstCard?.offsetWidth || 380;
-    const gap = 24;
-    const index = Math.round(scrollLeft / (cardWidth + gap));
-    setActiveSlideIndex(Math.min(Math.max(index, 0), displayNews.length - 1));
-  }, [displayNews.length]);
+  }, []);
 
   const scroll = (direction: "left" | "right") => {
     if (!sliderRef.current) return;
@@ -268,18 +261,6 @@ export default function NewsSection() {
     const scrollAmount = cardWidth + gap;
     container.scrollBy({
       left: direction === "left" ? -scrollAmount : scrollAmount,
-      behavior: "smooth",
-    });
-  };
-
-  const scrollToCard = (index: number) => {
-    if (!sliderRef.current) return;
-    const container = sliderRef.current;
-    const firstCard = container.firstElementChild as HTMLElement | null;
-    const cardWidth = firstCard?.offsetWidth || 380;
-    const gap = 24;
-    container.scrollTo({
-      left: index * (cardWidth + gap),
       behavior: "smooth",
     });
   };
@@ -296,9 +277,6 @@ export default function NewsSection() {
         {/* Section Heading & Slider Controls */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8 sm:mb-10">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] text-[11px] font-bold uppercase tracking-wider mb-2.5">
-              <span>Warta Terkini</span>
-            </div>
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
               Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
             </h2>
@@ -309,30 +287,25 @@ export default function NewsSection() {
 
           {/* Slider Arrow Navigation Buttons */}
           {displayNews.length > 0 && (
-            <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
-              <span className="text-xs text-stone-500 font-medium hidden md:inline-block">
-                Geser warta
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => scroll("left")}
-                  disabled={!canScrollLeft}
-                  aria-label="Geser warta sebelumnya"
-                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white border border-stone-300 text-stone-700 hover:text-[#003B73] hover:border-[#003B73] shadow-xs hover:shadow-md disabled:opacity-30 disabled:hover:border-stone-300 disabled:hover:text-stone-700 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer active:scale-95"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scroll("right")}
-                  disabled={!canScrollRight}
-                  aria-label="Geser warta berikutnya"
-                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#003B73] hover:bg-[#002855] text-white shadow-xs hover:shadow-md disabled:opacity-30 disabled:hover:bg-[#003B73] disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer active:scale-95"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+              <button
+                type="button"
+                onClick={() => scroll("left")}
+                disabled={!canScrollLeft}
+                aria-label="Geser warta sebelumnya"
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white border border-stone-300 text-stone-700 hover:text-[#003B73] hover:border-[#003B73] shadow-xs hover:shadow-md disabled:opacity-30 disabled:hover:border-stone-300 disabled:hover:text-stone-700 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer active:scale-95"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scroll("right")}
+                disabled={!canScrollRight}
+                aria-label="Geser warta berikutnya"
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#003B73] hover:bg-[#002855] text-white shadow-xs hover:shadow-md disabled:opacity-30 disabled:hover:bg-[#003B73] disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer active:scale-95"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
           )}
         </div>
@@ -407,32 +380,6 @@ export default function NewsSection() {
                   </div>
                 </article>
               ))}
-            </div>
-
-            {/* Slider Bottom Indicators & Counter */}
-            <div className="flex items-center justify-between mt-5 sm:mt-6 px-1">
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 max-w-[70%]">
-                {displayNews.map((_, dotIdx) => (
-                  <button
-                    key={dotIdx}
-                    type="button"
-                    onClick={() => scrollToCard(dotIdx)}
-                    aria-label={`Geser ke warta ${dotIdx + 1}`}
-                    className={`transition-all duration-300 rounded-full cursor-pointer ${
-                      activeSlideIndex === dotIdx
-                        ? "w-7 h-2 bg-[#003B73]"
-                        : "w-2 h-2 bg-stone-300 hover:bg-stone-400"
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <div className="text-[11px] sm:text-xs text-stone-500 font-medium flex items-center gap-1.5">
-                <span className="hidden sm:inline text-stone-400">Menampilkan warta</span>
-                <span className="font-bold text-stone-800">{activeSlideIndex + 1}</span>
-                <span className="text-stone-400">/</span>
-                <span>{displayNews.length}</span>
-              </div>
             </div>
           </div>
         )}
