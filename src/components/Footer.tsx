@@ -114,7 +114,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                <span>(0271) 717417 ext. 3158</span>
+                <span>3158</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#D4AF37] shrink-0" />
