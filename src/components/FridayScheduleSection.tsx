@@ -57,7 +57,7 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueName: "Masjid Hj. Sudalmiyah Rais",
     mosqueLocation: "Kampus 2 UMS",
     date: "Jumat, 16 Oktober 2026",
-    hijriDate: "5 Rabiul Akhir 1448 H",
+    hijriDate: "5 Jumadilawal 1448 H",
     khatibName: "Prof. Dr. Sofyan Anif, M.Si.",
     khatibTitle: "Rektor Universitas Muhammadiyah Surakarta",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -76,7 +76,7 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueName: "Masjid Fadhlurrahman",
     mosqueLocation: "Kampus 1 UMS",
     date: "Jumat, 16 Oktober 2026",
-    hijriDate: "5 Rabiul Akhir 1448 H",
+    hijriDate: "5 Jumadilawal 1448 H",
     khatibName: "Dr. Syamsul Hidayat, M.Ag.",
     khatibTitle: "Dekan FAI UMS / Majelis Tarjih",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -95,7 +95,7 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueName: "Masjid KH. Mas Mansur",
     mosqueLocation: "Kampus 4 UMS (Pesma)",
     date: "Jumat, 16 Oktober 2026",
-    hijriDate: "5 Rabiul Akhir 1448 H",
+    hijriDate: "5 Jumadilawal 1448 H",
     khatibName: "Drs. Dahlan Rais, M.Hum.",
     khatibTitle: "Ketua BPH UMS / PP Muhammadiyah",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -114,7 +114,7 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueName: "Masjid Ma'had Abu Bakar",
     mosqueLocation: "Kampus 2 UMS",
     date: "Jumat, 16 Oktober 2026",
-    hijriDate: "5 Rabiul Akhir 1448 H",
+    hijriDate: "5 Jumadilawal 1448 H",
     khatibName: "Dr. Mirwan Akhmad Taufiq, M.S.I.",
     khatibTitle: "Direktur Ma'had Abu Bakar Ash-Shiddiq",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -133,7 +133,7 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueName: "Masjid Ar-Razi FKG",
     mosqueLocation: "Kampus 4 UMS (FKG)",
     date: "Jumat, 16 Oktober 2026",
-    hijriDate: "5 Rabiul Akhir 1448 H",
+    hijriDate: "5 Jumadilawal 1448 H",
     khatibName: "drg. Morita Sari, Sp.KG., Ph.D.",
     khatibTitle: "Dosen FKG UMS / Praktisi Kesehatan Islam",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -152,7 +152,7 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueName: "Masjid Munajat Shabran",
     mosqueLocation: "Makamhaji (Pondok Shabran)",
     date: "Jumat, 16 Oktober 2026",
-    hijriDate: "5 Rabiul Akhir 1448 H",
+    hijriDate: "5 Jumadilawal 1448 H",
     khatibName: "Nurul Huda, M.Ag.",
     khatibTitle: "Mudir Pondok Hajjah Nuriyah Shabran",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -178,11 +178,19 @@ export default function FridayScheduleSection() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.schedules) && data.schedules.length > 0) {
-          setSchedules(data.schedules);
+          const sanitized = data.schedules.map((s: FridayOfficerSchedule) => ({
+            ...s,
+            hijriDate: s.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H",
+          }));
+          setSchedules(sanitized);
         } else if (data.success && data.schedule) {
           setSchedules((prev) => {
             const copy = [...prev];
-            copy[0] = { ...copy[0], ...data.schedule };
+            copy[0] = {
+              ...copy[0],
+              ...data.schedule,
+              hijriDate: data.schedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H",
+            };
             return copy;
           });
         }
@@ -332,7 +340,7 @@ export default function FridayScheduleSection() {
                       Khatib Shalat Jumat
                     </span>
                     <span className="text-xs font-semibold text-[#B58A1E] font-mono">
-                      {activeSchedule.date} • {activeSchedule.hijriDate}
+                      {activeSchedule.date} • {activeSchedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H"}
                     </span>
                   </div>
 

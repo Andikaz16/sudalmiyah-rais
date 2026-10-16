@@ -191,15 +191,23 @@ export default function AdminDashboardPage() {
       setRegistrations(statsJson.recentRegistrations || []);
       if (fridayJson.success) {
         if (Array.isArray(fridayJson.schedules) && fridayJson.schedules.length > 0) {
-          setFridaySchedules(fridayJson.schedules);
+          const sanitizedSchedules = fridayJson.schedules.map((s: FridayOfficerSchedule) => ({
+            ...s,
+            hijriDate: s.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H",
+          }));
+          setFridaySchedules(sanitizedSchedules);
           const current =
-            fridayJson.schedules.find(
+            sanitizedSchedules.find(
               (s: FridayOfficerSchedule) => (s.mosqueId || s.id) === selectedMosqueId
-            ) || fridayJson.schedules[0];
+            ) || sanitizedSchedules[0];
           setFridaySchedule(current);
         } else if (fridayJson.schedule) {
-          setFridaySchedule(fridayJson.schedule);
-          setFridaySchedules([fridayJson.schedule]);
+          const sanitizedCurrent = {
+            ...fridayJson.schedule,
+            hijriDate: fridayJson.schedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H",
+          };
+          setFridaySchedule(sanitizedCurrent);
+          setFridaySchedules([sanitizedCurrent]);
         }
       }
       if (qrisJson.success && qrisJson.qris) {
@@ -386,7 +394,7 @@ export default function AdminDashboardPage() {
         mosqueName: meta?.name || "Masjid Kampus UMS",
         mosqueLocation: meta?.location,
         date: "Jumat, 16 Oktober 2026",
-        hijriDate: "5 Rabiul Akhir 1448 H",
+        hijriDate: "5 Jumadilawal 1448 H",
         khatibName: "",
         khatibTitle: "",
         khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -1357,7 +1365,7 @@ export default function AdminDashboardPage() {
                       value={fridaySchedule.hijriDate}
                       onChange={(e) => setFridaySchedule({ ...fridaySchedule, hijriDate: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
-                      placeholder="Contoh: 5 Rabiul Akhir 1448 H"
+                      placeholder="Contoh: 5 Jumadilawal 1448 H"
                     />
                   </div>
                   <div>

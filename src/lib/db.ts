@@ -58,13 +58,18 @@ function ensureDbDirectory(targetFilePath: string) {
 }
 
 export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): FridayOfficerSchedule[] {
+  const getSafeHijri = (val?: string) => {
+    if (val && !val.includes("Rabiul Akhir")) return val;
+    return "5 Jumadilawal 1448 H";
+  };
+
   const sudalmiyah: FridayOfficerSchedule = {
     id: primary?.id || "fri-sudalmiyah",
     mosqueId: "sudalmiyah",
     mosqueName: "Masjid Hj. Sudalmiyah Rais",
     mosqueLocation: "Kampus 2 UMS",
     date: primary?.date || "Jumat, 16 Oktober 2026",
-    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    hijriDate: getSafeHijri(primary?.hijriDate),
     khatibName: primary?.khatibName || "Prof. Dr. Sofyan Anif, M.Si.",
     khatibTitle: primary?.khatibTitle || "Rektor Universitas Muhammadiyah Surakarta",
     khatibPhotoUrl: primary?.khatibPhotoUrl || "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -84,7 +89,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     mosqueName: "Masjid Fadhlurrahman",
     mosqueLocation: "Kampus 1 UMS",
     date: primary?.date || "Jumat, 16 Oktober 2026",
-    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    hijriDate: getSafeHijri(primary?.hijriDate),
     khatibName: "Dr. Syamsul Hidayat, M.Ag.",
     khatibTitle: "Dekan FAI UMS / Majelis Tarjih",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -104,7 +109,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     mosqueName: "Masjid KH. Mas Mansur",
     mosqueLocation: "Kampus 4 UMS (Pesma)",
     date: primary?.date || "Jumat, 16 Oktober 2026",
-    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    hijriDate: getSafeHijri(primary?.hijriDate),
     khatibName: "Drs. Dahlan Rais, M.Hum.",
     khatibTitle: "Ketua BPH UMS / PP Muhammadiyah",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -124,7 +129,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     mosqueName: "Masjid Ma'had Abu Bakar",
     mosqueLocation: "Kampus 2 UMS",
     date: primary?.date || "Jumat, 16 Oktober 2026",
-    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    hijriDate: getSafeHijri(primary?.hijriDate),
     khatibName: "Dr. Mirwan Akhmad Taufiq, M.S.I.",
     khatibTitle: "Direktur Ma'had Abu Bakar Ash-Shiddiq",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -144,7 +149,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     mosqueName: "Masjid Ar-Razi FKG",
     mosqueLocation: "Kampus 4 UMS (FKG)",
     date: primary?.date || "Jumat, 16 Oktober 2026",
-    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    hijriDate: getSafeHijri(primary?.hijriDate),
     khatibName: "drg. Morita Sari, Sp.KG., Ph.D.",
     khatibTitle: "Dosen FKG UMS / Praktisi Kesehatan Islam",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
@@ -164,7 +169,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     mosqueName: "Masjid Munajat Shabran",
     mosqueLocation: "Makamhaji (Pondok Shabran)",
     date: primary?.date || "Jumat, 16 Oktober 2026",
-    hijriDate: primary?.hijriDate || "5 Rabiul Akhir 1448 H",
+    hijriDate: getSafeHijri(primary?.hijriDate),
     khatibName: "Nurul Huda, M.Ag.",
     khatibTitle: "Mudir Pondok Hajjah Nuriyah Shabran",
     khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",

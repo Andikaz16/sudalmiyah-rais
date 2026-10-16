@@ -28,7 +28,30 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const mosqueId = searchParams.get("mosqueId");
 
-  const schedules = db.fridaySchedules || [];
+  let schedules = db.fridaySchedules || [];
+  let changed = false;
+
+  if (db.fridaySchedule && db.fridaySchedule.hijriDate?.includes("Rabiul Akhir")) {
+    db.fridaySchedule.hijriDate = db.fridaySchedule.hijriDate.replace(/Rabiul Akhir/gi, "Jumadilawal");
+    changed = true;
+  }
+
+  schedules = schedules.map((s) => {
+    if (s.hijriDate?.includes("Rabiul Akhir")) {
+      changed = true;
+      return {
+        ...s,
+        hijriDate: s.hijriDate.replace(/Rabiul Akhir/gi, "Jumadilawal"),
+      };
+    }
+    return s;
+  });
+
+  if (changed) {
+    db.fridaySchedules = schedules;
+    saveDb(db);
+  }
+
   const activeSchedule = mosqueId
     ? schedules.find((s) => (s.mosqueId || s.id) === mosqueId) || db.fridaySchedule
     : db.fridaySchedule || schedules[0];
