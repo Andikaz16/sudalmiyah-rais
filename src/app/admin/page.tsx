@@ -219,14 +219,24 @@ export default function AdminDashboardPage() {
             const parsedCache = JSON.parse(rawCache) as {
               popup?: PopupBanner | null;
               popups?: PopupBanner[];
-              updatedAt: string;
+              explicitlyDeleted?: boolean;
+              updatedAt?: string;
             };
-            if (Array.isArray(parsedCache.popups) && parsedCache.popups.length > 0) {
-              resolvedList = parsedCache.popups;
-              resolvedPopup = resolvedList[0] || null;
-            } else if (parsedCache.popup) {
-              resolvedPopup = parsedCache.popup;
-              resolvedList = [parsedCache.popup];
+            if (!parsedCache.explicitlyDeleted) {
+              if (resolvedList.length === 0 && Array.isArray(parsedCache.popups) && parsedCache.popups.length > 0) {
+                resolvedList = parsedCache.popups;
+                resolvedPopup = resolvedList[0] || null;
+                // Silently re-seed cold serverless container with active popups
+                fetch("/api/popup", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ popups: resolvedList }),
+                }).catch(() => {});
+              } else if (Array.isArray(parsedCache.popups) && parsedCache.popups.length > resolvedList.length) {
+                // If local cache has more banners than server (e.g. cold container had older seed)
+                resolvedList = parsedCache.popups;
+                resolvedPopup = resolvedList[0] || null;
+              }
             }
           }
         } catch {
@@ -571,6 +581,7 @@ export default function AdminDashboardPage() {
         JSON.stringify({
           popup,
           popups: fullList,
+          explicitlyDeleted: fullList.length === 0,
           updatedAt: new Date().toISOString(),
         })
       );

@@ -322,7 +322,24 @@
       "createdAt": "2026-10-15T11:20:00Z"
     }
   ],
-  "popupBanner": null,
+  "popupBanner": {
+    "id": "popup-patungan-air-01",
+    "title": "Patungan Air Minum Sehat & Gratis Masjid Hj. Sudalmiyah Rais",
+    "imageUrl": "/images/popup/patungan-air-minum.jpg",
+    "targetUrl": "/donasi",
+    "isActive": true,
+    "updatedAt": "2026-10-15T13:08:05.000Z"
+  },
+  "popupBanners": [
+    {
+      "id": "popup-patungan-air-01",
+      "title": "Patungan Air Minum Sehat & Gratis Masjid Hj. Sudalmiyah Rais",
+      "imageUrl": "/images/popup/patungan-air-minum.jpg",
+      "targetUrl": "/donasi",
+      "isActive": true,
+      "updatedAt": "2026-10-15T13:08:05.000Z"
+    }
+  ],
   "documents": [
     {
       "id": "doc-01",

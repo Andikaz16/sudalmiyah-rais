@@ -55,6 +55,23 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const contentType = request.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      const body = await request.json();
+      if (Array.isArray(body.popups)) {
+        const db = getDb();
+        db.popupBanners = body.popups;
+        db.popupBanner = body.popups[0] || null;
+        saveDb(db);
+        return NextResponse.json({
+          success: true,
+          message: "Pop-up banner berhasil disinkronkan.",
+          popup: db.popupBanner,
+          popups: db.popupBanners,
+        });
+      }
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const rawTargetUrl = formData.get("targetUrl");

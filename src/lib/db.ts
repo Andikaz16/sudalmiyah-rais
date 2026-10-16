@@ -276,10 +276,24 @@ export function getDefaultDocuments(): DownloadDocument[] {
   ];
 }
 
+export function getDefaultPopupBanners(): PopupBanner[] {
+  return [
+    {
+      id: "popup-patungan-air-01",
+      title: "Patungan Air Minum Sehat & Gratis Masjid Hj. Sudalmiyah Rais",
+      imageUrl: "/images/popup/patungan-air-minum.jpg",
+      targetUrl: "/donasi",
+      isActive: true,
+      updatedAt: "2026-10-15T13:08:05.000Z",
+    },
+  ];
+}
+
 function getInitialData(): DatabaseSchema {
   const adminPasswordHash = bcrypt.hashSync("AdminSudalmiyah2026!", 10);
   const studentPasswordHash = bcrypt.hashSync("MahasiswaUMS2026!", 10);
   const defaultSchedules = getDefaultFridaySchedules();
+  const defaultPopups = getDefaultPopupBanners();
 
   return {
     users: [
@@ -353,7 +367,8 @@ function getInitialData(): DatabaseSchema {
       updatedAt: new Date().toISOString(),
     },
     registrations: [],
-    popupBanner: null,
+    popupBanner: defaultPopups[0] || null,
+    popupBanners: defaultPopups,
     finances: [
       {
         id: "fin-01",
@@ -595,6 +610,15 @@ export function getDb(): DatabaseSchema {
     }
     if (!memoryDb?.users || memoryDb.users.length === 0) {
       memoryDb!.users = getInitialData().users;
+    }
+    if (!Array.isArray(memoryDb?.popupBanners) || memoryDb.popupBanners.length === 0) {
+      if (memoryDb?.popupBanner) {
+        memoryDb!.popupBanners = [memoryDb.popupBanner];
+      } else {
+        const defaults = getDefaultPopupBanners();
+        memoryDb!.popupBanners = defaults;
+        memoryDb!.popupBanner = defaults[0] || null;
+      }
     }
     return memoryDb as DatabaseSchema;
   } catch (err) {

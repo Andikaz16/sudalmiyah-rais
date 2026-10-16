@@ -50,13 +50,26 @@ export default function AnnouncementPopup() {
             serverList = [data.popup];
           }
 
-          // Update local cache
+          // Guard local cache: do not overwrite active local cache with empty list
+          // if it was caused by a cold serverless container restart
           try {
+            const rawCache = localStorage.getItem(POPUP_CACHE_KEY);
+            if (serverList.length === 0 && rawCache) {
+              const parsed = JSON.parse(rawCache);
+              const hasCachedPopups = Array.isArray(parsed.popups) && parsed.popups.length > 0;
+              if (hasCachedPopups && !parsed.explicitlyDeleted) {
+                // Keep local cache and do not blank out screen
+                setPopups(parsed.popups.filter((p: PopupBanner) => p && p.isActive));
+                return;
+              }
+            }
+
             localStorage.setItem(
               POPUP_CACHE_KEY,
               JSON.stringify({
                 popup: serverList[0] || null,
                 popups: serverList,
+                explicitlyDeleted: serverList.length === 0,
                 updatedAt: new Date().toISOString(),
               })
             );
