@@ -2,10 +2,14 @@ import { put, list, del } from "@vercel/blob";
 import { PopupBanner } from "./types";
 
 /**
- * Checks if Vercel Blob storage is enabled via BLOB_READ_WRITE_TOKEN.
+ * Checks if Vercel Blob storage is enabled via BLOB_READ_WRITE_TOKEN or BLOB_STORE_ID (OIDC).
  */
 export function isBlobConfigured(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  return Boolean(
+    process.env.BLOB_READ_WRITE_TOKEN ||
+    process.env.BLOB_STORE_ID ||
+    process.env.VERCEL_BLOB_STORE_ID
+  );
 }
 
 /**
@@ -18,7 +22,7 @@ export async function uploadImageToBlob(
   contentType?: string
 ): Promise<string> {
   if (!isBlobConfigured()) {
-    throw new Error("BLOB_READ_WRITE_TOKEN is not configured.");
+    throw new Error("Vercel Blob storage is not configured.");
   }
 
   const cleanFilename = filename.replace(/[^a-zA-Z0-9.-]/g, "_");
