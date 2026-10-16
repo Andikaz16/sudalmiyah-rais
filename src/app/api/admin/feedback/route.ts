@@ -29,7 +29,12 @@ export async function GET(request: NextRequest) {
       filtered = filtered.filter((f) => f.status === status);
     }
     if (mosque && mosque !== "ALL") {
-      filtered = filtered.filter((f) => f.targetMosque === mosque);
+      filtered = filtered.filter(
+        (f) =>
+          f.targetMosque === mosque ||
+          f.targetMosque.startsWith(mosque) ||
+          mosque.startsWith(f.targetMosque)
+      );
     }
     if (category && category !== "ALL") {
       filtered = filtered.filter((f) => f.category === category);

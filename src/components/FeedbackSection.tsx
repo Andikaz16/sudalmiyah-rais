@@ -12,13 +12,13 @@ import {
 import { FeedbackCategory, MosqueFeedback } from "@/lib/types";
 
 const MOSQUE_OPTIONS = [
-  "Masjid Hj. Sudalmiyah Rais (Kampus 2)",
-  "Masjid Fadhlurrahman (Kampus 1)",
-  "Masjid KH. Mas Mansur (Kampus 4)",
-  "Masjid Ma'had Abu Bakar (Kampus 2)",
-  "Masjid Ar-Razi FKG (Kampus 4)",
-  "Masjid Munajat Shabran (Makamhaji)",
-  "Semua Masjid Kampus (Saran Umum)",
+  "Masjid Hj. Sudalmiyah Rais",
+  "Masjid Fadhlurrahman",
+  "Masjid KH. Mas Mansur",
+  "Masjid Ma'had Abu Bakar",
+  "Masjid Ar-Razi FKG",
+  "Masjid Munajat Shabran",
+  "Semua Masjid Kampus",
 ];
 
 const CATEGORY_OPTIONS: { key: FeedbackCategory; label: string; desc: string }[] = [

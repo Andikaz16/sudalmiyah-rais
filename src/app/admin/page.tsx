@@ -1818,13 +1818,13 @@ export default function AdminDashboardPage() {
                   className="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#003B73]"
                 >
                   <option value="ALL">Semua Masjid Kampus</option>
-                  <option value="Masjid Hj. Sudalmiyah Rais (Kampus 2)">Masjid Hj. Sudalmiyah Rais</option>
-                  <option value="Masjid Fadhlurrahman (Kampus 1)">Masjid Fadhlurrahman</option>
-                  <option value="Masjid KH. Mas Mansur (Kampus 4)">Masjid KH. Mas Mansur</option>
-                  <option value="Masjid Ma'had Abu Bakar (Kampus 2)">Masjid Ma'had Abu Bakar</option>
-                  <option value="Masjid Ar-Razi FKG (Kampus 4)">Masjid Ar-Razi FKG</option>
-                  <option value="Masjid Munajat Shabran (Makamhaji)">Masjid Munajat Shabran</option>
-                  <option value="Semua Masjid Kampus (Saran Umum)">Saran Umum Seluruh Masjid</option>
+                  <option value="Masjid Hj. Sudalmiyah Rais">Masjid Hj. Sudalmiyah Rais</option>
+                  <option value="Masjid Fadhlurrahman">Masjid Fadhlurrahman</option>
+                  <option value="Masjid KH. Mas Mansur">Masjid KH. Mas Mansur</option>
+                  <option value="Masjid Ma'had Abu Bakar">Masjid Ma'had Abu Bakar</option>
+                  <option value="Masjid Ar-Razi FKG">Masjid Ar-Razi FKG</option>
+                  <option value="Masjid Munajat Shabran">Masjid Munajat Shabran</option>
+                  <option value="Semua Masjid Kampus">Saran Umum Seluruh Masjid</option>
                 </select>
               </div>
 
