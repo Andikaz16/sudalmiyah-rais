@@ -282,7 +282,7 @@ export function getDefaultPopupBanners(): PopupBanner[] {
       id: "popup-patungan-air-01",
       title: "Patungan Air Minum Sehat & Gratis Masjid Hj. Sudalmiyah Rais",
       imageUrl: "/images/popup/patungan-air-minum.jpg",
-      targetUrl: "/donasi",
+      targetUrl: "",
       isActive: true,
       updatedAt: "2026-10-15T13:08:05.000Z",
     },

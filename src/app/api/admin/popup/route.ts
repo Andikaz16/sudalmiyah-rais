@@ -52,6 +52,26 @@ export async function GET(request: NextRequest) {
     popups = getPopupsList(db);
   }
 
+  // Ensure no legacy automatic /donasi persists unless explicitly re-entered
+  let hasLegacyDonasi = false;
+  popups = popups.map((p) => {
+    if (p.targetUrl === "/donasi") {
+      hasLegacyDonasi = true;
+      return { ...p, targetUrl: "" };
+    }
+    return p;
+  });
+
+  if (hasLegacyDonasi) {
+    const db = getDb();
+    db.popupBanners = popups;
+    db.popupBanner = popups[0] || null;
+    saveDb(db);
+    if (isBlobConfigured()) {
+      savePopupsToBlob(popups).catch(() => {});
+    }
+  }
+
   return NextResponse.json(
     {
       popup: popups[0] || null,

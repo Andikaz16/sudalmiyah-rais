@@ -131,13 +131,20 @@ export default function AnnouncementPopup() {
   if (popups.length === 0) return null;
 
   const current = popups[0];
-  const cleanUrl = current.targetUrl?.trim() || "";
+  const rawTargetUrl = current.targetUrl?.trim() || "";
+  const cleanUrl = rawTargetUrl === "/donasi" ? "" : rawTargetUrl;
   const hasUrl = cleanUrl.length > 0;
-  const isExternal =
-    cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://");
+
+  const isHttpOrHttps = cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://");
+  const isExplicitInternal = cleanUrl.startsWith("/");
+  const isExternalDomain = !isExplicitInternal && (cleanUrl.includes(".") || cleanUrl.startsWith("wa.me"));
+  const isExternal = isHttpOrHttps || isExternalDomain;
+
   const normalizedHref = hasUrl
     ? isExternal
-      ? cleanUrl
+      ? isHttpOrHttps
+        ? cleanUrl
+        : `https://${cleanUrl}`
       : cleanUrl.startsWith("/")
       ? cleanUrl
       : `/${cleanUrl}`
@@ -147,8 +154,8 @@ export default function AnnouncementPopup() {
     if (!hasUrl) return;
     e.preventDefault();
     handleCloseOne(current.id);
-    if (isExternal) {
-      window.open(cleanUrl, "_blank", "noopener,noreferrer");
+    if (isExternal && normalizedHref) {
+      window.open(normalizedHref, "_blank", "noopener,noreferrer");
     } else if (normalizedHref) {
       router.push(normalizedHref);
     }

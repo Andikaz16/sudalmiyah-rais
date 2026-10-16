@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse, connection } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDb, saveDb } from "@/lib/db";
 import { PopupBanner } from "@/lib/types";
-import { isBlobConfigured, readPopupsFromBlob } from "@/lib/blobStorage";
+import { isBlobConfigured, readPopupsFromBlob, savePopupsToBlob } from "@/lib/blobStorage";
 import { POST as adminPost, PATCH as adminPatch, DELETE as adminDelete } from "@/app/api/admin/popup/route";
 
 export async function GET(request: NextRequest) {
@@ -30,6 +30,26 @@ export async function GET(request: NextRequest) {
         allPopups = db.popupBanners;
       } else if (db.popupBanner) {
         allPopups = [db.popupBanner];
+      }
+    }
+
+    // Sanitize any legacy automatic /donasi
+    let hasLegacyDonasi = false;
+    allPopups = allPopups.map((p) => {
+      if (p.targetUrl === "/donasi") {
+        hasLegacyDonasi = true;
+        return { ...p, targetUrl: "" };
+      }
+      return p;
+    });
+
+    if (hasLegacyDonasi) {
+      const db = getDb();
+      db.popupBanners = allPopups;
+      db.popupBanner = allPopups[0] || null;
+      saveDb(db);
+      if (isBlobConfigured()) {
+        savePopupsToBlob(allPopups).catch(() => {});
       }
     }
 
