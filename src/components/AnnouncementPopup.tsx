@@ -7,19 +7,32 @@ import { PopupBanner } from "@/lib/types";
 
 export const POPUP_CACHE_KEY = "sudalmiyah_popup_cache";
 
+// Module-level in-memory session flags:
+// Persists during client-side SPA navigation between pages (e.g. Beranda -> Ruang Ibadah -> Beranda),
+// but automatically resets when the browser page is reloaded / refreshed (F5 / browser refresh).
+let sessionDismissed = false;
+let sessionActivePopups: PopupBanner[] | null = null;
+
 export default function AnnouncementPopup() {
   // Synchronous initialization from local cache for instant 0ms appearance
   const [popups, setPopups] = useState<PopupBanner[]>(() => {
     if (typeof window === "undefined") return [];
+    if (sessionDismissed) return [];
+    if (sessionActivePopups !== null) return sessionActivePopups;
+
     try {
       const rawCache = localStorage.getItem(POPUP_CACHE_KEY);
       if (rawCache) {
         const parsed = JSON.parse(rawCache);
         if (Array.isArray(parsed.popups) && parsed.popups.length > 0) {
-          return parsed.popups.filter((p: PopupBanner) => p && p.isActive);
+          const list = parsed.popups.filter((p: PopupBanner) => p && p.isActive);
+          sessionActivePopups = list;
+          return list;
         }
         if (parsed.popup && parsed.popup.isActive) {
-          return [parsed.popup];
+          const list = [parsed.popup];
+          sessionActivePopups = list;
+          return list;
         }
       }
     } catch {
@@ -31,7 +44,14 @@ export default function AnnouncementPopup() {
   const router = useRouter();
 
   const handleCloseOne = useCallback((id: string) => {
-    setPopups((prev) => prev.filter((item) => item.id !== id));
+    setPopups((prev) => {
+      const next = prev.filter((item) => item.id !== id);
+      sessionActivePopups = next;
+      if (next.length === 0) {
+        sessionDismissed = true;
+      }
+      return next;
+    });
   }, []);
 
   // Background fetch to sync with latest takmir updates
@@ -58,8 +78,12 @@ export default function AnnouncementPopup() {
               const parsed = JSON.parse(rawCache);
               const hasCachedPopups = Array.isArray(parsed.popups) && parsed.popups.length > 0;
               if (hasCachedPopups && !parsed.explicitlyDeleted) {
-                // Keep local cache and do not blank out screen
-                setPopups(parsed.popups.filter((p: PopupBanner) => p && p.isActive));
+                // Keep local cache
+                if (!sessionDismissed) {
+                  const kept = parsed.popups.filter((p: PopupBanner) => p && p.isActive);
+                  setPopups(kept);
+                  sessionActivePopups = kept;
+                }
                 return;
               }
             }
@@ -77,7 +101,13 @@ export default function AnnouncementPopup() {
             // ignore storage errors
           }
 
-          setPopups(serverList);
+          if (!sessionDismissed) {
+            setPopups(serverList);
+            sessionActivePopups = serverList;
+            if (serverList.length === 0) {
+              sessionDismissed = true;
+            }
+          }
         }
       } catch (err) {
         console.error("AnnouncementPopup sync error:", err);

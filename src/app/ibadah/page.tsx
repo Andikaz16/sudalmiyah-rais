@@ -131,16 +131,65 @@ const FEATURE_LIST: FeatureCard[] = [
 export default function IbadahPage() {
   const [activeFeature, setActiveFeature] = useState<FeatureKey | null>(null);
 
-  // Close feature view with ESC to return to menu
+  const handleOpenFeature = (featId: FeatureKey) => {
+    setActiveFeature(featId);
+    if (typeof window !== "undefined") {
+      window.history.pushState({ ibadahFeature: featId }, "", `#${featId}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handleBackToMenu = () => {
+    if (typeof window !== "undefined") {
+      if (window.history.state?.ibadahFeature || window.location.hash) {
+        window.history.back();
+        return;
+      }
+    }
+    setActiveFeature(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Close feature view with ESC to return to menu, and sync with popstate (phone back button)
   useEffect(() => {
+    // Initial mount sync with hash
+    const initialHash = window.location.hash.replace("#", "");
+    if (initialHash) {
+      const matched = FEATURE_LIST.find(
+        (f) => f.id === initialHash || initialHash.startsWith(`${f.id}-`)
+      );
+      if (matched) {
+        setActiveFeature(matched.id);
+      }
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setActiveFeature(null);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        handleBackToMenu();
       }
     };
+
+    const handlePopState = (e: PopStateEvent) => {
+      const state = e.state;
+      const currentHash = window.location.hash.replace("#", "");
+      if (state && state.ibadahFeature) {
+        setActiveFeature(state.ibadahFeature);
+      } else if (currentHash) {
+        const matched = FEATURE_LIST.find(
+          (f) => f.id === currentHash || currentHash.startsWith(`${f.id}-`)
+        );
+        setActiveFeature(matched ? matched.id : null);
+      } else {
+        setActiveFeature(null);
+      }
+    };
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("popstate", handlePopState);
+    };
   }, []);
 
   const currentFeat = FEATURE_LIST.find((f) => f.id === activeFeature);
@@ -182,10 +231,7 @@ export default function IbadahPage() {
                 {FEATURE_LIST.map((feat, idx) => (
                   <button
                     key={feat.id}
-                    onClick={() => {
-                      setActiveFeature(feat.id);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
+                    onClick={() => handleOpenFeature(feat.id)}
                     style={{ animationDelay: `${idx * 45}ms` }}
                     className="group relative bg-white border border-stone-200/90 rounded-2xl sm:rounded-3xl p-3 sm:p-5 flex flex-col items-center justify-between text-center shadow-sm hover:shadow-xl hover:border-[#D4AF37] hover:-translate-y-1.5 active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden aspect-square sm:aspect-auto sm:min-h-[200px] animate-fade-up"
                   >
@@ -251,10 +297,7 @@ export default function IbadahPage() {
                 <div className="flex items-center gap-3">
                   {/* Back button (Arrow Icon) */}
                   <button
-                    onClick={() => {
-                      setActiveFeature(null);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
+                    onClick={handleBackToMenu}
                     className="w-10 h-10 rounded-xl bg-stone-100 hover:bg-stone-200 active:scale-95 text-stone-700 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-stone-200 shrink-0"
                     title="Kembali ke Menu Ruang Ibadah"
                     aria-label="Kembali ke Menu Ruang Ibadah"
@@ -478,8 +521,26 @@ function QuranFeatureView() {
     );
   });
 
-  const handleOpenSurah = async (surahNumber: number, targetAyah?: number) => {
+  const handleBackToSurahList = () => {
+    if (typeof window !== "undefined") {
+      if (window.history.state?.surah || window.location.hash.includes("-surah-")) {
+        window.history.back();
+        return;
+      }
+    }
+    setSelectedSurah(null);
+    setJuzContext(null);
+  };
+
+  const handleOpenSurah = async (surahNumber: number, targetAyah?: number, skipPushState = false) => {
     setSelectedSurah(surahNumber);
+    if (!skipPushState && typeof window !== "undefined") {
+      window.history.pushState(
+        { ibadahFeature: "quran", surah: surahNumber },
+        "",
+        `#quran-surah-${surahNumber}`
+      );
+    }
     setLoading(true);
     setSurahDetail(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -505,6 +566,39 @@ function QuranFeatureView() {
       }
     }
   };
+
+  // Sync phone back button with Surah reading state
+  useEffect(() => {
+    const initialHash = window.location.hash;
+    if (initialHash.startsWith("#quran-surah-")) {
+      const num = parseInt(initialHash.replace("#quran-surah-", ""), 10);
+      if (!isNaN(num) && num >= 1 && num <= 114) {
+        handleOpenRegularSurah(num);
+      }
+    }
+
+    const onPopState = (e: PopStateEvent) => {
+      const state = e.state;
+      const currentHash = window.location.hash;
+      if (state && typeof state.surah === "number") {
+        if (state.surah !== selectedSurah) {
+          handleOpenSurah(state.surah, undefined, true);
+        }
+      } else if (currentHash.startsWith("#quran-surah-")) {
+        const num = parseInt(currentHash.replace("#quran-surah-", ""), 10);
+        if (!isNaN(num) && num !== selectedSurah) {
+          handleOpenSurah(num, undefined, true);
+        }
+      } else {
+        // Popped back to Surah list
+        setSelectedSurah(null);
+        setJuzContext(null);
+      }
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [selectedSurah]);
 
   const handleOpenRegularSurah = (surahNumber: number) => {
     setJuzContext(null);
@@ -588,10 +682,7 @@ function QuranFeatureView() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between pb-4 border-b border-stone-200 mb-6 gap-3">
             <div className="flex items-center gap-2">
               <button
-                onClick={() => {
-                  setSelectedSurah(null);
-                  setJuzContext(null);
-                }}
+                onClick={handleBackToSurahList}
                 className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-stone-50 border border-stone-200 text-stone-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-xs"
               >
                 <svg
@@ -777,10 +868,7 @@ function QuranFeatureView() {
               {/* Navigasi Bawah Antar Surat & Juz */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-stone-200">
                 <button
-                  onClick={() => {
-                    setSelectedSurah(null);
-                    setJuzContext(null);
-                  }}
+                  onClick={handleBackToSurahList}
                   className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white hover:bg-stone-50 border border-stone-200 text-stone-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-xs"
                 >
                   Kembali ke Daftar Al-Qur'an
