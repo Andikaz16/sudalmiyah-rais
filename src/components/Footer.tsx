@@ -110,15 +110,15 @@ export default function Footer() {
             <div className="space-y-2 text-xs text-stone-300">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
-                <span>Kampus 2 UMS, Jl. A. Yani, Pabelan, Kartasura, Sukoharjo, Jawa Tengah</span>
+                <span>Kampus 2, Jl. Ahmad Yani, Pabelan, Kecamatan Kartasura, Kabupaten Sukoharjo, Jawa Tengah 57162</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                <span>(0271) 717417 ext. Takmir</span>
+                <span>(0271) 717417 ext. 3158</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                <span>masjid.sudalmiyah@ums.ac.id</span>
+                <span>lppik@ums.ac.id</span>
               </div>
             </div>
 
