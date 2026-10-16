@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { QrisSettings } from "@/lib/types";
+import { getHijriDate } from "@/lib/prayer-times";
 
 interface InfaqHadith {
   id: number;
@@ -172,7 +173,17 @@ export default function DonationSection() {
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
 
   const formatHadithShareText = (hadith: InfaqHadith) => {
+    const today = new Date();
+    const hijriDate = getHijriDate(today);
+    const masehiDate = new Intl.DateTimeFormat("id-ID", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(today);
+
     return `MUTIARA HADITS: ${hadith.theme}
+${masehiDate} / ${hijriDate} (KHGT)
 
 ${hadith.arabic}
 
@@ -181,6 +192,7 @@ ${hadith.arabic}
 (${hadith.source} — ${hadith.fadhilah})
 
 Disiarkan oleh Masjid Sudalmiyah Rais - Universitas Muhammadiyah Surakarta
+Penanggalan: ${hijriDate} (Kalender Hijriyah Global Tunggal - KHGT)
 Infaq Digital: https://masjidsudalmiyah.ums.ac.id/#donasi`;
   };
 

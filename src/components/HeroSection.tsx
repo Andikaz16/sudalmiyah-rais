@@ -21,7 +21,7 @@ const HERO_SLIDES: HeroSlide[] = [
     leadWord: "Kedamaian Ibadah di",
     mosqueName: "Masjid Sudalmiyah Rais",
     description:
-      "Masjid percontohan Amal Usaha Muhammadiyah (AUM) di tingkat PTMA sebagai pembinaan sivitas akademika UMS yang diproyeksikan menjadi masjid ramah aktivis dan lingkungan",
+      "Masjid percontohan Amal Usaha Muhammadiyah tingkat PTMA sebagai pilar pembinaan AIK bagi sivitas akademika UMS, dan diproyeksikan menjadi masjid ramah aktivis dan lingkungan",
     objectPosition: "object-[center_35%]",
   },
   {

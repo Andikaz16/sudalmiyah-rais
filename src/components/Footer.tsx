@@ -37,7 +37,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-stone-300 text-xs leading-relaxed max-w-md">
-              Pusat peribadatan dan teladan Masjid Percontohan Amal Usaha Muhammadiyah (AUM) bagi civitas akademika UMS dan masyarakat luas. Mengimplementasikan standar Idarah, Imarah, dan Ri&apos;ayah yang profesional, inklusif, makmur dan memakmurkan.
+              Masjid percontohan Amal Usaha Muhammadiyah (AUM) tingkat PTMA dan menjadi pusat pembinaan AIK bagi civitas akademika UMS. Mengimplementasikan gerakan Islam yang unggul dan berkemajuan berbasis jama&apos;ah, jam&apos;iyah dan jariyah.
             </p>
             <div className="flex items-center gap-2 pt-1 text-[#FCD34D] text-xs font-medium">
               <ShieldCheck className="w-4 h-4 shrink-0" />
