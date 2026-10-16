@@ -58,7 +58,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/#masjidmu" className="hover:text-[#FCD34D] transition-colors">
-                  Pilar Masjid Percontohan AUM
+                  Pilar Masjid Percontohan LPCR-PM
                 </Link>
               </li>
               <li>

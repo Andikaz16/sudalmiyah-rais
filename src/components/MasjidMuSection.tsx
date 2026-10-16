@@ -110,11 +110,14 @@ export default function MasjidMuSection() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-            Masjid Percontohan <span className="text-[#003B73]">AUM</span>
+            Masjid Percontohan <span className="text-[#003B73]">LPCR-PM</span>
           </h2>
+          <p className="mt-2 text-xs sm:text-sm font-semibold tracking-wider text-[#003B73]/90 uppercase font-sans">
+            Lembaga Pengembangan Cabang Ranting &amp; Pembinaan Masjid PP Muhammadiyah
+          </p>
 
           <p className="mt-4 text-sm sm:text-base text-stone-600 leading-relaxed">
-            Masjid UMS hadir sebagai teladan dan standar <strong>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</strong> di lingkungan Perguruan Tinggi Muhammadiyah dan &apos;Aisyiyah (PTMA) serta institusi persyarikatan. Menjadi episentrum pembinaan spiritual, integrasi Al-Islam &amp; Kemuhammadiyahan (AIK), pengkaderan persyarikatan, serta tata kelola modern berbasis Idarah, Imarah, dan Ri&apos;ayah.
+            Masjid UMS hadir sebagai teladan dan standar <strong>Masjid Percontohan LPCR-PM (Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid) Pimpinan Pusat Muhammadiyah</strong> di lingkungan Perguruan Tinggi Muhammadiyah dan &apos;Aisyiyah (PTMA) serta institusi persyarikatan. Menjadi episentrum pembinaan spiritual, integrasi Al-Islam &amp; Kemuhammadiyahan (AIK), pengkaderan persyarikatan, serta tata kelola modern berbasis Idarah, Imarah, dan Ri&apos;ayah.
           </p>
         </div>
 
@@ -205,10 +208,10 @@ export default function MasjidMuSection() {
         <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#002855] via-[#003B73] to-[#001F3F] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-blue-400/20">
           <div className="space-y-2 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-bold font-serif">
-              Mewujudkan Standar Masjid Percontohan AUM Berkemajuan
+              Mewujudkan Standar Masjid Percontohan LPCR-PM Berkemajuan
             </h3>
             <p className="text-xs sm:text-sm text-stone-200 max-w-2xl leading-relaxed">
-              Dukung penguatan peran masjid di lingkungan Amal Usaha Muhammadiyah melalui partisipasi aktif ibadah berjamaah, penguatan kajian AIK, pemanfaatan ruang ibadah digital, serta saluran infaq berkah.
+              Dukung penguatan peran masjid di lingkungan LPCR-PM dan Amal Usaha Muhammadiyah melalui partisipasi aktif ibadah berjamaah, penguatan kajian AIK, pemanfaatan ruang ibadah digital, serta saluran infaq berkah.
             </p>
           </div>
 
