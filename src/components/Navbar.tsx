@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -15,8 +15,49 @@ import {
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [layananDropdownOpen, setLayananDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const pathname = usePathname();
+
+  const handleDropdownEnter = () => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+      leaveTimeoutRef.current = null;
+    }
+    setLayananDropdownOpen(true);
+  };
+
+  const handleDropdownLeave = () => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+    }
+    leaveTimeoutRef.current = setTimeout(() => {
+      setLayananDropdownOpen(false);
+    }, 250);
+  };
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setLayananDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setLayananDropdownOpen(false);
+    setIsOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -74,13 +115,17 @@ export default function Navbar() {
                 return (
                   <div
                     key="layanan-dropdown"
+                    ref={dropdownRef}
                     className="relative"
-                    onMouseEnter={() => setLayananDropdownOpen(true)}
-                    onMouseLeave={() => setLayananDropdownOpen(false)}
+                    onMouseEnter={handleDropdownEnter}
+                    onMouseLeave={handleDropdownLeave}
                   >
                     <button
                       type="button"
-                      onClick={() => setLayananDropdownOpen(!layananDropdownOpen)}
+                      onClick={() => {
+                        if (leaveTimeoutRef.current) clearTimeout(leaveTimeoutRef.current);
+                        setLayananDropdownOpen((prev) => !prev);
+                      }}
                       className={`px-3.5 py-2 rounded-full text-sm font-medium transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${
                         isLayananActive
                           ? "text-[#003B73] font-semibold bg-[#003B73]/10"
@@ -95,52 +140,61 @@ export default function Navbar() {
                       />
                     </button>
 
-                    {/* Dropdown Menu Box */}
+                    {/* Dropdown Menu Box with zero-gap hover bridge */}
                     {layananDropdownOpen && (
-                      <div className="absolute top-full left-0 mt-1 w-72 rounded-2xl bg-white border border-stone-200/90 shadow-2xl p-2 z-50 animate-fade-in space-y-1">
-                        <Link
-                          href="/layanan"
-                          onClick={() => setLayananDropdownOpen(false)}
-                          className={`p-2.5 rounded-xl flex items-start gap-3 transition-colors ${
-                            pathname === "/layanan"
-                              ? "bg-stone-100 text-[#003B73]"
-                              : "hover:bg-stone-50 text-stone-800"
-                          }`}
-                        >
-                          <div className="p-2 rounded-lg bg-[#003B73]/10 text-[#003B73] shrink-0 mt-0.5">
-                            <Building2 className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold leading-tight">
-                              Formulir Peminjaman
-                            </div>
-                            <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
-                              Peminjaman aula, ruang serbaguna, dan fasilitas masjid
-                            </div>
-                          </div>
-                        </Link>
+                      <div
+                        className="absolute top-full left-0 pt-2 w-72 z-50 animate-fade-in"
+                        onMouseEnter={handleDropdownEnter}
+                        onMouseLeave={handleDropdownLeave}
+                      >
+                        {/* Invisible hover bridge buffer connecting trigger button to menu */}
+                        <div className="absolute -top-2 left-0 right-0 h-4 bg-transparent pointer-events-auto" />
 
-                        <Link
-                          href="/layanan/unduhan"
-                          onClick={() => setLayananDropdownOpen(false)}
-                          className={`p-2.5 rounded-xl flex items-start gap-3 transition-colors ${
-                            pathname === "/layanan/unduhan"
-                              ? "bg-stone-100 text-[#003B73]"
-                              : "hover:bg-stone-50 text-stone-800"
-                          }`}
-                        >
-                          <div className="p-2 rounded-lg bg-amber-500/10 text-amber-800 shrink-0 mt-0.5">
-                            <BookOpen className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold leading-tight">
-                              Pusat Unduhan Dokumen
+                        <div className="rounded-2xl bg-white border border-stone-200/90 shadow-2xl p-2 space-y-1 relative z-10">
+                          <Link
+                            href="/layanan"
+                            onClick={() => setLayananDropdownOpen(false)}
+                            className={`p-2.5 rounded-xl flex items-start gap-3 transition-colors ${
+                              pathname === "/layanan"
+                                ? "bg-stone-100 text-[#003B73]"
+                                : "hover:bg-stone-50 text-stone-800"
+                            }`}
+                          >
+                            <div className="p-2 rounded-lg bg-[#003B73]/10 text-[#003B73] shrink-0 mt-0.5">
+                              <Building2 className="w-4 h-4" />
                             </div>
-                            <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
-                              E-Book HPT, PHIWM, Risalah Islam Berkemajuan, &amp; panduan
+                            <div>
+                              <div className="text-xs font-bold leading-tight">
+                                Formulir Peminjaman
+                              </div>
+                              <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
+                                Peminjaman aula, ruang serbaguna, dan fasilitas masjid
+                              </div>
                             </div>
-                          </div>
-                        </Link>
+                          </Link>
+
+                          <Link
+                            href="/layanan/unduhan"
+                            onClick={() => setLayananDropdownOpen(false)}
+                            className={`p-2.5 rounded-xl flex items-start gap-3 transition-colors ${
+                              pathname === "/layanan/unduhan"
+                                ? "bg-stone-100 text-[#003B73]"
+                                : "hover:bg-stone-50 text-stone-800"
+                            }`}
+                          >
+                            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-800 shrink-0 mt-0.5">
+                              <BookOpen className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <div className="text-xs font-bold leading-tight">
+                                Pusat Unduhan Dokumen
+                              </div>
+                              <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
+                                E-Book HPT, PHIWM, Risalah Islam Berkemajuan, &amp; panduan
+                              </div>
+                            </div>
+                          </Link>
+                        </div>
                       </div>
                     )}
                   </div>
