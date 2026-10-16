@@ -18,7 +18,7 @@ const HERO_SLIDES: HeroSlide[] = [
   {
     id: "sudalmiyah",
     image: "/images/masjid-sudalmiyah.jpg",
-    leadWord: "Kedamaian Ibadah di",
+    leadWord: "Harmoni Ibadah Lintas Fakultas di",
     mosqueName: "Masjid Sudalmiyah Rais",
     description:
       "Masjid percontohan Amal Usaha Muhammadiyah tingkat PTMA sebagai pilar pembinaan AIK bagi sivitas akademika UMS, dan diproyeksikan menjadi masjid ramah aktivis dan lingkungan",
@@ -27,7 +27,7 @@ const HERO_SLIDES: HeroSlide[] = [
   {
     id: "fadhlurrahman",
     image: "/images/hero-fadhlurrahman.jpg",
-    leadWord: "Kesejukan Syiar di",
+    leadWord: "Ghirah Berislam di",
     mosqueName: "Masjid Fadhlurrahman",
     description:
       "Masjid pertama dan bersejarah yang menjadi ruh pembinaan Al-Islam dan Kemuhammadiyahan bagi civitas akademika UMS",
@@ -36,7 +36,7 @@ const HERO_SLIDES: HeroSlide[] = [
   {
     id: "mas-mansur",
     image: "/images/hero-mas-mansur.jpg",
-    leadWord: "Keteduhan Ruhani di",
+    leadWord: "Kesejukan Ruhani di",
     mosqueName: "Masjid KH. Mas Mansur",
     description:
       "Sentra pembinaan mahasiswa interdisipliner UMS dan International dalam pengembangan keilmuan yang berakhlak, berprestasi dan bermanfaat",
@@ -46,7 +46,7 @@ const HERO_SLIDES: HeroSlide[] = [
     id: "mahad-abu-bakar",
     image: "/images/hero-mahad-abu-bakar.jpg",
     leadWord: "Keluhuran Ilmu & Adab di",
-    mosqueName: "Masjid Ma'had Abu Bakar",
+    mosqueName: "Masjid Ma'had Abu Bakar Ash-Shiddiq",
     description:
       "Pusat dirasat Islamiyah dan bahasa Arab Ma'had Abu bakar Ash-Shiddiq yang sekarang statusnya menjadi Amal Usaha Muhammadiyah (AUM) di lingkungan UMS",
     objectPosition: "object-[center_40%]",
@@ -54,7 +54,7 @@ const HERO_SLIDES: HeroSlide[] = [
   {
     id: "ar-razi",
     image: "/images/hero-ar-razi.jpg",
-    leadWord: "Keberkahan & Dedikasi di",
+    leadWord: "Integrasi Keislaman & Keilmuan di",
     mosqueName: "Masjid Ar-Razi FKG",
     description:
       "Masjid yang terinspirasi ilmuwan polimatik terkemuka dan ahli di beberapa bidang utama, terutama kedokteran, kimia dan filsafat yakni Abu Bakar Muhammad bin Zakariya al-Razi",
@@ -63,8 +63,8 @@ const HERO_SLIDES: HeroSlide[] = [
   {
     id: "munajat-shabran",
     image: "/images/hero-munajat-shabran.jpg",
-    leadWord: "Ghirah Perkaderan di",
-    mosqueName: "Masjid Munajat Shabran",
+    leadWord: "Pusat Perkaderan di",
+    mosqueName: "Masjid Al-Munajat Pondok Shabran",
     description:
       "Pusat perkaderan mahasiswa utusan wilayah Muhammadiyah seluruh Indonesia yang diorbitkan menjadi kader intelek ulama', ulama' intelek.",
     objectPosition: "object-center",
