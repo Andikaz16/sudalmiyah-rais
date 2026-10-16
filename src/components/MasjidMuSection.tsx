@@ -38,11 +38,11 @@ export default function MasjidMuSection() {
       color: "text-[#003B73]",
       bgBadge: "bg-[#003B73]/10 text-[#003B73] border-[#003B73]/20",
       description:
-        "Standar manajemen kelembagaan masjid LPCR-PM dengan tata kelola profesional, transparansi digital terverifikasi audit, kepengurusan terstruktur, serta sinergi erat bersama institusi kampus dan Ortom.",
+        "Standar manajemen kelembagaan masjid LPCR-PM dengan tata kelola profesional, transparansi digital terverifikasi audit, kepengurusan terstruktur, serta sinergi erat bersama institusi kampus, Ortom, Ormawa, dan UKM.",
       points: [
         "Integrasi tata kelola manajerial berstandar LPCR-PM & PTMA",
         "Laporan keuangan infaq terbuka, teraudit & real-time",
-        "Sinergi aktif bersama Ortom (IMM, Tapak Suci, HW, & 'Aisyiyah)",
+        "Sinergi aktif bersama Ortom (IMM, Tapak Suci, HW, & 'Aisyiyah), Ormawa, dan UKM",
       ],
     },
     {
