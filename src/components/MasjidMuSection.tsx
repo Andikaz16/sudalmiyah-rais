@@ -84,7 +84,7 @@ export default function MasjidMuSection() {
       icon: BookOpen,
     },
     {
-      label: "Standar Hisab MASA Tarjih",
+      label: "Standar MASA SatuMu",
       desc: "Akurasi Waktu Ibadah & Pedoman HPT Resmi",
       icon: Compass,
     },
