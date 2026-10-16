@@ -16,63 +16,48 @@ import {
 export default function MasjidMuSection() {
   const pillars = [
     {
-      code: "IDARAH",
-      title: "Tata Kelola & Manajemen AUM Berkemajuan",
-      subtitle: "Good Governance Institusi Persyarikatan",
-      icon: ShieldCheck,
-      color: "text-[#003B73]",
-      bgBadge: "bg-[#003B73]/10 text-[#003B73] border-[#003B73]/20",
-      description:
-        "Standar manajemen kelembagaan masjid di lingkungan Amal Usaha Muhammadiyah (AUM) dengan tata kelola profesional, transparansi digital terverifikasi audit, kepengurusan terstruktur, dan akuntabilitas syariah.",
-      points: [
-        "Integrasi tata kelola manajerial berstandar AUM & PTMA",
-        "Laporan keuangan infaq terbuka, teraudit & real-time",
-        "SOP takmir profesional dan digitalisasi layanan fasilitas",
-      ],
-    },
-    {
-      code: "IMARAH",
-      title: "Kemakmuran Ibadah & Episentrum AIK",
-      subtitle: "Dakwah Mencerahkan & Kaderisasi Persyarikatan",
-      icon: Compass,
+      code: "JAMA'AH",
+      title: "Pembinaan Jama'ah & Kemakmuran Ibadah",
+      subtitle: "Dakwah Mencerahkan & Penguatan AIK",
+      icon: Users,
       color: "text-[#B58A1E]",
       bgBadge: "bg-[#B58A1E]/10 text-[#B58A1E] border-[#B58A1E]/20",
       description:
-        "Menggerakkan peribadatan berpedoman resmi HPT PP Muhammadiyah dan hisab MASA, sekaligus menjadi episentrum pembinaan Al-Islam dan Kemuhammadiyahan (AIK) bagi seluruh pimpinan, dosen, karyawan, dan mahasiswa.",
+        "Menggerakkan peribadatan berpedoman resmi HPT PP Muhammadiyah dan hisab MASA SatuMu, penguatan ideologi AIK, serta kajian tematik ilmiah yang menyejukkan bagi civitas akademika dan masyarakat.",
       points: [
-        "Pusat pembinaan ideologi AIK civitas akademika & pimpinan AUM",
-        "Jadwal shalat hisab astronomis standar Munas Tarjih & MASA",
+        "Pusat pembinaan ideologi AIK civitas akademika & mahasiswa",
+        "Jadwal shalat hisab astronomis standar Munas Tarjih & MASA SatuMu",
         "Kajian tematik ilmiah, fatwa tarjih, dan ruang ibadah digital",
       ],
     },
     {
-      code: "RI'AYAH",
-      title: "Infrastruktur Unggul & Eco-Mosque",
-      subtitle: "Standar Sarana Representatif AUM",
-      icon: Leaf,
-      color: "text-emerald-700",
-      bgBadge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      code: "JAM'IYAH",
+      title: "Tata Kelola Organisasi & Manajemen Modern",
+      subtitle: "Good Governance & Sinergi Persyarikatan",
+      icon: ShieldCheck,
+      color: "text-[#003B73]",
+      bgBadge: "bg-[#003B73]/10 text-[#003B73] border-[#003B73]/20",
       description:
-        "Pemeliharaan fisik, sanitasi, dan fasilitas masjid representatif standar kampus unggul. Mengedepankan prinsip Eco-Campus/Eco-Mosque ramah lingkungan, hemat energi, serta aksesibilitas inklusif ramah difabel dan lansia.",
+        "Standar manajemen kelembagaan masjid LPCR-PM dengan tata kelola profesional, transparansi digital terverifikasi audit, kepengurusan terstruktur, serta sinergi erat bersama institusi kampus dan Ortom.",
       points: [
-        "Standar sarana representatif bagi tamu, civitas, dan jamaah AUM",
-        "Aksesibilitas ramah kursi roda, disabilitas, dan ramah lansia",
-        "Penerapan prinsip Eco-Mosque, efisiensi energi & kebersihan prima",
+        "Integrasi tata kelola manajerial berstandar LPCR-PM & PTMA",
+        "Laporan keuangan infaq terbuka, teraudit & real-time",
+        "Sinergi aktif bersama Ortom (IMM, Tapak Suci, HW, & 'Aisyiyah)",
       ],
     },
     {
-      code: "SOSIAL",
-      title: "Pemberdayaan Umat & Sinergi Persyarikatan",
-      subtitle: "Masjid Makmur dan Memakmurkan Sekitar",
+      code: "JARIYAH",
+      title: "Pemberdayaan Umat & Sarana Lestari",
+      subtitle: "Filantropi Digital, Beasiswa & Eco-Mosque",
       icon: HeartHandshake,
-      color: "text-[#003B73]",
-      bgBadge: "bg-blue-50 text-[#003B73] border-blue-200",
+      color: "text-emerald-700",
+      bgBadge: "bg-emerald-50 text-emerald-700 border-emerald-200",
       description:
-        "Wujud kepedulian sosial AUM melalui optimalisasi infaq digital untuk beasiswa mahasiswa, kemaslahatan masyarakat sekitar kampus, serta sinergi pengkaderan bersama Organisasi Otonom (Ortom) Muhammadiyah.",
+        "Optimalisasi infaq dan wakaf digital untuk beasiswa mahasiswa serta kemaslahatan sosial, didukung sarana prasarana fisik representatif standar kampus unggul yang ramah lingkungan dan difabel.",
       points: [
         "Penyaluran infaq berkah untuk beasiswa dan santunan sosial",
-        "Sinergi aktif bersama Ortom (IMM, Tapak Suci, HW, & 'Aisyiyah)",
-        "Pelayanan umat dan kemitraan harmonis warga sekitar lingkungan AUM",
+        "Aksesibilitas inklusif ramah disabilitas, lansia, & sarana unggul",
+        "Penerapan prinsip Eco-Mosque ramah lingkungan & efisiensi energi",
       ],
     },
   ];
@@ -146,14 +131,14 @@ export default function MasjidMuSection() {
           })}
         </div>
 
-        {/* Four Core Pillars Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        {/* Three 3J Pillars Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {pillars.map((pillar, idx) => {
             const Icon = pillar.icon;
             return (
               <div
                 key={idx}
-                className="rounded-3xl border border-stone-200/90 bg-[#FAF8F5]/60 p-6 sm:p-8 flex flex-col justify-between hover:bg-white hover:shadow-xl hover:border-[#D4AF37]/40 transition-all duration-300 group"
+                className="rounded-3xl border border-stone-200/90 bg-[#FAF8F5]/60 p-6 sm:p-7 flex flex-col justify-between hover:bg-white hover:shadow-xl hover:border-[#D4AF37]/40 transition-all duration-300 group"
               >
                 <div>
                   {/* Top Meta */}
@@ -169,15 +154,15 @@ export default function MasjidMuSection() {
                   </div>
 
                   {/* Title & Subtitle */}
-                  <h3 className="text-lg sm:text-xl font-bold text-stone-900 font-serif mb-1 group-hover:text-[#003B73] transition-colors">
+                  <h3 className="text-base sm:text-lg font-bold text-stone-900 font-serif mb-1 group-hover:text-[#003B73] transition-colors">
                     {pillar.title}
                   </h3>
-                  <p className="text-xs font-semibold text-[#B58A1E] uppercase tracking-wider mb-3">
+                  <p className="text-[11px] font-semibold text-[#B58A1E] uppercase tracking-wider mb-3">
                     {pillar.subtitle}
                   </p>
 
                   {/* Description */}
-                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed mb-5">
+                  <p className="text-xs text-stone-600 leading-relaxed mb-5">
                     {pillar.description}
                   </p>
 
@@ -195,7 +180,7 @@ export default function MasjidMuSection() {
                 {/* Bottom link to related service */}
                 <div className="pt-2">
                   <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider flex items-center gap-1 group-hover:text-[#003B73] transition-colors">
-                    <span>Standar Keunggulan Masjid AUM UMS</span>
+                    <span>Pilar 3J Masjid LPCR-PM UMS</span>
                     <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
