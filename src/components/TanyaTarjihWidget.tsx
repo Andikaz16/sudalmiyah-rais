@@ -66,7 +66,13 @@ export default function TanyaTarjihWidget() {
       const res = await fetch("/api/tanya-tarjih", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: textToSend }),
+        body: JSON.stringify({
+          message: textToSend,
+          history: messages.slice(-6).map((m) => ({
+            sender: m.sender,
+            text: m.text,
+          })),
+        }),
       });
 
       const data = await res.json();

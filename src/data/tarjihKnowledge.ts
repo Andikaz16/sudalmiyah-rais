@@ -12,7 +12,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
   {
     id: "tarawih-witir",
     title: "Tuntunan Shalat Tarawih & Witir",
-    keywords: ["tarawih", "witir", "rakaat", "ramadhan", "malam", "qiyamul lail", "tahajud", "11 rakaat"],
+    keywords: ["tarawih", "shalat tarawih", "shalat witir", "qiyamul lail", "11 rakaat", "formasi 4-4-3"],
     summary:
       "Shalat Tarawih menurut Himpunan Putusan Tarjih (HPT) Muhammadiyah berjumlah 11 rakaat (termasuk witir), yang dapat ditunaikan dengan formasi 4-4-3 rakaat tanpa tasyahud awal di rakaat keempat, atau 2-2-2-2-2-1 rakaat.",
     dalil:
@@ -24,7 +24,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
   {
     id: "iftitah",
     title: "Bacaan Doa Iftitah dalam Shalat",
-    keywords: ["iftitah", "doa iftitah", "bacaan shalat", "allahumma baid", "kabiro", "takbiratul ihram"],
+    keywords: ["iftitah", "doa iftitah", "allahumma baid", "bacaan iftitah"],
     summary:
       "Bacaan doa iftitah yang rajih dan resmi menurut Himpunan Putusan Tarjih (HPT) adalah riwayat Abu Hurairah r.a. yang diawali dengan 'Allahumma baa'id bainii wa baina khathaayaaya...'",
     dalil:
@@ -36,7 +36,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
   {
     id: "basmalah-fatihah",
     title: "Bacaan Basmalah dalam Shalat Jahriyah (Sirr)",
-    keywords: ["basmalah", "bismillah", "sirr", "jahr", "fatihah", "fardhu", "maghrib", "isya", "subuh"],
+    keywords: ["bacaan basmalah", "basmalah sirr", "bismillah pelan", "bismillah fatihah"],
     summary:
       "Menurut putusan Majelis Tarjih Muhammadiyah, bacaan Basmalah pada awal surat Al-Fatihah dan surat lainnya dalam shalat fardhu jahriyah (Subuh, Maghrib, Isya) dibaca secara sirr (pelan / tidak dikeraskan).",
     dalil:
@@ -48,7 +48,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
   {
     id: "qunut-subuh",
     title: "Hukum Qunut dalam Shalat Subuh",
-    keywords: ["qunut", "subuh", "doa qunut", "nazilah", "hukum qunut"],
+    keywords: ["qunut", "doa qunut", "qunut subuh", "qunut nazilah"],
     summary:
       "Menurut Majelis Tarjih PP Muhammadiyah, membaca doa qunut secara rutin setiap shalat Subuh tidak disyariatkan karena hadits yang mewajibkan/merutinkannya dinilai lemah. Qunut disyariatkan saat terjadi Qunut Nazilah.",
     dalil:
@@ -60,7 +60,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
   {
     id: "adzan-jumat",
     title: "Jumlah Adzan pada Shalat Jumat (1 Kali)",
-    keywords: ["adzan jumat", "adzan 1 kali", "adzan 2 kali", "khutbah jumat", "shalat jumat"],
+    keywords: ["adzan jumat", "adzan 1 kali", "adzan 2 kali", "adzan dua kali", "jumlah adzan jumat"],
     summary:
       "Masjid Muhammadiyah (termasuk Masjid Sudalmiyah Rais UMS) mengamalkan adzan shalat Jumat sebanyak 1 kali, yaitu dikumandangkan tepat saat khatib telah menaiki mimbar.",
     dalil:
@@ -72,7 +72,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
   {
     id: "khgt-hisab",
     title: "Kalender Hijriyah Global Tunggal (KHGT) & Hisab Tarjih",
-    keywords: ["khgt", "kalender hijriyah", "hisab", "rukyatul hilal", "astronomi", "muhammadiyah", "awal puasa", "idul fitri", "1 syawal", "1 ramadhan"],
+    keywords: ["khgt", "kalender hijriyah global", "hisab tarjih", "wujudul hilal", "hisab hakiki", "kongres istanbul"],
     summary:
       "Muhammadiyah resmi memberlakukan Kalender Hijriyah Global Tunggal (KHGT) berlandaskan hisab hakiki wujudul hilal dan kesepakatan Kongres Kalender Islam Global Istanbul 2016, agar penanggalan Islam di seluruh dunia bersatu dalam satu hari satu tanggal.",
     dalil:
@@ -84,7 +84,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
   {
     id: "jamak-qashar",
     title: "Tuntunan Shalat Jamak & Qashar Mahasiswa/Musafir",
-    keywords: ["jamak", "qashar", "musafir", "perjalanan", "pulang kampung", "mahasiswa", "shalat di jalan"],
+    keywords: ["jamak qashar", "shalat jamak", "shalat qashar", "shalat musafir", "keringanan shalat safar"],
     summary:
       "Musafir yang bepergian berhak meringkas (qashar) shalat empat rakaat menjadi dua rakaat, serta menjamak (menggabungkan Dzuhur dengan Ashar, dan Maghrib dengan Isya) baik taqdim maupun takhir.",
     dalil:
@@ -96,7 +96,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
   {
     id: "zakat-fitrah",
     title: "Zakat Fitrah dengan Uang atau Beras",
-    keywords: ["zakat fitrah", "beras", "uang", "kadar zakat", "ramadhan", "idul fitri", "fakir miskin"],
+    keywords: ["zakat fitrah", "kadar zakat fitrah", "zakat fitrah uang", "zakat fitrah beras"],
     summary:
       "Zakat fitrah wajib ditunaikan bagi setiap muslim menjelang Idul Fitri sebesar 1 sha' makanan pokok (setara 2,5 kg atau 3 kg beras menurut kehati-hatian), dan menurut Tarjih boleh dikonversikan ke dalam nilai uang yang setara.",
     dalil:
@@ -108,7 +108,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
   {
     id: "shalat-id-lapangan",
     title: "Sunnah Shalat Idul Fitri & Idul Adha di Lapangan",
-    keywords: ["shalat id", "idul fitri", "idul adha", "lapangan", "sunnah nabi", "kampus 2 ums"],
+    keywords: ["shalat id di lapangan", "shalat idul fitri lapangan", "shalat idul adha lapangan"],
     summary:
       "Sunnah muakkadah yang dianjurkan oleh Rasulullah SAW dan ditegaskan Majelis Tarjih adalah menyelenggarakan Shalat Idul Fitri dan Idul Adha di tanah lapang terbuka, kecuali jika ada halangan hujan lebat.",
     dalil:
@@ -120,7 +120,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
   {
     id: "bunga-bank",
     title: "Fatwa Majelis Tarjih tentang Bunga Bank & Perbankan",
-    keywords: ["bunga bank", "riba", "bank syariah", "fintech", "hukum bank", "investasi"],
+    keywords: ["bunga bank", "bunga bank konvensional", "riba bank", "tabungan bank konvensional"],
     summary:
       "Majelis Tarjih PP Muhammadiyah menetapkan bahwa bunga bank konvensional termasuk riba nasiah yang hukumnya haram, dan merekomendasikan umat serta Amal Usaha Muhammadiyah (AUM) beralih ke perbankan dan lembaga keuangan syariah.",
     dalil:
