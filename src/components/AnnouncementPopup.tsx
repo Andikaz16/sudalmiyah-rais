@@ -100,89 +100,78 @@ export default function AnnouncementPopup() {
 
   if (popups.length === 0) return null;
 
-  // Stacked display: popups[0] is front-most, subsequent items are in the background
-  const stackedOrder = [...popups].reverse();
+  const current = popups[0];
+  const cleanUrl = current.targetUrl?.trim() || "";
+  const hasUrl = cleanUrl.length > 0;
+  const isExternal =
+    cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://");
+  const normalizedHref = hasUrl
+    ? isExternal
+      ? cleanUrl
+      : cleanUrl.startsWith("/")
+      ? cleanUrl
+      : `/${cleanUrl}`
+    : undefined;
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    if (!hasUrl) return;
+    e.preventDefault();
+    handleCloseOne(current.id);
+    if (isExternal) {
+      window.open(cleanUrl, "_blank", "noopener,noreferrer");
+    } else if (normalizedHref) {
+      router.push(normalizedHref);
+    }
+  };
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      onClick={() => handleCloseOne(popups[0].id)}
+      onClick={() => handleCloseOne(current.id)}
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-start pt-24 sm:pt-28 pb-8 px-4 bg-black/75 backdrop-blur-[2px] overflow-y-auto animate-fade-in"
     >
-      <div className="relative flex items-center justify-center w-full max-w-2xl my-auto pointer-events-none">
-        {stackedOrder.map((item, idx) => {
-          const isTop = idx === stackedOrder.length - 1;
-          const cleanUrl = item.targetUrl?.trim() || "";
-          const hasUrl = cleanUrl.length > 0;
-          const isExternal =
-            cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://");
-          const normalizedHref = hasUrl
-            ? isExternal
-              ? cleanUrl
-              : cleanUrl.startsWith("/")
-              ? cleanUrl
-              : `/${cleanUrl}`
-            : undefined;
+      <div className="relative flex items-center justify-center w-full max-w-2xl my-auto">
+        <div
+          key={current.id}
+          onClick={(e) => e.stopPropagation()}
+          className="relative inline-block rounded-2xl overflow-hidden shadow-2xl bg-white border-2 border-stone-200/90 animate-fade-in"
+        >
+          {/* Close Button [X] clearly positioned and never covered by navbar */}
+          <button
+            type="button"
+            onClick={() => handleCloseOne(current.id)}
+            aria-label="Tutup Pop-up"
+            className="absolute top-3 right-3 z-30 w-8 h-8 rounded-lg bg-white/95 hover:bg-white text-stone-900 border-2 border-stone-800 shadow-xl flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+            title="Tutup (Esc)"
+          >
+            <X className="w-5 h-5 stroke-[2.5]" />
+          </button>
 
-          const handleImageClick = (e: React.MouseEvent) => {
-            if (!hasUrl) return;
-            e.preventDefault();
-            handleCloseOne(item.id);
-            if (isExternal) {
-              window.open(cleanUrl, "_blank", "noopener,noreferrer");
-            } else if (normalizedHref) {
-              router.push(normalizedHref);
-            }
-          };
-
-          return (
-            <div
-              key={item.id}
-              onClick={(e) => e.stopPropagation()}
-              className={`pointer-events-auto inline-block rounded-2xl overflow-hidden shadow-2xl bg-white transition-all duration-200 border-2 border-stone-200/90 ${
-                isTop
-                  ? "relative z-20 opacity-100 scale-100"
-                  : "absolute z-10 opacity-60 scale-[0.97]"
-              }`}
+          {hasUrl ? (
+            <a
+              href={normalizedHref}
+              onClick={handleImageClick}
+              className="block cursor-pointer"
             >
-              {/* Close Button [X] clearly positioned and never covered by navbar */}
-              <button
-                type="button"
-                onClick={() => handleCloseOne(item.id)}
-                aria-label="Tutup Pop-up"
-                className="absolute top-3 right-3 z-30 w-8 h-8 rounded-lg bg-white/95 hover:bg-white text-stone-900 border-2 border-stone-800 shadow-xl flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
-                title="Tutup (Esc)"
-              >
-                <X className="w-5 h-5 stroke-[2.5]" />
-              </button>
-
-              {hasUrl ? (
-                <a
-                  href={normalizedHref}
-                  onClick={handleImageClick}
-                  className="block cursor-pointer"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.imageUrl}
-                    alt="Pengumuman Masjid"
-                    className="block w-auto h-auto max-w-[90vw] sm:max-w-lg md:max-w-xl max-h-[72vh] sm:max-h-[75vh] object-contain select-none"
-                  />
-                </a>
-              ) : (
-                <div className="block">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.imageUrl}
-                    alt="Pengumuman Masjid"
-                    className="block w-auto h-auto max-w-[90vw] sm:max-w-lg md:max-w-xl max-h-[72vh] sm:max-h-[75vh] object-contain select-none"
-                  />
-                </div>
-              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={current.imageUrl}
+                alt="Pengumuman Masjid"
+                className="block w-auto h-auto max-w-[90vw] sm:max-w-lg md:max-w-xl max-h-[72vh] sm:max-h-[75vh] object-contain select-none"
+              />
+            </a>
+          ) : (
+            <div className="block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={current.imageUrl}
+                alt="Pengumuman Masjid"
+                className="block w-auto h-auto max-w-[90vw] sm:max-w-lg md:max-w-xl max-h-[72vh] sm:max-h-[75vh] object-contain select-none"
+              />
             </div>
-          );
-        })}
+          )}
+        </div>
       </div>
     </div>
   );
