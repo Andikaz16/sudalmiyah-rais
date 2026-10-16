@@ -274,40 +274,14 @@ export default function NewsSection() {
   return (
     <section id="berita" className="py-12 sm:py-18 bg-[#FAF8F5] text-stone-900 border-t border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Heading & Slider Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8 sm:mb-10">
-          <div>
-            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-              Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
-            </h2>
-            <p className="text-sm sm:text-base text-stone-600 mt-2 leading-relaxed max-w-2xl">
-              Warta aktual civitas akademika UMS serta rilis berita resmi langsung dari portal Suara Muhammadiyah dan Lensamu.
-            </p>
-          </div>
-
-          {/* Slider Arrow Navigation Buttons */}
-          {displayNews.length > 0 && (
-            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-              <button
-                type="button"
-                onClick={() => scroll("left")}
-                disabled={!canScrollLeft}
-                aria-label="Geser warta sebelumnya"
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white border border-stone-300 text-stone-700 hover:text-[#003B73] hover:border-[#003B73] shadow-xs hover:shadow-md disabled:opacity-30 disabled:hover:border-stone-300 disabled:hover:text-stone-700 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer active:scale-95"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scroll("right")}
-                disabled={!canScrollRight}
-                aria-label="Geser warta berikutnya"
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#003B73] hover:bg-[#002855] text-white shadow-xs hover:shadow-md disabled:opacity-30 disabled:hover:bg-[#003B73] disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer active:scale-95"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          )}
+        {/* Section Heading - Centered to match other sections */}
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
+            Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
+          </h2>
+          <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
+            Warta aktual civitas akademika UMS serta rilis berita resmi langsung dari portal Suara Muhammadiyah dan Lensamu.
+          </p>
         </div>
 
         {/* News Cards Horizontal Slider */}
@@ -316,7 +290,26 @@ export default function NewsSection() {
             <p className="text-stone-500 text-sm">Belum ada warta saat ini.</p>
           </div>
         ) : (
-          <div>
+          <div className="relative group">
+            {/* Floating Navigation Arrows (Desktop & Tablet) */}
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              disabled={!canScrollLeft}
+              aria-label="Geser warta sebelumnya"
+              className="hidden sm:flex absolute -left-3 lg:-left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-white/95 hover:bg-white border border-stone-200 text-stone-700 hover:text-[#003B73] hover:border-[#003B73] shadow-lg disabled:opacity-0 disabled:pointer-events-none items-center justify-center transition-all cursor-pointer active:scale-95"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              disabled={!canScrollRight}
+              aria-label="Geser warta berikutnya"
+              className="hidden sm:flex absolute -right-3 lg:-right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-[#003B73] hover:bg-[#002855] text-white shadow-lg disabled:opacity-0 disabled:pointer-events-none items-center justify-center transition-all cursor-pointer active:scale-95"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
             {/* Scrollable Container with Snap & Touch Gesture */}
             <div
               ref={sliderRef}
@@ -380,6 +373,28 @@ export default function NewsSection() {
                   </div>
                 </article>
               ))}
+            </div>
+
+            {/* Mobile Navigation Arrows */}
+            <div className="flex sm:hidden items-center justify-center gap-3 mt-4">
+              <button
+                type="button"
+                onClick={() => scroll("left")}
+                disabled={!canScrollLeft}
+                aria-label="Geser warta sebelumnya"
+                className="w-10 h-10 rounded-full bg-white border border-stone-300 text-stone-700 hover:text-[#003B73] shadow-xs disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center active:scale-95 cursor-pointer"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scroll("right")}
+                disabled={!canScrollRight}
+                aria-label="Geser warta berikutnya"
+                className="w-10 h-10 rounded-full bg-[#003B73] text-white shadow-xs disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center active:scale-95 cursor-pointer"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
           </div>
         )}
