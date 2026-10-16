@@ -656,15 +656,20 @@ export default function AdminDashboardPage() {
       const res = await fetch("/api/popup", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: targetId, isActive: !target.isActive }),
+        body: JSON.stringify({
+          id: targetId,
+          isActive: !target.isActive,
+          imageUrl: target.imageUrl,
+          title: target.title,
+          targetUrl: target.targetUrl,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal mengubah status tayang.");
-      const updatedList: PopupBanner[] = Array.isArray(data.popups)
-        ? data.popups
-        : data.popup
-        ? [data.popup]
-        : [];
+      let updatedList: PopupBanner[] =
+        Array.isArray(data.popups) && data.popups.length > 0
+          ? data.popups
+          : popupBanners.map((p) => (p.id === targetId ? { ...p, isActive: !target.isActive } : p));
       const primary = updatedList[0] || null;
       setPopupBanner(primary);
       setPopupBanners(updatedList);
@@ -683,6 +688,7 @@ export default function AdminDashboardPage() {
     if (e && e.preventDefault) e.preventDefault();
     const targetId = id || popupBanner?.id;
     if (!targetId) return;
+    const currentItem = popupBanners.find((p) => p.id === targetId) || popupBanner;
     setSavingPopup(true);
     setPopupSaveSuccess(false);
     try {
@@ -693,15 +699,25 @@ export default function AdminDashboardPage() {
         body: JSON.stringify({
           id: targetId,
           targetUrl: urlToSave.trim(),
+          imageUrl: currentItem?.imageUrl,
+          title: currentItem?.title,
+          isActive: currentItem?.isActive,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan pengaturan.");
-      const updatedList: PopupBanner[] = Array.isArray(data.popups)
-        ? data.popups
-        : data.popup
-        ? [data.popup]
-        : [];
+      let updatedList: PopupBanner[] =
+        Array.isArray(data.popups) && data.popups.length > 0
+          ? data.popups
+          : popupBanners.map((p) =>
+              p.id === targetId ? { ...p, targetUrl: urlToSave.trim() } : p
+            );
+
+      // Guard: ensure targetId is never dropped
+      if (!updatedList.some((p) => p.id === targetId) && currentItem) {
+        updatedList = [{ ...currentItem, targetUrl: urlToSave.trim() }, ...updatedList];
+      }
+
       const primary = updatedList[0] || null;
       setPopupBanner(primary);
       setPopupBanners(updatedList);

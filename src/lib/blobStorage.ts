@@ -47,6 +47,8 @@ export async function savePopupsToBlob(popups: PopupBanner[]): Promise<string | 
     const blob = await put("database/popups.json", jsonString, {
       access: "public",
       addRandomSuffix: false,
+      allowOverwrite: true,
+      cacheControlMaxAge: 60,
       contentType: "application/json",
     });
     return blob.url;

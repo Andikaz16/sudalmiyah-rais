@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     db.popupBanner = popups[0] || null;
     saveDb(db);
     if (isBlobConfigured()) {
-      savePopupsToBlob(popups).catch(() => {});
+      await savePopupsToBlob(popups);
     }
   }
 
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         db.popupBanner = body.popups[0] || null;
         saveDb(db);
         if (isBlobConfigured()) {
-          savePopupsToBlob(body.popups).catch(() => {});
+          await savePopupsToBlob(body.popups);
         }
         return NextResponse.json({
           success: true,
@@ -176,6 +176,7 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getDb();
+    const localList = getPopupsList(db);
     let existingList: PopupBanner[] = [];
     if (isBlobConfigured()) {
       try {
@@ -186,7 +187,14 @@ export async function POST(request: NextRequest) {
       } catch {}
     }
     if (existingList.length === 0) {
-      existingList = getPopupsList(db);
+      existingList = localList;
+    } else if (localList.length > 0) {
+      const existingIds = new Set(existingList.map((p) => p.id));
+      for (const item of localList) {
+        if (!existingIds.has(item.id)) {
+          existingList.push(item);
+        }
+      }
     }
 
     const popupRecord: PopupBanner = {
@@ -219,9 +227,7 @@ export async function POST(request: NextRequest) {
     saveDb(db);
 
     if (isBlobConfigured()) {
-      savePopupsToBlob(updatedList).catch((err) =>
-        console.warn("Notice: Vercel Blob sync error:", err)
-      );
+      await savePopupsToBlob(updatedList);
     }
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
@@ -262,7 +268,9 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const db = getDb();
+    const localList = getPopupsList(db);
     let list: PopupBanner[] = [];
+
     if (isBlobConfigured()) {
       try {
         const blobList = await readPopupsFromBlob();
@@ -271,16 +279,46 @@ export async function PATCH(request: NextRequest) {
         }
       } catch {}
     }
-    if (list.length === 0) {
-      list = getPopupsList(db);
-    }
 
     if (list.length === 0) {
+      list = localList;
+    } else if (localList.length > 0) {
+      const existingIds = new Set(list.map((p) => p.id));
+      for (const item of localList) {
+        if (!existingIds.has(item.id)) {
+          list.push(item);
+        }
+      }
+    }
+
+    if (list.length === 0 && !body.imageUrl) {
       return NextResponse.json({ error: "Belum ada pop-up banner yang tersimpan." }, { status: 404 });
     }
 
-    const targetId = typeof body.id === "string" && body.id.trim() ? body.id.trim() : list[0].id;
+    const targetId = typeof body.id === "string" && body.id.trim() ? body.id.trim() : list[0]?.id;
     const nowIso = new Date().toISOString();
+
+    const itemExists = list.some((p) => p.id === targetId);
+    if (!itemExists) {
+      if (body.imageUrl) {
+        list = [
+          {
+            id: targetId,
+            imageUrl: body.imageUrl,
+            title: typeof body.title === "string" ? body.title.trim() : "",
+            targetUrl: typeof body.targetUrl === "string" ? body.targetUrl.trim() : "",
+            isActive: body.isActive !== undefined ? Boolean(body.isActive) : true,
+            updatedAt: nowIso,
+          },
+          ...list,
+        ];
+      } else {
+        return NextResponse.json(
+          { error: "Pop-up yang dimaksud tidak ditemukan dalam sistem." },
+          { status: 404 }
+        );
+      }
+    }
 
     const updatedList = list.map((item) => {
       if (item.id !== targetId) return item;
@@ -304,7 +342,7 @@ export async function PATCH(request: NextRequest) {
     saveDb(db);
 
     if (isBlobConfigured()) {
-      savePopupsToBlob(updatedList).catch(() => {});
+      await savePopupsToBlob(updatedList);
     }
 
     const updatedItem = updatedList.find((p) => p.id === targetId) || updatedList[0];
@@ -359,7 +397,7 @@ export async function DELETE(request: NextRequest) {
     saveDb(db);
 
     if (isBlobConfigured()) {
-      savePopupsToBlob(updatedList).catch(() => {});
+      await savePopupsToBlob(updatedList);
       if (removedItem?.imageUrl && removedItem.imageUrl.includes("blob.vercel-storage.com")) {
         deleteBlobByUrl(removedItem.imageUrl).catch(() => {});
       }

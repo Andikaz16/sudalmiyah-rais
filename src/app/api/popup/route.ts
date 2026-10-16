@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
       db.popupBanner = allPopups[0] || null;
       saveDb(db);
       if (isBlobConfigured()) {
-        savePopupsToBlob(allPopups).catch(() => {});
+        await savePopupsToBlob(allPopups);
       }
     }
 
