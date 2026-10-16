@@ -30,7 +30,8 @@ import {
 interface MosqueHistory {
   id: string;
   name: string;
-  location: string;
+  mapsUrl: string;
+  location?: string;
   established: string;
   image: string;
   leadWord: string;
@@ -134,75 +135,87 @@ export default function SejarahPage() {
     {
       id: "fadhlurrahman",
       name: "Masjid Fadhlurrahman",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Masjid+Fadhlurrahman+UMS",
       location: "Kampus 1 UMS, Pabelan, Kartasura",
       established: "Era Awal Perintisan Kampus UMS (1981)",
       image: "/images/hero-fadhlurrahman.jpg",
-      leadWord: "Kesejukan Syiar",
+      leadWord: "Ghirah Berislam",
       tagline: "Masjid Pertama & Tonggak Sejarah Al-Islam Kemuhammadiyahan UMS",
       historicalContext:
         "Masjid Fadhlurrahman merupakan rumah ibadah pertama yang didirikan di area kampus Universitas Muhammadiyah Surakarta. Berdiri sejak era awal pemindahan dan konsolidasi kampus di Pabelan, masjid ini menjadi saksi bisu pembinaan angkatan-angkatan awal sarjana dan kader Muhammadiyah. Masjid ini senantiasa mempertahankan nilai historis sebagai episentrum kajian keislaman dasar dan shalat berjamaah sivitas akademika Fakultas Keguruan dan Ilmu Pendidikan (FKIP) serta fakultas di Kampus 1.",
       keyFigures: "Para tokoh pendiri UMS dan dewan guru besar perintis universitas",
-      facilities: ["Ruang Shalat Utama", "Serambi Kajian", "Area Wudhu Modern", "Sekretariat Pembinaan AIK"],
+      facilities: ["Ruang Shalat Utama", "Serambi Kajian"],
       philosophicalMeaning:
         "Dinamai Fadhlurrahman yang merefleksikan 'keutamaan dan karunia dari Allah Yang Maha Pengasih', sebagai wujud rasa syukur atas nikmat perkembangan pesat kampus UMS.",
     },
     {
       id: "mas-mansur",
       name: "Masjid KH. Mas Mansur",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Masjid+KH+Mas+Mansur+PESMA+UMS",
       location: "Kompleks Pesantren Mahasiswa (PESMA) Kampus 4 UMS",
       established: "2008 M / 1429 H",
       image: "/images/hero-mas-mansur.jpg",
-      leadWord: "Keteduhan Ruhani",
-      tagline: "Sentra Pembinaan Mahasiswa Interdisipliner & Kader Bangsa",
+      leadWord: "Kesejukan Ruhani",
+      tagline: "Sentra Pembinaan Mahasiswa Interdisipliner & Internasional",
       historicalContext:
         "Didirikan menyatu dengan asrama Pesantren Mahasiswa (PESMA) KH. Mas Mansur. Masjid ini difungsikan khusus sebagai kawah candradimuka bagi para mahasiswa penerima beasiswa unggulan, santri berprestasi, dan mahasiswa internasional. Setiap hari masjid ini aktif dengan lantunan halaqah tahfidz Al-Qur'an, kultum bahasa Arab dan Inggris, serta kajian pemikiran Islam kontemporer.",
       keyFigures: "KH. Mas Mansur (Pahlawan Nasional & Ketua PB Muhammadiyah 1937-1942)",
-      facilities: ["Ruang Shalat 2 Lantai", "Halaqah Tahfidz", "Perpustakaan Asrama", "Auditorium Santri"],
+      facilities: [
+        "Ruang Shalat 2 Lantai",
+        "Lapangan Luas",
+        "Pesmart",
+        "Guesthouse",
+        "Asrama",
+        "Parkir Luas",
+      ],
       philosophicalMeaning:
         "Mengabadikan keteladanan KH. Mas Mansur yang mencetuskan 'Langkah Dua Belas Muhammadiyah', memadukan intelektualisme progresif dan keteguhan akidah.",
     },
     {
       id: "mahad-abu-bakar",
       name: "Masjid Ma'had Abu Bakar Ash-Shiddiq",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Masjid+Mahad+Abu+Bakar+Ash+Shiddiq+UMS",
       location: "Kampus 2 UMS (Sayap Timur)",
       established: "1994 M / 1415 H",
       image: "/images/hero-mahad-abu-bakar.jpg",
       leadWord: "Keluhuran Ilmu & Adab",
-      tagline: "Pusat Dirasat Islamiyah & Penguatan Bahasa Arab Al-Qur'an",
+      tagline: "Pusat Dirasat Islamiyah & Penguatan Bahasa Arab (AUM UMS)",
       historicalContext:
         "Bermula dari kerja sama keilmuan internasional dalam wadah Ma'had Abu Bakar Ash-Shiddiq UMS untuk pengajaran bahasa Arab dan studi syariah. Masjid ini menjadi laboratorium hidup bagi para penuntut ilmu yang berikrar memelihara bahasa Arab sebagai bahasa Al-Qur'an dan khazanah literatur turots Islam. Kini, Ma'had Abu Bakar telah berkembang kokoh menjadi salah satu AUM unggulan di bawah naungan UMS.",
       keyFigures: "Sahabat Abu Bakar Ash-Shiddiq RA & Asatidzah Ma'had",
-      facilities: ["Kubah Klasik Timur Tengah", "Koleksi Kitab Kuning", "Pusat Bahasa Arab", "Hall Kajian Hadits"],
+      facilities: ["Masjid", "Kelas", "Perpustakaan", "Parkir"],
       philosophicalMeaning:
         "Mewarisi kejujuran, komitmen, dan keteguhan ash-Shiddiq dalam mendalami ilmu-ilmu syar'i dan mendakwahkannya dengan hikmah.",
     },
     {
       id: "ar-razi",
       name: "Masjid Ar-Razi FKG",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Masjid+Ar-Razi+FKG+UMS",
       location: "Fakultas Kedokteran Gigi (FKG) Kampus 4 UMS",
       established: "2018 M / 1439 H",
       image: "/images/hero-ar-razi.jpg",
-      leadWord: "Keberkahan & Dedikasi",
-      tagline: "Integrasi Nilai Kedokteran, Kimia, & Spiritualitas Tenaga Medis",
+      leadWord: "Integrasi Keislaman & Keilmuan",
+      tagline: "Integrasi Nilai Kedokteran, Sains, & Spiritualitas Tenaga Medis",
       historicalContext:
         "Hadir di lingkungan Fakultas Kedokteran Gigi dan Rumah Sakit Gigi dan Mulut (RSGM) UMS. Masjid ini dibangun sebagai sarana pembentukan etika dan spiritualitas dokter gigi muslim yang berjiwa pengabdi. Suasana hening dan bersih mendukung para calon dokter untuk merefleksikan sumpah profesi dan nilai-nilai kemanusiaan dalam bingkai ibadah lillahi ta'ala.",
       keyFigures: "Abu Bakar Muhammad bin Zakariya al-Razi (865–925 M)",
-      facilities: ["Ruang Ibadah Bersih Higienis", "Akses Langsung RSGM", "Fasilitas Ramah Pasien", "Pojok Konseling"],
+      facilities: ["Ruang Ibadah Bersih", "Parkir", "Satpam"],
       philosophicalMeaning:
         "Terinspirasi dari Al-Razi, ilmuwan polimatik dan pelopor kedokteran klinis Islam yang meletakkan dasar farmakologi, etika medis, dan penanganan pasien tanpa diskriminasi.",
     },
     {
       id: "munajat-shabran",
-      name: "Masjid Munajat Shabran",
+      name: "Masjid Al-Munajat Pondok Shabran",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Masjid+Munajat+Pondok+Shabran+Makamhaji",
       location: "Pondok Pesantren Mahasiswa H. Ahmad Dahlan (Shabran), Makamhaji",
       established: "1982 M / 1403 H",
       image: "/images/hero-munajat-shabran.jpg",
-      leadWord: "Ghirah Perkaderan",
-      tagline: "Kawah Candradimuka Ulama Intelek & Intelek Ulama Persyarikatan",
+      leadWord: "Pusat Perkaderan",
+      tagline: "Kawah Candradimuka Intelek Ulama & Ulama Intelek Persyarikatan",
       historicalContext:
-        "Pondok Shabran didirikan atas wasiat dan wakaf keluarga H. Ahmad Dahlan dan H. Nuriyah Shabran untuk mencetak kader ulama tarjih Muhammadiyah. Masjid Munajat Shabran menjadi pusat peribadatan malam, qiyamul lail berjamaah, munajat, serta gemblengan ideologis kader-kader utusan Pimpinan Wilayah Muhammadiyah (PWM) dari 38 provinsi di Indonesia yang kelak diterjunkan berdakwah ke pelosok nusantara.",
+        "Pondok Shabran didirikan atas wasiat dan wakaf keluarga H. Ahmad Dahlan dan H. Nuriyah Shabran untuk mencetak kader ulama tarjih Muhammadiyah. Masjid Al-Munajat Pondok Shabran menjadi pusat peribadatan malam, qiyamul lail berjamaah, munajat, serta gemblengan ideologis kader-kader utusan Pimpinan Wilayah Muhammadiyah (PWM) dari 38 provinsi di Indonesia yang kelak diterjunkan berdakwah ke pelosok nusantara.",
       keyFigures: "Keluarga Pewakaf Hj. Nuriyah Shabran & Pimpinan PP Muhammadiyah",
-      facilities: ["Serambi Pengkaderan", "Pusat Bahtsul Masail Tarjih", "Ruang Tadarus Intensif", "Asrama Kader"],
+      facilities: ["Gedung Lantai 4", "Asrama Kader Putra & Putri"],
       philosophicalMeaning:
         "Kata 'Munajat' menyimbolkan doa tulus dan permohonan tiada putus kepada Allah SWT agar setiap kader senantiasa diberi keistiqamahan dalam memikul risalah dakwah Islam berkemajuan.",
     },
@@ -255,15 +268,32 @@ export default function SejarahPage() {
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] text-xs font-bold uppercase tracking-wider mb-2">
                     <Award className="w-4 h-4 text-[#B58A1E]" />
-                    <span>Masjid Utama & Pusat Percontohan AUM</span>
+                    <span>Masjid Utama & Pusat Percontohan LPCR-PM</span>
                   </div>
-                  <h2 className="text-2xl sm:text-4xl font-black font-serif text-stone-900 tracking-tight">
-                    Masjid Hj. Sudalmiyah Rais
-                  </h2>
-                  <p className="text-xs sm:text-sm text-stone-500 mt-1 flex items-center gap-2">
+                  <div>
+                    <a
+                      href="https://www.google.com/maps/search/?api=1&query=Masjid+Hj.+Sudalmiyah+Rais+UMS"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/title inline-flex items-center gap-2 hover:text-[#003B73] transition-colors"
+                      title="Buka peta Google Maps untuk Masjid Hj. Sudalmiyah Rais"
+                    >
+                      <h2 className="text-2xl sm:text-4xl font-black font-serif text-stone-900 group-hover/title:text-[#003B73] tracking-tight transition-colors">
+                        Masjid Hj. Sudalmiyah Rais
+                      </h2>
+                      <ExternalLink className="w-5 h-5 text-stone-400 group-hover/title:text-[#003B73] transition-colors shrink-0" />
+                    </a>
+                  </div>
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=Masjid+Hj.+Sudalmiyah+Rais+UMS"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs sm:text-sm text-stone-500 hover:text-[#003B73] mt-1 inline-flex items-center gap-1.5 transition-colors"
+                    title="Buka lokasi di Google Maps"
+                  >
                     <MapPin className="w-3.5 h-3.5 text-[#B58A1E]" />
                     <span>Kampus 2 UMS, Jl. A. Yani, Pabelan, Kartasura, Sukoharjo</span>
-                  </p>
+                  </a>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -277,12 +307,18 @@ export default function SejarahPage() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
                 {/* Visual Image */}
                 <div className="lg:col-span-5 flex flex-col gap-4">
-                  <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-md border border-stone-200">
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=Masjid+Hj.+Sudalmiyah+Rais+UMS"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group/img relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-md border border-stone-200 block"
+                    title="Buka lokasi Masjid Hj. Sudalmiyah Rais di Google Maps"
+                  >
                     <Image
                       src="/images/masjid-sudalmiyah.jpg"
                       alt="Masjid Hj. Sudalmiyah Rais UMS"
                       fill
-                      className="object-cover hover:scale-105 transition-transform duration-500"
+                      className="object-cover group-hover/img:scale-105 transition-transform duration-500"
                       priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
@@ -291,7 +327,11 @@ export default function SejarahPage() {
                         Kapasitas 4.000+ Jamaah dengan Fasilitas Hall & Sayap Pembinaan
                       </div>
                     </div>
-                  </div>
+                    <div className="absolute top-3 right-3 bg-black/60 group-hover/img:bg-black/80 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg backdrop-blur-xs flex items-center gap-1.5 opacity-0 group-hover/img:opacity-100 transition-opacity">
+                      <MapPin className="w-3 h-3 text-[#FCD34D]" />
+                      <span>Buka Google Maps</span>
+                    </div>
+                  </a>
 
                   {/* Highlight Box Profil Tokoh */}
                   <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl p-5">
@@ -545,19 +585,29 @@ export default function SejarahPage() {
                   className="bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-                    {/* Gambar Masjid */}
+                    {/* Gambar Masjid - Klik untuk membuka Google Maps */}
                     <div className="lg:col-span-5">
-                      <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-sm border border-stone-200">
+                      <a
+                        href={mosque.mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group/img relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-sm border border-stone-200 block"
+                        title={`Buka lokasi ${mosque.name} di Google Maps`}
+                      >
                         <Image
                           src={mosque.image}
                           alt={mosque.name}
                           fill
-                          className="object-cover hover:scale-105 transition-transform duration-500"
+                          className="object-cover group-hover/img:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute top-3 left-3 bg-[#003B73]/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-md backdrop-blur-xs">
                           {mosque.leadWord}
                         </div>
-                      </div>
+                        <div className="absolute bottom-3 right-3 bg-black/60 group-hover/img:bg-black/80 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg backdrop-blur-xs flex items-center gap-1.5 opacity-0 group-hover/img:opacity-100 transition-opacity">
+                          <MapPin className="w-3 h-3 text-[#FCD34D]" />
+                          <span>Buka Google Maps</span>
+                        </div>
+                      </a>
                     </div>
 
                     {/* Konten Sejarah */}
@@ -566,16 +616,22 @@ export default function SejarahPage() {
                         <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200">
                           {mosque.established}
                         </span>
-                        <span className="text-stone-300">•</span>
-                        <span className="text-xs text-stone-500 flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-[#B58A1E]" />
-                          {mosque.location}
-                        </span>
                       </div>
 
-                      <h4 className="text-xl sm:text-2xl font-serif font-black text-stone-900">
-                        {mosque.name}
-                      </h4>
+                      <div>
+                        <a
+                          href={mosque.mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group/title inline-flex items-center gap-2 hover:text-[#003B73] transition-colors"
+                          title={`Buka peta lokasi ${mosque.name} di Google Maps`}
+                        >
+                          <h4 className="text-xl sm:text-2xl font-serif font-black text-stone-900 group-hover/title:text-[#003B73] transition-colors">
+                            {mosque.name}
+                          </h4>
+                          <ExternalLink className="w-4 h-4 text-stone-400 group-hover/title:text-[#003B73] transition-colors shrink-0" />
+                        </a>
+                      </div>
 
                       <p className="text-xs sm:text-sm font-semibold text-[#003B73]">
                         {mosque.tagline}
@@ -590,7 +646,7 @@ export default function SejarahPage() {
                           <strong>Makna &amp; Inspirasi:</strong> {mosque.philosophicalMeaning}
                         </div>
                         <div>
-                          <strong>Fasilitas Utama:</strong>{" "}
+                          <strong>Fasilitas Umum:</strong>{" "}
                           {mosque.facilities.join(" • ")}
                         </div>
                       </div>
@@ -614,7 +670,7 @@ export default function SejarahPage() {
               </h3>
               <p className="text-xs sm:text-sm text-stone-200 mt-2 leading-relaxed">
                 Dari berdirinya Masjid Fadhlurrahman di masa perintisan, berdirinya Masjid Sudalmiyah Rais di Kampus 2, 
-                hingga kini menjadi sentra percontohan nasional Amal Usaha Muhammadiyah (AUM), masjid kampus UMS 
+                hingga kini menjadi sentra percontohan nasional LPCR-PM PP Muhammadiyah, masjid kampus UMS 
                 senantiasa setia merawat peribadatan yang murni, inklusif, dan mencerdaskan kehidupan bangsa.
               </p>
 
