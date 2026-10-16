@@ -50,45 +50,53 @@ export default function Footer() {
             <h4 className="font-bold text-white text-xs uppercase tracking-wider">
               Navigasi Layanan
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2.5 text-xs">
               <li>
-                <Link href="/sejarah" className="hover:text-[#FCD34D] transition-colors">
-                  Sejarah Masjid Kampus
+                <Link href="/sejarah" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
+                  <span>Sejarah Masjid Kampus</span>
                 </Link>
               </li>
               <li>
-                <Link href="/#masjidmu" className="hover:text-[#FCD34D] transition-colors">
-                  Pilar Masjid Percontohan LPCR-PM
+                <Link href="/#masjidmu" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
+                  <span>Pilar Masjid Percontohan LPCR-PM</span>
                 </Link>
               </li>
               <li>
-                <Link href="/ibadah" className="hover:text-[#FCD34D] transition-colors">
-                  Ruang Ibadah Digital
+                <Link href="/ibadah" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
+                  <span>Ruang Ibadah Digital</span>
                 </Link>
               </li>
               <li>
-                <Link href="/jadwal" className="hover:text-[#FCD34D] transition-colors">
-                  Jadwal Shalat Surakarta
+                <Link href="/jadwal" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
+                  <span>Jadwal Shalat Surakarta</span>
                 </Link>
               </li>
               <li>
-                <Link href="/agenda" className="hover:text-[#FCD34D] transition-colors">
-                  Agenda &amp; Kajian Rutin
+                <Link href="/agenda" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
+                  <span>Agenda &amp; Kajian Rutin</span>
                 </Link>
               </li>
               <li>
-                <Link href="/donasi" className="hover:text-[#FCD34D] transition-colors">
-                  Infaq Digital QRIS
+                <Link href="/donasi" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
+                  <span>Infaq Digital QRIS</span>
                 </Link>
               </li>
               <li>
-                <Link href="/#kotak-saran" className="hover:text-[#FCD34D] transition-colors">
-                  Kotak Saran &amp; Aspirasi
+                <Link href="/#kotak-saran" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
+                  <span>Kotak Saran &amp; Aspirasi</span>
                 </Link>
               </li>
               <li>
-                <Link href="/#berita" className="hover:text-[#FCD34D] transition-colors">
-                  Warta Kampus &amp; Persyarikatan
+                <Link href="/#berita" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
+                  <span>Warta Kampus &amp; Persyarikatan</span>
                 </Link>
               </li>
             </ul>
