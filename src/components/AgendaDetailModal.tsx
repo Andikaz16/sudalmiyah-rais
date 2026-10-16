@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
 import {
   X,
   Calendar,
@@ -11,8 +10,6 @@ import {
   User,
   GraduationCap,
   ExternalLink,
-  QrCode,
-  ShieldCheck,
   Info,
 } from "lucide-react";
 import { Agenda } from "@/lib/types";
@@ -203,24 +200,10 @@ export default function AgendaDetailModal({
             </div>
           </div>
 
-          {/* Attendance Guidance */}
-          <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-2 text-xs">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-              <span className="font-bold text-emerald-950 uppercase tracking-wider text-[11px]">
-                Tata Cara Presensi Kehadiran
-              </span>
-            </div>
-            <p className="text-emerald-900 leading-relaxed">
-              {agenda.requiresRegistration
-                ? "Daftarkan diri Anda secara online untuk mengamankan kuota. Saat hadir di masjid, tunjukkan bukti konfirmasi pendaftaran."
-                : "Tidak perlu mendaftar tiket online sebelumnya. Mahasiswa dan jamaah hadir langsung di lokasi masjid dan melakukan scan QR Code dinamis di layar proyektor masjid menggunakan HP saat acara berlangsung."}
-            </p>
-          </div>
         </div>
 
         {/* Modal Actions Footer */}
-        <div className="px-5 sm:px-6 py-4 border-t border-stone-200 bg-[#FAF8F5] flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+        <div className="px-5 sm:px-6 py-4 border-t border-stone-200 bg-[#FAF8F5] flex items-center justify-between gap-3 shrink-0">
           <button
             onClick={onClose}
             className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
@@ -228,24 +211,16 @@ export default function AgendaDetailModal({
             Tutup
           </button>
 
-          <div className="w-full sm:w-auto flex items-center gap-2">
-            {agenda.requiresRegistration ? (
+          {agenda.requiresRegistration && onRegisterClick && (
+            <div className="w-full sm:w-auto flex items-center gap-2">
               <button
-                onClick={() => onRegisterClick && onRegisterClick(agenda)}
+                onClick={() => onRegisterClick(agenda)}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md transition-all cursor-pointer"
               >
                 Daftar Presensi Tiket
               </button>
-            ) : (
-              <Link
-                href={`/agenda/presensi?agendaId=${agenda.id}`}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <QrCode className="w-3.5 h-3.5 text-amber-300" />
-                <span>Buka Formulir Presensi QR</span>
-              </Link>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>,
