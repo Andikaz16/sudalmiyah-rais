@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -12,8 +11,6 @@ import {
   AlertCircle,
   FileText,
   Loader2,
-  Building2,
-  BookOpen,
 } from "lucide-react";
 import { FacilityBooking } from "@/lib/types";
 
@@ -94,26 +91,6 @@ export default function LayananPage() {
       <Navbar />
 
       <main className="flex-1 w-full">
-        {/* Navigation Switcher between Services */}
-        <div className="bg-white border-b border-stone-200 sticky top-20 z-30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto py-2.5 scrollbar-none">
-              <div className="px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-[#003B73] text-white shrink-0 flex items-center gap-2 shadow-xs">
-                <Building2 className="w-4 h-4 text-amber-300" />
-                <span>Peminjaman Fasilitas &amp; Aula</span>
-              </div>
-              <span className="text-stone-300">/</span>
-              <Link
-                href="/layanan/unduhan"
-                className="px-4 py-2 rounded-full text-xs sm:text-sm font-medium text-stone-600 hover:text-[#003B73] hover:bg-stone-100 transition-colors shrink-0 flex items-center gap-2"
-              >
-                <BookOpen className="w-4 h-4 text-stone-400" />
-                <span>Pusat Unduhan &amp; Pustaka Dokumen</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-
         {/* Header Banner */}
         <section className="bg-white border-b border-stone-200 py-12 text-center">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

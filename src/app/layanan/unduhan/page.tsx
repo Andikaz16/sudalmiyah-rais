@@ -8,11 +8,7 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import {
   FileText,
   Download,
-  BookOpen,
-  Search,
   ExternalLink,
-  ShieldCheck,
-  Building2,
   Calendar,
   Sparkles,
 } from "lucide-react";
@@ -21,17 +17,11 @@ import { DownloadDocument } from "@/lib/types";
 export default function UnduhanPage() {
   const [documents, setDocuments] = useState<DownloadDocument[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
-  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const fetchDocs = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (selectedCategory !== "ALL") params.append("category", selectedCategory);
-      if (searchQuery.trim()) params.append("search", searchQuery.trim());
-
-      const res = await fetch(`/api/documents?${params.toString()}`);
+      const res = await fetch("/api/documents");
       const data = await res.json();
       if (data.success && data.documents) {
         setDocuments(data.documents);
@@ -45,12 +35,7 @@ export default function UnduhanPage() {
 
   useEffect(() => {
     fetchDocs();
-  }, [selectedCategory]);
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchDocs();
-  };
+  }, []);
 
   const handleDownload = async (doc: DownloadDocument) => {
     // Record download count
@@ -78,93 +63,20 @@ export default function UnduhanPage() {
     document.body.removeChild(link);
   };
 
-  const categories = [
-    { id: "ALL", label: "Semua Dokumen" },
-    { id: "TARJIH_FIQIH", label: "Tarjih & Fiqih" },
-    { id: "IDEOLOGI", label: "Ideologi & Akhlak" },
-    { id: "KEMUHAMMADIYAHAN", label: "Kemuhammadiyahan" },
-    { id: "DOKUMEN_MUKTAMAR", label: "Dokumen Muktamar" },
-    { id: "PANDUAN_MASJID", label: "Panduan Takmir" },
-  ];
-
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col font-sans">
       <Navbar />
 
       <main className="flex-1 w-full">
-        {/* Navigation Switcher between Services */}
-        <div className="bg-white border-b border-stone-200 sticky top-20 z-30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto py-2.5 scrollbar-none">
-              <Link
-                href="/layanan"
-                className="px-4 py-2 rounded-full text-xs sm:text-sm font-medium text-stone-600 hover:text-[#003B73] hover:bg-stone-100 transition-colors shrink-0 flex items-center gap-2"
-              >
-                <Building2 className="w-4 h-4 text-stone-400" />
-                <span>Peminjaman Fasilitas &amp; Aula</span>
-              </Link>
-              <span className="text-stone-300">/</span>
-              <div className="px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-[#003B73] text-white shrink-0 flex items-center gap-2 shadow-xs">
-                <BookOpen className="w-4 h-4 text-amber-300" />
-                <span>Pusat Unduhan &amp; Pustaka Dokumen</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Hero Header */}
         <section className="bg-gradient-to-b from-white to-[#FAF8F5] border-b border-stone-200/80 py-12 sm:py-16 text-center">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] text-xs font-bold mb-4 font-mono">
-              <ShieldCheck className="w-4 h-4 text-[#003B73]" />
-              <span>Pustaka Resmi Persyarikatan Muhammadiyah</span>
-            </div>
             <h1 className="text-3xl sm:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
               Pusat Unduhan &amp; <span className="text-[#003B73]">Pustaka Dokumen</span>
             </h1>
             <p className="text-sm sm:text-base text-stone-600 mt-4 leading-relaxed max-w-2xl mx-auto">
               Akses dan unduh berkas pedoman resmi, Himpunan Putusan Tarjih (HPT), Pedoman Hidup Islami Warga Muhammadiyah (PHIWM), Risalah Islam Berkemajuan, serta Buku Panduan Standar Masjid Percontohan.
             </p>
-
-            {/* Search Input Bar */}
-            <form onSubmit={handleSearchSubmit} className="mt-8 max-w-xl mx-auto">
-              <div className="relative flex items-center">
-                <Search className="w-4 h-4 text-stone-400 absolute left-4 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Cari dokumen, fatwa, atau pedoman..."
-                  className="w-full pl-11 pr-24 py-3 rounded-full bg-white border border-stone-300 focus:border-[#003B73] focus:ring-2 focus:ring-[#003B73]/20 text-stone-900 text-xs sm:text-sm placeholder:text-stone-400 shadow-sm outline-none transition-all"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-1.5 px-4 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
-                >
-                  Cari
-                </button>
-              </div>
-            </form>
-
-            {/* Filter Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
-              {categories.map((c) => {
-                const isActive = selectedCategory === c.id;
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => setSelectedCategory(c.id)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                      isActive
-                        ? "bg-[#003B73] text-white shadow-xs"
-                        : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100"
-                    }`}
-                  >
-                    {c.label}
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </section>
 
