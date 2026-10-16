@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
 interface NewsItem {
   id: string;
@@ -238,85 +239,202 @@ export default function NewsSection() {
     };
   }, []);
 
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+
   const displayNews = newsList.filter((item) => (item.source as string) !== "MASJIDMU");
+
+  const checkScrollPosition = useCallback(() => {
+    if (!sliderRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
+    setCanScrollLeft(scrollLeft > 15);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 15);
+
+    const firstCard = sliderRef.current.firstElementChild as HTMLElement | null;
+    const cardWidth = firstCard?.offsetWidth || 380;
+    const gap = 24;
+    const index = Math.round(scrollLeft / (cardWidth + gap));
+    setActiveSlideIndex(Math.min(Math.max(index, 0), displayNews.length - 1));
+  }, [displayNews.length]);
+
+  const scroll = (direction: "left" | "right") => {
+    if (!sliderRef.current) return;
+    const container = sliderRef.current;
+    const firstCard = container.firstElementChild as HTMLElement | null;
+    const cardWidth = firstCard?.offsetWidth || 380;
+    const gap = 24;
+    const scrollAmount = cardWidth + gap;
+    container.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
+  const scrollToCard = (index: number) => {
+    if (!sliderRef.current) return;
+    const container = sliderRef.current;
+    const firstCard = container.firstElementChild as HTMLElement | null;
+    const cardWidth = firstCard?.offsetWidth || 380;
+    const gap = 24;
+    container.scrollTo({
+      left: index * (cardWidth + gap),
+      behavior: "smooth",
+    });
+  };
+
+  useEffect(() => {
+    checkScrollPosition();
+    window.addEventListener("resize", checkScrollPosition);
+    return () => window.removeEventListener("resize", checkScrollPosition);
+  }, [checkScrollPosition, displayNews.length]);
 
   return (
     <section id="berita" className="py-12 sm:py-18 bg-[#FAF8F5] text-stone-900 border-t border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-            Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
-          </h2>
-          <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
-            Warta aktual civitas akademika UMS serta rilis berita resmi langsung dari portal Suara Muhammadiyah dan Lensamu.
-          </p>
+        {/* Section Heading & Slider Controls */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8 sm:mb-10">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] text-[11px] font-bold uppercase tracking-wider mb-2.5">
+              <span>Warta Terkini</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
+              Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
+            </h2>
+            <p className="text-sm sm:text-base text-stone-600 mt-2 leading-relaxed max-w-2xl">
+              Warta aktual civitas akademika UMS serta rilis berita resmi langsung dari portal Suara Muhammadiyah dan Lensamu.
+            </p>
+          </div>
+
+          {/* Slider Arrow Navigation Buttons */}
+          {displayNews.length > 0 && (
+            <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
+              <span className="text-xs text-stone-500 font-medium hidden md:inline-block">
+                Geser warta
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => scroll("left")}
+                  disabled={!canScrollLeft}
+                  aria-label="Geser warta sebelumnya"
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white border border-stone-300 text-stone-700 hover:text-[#003B73] hover:border-[#003B73] shadow-xs hover:shadow-md disabled:opacity-30 disabled:hover:border-stone-300 disabled:hover:text-stone-700 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer active:scale-95"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scroll("right")}
+                  disabled={!canScrollRight}
+                  aria-label="Geser warta berikutnya"
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#003B73] hover:bg-[#002855] text-white shadow-xs hover:shadow-md disabled:opacity-30 disabled:hover:bg-[#003B73] disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer active:scale-95"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* News Cards Grid */}
+        {/* News Cards Horizontal Slider */}
         {displayNews.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-3xl border border-stone-200 p-8 max-w-xl mx-auto shadow-xs">
             <p className="text-stone-500 text-sm">Belum ada warta saat ini.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-            {displayNews.map((item) => (
-            <article
-              key={item.id}
-              className="bg-white border border-stone-200/90 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#D4AF37]/50 transition-all duration-300 flex flex-col justify-between group"
+          <div>
+            {/* Scrollable Container with Snap & Touch Gesture */}
+            <div
+              ref={sliderRef}
+              onScroll={checkScrollPosition}
+              className="flex gap-5 sm:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory no-scrollbar pb-4 pt-1 -mx-4 sm:mx-0 px-4 sm:px-0"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              <div>
-                {/* Thumbnail Image Container */}
-                <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-stone-100">
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.title}
-                    fill
-                    unoptimized
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
+              {displayNews.map((item) => (
+                <article
+                  key={item.id}
+                  className="w-[84vw] sm:w-[360px] md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] shrink-0 snap-start bg-white border border-stone-200/90 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:border-[#D4AF37]/50 transition-all duration-300 flex flex-col justify-between group"
+                >
+                  <div>
+                    {/* Thumbnail Image Container */}
+                    <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-stone-100">
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        fill
+                        unoptimized
+                        sizes="(max-width: 640px) 84vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
 
-                {/* Card Body */}
-                <div className="p-5 sm:p-6">
-                  {/* Meta Row: Badge on Left, Time on Right */}
-                  <div className="flex items-center justify-between mb-3.5">
-                    <span
-                      className={`text-[10px] sm:text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm ${item.badgeClass}`}
-                    >
-                      {item.badge}
-                    </span>
-                    <span className="text-stone-400 text-xs font-normal">
-                      {formatClientTimeAgo(item.publishedAt, item.timeAgo, now)}
-                    </span>
+                    {/* Card Body */}
+                    <div className="p-5 sm:p-6">
+                      {/* Meta Row: Badge on Left, Time on Right */}
+                      <div className="flex items-center justify-between mb-3.5">
+                        <span
+                          className={`text-[10px] sm:text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-xs ${item.badgeClass}`}
+                        >
+                          {item.badge}
+                        </span>
+                        <span className="text-stone-400 text-xs font-normal">
+                          {formatClientTimeAgo(item.publishedAt, item.timeAgo, now)}
+                        </span>
+                      </div>
+
+                      {/* News Title */}
+                      <h3 className="text-stone-900 font-bold text-base sm:text-lg leading-snug line-clamp-2 mb-2.5 font-sans group-hover:text-[#003B73] transition-colors min-h-[3rem]">
+                        {item.title}
+                      </h3>
+
+                      {/* Excerpt */}
+                      <p className="text-stone-600 text-xs sm:text-sm leading-relaxed line-clamp-3 min-h-[4rem]">
+                        {item.excerpt}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* News Title */}
-                  <h3 className="text-stone-900 font-bold text-base sm:text-lg leading-snug line-clamp-2 mb-2.5 font-sans group-hover:text-[#003B73] transition-colors">
-                    {item.title}
-                  </h3>
+                  {/* Card Footer: BACA SELENGKAPNYA -> */}
+                  <div className="px-5 sm:px-6 pb-5 pt-3 border-t border-stone-100">
+                    <button
+                      onClick={() => setSelectedArticle(item)}
+                      className="text-stone-600 hover:text-[#003B73] transition-colors text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 focus:outline-none cursor-pointer group/btn"
+                    >
+                      <span>BACA SELENGKAPNYA</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-stone-400 group-hover/btn:text-[#003B73] group-hover/btn:translate-x-1 transition-all" />
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
 
-                  {/* Excerpt */}
-                  <p className="text-stone-600 text-xs sm:text-sm leading-relaxed line-clamp-3">
-                    {item.excerpt}
-                  </p>
-                </div>
+            {/* Slider Bottom Indicators & Counter */}
+            <div className="flex items-center justify-between mt-5 sm:mt-6 px-1">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 max-w-[70%]">
+                {displayNews.map((_, dotIdx) => (
+                  <button
+                    key={dotIdx}
+                    type="button"
+                    onClick={() => scrollToCard(dotIdx)}
+                    aria-label={`Geser ke warta ${dotIdx + 1}`}
+                    className={`transition-all duration-300 rounded-full cursor-pointer ${
+                      activeSlideIndex === dotIdx
+                        ? "w-7 h-2 bg-[#003B73]"
+                        : "w-2 h-2 bg-stone-300 hover:bg-stone-400"
+                    }`}
+                  />
+                ))}
               </div>
 
-              {/* Card Footer: BACA SELENGKAPNYA -> */}
-              <div className="px-5 sm:px-6 pb-5 pt-3 border-t border-stone-100">
-                <button
-                  onClick={() => setSelectedArticle(item)}
-                  className="text-stone-500 hover:text-[#003B73] transition-colors text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 focus:outline-none"
-                >
-                  <span>BACA SELENGKAPNYA</span>
-                  <span>&rarr;</span>
-                </button>
+              <div className="text-[11px] sm:text-xs text-stone-500 font-medium flex items-center gap-1.5">
+                <span className="hidden sm:inline text-stone-400">Menampilkan warta</span>
+                <span className="font-bold text-stone-800">{activeSlideIndex + 1}</span>
+                <span className="text-stone-400">/</span>
+                <span>{displayNews.length}</span>
               </div>
-            </article>
-          ))}
-        </div>
+            </div>
+          </div>
         )}
       </div>
 
