@@ -4,6 +4,13 @@ import fs from "fs";
 import { getDb, saveDb, logSecurityEvent } from "@/lib/db";
 import { verifySessionToken } from "@/lib/security";
 import { PopupBanner } from "@/lib/types";
+import {
+  isBlobConfigured,
+  uploadImageToBlob,
+  savePopupsToBlob,
+  readPopupsFromBlob,
+  deleteBlobByUrl,
+} from "@/lib/blobStorage";
 
 function getPopupsList(db: ReturnType<typeof getDb>): PopupBanner[] {
   if (Array.isArray(db.popupBanners) && db.popupBanners.length > 0) {
@@ -28,8 +35,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
   }
 
-  const db = getDb();
-  const popups = getPopupsList(db);
+  let popups: PopupBanner[] = [];
+  if (isBlobConfigured()) {
+    try {
+      const blobList = await readPopupsFromBlob();
+      if (Array.isArray(blobList) && blobList.length > 0) {
+        popups = blobList;
+      }
+    } catch (err) {
+      console.warn("Notice: Vercel Blob read error in admin GET:", err);
+    }
+  }
+
+  if (popups.length === 0) {
+    const db = getDb();
+    popups = getPopupsList(db);
+  }
+
   return NextResponse.json(
     {
       popup: popups[0] || null,
@@ -63,6 +85,9 @@ export async function POST(request: NextRequest) {
         db.popupBanners = body.popups;
         db.popupBanner = body.popups[0] || null;
         saveDb(db);
+        if (isBlobConfigured()) {
+          savePopupsToBlob(body.popups).catch(() => {});
+        }
         return NextResponse.json({
           success: true,
           message: "Pop-up banner berhasil disinkronkan.",
@@ -118,14 +143,35 @@ export async function POST(request: NextRequest) {
       // Ignore archival write error on read-only environments
     }
 
-    const dataUriUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+    let finalImageUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+
+    if (isBlobConfigured()) {
+      try {
+        const ext = path.extname(file.name).toLowerCase() || ".jpg";
+        const safeFilename = `popup_${Date.now()}${ext}`;
+        finalImageUrl = await uploadImageToBlob(safeFilename, buffer, file.type);
+      } catch (blobErr) {
+        console.warn("Notice: Vercel Blob upload failed, fallback to Data URI:", blobErr);
+      }
+    }
 
     const db = getDb();
-    const existingList = getPopupsList(db);
+    let existingList: PopupBanner[] = [];
+    if (isBlobConfigured()) {
+      try {
+        const blobList = await readPopupsFromBlob();
+        if (Array.isArray(blobList) && blobList.length > 0) {
+          existingList = blobList;
+        }
+      } catch {}
+    }
+    if (existingList.length === 0) {
+      existingList = getPopupsList(db);
+    }
 
     const popupRecord: PopupBanner = {
       id: replaceId || `popup-${Date.now().toString(36)}`,
-      imageUrl: dataUriUrl,
+      imageUrl: finalImageUrl,
       title: "",
       targetUrl: manualTargetUrl,
       isActive: true,
@@ -138,7 +184,7 @@ export async function POST(request: NextRequest) {
         p.id === replaceId
           ? {
               ...p,
-              imageUrl: dataUriUrl,
+              imageUrl: finalImageUrl,
               targetUrl: manualTargetUrl !== "" ? manualTargetUrl : p.targetUrl,
               updatedAt: popupRecord.updatedAt,
             }
@@ -151,6 +197,12 @@ export async function POST(request: NextRequest) {
     db.popupBanners = updatedList;
     db.popupBanner = updatedList[0] || null;
     saveDb(db);
+
+    if (isBlobConfigured()) {
+      savePopupsToBlob(updatedList).catch((err) =>
+        console.warn("Notice: Vercel Blob sync error:", err)
+      );
+    }
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -190,7 +242,18 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const db = getDb();
-    const list = getPopupsList(db);
+    let list: PopupBanner[] = [];
+    if (isBlobConfigured()) {
+      try {
+        const blobList = await readPopupsFromBlob();
+        if (Array.isArray(blobList) && blobList.length > 0) {
+          list = blobList;
+        }
+      } catch {}
+    }
+    if (list.length === 0) {
+      list = getPopupsList(db);
+    }
 
     if (list.length === 0) {
       return NextResponse.json({ error: "Belum ada pop-up banner yang tersimpan." }, { status: 404 });
@@ -219,6 +282,10 @@ export async function PATCH(request: NextRequest) {
     db.popupBanners = updatedList;
     db.popupBanner = updatedList[0] || null;
     saveDb(db);
+
+    if (isBlobConfigured()) {
+      savePopupsToBlob(updatedList).catch(() => {});
+    }
 
     const updatedItem = updatedList.find((p) => p.id === targetId) || updatedList[0];
 
@@ -251,13 +318,32 @@ export async function DELETE(request: NextRequest) {
   try {
     const db = getDb();
     const idParam = request.nextUrl.searchParams.get("id")?.trim();
-    const list = getPopupsList(db);
+    let list: PopupBanner[] = [];
+    if (isBlobConfigured()) {
+      try {
+        const blobList = await readPopupsFromBlob();
+        if (Array.isArray(blobList) && blobList.length > 0) {
+          list = blobList;
+        }
+      } catch {}
+    }
+    if (list.length === 0) {
+      list = getPopupsList(db);
+    }
 
+    const removedItem = idParam ? list.find((p) => p.id === idParam) : null;
     const updatedList = idParam ? list.filter((p) => p.id !== idParam) : [];
 
     db.popupBanners = updatedList;
     db.popupBanner = updatedList[0] || null;
     saveDb(db);
+
+    if (isBlobConfigured()) {
+      savePopupsToBlob(updatedList).catch(() => {});
+      if (removedItem?.imageUrl && removedItem.imageUrl.includes("blob.vercel-storage.com")) {
+        deleteBlobByUrl(removedItem.imageUrl).catch(() => {});
+      }
+    }
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
