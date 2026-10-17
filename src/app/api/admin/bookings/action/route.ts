@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
 import { verifySessionToken } from "@/lib/security";
 
 const actionSchema = z.object({
@@ -25,14 +25,14 @@ export async function POST(request: NextRequest) {
     }
 
     const { bookingId, status } = parse.data;
-    const db = getDb();
+    const db = await getDbAsync();
     const booking = db.facilityBookings.find((b) => b.id === bookingId);
     if (!booking) {
       return NextResponse.json({ error: "Peminjaman tidak ditemukan" }, { status: 404 });
     }
 
     booking.status = status;
-    saveDb(db);
+    await saveDb(db);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(

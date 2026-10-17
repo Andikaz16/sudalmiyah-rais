@@ -16,8 +16,10 @@ import {
   PopupBanner,
   DownloadDocument,
 } from "./types";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { getFirestoreDb, isFirebaseConfigured } from "./firebase";
 
-interface DatabaseSchema {
+export interface DatabaseSchema {
   users: User[];
   agendas: Agenda[];
   fridaySchedule: FridayOfficerSchedule;
@@ -546,6 +548,63 @@ function getInitialData(): DatabaseSchema {
   };
 }
 
+export function ensureDbDefaults(data: DatabaseSchema): DatabaseSchema {
+  if (!data) return getInitialData();
+  if (!data.fridaySchedules || data.fridaySchedules.length < 6) {
+    const defaults = getDefaultFridaySchedules(data.fridaySchedule);
+    if (!data.fridaySchedules || data.fridaySchedules.length === 0) {
+      data.fridaySchedules = defaults;
+    } else {
+      const existingMap = new Map(data.fridaySchedules.map((s) => [s.mosqueId || s.id, s]));
+      data.fridaySchedules = defaults.map((d) => {
+        const key = d.mosqueId || d.id;
+        return existingMap.get(key) || d;
+      });
+    }
+  }
+  if (!data.fridaySchedule && data.fridaySchedules && data.fridaySchedules[0]) {
+    data.fridaySchedule = data.fridaySchedules[0];
+  }
+  if (!data.qrisSettings) {
+    data.qrisSettings = getInitialData().qrisSettings;
+  }
+  if (!data.feedbacks) {
+    data.feedbacks = getInitialData().feedbacks || [];
+  }
+  if (!data.documents || data.documents.length === 0) {
+    data.documents = getDefaultDocuments();
+  }
+  if (data.agendas) {
+    const initial = getInitialData();
+    data.agendas.forEach((a) => {
+      const match = initial.agendas.find((ia) => ia.id === a.id);
+      if (match && !a.bannerUrl) {
+        a.bannerUrl = match.bannerUrl || "/uploads/agendas/agenda-jumat.jpg";
+      }
+    });
+  } else {
+    data.agendas = getInitialData().agendas;
+  }
+  if (!data.users || data.users.length === 0) {
+    data.users = getInitialData().users;
+  }
+  if (!Array.isArray(data.popupBanners) || data.popupBanners.length === 0) {
+    if (data.popupBanner) {
+      data.popupBanners = [data.popupBanner];
+    } else {
+      const defaults = getDefaultPopupBanners();
+      data.popupBanners = defaults;
+      data.popupBanner = defaults[0] || null;
+    }
+  }
+  if (!Array.isArray(data.registrations)) data.registrations = [];
+  if (!Array.isArray(data.finances)) data.finances = [];
+  if (!Array.isArray(data.campaigns)) data.campaigns = [];
+  if (!Array.isArray(data.facilityBookings)) data.facilityBookings = [];
+  if (!Array.isArray(data.auditLogs)) data.auditLogs = [];
+  return data;
+}
+
 export function getDb(): DatabaseSchema {
   const targetFile = getDbFilePath();
   const repoFile = path.join(process.cwd(), "data", "masjid_store.json");
@@ -581,53 +640,8 @@ export function getDb(): DatabaseSchema {
       return memoryDb;
     }
     const content = fs.readFileSync(fileToRead, "utf-8");
-    memoryDb = JSON.parse(content);
+    memoryDb = ensureDbDefaults(JSON.parse(content));
     lastDbMtimeMs = stat.mtimeMs;
-    if (!memoryDb?.fridaySchedules || memoryDb.fridaySchedules.length < 6) {
-      const defaults = getDefaultFridaySchedules(memoryDb?.fridaySchedule);
-      if (!memoryDb?.fridaySchedules || memoryDb.fridaySchedules.length === 0) {
-        memoryDb!.fridaySchedules = defaults;
-      } else {
-        const existingMap = new Map(memoryDb.fridaySchedules.map((s) => [s.mosqueId || s.id, s]));
-        memoryDb!.fridaySchedules = defaults.map((d) => {
-          const key = d.mosqueId || d.id;
-          return existingMap.get(key) || d;
-        });
-      }
-    }
-    if (!memoryDb?.fridaySchedule) {
-      memoryDb!.fridaySchedule = memoryDb!.fridaySchedules[0];
-    }
-    if (!memoryDb?.qrisSettings) {
-      memoryDb!.qrisSettings = getInitialData().qrisSettings;
-    }
-    if (!memoryDb?.feedbacks) {
-      memoryDb!.feedbacks = getInitialData().feedbacks || [];
-    }
-    if (!memoryDb?.documents || memoryDb.documents.length === 0) {
-      memoryDb!.documents = getDefaultDocuments();
-    }
-    if (memoryDb?.agendas) {
-      const initial = getInitialData();
-      memoryDb.agendas.forEach((a) => {
-        const match = initial.agendas.find((ia) => ia.id === a.id);
-        if (match && !a.bannerUrl) {
-          a.bannerUrl = match.bannerUrl || "/uploads/agendas/agenda-jumat.jpg";
-        }
-      });
-    }
-    if (!memoryDb?.users || memoryDb.users.length === 0) {
-      memoryDb!.users = getInitialData().users;
-    }
-    if (!Array.isArray(memoryDb?.popupBanners) || memoryDb.popupBanners.length === 0) {
-      if (memoryDb?.popupBanner) {
-        memoryDb!.popupBanners = [memoryDb.popupBanner];
-      } else {
-        const defaults = getDefaultPopupBanners();
-        memoryDb!.popupBanners = defaults;
-        memoryDb!.popupBanner = defaults[0] || null;
-      }
-    }
     return memoryDb as DatabaseSchema;
   } catch (err) {
     console.error("Database read error, falling back to initial data:", err);
@@ -638,7 +652,33 @@ export function getDb(): DatabaseSchema {
   }
 }
 
-export function saveDb(data: DatabaseSchema): void {
+export async function getDbAsync(): Promise<DatabaseSchema> {
+  if (isFirebaseConfigured()) {
+    try {
+      const firestore = getFirestoreDb();
+      if (firestore) {
+        const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const cloudData = ensureDbDefaults(snap.data() as DatabaseSchema);
+          memoryDb = cloudData;
+          return cloudData;
+        } else {
+          // First time initialization: seed Firestore with current local data
+          const local = getDb();
+          await setDoc(docRef, JSON.parse(JSON.stringify(local)));
+          memoryDb = local;
+          return local;
+        }
+      }
+    } catch (err) {
+      console.warn("Notice: Firestore read error, falling back to local file:", err);
+    }
+  }
+  return getDb();
+}
+
+export async function saveDb(data: DatabaseSchema): Promise<void> {
   memoryDb = data;
   const targetFile = getDbFilePath();
   try {
@@ -649,6 +689,19 @@ export function saveDb(data: DatabaseSchema): void {
   } catch (err) {
     // Graceful fallback for read-only serverless filesystems
     console.warn("Notice: Could not persist to disk, keeping in memory cache:", err);
+  }
+
+  // Persist directly to Firebase Cloud Firestore if configured
+  if (isFirebaseConfigured()) {
+    try {
+      const firestore = getFirestoreDb();
+      if (firestore) {
+        const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
+        await setDoc(docRef, JSON.parse(JSON.stringify(data)));
+      }
+    } catch (err) {
+      console.error("Notice: Firestore write error:", err);
+    }
   }
 }
 
@@ -675,7 +728,7 @@ export function logSecurityEvent(
     if (db.auditLogs.length > 200) {
       db.auditLogs = db.auditLogs.slice(0, 200);
     }
-    saveDb(db);
+    saveDb(db).catch(() => {});
   } catch (err) {
     console.warn("Security event logging error ignored:", err);
   }

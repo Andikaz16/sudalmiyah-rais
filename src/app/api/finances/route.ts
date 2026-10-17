@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
 import { checkRateLimit, sanitizeString } from "@/lib/security";
 import { FinancialRecord } from "@/lib/types";
 
@@ -12,7 +12,7 @@ const donationSubmitSchema = z.object({
 });
 
 export async function GET() {
-  const db = getDb();
+  const db = await getDbAsync();
 
   const totalIncome = db.finances
     .filter((f) => f.type === "INCOME" && f.isVerified)
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parseResult.data;
-    const db = getDb();
+    const db = await getDbAsync();
 
     const newRecord: FinancialRecord = {
       id: `fin-${Date.now().toString(36)}`,
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.finances.unshift(newRecord);
-    saveDb(db);
+    await saveDb(db);
 
     logSecurityEvent(
       "DONATION_SUBMITTED",

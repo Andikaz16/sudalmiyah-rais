@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
 import { checkRateLimit, sanitizeString } from "@/lib/security";
 import { FacilityBooking } from "@/lib/types";
 
@@ -22,7 +22,7 @@ const bookingSchema = z.object({
 });
 
 export async function GET() {
-  const db = getDb();
+  const db = await getDbAsync();
   return NextResponse.json({ bookings: db.facilityBookings });
 }
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parseResult.data;
-    const db = getDb();
+    const db = await getDbAsync();
 
     const newBooking: FacilityBooking = {
       id: `bkg-${Date.now().toString(36)}`,
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.facilityBookings.unshift(newBooking);
-    saveDb(db);
+    await saveDb(db);
 
     logSecurityEvent(
       "FACILITY_BOOKING_SUBMITTED",

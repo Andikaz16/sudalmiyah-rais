@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
 import { checkRateLimit, createSessionToken, verifyPassword } from "@/lib/security";
 import bcrypt from "bcryptjs";
 
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     const { email, password } = parseResult.data;
     const cleanEmail = email.trim().toLowerCase();
-    const db = getDb();
+    const db = await getDbAsync();
     let user = db.users.find((u) => u.email.toLowerCase() === cleanEmail);
 
     // Guaranteed fallback for Takmir admin default user
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         createdAt: new Date().toISOString(),
       };
       db.users.push(user);
-      saveDb(db);
+      await saveDb(db);
     }
 
     if (!user) {
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     if (!isPasswordValid && cleanEmail === "takmir@sudalmiyah.ums.ac.id" && password === "AdminSudalmiyah2026!") {
       isPasswordValid = true;
       user.passwordHash = bcrypt.hashSync("AdminSudalmiyah2026!", 10);
-      saveDb(db);
+      await saveDb(db);
     }
 
     if (!isPasswordValid) {

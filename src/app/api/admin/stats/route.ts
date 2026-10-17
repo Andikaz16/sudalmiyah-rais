@@ -1,9 +1,9 @@
 import { NextResponse, connection } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDbAsync } from "@/lib/db";
 
 export async function GET() {
   await connection();
-  const db = getDb();
+  const db = await getDbAsync();
 
   const totalAgendas = db.agendas.length;
   const totalRegistrations = db.registrations.length;

@@ -1,8 +1,8 @@
 import { NextResponse, connection } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDbAsync } from "@/lib/db";
 
 export async function GET() {
   await connection();
-  const db = getDb();
+  const db = await getDbAsync();
   return NextResponse.json({ logs: db.auditLogs });
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connection } from "next/server";
 import { z } from "zod";
-import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { QrisSettings } from "@/lib/types";
 
@@ -17,7 +17,7 @@ const updateQrisSchema = z.object({
 
 export async function GET() {
   await connection();
-  const db = getDb();
+  const db = await getDbAsync();
   return NextResponse.json(
     {
       success: true,
@@ -54,7 +54,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const data = parseResult.data;
-    const db = getDb();
+    const db = await getDbAsync();
 
     const updatedQris: QrisSettings = {
       id: db.qrisSettings?.id || `qris-${Date.now()}`,
@@ -69,7 +69,7 @@ export async function PUT(request: NextRequest) {
     };
 
     db.qrisSettings = updatedQris;
-    saveDb(db);
+    await saveDb(db);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(

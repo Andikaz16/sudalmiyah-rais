@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb, saveDb, logSecurityEvent } from "@/lib/db";
+import { getDbAsync, saveDb, logSecurityEvent } from "@/lib/db";
 import { verifyDynamicToken, calculateDistanceMeters, MASJID_COORDINATES } from "@/lib/presensi-token";
 import { sanitizeString, generateTicketCode, checkRateLimit } from "@/lib/security";
 import { Registration } from "@/lib/types";
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     const agendaId = verification.agendaId!;
     const agenda = db.agendas.find((a) => a.id === agendaId);
 
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
       agenda.registeredCount = (agenda.registeredCount || 0) + 1;
     }
 
-    saveDb(db);
+    await saveDb(db);
 
     logSecurityEvent(
       "PRESENSI_CHECKIN",

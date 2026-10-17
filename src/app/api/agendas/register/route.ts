@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
 import { checkRateLimit, generateTicketCode, sanitizeString } from "@/lib/security";
 import { Registration } from "@/lib/types";
 
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parseResult.data;
-    const db = getDb();
+    const db = await getDbAsync();
 
     // Verify agenda exists and is open
     const agenda = db.agendas.find((a) => a.id === data.agendaId);
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     db.registrations.unshift(newRegistration);
     agenda.registeredCount += 1;
-    saveDb(db);
+    await saveDb(db);
 
     logSecurityEvent(
       "EVENT_REGISTRATION",

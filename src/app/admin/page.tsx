@@ -35,6 +35,8 @@ import {
   RotateCcw,
   Camera,
   X,
+  Database,
+  Copy,
 } from "lucide-react";
 import {
   Agenda,
@@ -149,6 +151,9 @@ export default function AdminDashboardPage() {
 
   const [agendas, setAgendas] = useState<Agenda[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [systemStatus, setSystemStatus] = useState<{ firebaseConfigured: boolean; blobConfigured: boolean } | null>(null);
+  const [showFirebaseModal, setShowFirebaseModal] = useState(false);
+  const [copiedEnv, setCopiedEnv] = useState(false);
 
   // Feedback & Saran Jamaah State
   const [feedbacks, setFeedbacks] = useState<MosqueFeedback[]>([]);
@@ -354,14 +359,20 @@ export default function AdminDashboardPage() {
 
   const loadData = async () => {
     try {
-      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes] = await Promise.all([
+      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch(`/api/agendas?t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/friday-schedule"),
         fetch("/api/qris"),
         fetch(`/api/popup?admin=1&t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/documents"),
+        fetch("/api/admin/system-status"),
       ]);
+
+      if (statusRes.ok) {
+        const statusJson = await statusRes.json();
+        setSystemStatus(statusJson);
+      }
 
       if (statsRes.status === 401 || statsRes.status === 403) {
         router.push("/auth/login");
@@ -1317,7 +1328,26 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {systemStatus?.firebaseConfigured ? (
+              <div className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-400/40 text-emerald-300">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="hidden md:inline">Database:</span>
+                <span className="font-semibold text-emerald-200">Firebase Real-time</span>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowFirebaseModal(true)}
+                className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/50 text-amber-300 transition-colors cursor-pointer"
+                title="Klik untuk panduan setup Firebase Firestore gratis"
+              >
+                <Database className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden md:inline">Database:</span>
+                <span className="font-semibold text-amber-200 underline decoration-dotted">Setup Firebase (Gratis)</span>
+              </button>
+            )}
+
             <Link
               href="/agenda/presensi-live"
               target="_blank"
@@ -4049,6 +4079,132 @@ export default function AdminDashboardPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Modal Panduan Koneksi Firebase Cloud Firestore */}
+      {showFirebaseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-stone-200 relative my-8">
+            <button
+              onClick={() => setShowFirebaseModal(false)}
+              className="absolute top-5 right-5 p-2 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 shrink-0">
+                <Database className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-stone-900 font-serif">
+                  Aktivasi Firebase Cloud Firestore
+                </h3>
+                <p className="text-xs text-stone-500">
+                  Sinkronisasi Data Real-time & Stabil di Seluruh Perangkat
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4 text-xs text-stone-700 leading-relaxed max-h-[65vh] overflow-y-auto pr-2">
+              <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 text-stone-800">
+                <p className="font-semibold text-amber-900 mb-1">
+                  Mengapa Menghubungkan ke Firebase?
+                </p>
+                <p>
+                  Vercel Serverless bersifat stateless (kontainer berganti-ganti). Dengan mengaktifkan Firebase Firestore (100% gratis), setiap kali Anda mengubah agenda, jadwal petugas Jumat, dokumentasi, atau QRIS di admin, perubahannya langsung tersimpan di cloud Google dan seketika langsung tampil di HP seluruh jamaah tanpa menunggu sinkronisasi berkas.
+                </p>
+              </div>
+
+              <div>
+                <p className="font-bold text-stone-900 text-sm mb-2">
+                  Langkah-Langkah Setup (Hanya 2 Menit):
+                </p>
+                <ol className="list-decimal list-inside space-y-2 text-stone-600 pl-1">
+                  <li>
+                    Buka{" "}
+                    <a
+                      href="https://console.firebase.google.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#003B73] font-semibold underline inline-flex items-center gap-1"
+                    >
+                      console.firebase.google.com
+                      <ExternalLink className="w-3 h-3 inline" />
+                    </a>{" "}
+                    dan login dengan akun Google.
+                  </li>
+                  <li>
+                    Klik <strong>Add project</strong> (Tambahkan project), beri nama (misal: <code className="bg-stone-100 px-1 py-0.5 rounded text-stone-800">masjid-sudalmiyah-ums</code>), lalu ikuti panduan hingga selesai.
+                  </li>
+                  <li>
+                    Di bilah menu kiri, pilih <strong>Build &gt; Firestore Database</strong>, lalu klik <strong>Create database</strong>. Pilih lokasi terdekat (misal <code className="bg-stone-100 px-1 py-0.5 rounded text-stone-800">asia-southeast2</code> Jakarta) dan pilih <strong>Start in test mode</strong>.
+                  </li>
+                  <li>
+                    Di halaman Project Overview (ikon gerigi Pengaturan &gt; Project settings), pada bagian <strong>Your apps</strong>, klik ikon Web (<code className="bg-stone-100 px-1 py-0.5 rounded text-stone-800">&lt;/&gt;</code>) untuk mendaftarkan web app.
+                  </li>
+                  <li>
+                    Salin nilai <code className="bg-stone-100 px-1 py-0.5 rounded text-stone-800">firebaseConfig</code> yang muncul ke file <code className="bg-stone-100 px-1 py-0.5 rounded text-stone-800">.env.local</code> atau ke menu <strong>Settings &gt; Environment Variables</strong> di dashboard Vercel.
+                  </li>
+                </ol>
+              </div>
+
+              <div className="bg-stone-900 text-stone-200 p-4 rounded-2xl relative font-mono text-[11px] leading-relaxed">
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-stone-800">
+                  <span className="text-stone-400 font-sans text-xs">Variabel Lingkungan (.env)</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const text = `NEXT_PUBLIC_FIREBASE_API_KEY=\nNEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=\nNEXT_PUBLIC_FIREBASE_PROJECT_ID=\nNEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=\nNEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=\nNEXT_PUBLIC_FIREBASE_APP_ID=`;
+                      navigator.clipboard.writeText(text);
+                      setCopiedEnv(true);
+                      setTimeout(() => setCopiedEnv(false), 2500);
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-200 transition-colors text-xs font-sans cursor-pointer"
+                  >
+                    {copiedEnv ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-300 font-medium">Tersalin!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-stone-400" />
+                        <span>Salin Format</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <pre className="overflow-x-auto whitespace-pre">
+{`NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=masjid-sudalmiyah-ums.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=masjid-sudalmiyah-ums
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=masjid-sudalmiyah-ums.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+NEXT_PUBLIC_FIREBASE_APP_ID=1:...:web:...`}
+                </pre>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950">
+                <p className="font-semibold text-emerald-900 mb-0.5">
+                  Migrasi Data Otomatis:
+                </p>
+                <p>
+                  Sistem telah dilengkapi fungsi <em>Auto-Seeding</em>. Begitu Firebase terhubung untuk pertama kali, seluruh agenda, jadwal khatib Jumat, nomor rekening, QRIS, dan data masjid yang ada saat ini akan otomatis disalin ke Firestore tanpa perlu input manual ulang.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3 pt-3 border-t border-stone-200">
+              <button
+                type="button"
+                onClick={() => setShowFirebaseModal(false)}
+                className="px-5 py-2.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs transition-colors cursor-pointer"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
         </div>
       )}

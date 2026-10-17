@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import path from "path";
 import fs from "fs";
-import { getDb, saveDb, logSecurityEvent } from "@/lib/db";
+import { getDb, getDbAsync, saveDb, logSecurityEvent, DatabaseSchema } from "@/lib/db";
 import { verifySessionToken } from "@/lib/security";
 import { PopupBanner } from "@/lib/types";
 import {
@@ -12,7 +12,7 @@ import {
   deleteBlobByUrl,
 } from "@/lib/blobStorage";
 
-function getPopupsList(db: ReturnType<typeof getDb>): PopupBanner[] {
+function getPopupsList(db: DatabaseSchema): PopupBanner[] {
   if (Array.isArray(db.popupBanners) && db.popupBanners.length > 0) {
     return db.popupBanners;
   }
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (popups.length === 0) {
-    const db = getDb();
+    const db = await getDbAsync();
     popups = getPopupsList(db);
   }
 
@@ -63,10 +63,10 @@ export async function GET(request: NextRequest) {
   });
 
   if (hasLegacyDonasi) {
-    const db = getDb();
+    const db = await getDbAsync();
     db.popupBanners = popups;
     db.popupBanner = popups[0] || null;
-    saveDb(db);
+    await saveDb(db);
     if (isBlobConfigured()) {
       await savePopupsToBlob(popups);
     }
@@ -101,10 +101,10 @@ export async function POST(request: NextRequest) {
     if (contentType.includes("application/json")) {
       const body = await request.json();
       if (Array.isArray(body.popups)) {
-        const db = getDb();
+        const db = await getDbAsync();
         db.popupBanners = body.popups;
         db.popupBanner = body.popups[0] || null;
-        saveDb(db);
+        await saveDb(db);
         if (isBlobConfigured()) {
           await savePopupsToBlob(body.popups);
         }
@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     const localList = getPopupsList(db);
     let existingList: PopupBanner[] = [];
     if (isBlobConfigured()) {
@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
 
     db.popupBanners = updatedList;
     db.popupBanner = updatedList[0] || null;
-    saveDb(db);
+    await saveDb(db);
 
     if (isBlobConfigured()) {
       await savePopupsToBlob(updatedList);
@@ -288,7 +288,7 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const db = getDb();
+    const db = await getDbAsync();
     const localList = getPopupsList(db);
     let list: PopupBanner[] = [];
 
@@ -365,7 +365,7 @@ export async function PATCH(request: NextRequest) {
 
     db.popupBanners = updatedList;
     db.popupBanner = updatedList[0] || null;
-    saveDb(db);
+    await saveDb(db);
 
     if (isBlobConfigured()) {
       await savePopupsToBlob(updatedList);
@@ -400,7 +400,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const db = getDb();
+    const db = await getDbAsync();
     const idParam = request.nextUrl.searchParams.get("id")?.trim();
     let list: PopupBanner[] = [];
     if (isBlobConfigured()) {
@@ -420,7 +420,7 @@ export async function DELETE(request: NextRequest) {
 
     db.popupBanners = updatedList;
     db.popupBanner = updatedList[0] || null;
-    saveDb(db);
+    await saveDb(db);
 
     if (isBlobConfigured()) {
       await savePopupsToBlob(updatedList);

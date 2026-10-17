@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDbAsync } from "@/lib/db";
 import { generateDynamicToken, ROTATION_INTERVAL_SECONDS, TOKEN_MAX_AGE_SECONDS } from "@/lib/presensi-token";
 
 export async function GET(request: NextRequest) {
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const requestedAgendaId = searchParams.get("agendaId");
 
-    const db = getDb();
+    const db = await getDbAsync();
     const agendas = db.agendas;
 
     if (!agendas || agendas.length === 0) {

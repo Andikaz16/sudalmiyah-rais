@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import { z } from "zod";
-import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDb, getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { Agenda, AgendaCategory } from "@/lib/types";
 import { isBlobConfigured, readAgendasFromBlob, saveAgendasToBlob } from "@/lib/blobStorage";
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
 
   // Priority 2: Database fallback
   if (agendas.length === 0) {
-    const db = getDb();
+    const db = await getDbAsync();
     agendas = db.agendas;
   }
 
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parseResult.data;
-    const db = getDb();
+    const db = await getDbAsync();
 
     const newAgenda: Agenda = {
       id: `agn-${Date.now().toString(36)}`,
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.agendas.unshift(newAgenda);
-    saveDb(db);
+    await saveDb(db);
 
     if (isBlobConfigured()) {
       try {
@@ -147,7 +147,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "ID agenda diperlukan." }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     const targetIdx = db.agendas.findIndex((a) => a.id === id);
     if (targetIdx === -1) {
       return NextResponse.json({ error: "Agenda tidak ditemukan." }, { status: 404 });
@@ -175,7 +175,7 @@ export async function PATCH(request: NextRequest) {
     };
 
     db.agendas[targetIdx] = updatedAgenda;
-    saveDb(db);
+    await saveDb(db);
 
     if (isBlobConfigured()) {
       try {

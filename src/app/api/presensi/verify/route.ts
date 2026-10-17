@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDbAsync } from "@/lib/db";
 import { verifyDynamicToken, TOKEN_MAX_AGE_SECONDS } from "@/lib/presensi-token";
 
 export async function GET(request: NextRequest) {
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     const agenda = db.agendas.find((a) => a.id === verification.agendaId);
 
     if (!agenda) {

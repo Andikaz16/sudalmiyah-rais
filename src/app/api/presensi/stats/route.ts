@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDbAsync } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     const agenda = db.agendas.find((a) => a.id === agendaId);
 
     if (!agenda) {

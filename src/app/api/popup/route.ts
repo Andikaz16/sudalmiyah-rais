@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse, connection } from "next/server";
-import { getDb, saveDb } from "@/lib/db";
+import { getDbAsync, saveDb } from "@/lib/db";
 import { PopupBanner, isPopupExpired } from "@/lib/types";
 import { isBlobConfigured, readPopupsFromBlob, savePopupsToBlob } from "@/lib/blobStorage";
 import { POST as adminPost, PATCH as adminPatch, DELETE as adminDelete } from "@/app/api/admin/popup/route";
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (allPopups.length === 0) {
-      const db = getDb();
+      const db = await getDbAsync();
       if (Array.isArray(db.popupBanners) && db.popupBanners.length > 0) {
         allPopups = db.popupBanners;
       } else if (db.popupBanner) {
@@ -44,10 +44,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (hasLegacyDonasi) {
-      const db = getDb();
+      const db = await getDbAsync();
       db.popupBanners = allPopups;
       db.popupBanner = allPopups[0] || null;
-      saveDb(db);
+      await saveDb(db);
       if (isBlobConfigured()) {
         await savePopupsToBlob(allPopups);
       }

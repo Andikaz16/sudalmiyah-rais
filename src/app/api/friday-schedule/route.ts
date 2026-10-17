@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import { z } from "zod";
-import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDb, getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { FridayOfficerSchedule } from "@/lib/types";
 
@@ -25,7 +25,7 @@ const updateFridaySchema = z.object({
 
 export async function GET(request: NextRequest) {
   await connection();
-  const db = getDb();
+  const db = await getDbAsync();
   const { searchParams } = new URL(request.url);
   const mosqueId = searchParams.get("mosqueId");
 
@@ -96,7 +96,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const data = parseResult.data;
-    const db = getDb();
+    const db = await getDbAsync();
     if (!db.fridaySchedules) {
       db.fridaySchedules = [];
     }
@@ -137,7 +137,7 @@ export async function PUT(request: NextRequest) {
       db.fridaySchedule = updatedSchedule;
     }
 
-    saveDb(db);
+    await saveDb(db);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(

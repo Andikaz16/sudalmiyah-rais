@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getDb, saveDb, logSecurityEvent } from "@/lib/db";
+import { getDbAsync, saveDb, logSecurityEvent } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { DocumentCategory, DownloadDocument } from "@/lib/types";
 
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
   }
 
-  const db = getDb();
+  const db = await getDbAsync();
   return NextResponse.json({
     success: true,
     documents: db.documents || [],
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parsed.data;
-    const db = getDb();
+    const db = await getDbAsync();
     if (!db.documents) {
       db.documents = [];
     }
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.documents.unshift(newDoc);
-    saveDb(db);
+    await saveDb(db);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -135,7 +135,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "ID dokumen diperlukan." }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     if (!db.documents) {
       return NextResponse.json({ error: "Dokumen tidak ditemukan." }, { status: 404 });
     }
@@ -160,7 +160,7 @@ export async function PUT(request: NextRequest) {
     target.updatedAt = new Date().toISOString();
 
     db.documents[index] = target;
-    saveDb(db);
+    await saveDb(db);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -196,7 +196,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "ID dokumen diperlukan." }, { status: 400 });
   }
 
-  const db = getDb();
+  const db = await getDbAsync();
   if (!db.documents) {
     return NextResponse.json({ error: "Dokumen tidak ditemukan." }, { status: 404 });
   }
@@ -207,7 +207,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   db.documents = db.documents.filter((d) => d.id !== id);
-  saveDb(db);
+  await saveDb(db);
 
   const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
   logSecurityEvent(

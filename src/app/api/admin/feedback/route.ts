@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
 import { verifySessionToken } from "@/lib/security";
 import { FeedbackStatus } from "@/lib/types";
 
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category");
     const search = searchParams.get("search")?.toLowerCase().trim();
 
-    const db = getDb();
+    const db = await getDbAsync();
     const feedbacks = db.feedbacks || [];
 
     let filtered = [...feedbacks];
@@ -91,7 +91,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const { id, status, adminResponse } = parsed.data;
-    const db = getDb();
+    const db = await getDbAsync();
     if (!db.feedbacks) db.feedbacks = [];
 
     const feedbackIndex = db.feedbacks.findIndex((f) => f.id === id);
@@ -113,7 +113,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     db.feedbacks[feedbackIndex] = feedback;
-    saveDb(db);
+    await saveDb(db);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -151,7 +151,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "ID masukan diperlukan." }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     if (!db.feedbacks) db.feedbacks = [];
 
     const exists = db.feedbacks.some((f) => f.id === id);
@@ -160,7 +160,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     db.feedbacks = db.feedbacks.filter((f) => f.id !== id);
-    saveDb(db);
+    await saveDb(db);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(

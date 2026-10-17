@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb, saveDb } from "@/lib/db";
+import { getDbAsync, saveDb } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
   const search = searchParams.get("search");
 
-  const db = getDb();
+  const db = await getDbAsync();
   let documents = db.documents || [];
 
   if (category && category !== "ALL") {
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "ID dokumen diperlukan." }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     if (!db.documents) {
       return NextResponse.json({ error: "Data dokumen kosong." }, { status: 404 });
     }
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     doc.downloadCount = (doc.downloadCount || 0) + 1;
-    saveDb(db);
+    await saveDb(db);
 
     return NextResponse.json({
       success: true,
