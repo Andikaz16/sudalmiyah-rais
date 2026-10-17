@@ -656,41 +656,6 @@ export default function SejarahPage() {
               ))}
             </div>
           </section>
-
-        {/* SECTION 4: GARIS WAKTU PERKEMBANGAN DAKWAH KAMPUS */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-          <div className="bg-gradient-to-br from-[#003B73] to-[#002855] text-white rounded-3xl p-6 sm:p-10 shadow-lg relative overflow-hidden">
-            <div className="relative z-10 max-w-3xl">
-              <span className="text-xs font-bold text-[#FCD34D] uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                <Sparkles className="w-3.5 h-3.5 text-[#FCD34D]" />
-                Komitmen Berkelanjutan
-              </span>
-              <h3 className="text-2xl sm:text-3xl font-serif font-black text-white">
-                Membangun Peradaban dari Masjid Kampus
-              </h3>
-              <p className="text-xs sm:text-sm text-stone-200 mt-2 leading-relaxed">
-                Dari berdirinya Masjid Fadhlurrahman di masa perintisan, berdirinya Masjid Sudalmiyah Rais di Kampus 2, 
-                hingga kini menjadi sentra percontohan nasional LPCR-PM PP Muhammadiyah, masjid kampus UMS 
-                senantiasa setia merawat peribadatan yang murni, inklusif, dan mencerdaskan kehidupan bangsa.
-              </p>
-
-              <div className="flex flex-wrap items-center gap-3 mt-6">
-                <Link
-                  href="/ibadah"
-                  className="px-5 py-2.5 rounded-xl bg-[#D4AF37] hover:bg-[#B58A1E] text-stone-950 font-bold text-xs sm:text-sm shadow-md transition-all"
-                >
-                  Buka Ruang Ibadah Digital
-                </Link>
-                <Link
-                  href="/layanan"
-                  className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm border border-white/20 transition-all"
-                >
-                  Peminjaman Fasilitas Masjid
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* MODAL PRATINJAU DOKUMEN SK & STRUKTUR TAKMIR */}
