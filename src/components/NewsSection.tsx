@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, ExternalLink } from "lucide-react";
 
 interface NewsItem {
   id: string;
@@ -239,11 +239,21 @@ export default function NewsSection() {
     };
   }, []);
 
+  const [selectedSource, setSelectedSource] = useState<string>("ALL");
   const sliderRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const displayNews = newsList.filter((item) => (item.source as string) !== "MASJIDMU");
+  const sourceTabs = [
+    { id: "ALL", label: "Semua Warta" },
+    { id: "UMS", label: "Warta Kampus UMS" },
+    { id: "SUARA_MUHAMMADIYAH", label: "Suara Muhammadiyah" },
+    { id: "LENSAMU", label: "Lensamu" },
+  ];
+
+  const displayNews = newsList
+    .filter((item) => (item.source as string) !== "MASJIDMU")
+    .filter((item) => selectedSource === "ALL" || item.source === selectedSource);
 
   const checkScrollPosition = useCallback(() => {
     if (!sliderRef.current) return;
@@ -275,7 +285,7 @@ export default function NewsSection() {
     <section id="berita" className="py-12 sm:py-18 bg-[#FAF8F5] text-stone-900 border-t border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading - Centered to match other sections */}
-        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
             Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
           </h2>
@@ -284,10 +294,32 @@ export default function NewsSection() {
           </p>
         </div>
 
+        {/* Source Filter Tabs */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-8 sm:mb-10 px-1">
+          {sourceTabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setSelectedSource(tab.id);
+                if (sliderRef.current) {
+                  sliderRef.current.scrollTo({ left: 0, behavior: "smooth" });
+                }
+              }}
+              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                selectedSource === tab.id
+                  ? "bg-[#003B73] text-white shadow-md shadow-[#003B73]/20"
+                  : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50 shadow-2xs"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         {/* News Cards Horizontal Slider */}
         {displayNews.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-3xl border border-stone-200 p-8 max-w-xl mx-auto shadow-xs">
-            <p className="text-stone-500 text-sm">Belum ada warta saat ini.</p>
+            <p className="text-stone-500 text-sm">Belum ada warta untuk kategori ini saat ini.</p>
           </div>
         ) : (
           <div className="relative group">
@@ -320,11 +352,12 @@ export default function NewsSection() {
               {displayNews.map((item) => (
                 <article
                   key={item.id}
-                  className="w-[84vw] sm:w-[360px] md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] shrink-0 snap-start bg-white border border-stone-200/90 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:border-[#D4AF37]/50 transition-all duration-300 flex flex-col justify-between group"
+                  onClick={() => setSelectedArticle(item)}
+                  className="w-[84vw] sm:w-[360px] md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] shrink-0 snap-start bg-white border border-stone-200/90 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:border-[#003B73]/50 transition-all duration-300 flex flex-col justify-between group cursor-pointer"
                 >
                   <div>
                     {/* Thumbnail Image Container */}
-                    <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-stone-100">
+                    <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-stone-100 group-hover:opacity-95 transition-opacity">
                       <Image
                         src={item.imageUrl}
                         alt={item.title}
@@ -361,15 +394,29 @@ export default function NewsSection() {
                     </div>
                   </div>
 
-                  {/* Card Footer: BACA SELENGKAPNYA -> */}
-                  <div className="px-5 sm:px-6 pb-5 pt-3 border-t border-stone-100">
+                  {/* Card Footer: BACA SELENGKAPNYA -> and Direct Source Link */}
+                  <div className="px-5 sm:px-6 pb-5 pt-3 border-t border-stone-100 flex items-center justify-between">
                     <button
-                      onClick={() => setSelectedArticle(item)}
-                      className="text-stone-600 hover:text-[#003B73] transition-colors text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 focus:outline-none cursor-pointer group/btn"
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedArticle(item);
+                      }}
+                      className="text-stone-600 group-hover:text-[#003B73] transition-colors text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 focus:outline-none cursor-pointer group/btn"
                     >
                       <span>BACA SELENGKAPNYA</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-stone-400 group-hover/btn:text-[#003B73] group-hover/btn:translate-x-1 transition-all" />
+                      <ArrowRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-[#003B73] group-hover/btn:translate-x-1 transition-all" />
                     </button>
+                    <a
+                      href={item.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      title="Buka sumber resmi di tab baru"
+                      className="p-1.5 rounded-full hover:bg-stone-100 text-stone-400 hover:text-[#003B73] transition-colors"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
                   </div>
                 </article>
               ))}

@@ -185,18 +185,91 @@ const fallbackArticles: ApiNewsItem[] = [
   },
 ];
 
-export async function GET() {
-  const articles: ApiNewsItem[] = [];
+function parseRssFeed(xml: string, source: "UMS" | "SUARA_MUHAMMADIYAH" | "LENSAMU"): ApiNewsItem[] {
+  const items: ApiNewsItem[] = [];
+  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+  let match;
 
-  // 1. Fetch UMS News
+  while ((match = itemRegex.exec(xml)) !== null && items.length < 6) {
+    const itemBlock = match[1];
+
+    const titleMatch = itemBlock.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/);
+    const linkMatch = itemBlock.match(/<link>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/link>/);
+    const pubDateMatch = itemBlock.match(/<pubDate>([\s\S]*?)<\/pubDate>/);
+    const descMatch = itemBlock.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/);
+    const contentMatch = itemBlock.match(/<content:encoded>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/content:encoded>/);
+
+    const fullText = (contentMatch ? contentMatch[1] : "") + (descMatch ? descMatch[1] : "");
+    const imgMatch = fullText.match(/<img[^>]+src=["']([^"']+)["']/i);
+
+    const rawTitle = titleMatch ? decodeHtmlEntities(titleMatch[1].trim()) : "";
+    const rawLink = linkMatch ? linkMatch[1].trim() : "";
+    const rawDesc = descMatch ? decodeHtmlEntities(descMatch[1].trim()) : "";
+    const pubDateStr = pubDateMatch ? pubDateMatch[1].trim() : "";
+
+    let pubDateIso = new Date().toISOString();
+    if (pubDateStr) {
+      const parsedD = new Date(pubDateStr);
+      if (!isNaN(parsedD.getTime())) {
+        pubDateIso = parsedD.toISOString();
+      }
+    }
+
+    if (rawTitle && rawLink) {
+      const isUms = source === "UMS";
+      const isSm = source === "SUARA_MUHAMMADIYAH";
+
+      items.push({
+        id: `${source.toLowerCase()}-rss-${items.length + 1}`,
+        source,
+        badge: isUms ? "UMS NEWS" : isSm ? "SUARA MUHAMMADIYAH" : "LENSAMU",
+        badgeClass: isUms
+          ? "bg-[#003B73] text-white"
+          : isSm
+          ? "bg-[#800000] text-white"
+          : "bg-[#005A36] text-white",
+        timeAgo: calculateTimeAgo(pubDateIso),
+        publishedAt: pubDateIso,
+        sourceDomain: isUms ? "news.ums.ac.id" : isSm ? "suaramuhammadiyah.id" : "lensamu.id",
+        sourceUrl: rawLink,
+        title: rawTitle,
+        excerpt: rawDesc.slice(0, 240) + (rawDesc.length > 240 ? "..." : ""),
+        content: [
+          rawDesc,
+          "Warta resmi civitas akademika dan persyarikatan ini dirilis langsung melalui portal berita resmi.",
+        ],
+        imageUrl: imgMatch
+          ? imgMatch[1]
+          : isUms
+          ? "/images/news/ums-pemilu.jpg"
+          : isSm
+          ? "/images/news/news-sm-1.jpg"
+          : "/images/news/news-lensamu-1.jpg",
+      });
+    }
+  }
+
+  return items;
+}
+
+// 1. Fetcher Khusus Berita Kampus UMS (Prioritas Utama)
+async function fetchUmsNews(): Promise<ApiNewsItem[]> {
+  const items: ApiNewsItem[] = [];
+
+  // Strategi A: WordPress REST API resmi
   try {
-    const resUms = await fetch("https://news.ums.ac.id/id/wp-json/wp/v2/posts?_embed&per_page=3", {
-      next: { revalidate: 3600 },
-      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+    const res = await fetch("https://news.ums.ac.id/id/wp-json/wp/v2/posts?_embed&per_page=6", {
+      next: { revalidate: 1800 },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(6000),
     });
-    if (resUms.ok) {
-      const data = await resUms.json();
-      if (Array.isArray(data)) {
+
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
         data.forEach((p) => {
           const rawExcerpt = p.excerpt?.rendered || "";
           const imgUrl =
@@ -208,7 +281,7 @@ export async function GET() {
             ? `${p.date}+07:00`
             : new Date().toISOString();
 
-          articles.push({
+          items.push({
             id: `ums-${p.id}`,
             source: "UMS",
             badge: "UMS NEWS",
@@ -226,21 +299,54 @@ export async function GET() {
             imageUrl: imgUrl,
           });
         });
+
+        if (items.length > 0) return items;
       }
     }
   } catch (err) {
-    console.error("Error fetching UMS news:", err);
+    console.warn("Notice: UMS REST API failed, trying RSS:", err);
   }
 
-  // 2. Fetch Lensamu (Muhammadiyah.or.id)
+  // Strategi B: RSS Feed Berita UMS
   try {
-    const resMu = await fetch("https://muhammadiyah.or.id/wp-json/wp/v2/posts?_embed&per_page=3", {
-      next: { revalidate: 3600 },
-      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+    const resRss = await fetch("https://news.ums.ac.id/id/feed/", {
+      next: { revalidate: 1800 },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        Accept: "text/xml, application/rss+xml, */*",
+      },
+      signal: AbortSignal.timeout(6000),
     });
-    if (resMu.ok) {
-      const data = await resMu.json();
-      if (Array.isArray(data)) {
+
+    if (resRss.ok) {
+      const xml = await resRss.text();
+      const parsed = parseRssFeed(xml, "UMS");
+      if (parsed.length > 0) return parsed;
+    }
+  } catch (err) {
+    console.warn("Notice: UMS RSS failed:", err);
+  }
+
+  // Strategi C: Fallback Lokal UMS
+  return fallbackArticles.filter((a) => a.source === "UMS");
+}
+
+// 2. Fetcher Lensamu (Muhammadiyah.or.id)
+async function fetchLensamuNews(): Promise<ApiNewsItem[]> {
+  const items: ApiNewsItem[] = [];
+
+  try {
+    const res = await fetch("https://muhammadiyah.or.id/wp-json/wp/v2/posts?_embed&per_page=3", {
+      next: { revalidate: 3600 },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+      },
+      signal: AbortSignal.timeout(6000),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
         data.forEach((p) => {
           const rawExcerpt = p.excerpt?.rendered || "";
           const imgUrl =
@@ -252,7 +358,7 @@ export async function GET() {
             ? `${p.date}+07:00`
             : new Date().toISOString();
 
-          articles.push({
+          items.push({
             id: `lensamu-${p.id}`,
             source: "LENSAMU",
             badge: "LENSAMU",
@@ -270,20 +376,32 @@ export async function GET() {
             imageUrl: imgUrl,
           });
         });
+
+        if (items.length > 0) return items;
       }
     }
   } catch (err) {
-    console.error("Error fetching Lensamu news:", err);
+    console.warn("Notice: Lensamu fetch error:", err);
   }
 
-  // 3. Fetch Suara Muhammadiyah
+  return fallbackArticles.filter((a) => a.source === "LENSAMU");
+}
+
+// 3. Fetcher Suara Muhammadiyah
+async function fetchSuaraMuhammadiyahNews(): Promise<ApiNewsItem[]> {
+  const items: ApiNewsItem[] = [];
+
   try {
-    const resSm = await fetch("https://suaramuhammadiyah.id", {
+    const res = await fetch("https://suaramuhammadiyah.id", {
       next: { revalidate: 3600 },
-      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+      },
+      signal: AbortSignal.timeout(6000),
     });
-    if (resSm.ok) {
-      const html = await resSm.text();
+
+    if (res.ok) {
+      const html = await res.text();
       const cardRegex = /<img[^>]+src="([^"]+)"[^>]*class="[^"]*w-100[^"]*"[\s\S]*?<a[^>]+href="(\/read\/[^"]+)"[^>]*>[\s\S]*?<h5>([\s\S]*?)<\/h5>/g;
       let m;
       let count = 0;
@@ -292,7 +410,6 @@ export async function GET() {
         const imgUrl = m[1];
         const link = `https://suaramuhammadiyah.id${m[2]}`;
 
-        // Extract timestamp from image URL format: YYYYMMDDHHmmss
         const dateMatch = imgUrl.match(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
         let pubDateIso = new Date().toISOString();
         if (dateMatch) {
@@ -300,7 +417,7 @@ export async function GET() {
           pubDateIso = `${y}-${mo}-${d}T${h}:${mi}:${s}+07:00`;
         }
 
-        articles.push({
+        items.push({
           id: `sm-live-${count + 1}`,
           source: "SUARA_MUHAMMADIYAH",
           badge: "SUARA MUHAMMADIYAH",
@@ -319,44 +436,30 @@ export async function GET() {
         });
         count++;
       }
+
+      if (items.length > 0) return items;
     }
   } catch (err) {
-    console.error("Error fetching Suara Muhammadiyah news:", err);
+    console.warn("Notice: Suara Muhammadiyah fetch error:", err);
   }
 
-  // Merge with fallbacks if any category is empty
-  const hasUms = articles.some((a) => a.source === "UMS");
-  const hasLensamu = articles.some((a) => a.source === "LENSAMU");
-  const hasSm = articles.some((a) => a.source === "SUARA_MUHAMMADIYAH");
+  return fallbackArticles.filter((a) => a.source === "SUARA_MUHAMMADIYAH");
+}
 
-  let finalArticles = [...articles];
+export async function GET() {
+  // Ambil ketiga sumber secara paralel untuk efisiensi
+  const [umsArticles, lensamuArticles, smArticles] = await Promise.all([
+    fetchUmsNews(),
+    fetchLensamuNews(),
+    fetchSuaraMuhammadiyahNews(),
+  ]);
 
-  if (!hasUms) {
-    finalArticles = [
-      ...finalArticles,
-      ...fallbackArticles.filter((a) => a.source === "UMS"),
-    ];
-  }
-  if (!hasLensamu) {
-    finalArticles = [
-      ...finalArticles,
-      ...fallbackArticles.filter((a) => a.source === "LENSAMU"),
-    ];
-  }
-  if (!hasSm) {
-    finalArticles = [
-      ...finalArticles,
-      ...fallbackArticles.filter((a) => a.source === "SUARA_MUHAMMADIYAH"),
-    ];
-  }
-
-  // If external fetch didn't return any, return full fallback list
-  if (finalArticles.length === 0) {
-    finalArticles = fallbackArticles;
-  }
-
-  // Return all aggregated articles from the 3 official sources (UMS, Suara Muhammadiyah, Lensamu)
-  const officialArticles = finalArticles.filter((a) => a.source !== "MASJIDMU");
+  // UTAMAKAN BERITA KAMPUS UMS DI URUTAN TERDEPAN (Posisi 0, 1, 2, dst.)
+  const officialArticles = [
+    ...umsArticles,
+    ...smArticles,
+    ...lensamuArticles,
+  ];
 
   return NextResponse.json(
     {
