@@ -154,6 +154,30 @@ export default function AdminDashboardPage() {
   const [systemStatus, setSystemStatus] = useState<{ firebaseConfigured: boolean; blobConfigured: boolean } | null>(null);
   const [showFirebaseModal, setShowFirebaseModal] = useState(false);
   const [copiedEnv, setCopiedEnv] = useState(false);
+  const [publishToast, setPublishToast] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    timestamp: string;
+  } | null>(null);
+  const [isPublishingProcessing, setIsPublishingProcessing] = useState<string | null>(null);
+
+  const triggerPublishNotification = (title: string, message: string) => {
+    setPublishToast({
+      show: true,
+      title,
+      message,
+      timestamp:
+        new Date().toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }) + " WIB",
+    });
+    setTimeout(() => {
+      setPublishToast(null);
+    }, 6000);
+  };
 
   // Feedback & Saran Jamaah State
   const [feedbacks, setFeedbacks] = useState<MosqueFeedback[]>([]);
@@ -648,6 +672,7 @@ export default function AdminDashboardPage() {
     if (!fridaySchedule) return;
     setSavingFriday(true);
     setFridaySaveSuccess(false);
+    setIsPublishingProcessing("Menyimpan jadwal Jumat & memublikasikan ke publik");
     try {
       const currentMeta = ADMIN_MOSQUES.find((m) => m.id === selectedMosqueId);
       const payload: FridayOfficerSchedule = {
@@ -678,10 +703,15 @@ export default function AdminDashboardPage() {
 
       setFridaySaveSuccess(true);
       setTimeout(() => setFridaySaveSuccess(false), 3000);
+      triggerPublishNotification(
+        "Jadwal Jumat Berhasil Dipublikasikan!",
+        `Jadwal petugas shalat Jumat untuk ${payload.mosqueName} telah tersimpan ke Firebase dan langsung aktif di portal publik.`
+      );
     } catch (err: any) {
       alert(err.message || "Gagal menyimpan jadwal.");
     } finally {
       setSavingFriday(false);
+      setIsPublishingProcessing(null);
     }
   };
 
@@ -749,6 +779,7 @@ export default function AdminDashboardPage() {
     if (!qrisSettings) return;
     setSavingQris(true);
     setQrisSaveSuccess(false);
+    setIsPublishingProcessing("Menyimpan pengaturan QRIS & memublikasikan ke publik");
     try {
       const res = await fetch("/api/qris", {
         method: "PUT",
@@ -760,10 +791,15 @@ export default function AdminDashboardPage() {
 
       setQrisSaveSuccess(true);
       setTimeout(() => setQrisSaveSuccess(false), 3000);
+      triggerPublishNotification(
+        "Pengaturan QRIS Berhasil Dipublikasikan!",
+        `Informasi QRIS (${qrisSettings.merchantName}) telah tersimpan ke Firebase dan langsung aktif di halaman Donasi publik.`
+      );
     } catch (err: any) {
       alert(err.message || "Gagal menyimpan pengaturan QRIS.");
     } finally {
       setSavingQris(false);
+      setIsPublishingProcessing(null);
     }
   };
 
@@ -798,6 +834,7 @@ export default function AdminDashboardPage() {
   const handleCreateAgenda = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingAgenda(true);
+    setIsPublishingProcessing("Menyimpan agenda baru & memublikasikan ke publik");
     try {
       const res = await fetch("/api/agendas", {
         method: "POST",
@@ -807,11 +844,16 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal membuat agenda.");
       setIsNewAgendaOpen(false);
-      loadData();
+      await loadData();
+      triggerPublishNotification(
+        "Agenda Baru Berhasil Dipublikasikan!",
+        `Agenda "${newAgenda.title}" telah tersimpan ke Firebase dan langsung aktif di beranda publik.`
+      );
     } catch (err) {
       alert(err instanceof Error ? err.message : "Terjadi kesalahan");
     } finally {
       setSavingAgenda(false);
+      setIsPublishingProcessing(null);
     }
   };
 
@@ -832,6 +874,7 @@ export default function AdminDashboardPage() {
   // Quick Toggle Agenda Completion
   const handleToggleQuickComplete = async (agenda: Agenda) => {
     const nextStatus = !agenda.isCompleted;
+    setIsPublishingProcessing(nextStatus ? "Menandai agenda selesai & memublikasikan" : "Mengubah status agenda & memublikasikan");
     try {
       const res = await fetch("/api/agendas", {
         method: "PATCH",
@@ -843,9 +886,15 @@ export default function AdminDashboardPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal memperbarui status agenda.");
-      loadData();
+      await loadData();
+      triggerPublishNotification(
+        nextStatus ? "Agenda Ditandai Selesai & Dipublikasikan!" : "Status Agenda Diperbarui!",
+        `Agenda "${agenda.title}" telah ${nextStatus ? "ditandai terlaksana" : "diubah kembali menjadi jadwal aktif"} dan langsung terupdate di portal publik.`
+      );
     } catch (err: any) {
       alert(err.message || "Gagal memperbarui status agenda.");
+    } finally {
+      setIsPublishingProcessing(null);
     }
   };
 
@@ -884,6 +933,7 @@ export default function AdminDashboardPage() {
     e.preventDefault();
     if (!editingAgendaDoc) return;
     setSavingAgendaDoc(true);
+    setIsPublishingProcessing("Menyimpan foto dokumentasi & memublikasikan ke publik");
     try {
       const res = await fetch("/api/agendas", {
         method: "PATCH",
@@ -898,12 +948,18 @@ export default function AdminDashboardPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan hasil dokumentasi agenda.");
+      const savedTitle = editingAgendaDoc.title;
       setEditingAgendaDoc(null);
-      loadData();
+      await loadData();
+      triggerPublishNotification(
+        "Hasil Dokumentasi Berhasil Dipublikasikan!",
+        `Dokumentasi ${docPhotos.length} foto dan ${docAttendees ? `${Number(docAttendees).toLocaleString("id-ID")} peserta` : "kegiatan"} untuk "${savedTitle}" telah tersimpan ke Firebase dan langsung tampil di beranda publik.`
+      );
     } catch (err: any) {
       alert(err.message || "Gagal menyimpan hasil agenda.");
     } finally {
       setSavingAgendaDoc(false);
+      setIsPublishingProcessing(null);
     }
   };
 
@@ -1118,6 +1174,10 @@ export default function AdminDashboardPage() {
         setPopupSaveSuccess(false);
         setSavedPopupId(null);
       }, 3000);
+      triggerPublishNotification(
+        "Pop-up Banner Berhasil Dipublikasikan!",
+        "Pengaturan pop-up pengumuman masjid telah tersimpan ke Firebase dan langsung aktif di beranda publik."
+      );
     } catch (err: any) {
       alert(err.message || "Gagal menyimpan pengaturan pop-up banner.");
     } finally {
@@ -1268,6 +1328,7 @@ export default function AdminDashboardPage() {
       return;
     }
     setSavingDoc(true);
+    setIsPublishingProcessing("Menyimpan dokumen & memublikasikan ke publik");
     try {
       const method = editingDocId ? "PUT" : "POST";
       const payload = editingDocId ? { id: editingDocId, ...docForm } : docForm;
@@ -1281,11 +1342,16 @@ export default function AdminDashboardPage() {
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan dokumen.");
 
       setIsDocModalOpen(false);
-      loadData();
+      await loadData();
+      triggerPublishNotification(
+        editingDocId ? "Dokumen Berhasil Diperbarui!" : "Dokumen Baru Berhasil Dipublikasikan!",
+        `Dokumen "${docForm.title}" telah tersimpan ke Firebase dan aktif di portal unduhan publik.`
+      );
     } catch (err: any) {
       alert(err.message || "Gagal menyimpan dokumen.");
     } finally {
       setSavingDoc(false);
+      setIsPublishingProcessing(null);
     }
   };
 
@@ -1305,6 +1371,59 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans pb-16">
+      {/* Floating Processing Indicator */}
+      {isPublishingProcessing && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#001F3F]/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-amber-400/50 flex items-center gap-2.5 text-xs font-semibold backdrop-blur-md animate-fade-in">
+          <div className="w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-amber-200">{isPublishingProcessing}...</span>
+        </div>
+      )}
+
+      {/* Floating Success Toast: Berhasil Dipublikasikan ke Publik */}
+      {publishToast && (
+        <div className="fixed bottom-6 right-4 sm:right-6 z-50 max-w-md w-[calc(100%-2rem)] sm:w-full bg-[#001F3F] text-white rounded-2xl p-4 shadow-2xl border border-emerald-500/40 animate-fade-in flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <h4 className="font-bold text-sm text-emerald-300 font-serif truncate">
+                {publishToast.title}
+              </h4>
+              <span className="text-[10px] text-stone-400 shrink-0">{publishToast.timestamp}</span>
+            </div>
+            <p className="text-xs text-stone-300 leading-relaxed mb-3">
+              {publishToast.message}
+            </p>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/"
+                target="_blank"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold transition-colors shadow-xs"
+              >
+                <span>Lihat di Beranda Publik</span>
+                <ExternalLink className="w-3 h-3" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setPublishToast(null)}
+                className="px-2.5 py-1 rounded-full bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] transition-colors cursor-pointer"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPublishToast(null)}
+            className="text-stone-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
+            title="Tutup notifikasi"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Top Admin Header */}
       <header className="bg-[#001F3F] border-b border-stone-800 text-white sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
