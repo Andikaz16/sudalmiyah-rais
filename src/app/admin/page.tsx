@@ -2408,18 +2408,43 @@ export default function AdminDashboardPage() {
                     )}
 
                     {uploadDurationType === "CUSTOM" && (
-                      <div className="space-y-1.5 pt-1 animate-fade-in">
-                        <label className="block text-[11px] font-semibold text-stone-700">
-                          Tanggal &amp; Waktu Berakhir:
-                        </label>
-                        <input
-                          type="datetime-local"
-                          value={uploadCustomDate}
-                          onChange={(e) => setUploadCustomDate(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-xs text-stone-900 font-mono focus:ring-2 focus:ring-[#003B73]"
-                        />
+                      <div className="space-y-3 pt-1 animate-fade-in">
+                        <div>
+                          <label className="block text-[11px] font-semibold text-stone-700 mb-1">
+                            Opsi A: Masukkan Durasi (Berapa Hari):
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              min="1"
+                              max="365"
+                              placeholder="Misal: 1, 2, 5, 10"
+                              onChange={(e) => {
+                                const days = parseInt(e.target.value, 10);
+                                if (!isNaN(days) && days > 0) {
+                                  const targetDate = new Date(Date.now() + days * 86400000);
+                                  setUploadCustomDate(toDatetimeLocal(targetDate.toISOString()));
+                                }
+                              }}
+                              className="w-36 px-3 py-1.5 rounded-xl bg-white border border-stone-300 text-xs text-stone-900 focus:ring-2 focus:ring-[#003B73]"
+                            />
+                            <span className="text-xs text-stone-600 font-medium">Hari dari sekarang</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-stone-700 mb-1">
+                            Opsi B: Atau Tentukan Tanggal &amp; Jam Berakhir:
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={uploadCustomDate}
+                            onChange={(e) => setUploadCustomDate(e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-xs text-stone-900 font-mono focus:ring-2 focus:ring-[#003B73]"
+                          />
+                        </div>
                         <p className="text-[10px] text-stone-500 leading-snug">
-                          Pilih tanggal dan jam persis kapan pop-up otomatis ditutup dan tidak tayang di beranda.
+                          Pop-up akan otomatis ditutup dan berhenti tayang di beranda saat batas waktu tersebut tiba.
                         </p>
                       </div>
                     )}
@@ -2683,6 +2708,31 @@ export default function AdminDashboardPage() {
                               >
                                 Set Tanpa Batas
                               </button>
+                              <div className="flex items-center gap-1.5 pt-1 sm:pt-0">
+                                <input
+                                  type="number"
+                                  min="1"
+                                  max="365"
+                                  id={`custom-extend-${item.id}`}
+                                  placeholder="Hari..."
+                                  className="w-16 px-2 py-1 rounded-lg bg-white border border-stone-300 text-[11px] text-stone-900 focus:ring-1 focus:ring-[#003B73]"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const input = document.getElementById(`custom-extend-${item.id}`) as HTMLInputElement;
+                                    const days = parseInt(input?.value, 10);
+                                    if (!isNaN(days) && days > 0) {
+                                      handleQuickExtend(item.id, days);
+                                      if (input) input.value = "";
+                                    }
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg bg-[#003B73] hover:bg-[#002855] text-white text-[11px] font-bold transition-colors cursor-pointer shadow-2xs"
+                                  title="Tambah durasi kustom hari"
+                                >
+                                  + Tambah Hari
+                                </button>
+                              </div>
                             </div>
                           </div>
 
