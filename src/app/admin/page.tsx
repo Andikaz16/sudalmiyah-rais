@@ -68,6 +68,68 @@ const DOCUMENT_CATEGORIES: { value: DocumentCategory; label: string }[] = [
   { value: "UMUM", label: "Lainnya / Umum" },
 ];
 
+// Client-side image compressor: optimizes uploads for fast transfer & avoids serverless payload limits
+async function compressImageForUpload(
+  file: File,
+  maxDimension = 1600,
+  quality = 0.82
+): Promise<File> {
+  if (!file.type.startsWith("image/")) {
+    return file;
+  }
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = document.createElement("img");
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob || blob.size >= file.size) {
+              resolve(file);
+            } else {
+              const compressedFile = new File(
+                [blob],
+                file.name.replace(/\.[^/.]+$/, ".jpg"),
+                {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                }
+              );
+              resolve(compressedFile);
+            }
+          },
+          "image/jpeg",
+          quality
+        );
+      };
+      img.onerror = () => resolve(file);
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
@@ -149,6 +211,7 @@ export default function AdminDashboardPage() {
   const [docPhotos, setDocPhotos] = useState<string[]>([]);
   const [docSummary, setDocSummary] = useState<string>("");
   const [uploadingDocPhoto, setUploadingDocPhoto] = useState<boolean>(false);
+  const [docPhotoUrlInput, setDocPhotoUrlInput] = useState<string>("");
   const [savingAgendaDoc, setSavingAgendaDoc] = useState<boolean>(false);
 
   // Pop-up Banner State
@@ -535,10 +598,11 @@ export default function AdminDashboardPage() {
 
   // Upload Khatib Photo from Media file
   const handleKhatibPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
     setUploadingKhatibPhoto(true);
     try {
+      const file = await compressImageForUpload(rawFile);
       const fd = new FormData();
       fd.append("file", file);
       fd.append("folder", "khatib");
@@ -561,6 +625,7 @@ export default function AdminDashboardPage() {
       alert(err.message || "Gagal mengunggah foto khatib.");
     } finally {
       setUploadingKhatibPhoto(false);
+      e.target.value = "";
     }
   };
 
@@ -609,10 +674,11 @@ export default function AdminDashboardPage() {
 
   // Upload QRIS Image from Media file
   const handleQrisImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
     setUploadingQrisImage(true);
     try {
+      const file = await compressImageForUpload(rawFile);
       const fd = new FormData();
       fd.append("file", file);
       fd.append("folder", "qris");
@@ -631,6 +697,7 @@ export default function AdminDashboardPage() {
       alert(err.message || "Gagal mengunggah gambar QRIS.");
     } finally {
       setUploadingQrisImage(false);
+      e.target.value = "";
     }
   };
 
@@ -660,10 +727,11 @@ export default function AdminDashboardPage() {
 
   // Upload Agenda Thumbnail from Media file
   const handleAgendaThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
     setUploadingAgendaThumbnail(true);
     try {
+      const file = await compressImageForUpload(rawFile);
       const fd = new FormData();
       fd.append("file", file);
       fd.append("folder", "agendas");
@@ -680,6 +748,7 @@ export default function AdminDashboardPage() {
       alert(err.message || "Gagal mengunggah thumbnail agenda.");
     } finally {
       setUploadingAgendaThumbnail(false);
+      e.target.value = "";
     }
   };
 
@@ -715,6 +784,7 @@ export default function AdminDashboardPage() {
     );
     setDocPhotos(Array.isArray(agenda.documentationPhotos) ? [...agenda.documentationPhotos] : []);
     setDocSummary(agenda.summaryNote || "");
+    setDocPhotoUrlInput("");
   };
 
   // Quick Toggle Agenda Completion
@@ -739,12 +809,14 @@ export default function AdminDashboardPage() {
 
   // Upload Photo for Agenda Documentation
   const handleUploadDocPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
     setUploadingDocPhoto(true);
     try {
+      const file = await compressImageForUpload(rawFile);
       const fd = new FormData();
       fd.append("file", file);
+      fd.append("folder", "agendas");
       const res = await fetch("/api/admin/upload", {
         method: "POST",
         body: fd,
@@ -756,6 +828,7 @@ export default function AdminDashboardPage() {
       alert(err.message || "Gagal mengunggah foto.");
     } finally {
       setUploadingDocPhoto(false);
+      e.target.value = "";
     }
   };
 
@@ -3589,7 +3662,7 @@ export default function AdminDashboardPage() {
                   </label>
                   <label className="cursor-pointer px-3 py-1 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-[11px] font-bold transition-all shadow-2xs flex items-center gap-1">
                     <Camera className="w-3 h-3" />
-                    <span>{uploadingDocPhoto ? "Mengunggah..." : "+ Tambah Foto"}</span>
+                    <span>{uploadingDocPhoto ? "Mengunggah..." : "+ Unggah Foto"}</span>
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp,image/jpg"
@@ -3598,6 +3671,38 @@ export default function AdminDashboardPage() {
                       disabled={uploadingDocPhoto}
                     />
                   </label>
+                </div>
+
+                {/* Alternatif Tambah URL Foto */}
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="url"
+                    placeholder="Atau tempel link / URL foto online (https://...)..."
+                    value={docPhotoUrlInput}
+                    onChange={(e) => setDocPhotoUrlInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (docPhotoUrlInput.trim()) {
+                          setDocPhotos((prev) => [...prev, docPhotoUrlInput.trim()]);
+                          setDocPhotoUrlInput("");
+                        }
+                      }
+                    }}
+                    className="flex-1 px-3 py-1.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (docPhotoUrlInput.trim()) {
+                        setDocPhotos((prev) => [...prev, docPhotoUrlInput.trim()]);
+                        setDocPhotoUrlInput("");
+                      }
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold shrink-0 cursor-pointer transition-colors"
+                  >
+                    + Tambah URL
+                  </button>
                 </div>
 
                 {docPhotos.length === 0 ? (

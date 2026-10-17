@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import { verifySessionToken } from "@/lib/security";
 import { logSecurityEvent } from "@/lib/db";
+import { isBlobConfigured, uploadFileToBlob } from "@/lib/blobStorage";
 
 export async function POST(request: NextRequest) {
   // Verify session
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Sanitize folder
-    const allowedFolders = ["khatib", "agendas", "qris", "general", "documents"];
+    const allowedFolders = ["khatib", "agendas", "qris", "general", "documents", "popup"];
     const folder = allowedFolders.includes(rawFolder) ? rawFolder : "general";
 
     // Validate MIME type
@@ -44,13 +45,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate size (max 25MB for PDF, 5MB for images)
-    const MAX_SIZE = file.type === "application/pdf" ? 25 * 1024 * 1024 : 5 * 1024 * 1024;
+    // Validate size (max 25MB for PDF, 10MB for images)
+    const MAX_SIZE = file.type === "application/pdf" ? 25 * 1024 * 1024 : 10 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
         {
           error: `Ukuran berkas terlalu besar. Maksimal ukuran adalah ${
-            file.type === "application/pdf" ? "25MB" : "5MB"
+            file.type === "application/pdf" ? "25MB" : "10MB"
           }.`,
         },
         { status: 400 }
@@ -60,21 +61,43 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
     // Build safe filename
-    const ext = path.extname(file.name).toLowerCase() || ".jpg";
+    const ext = path.extname(file.name).toLowerCase() || (file.type === "application/pdf" ? ".pdf" : ".jpg");
     const rawName = path.basename(file.name, ext).replace(/[^a-zA-Z0-9_-]/g, "_");
     const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const safeFilename = `${rawName}_${uniqueSuffix}${ext}`;
-    const destinationPath = path.join(uploadDir, safeFilename);
 
-    fs.writeFileSync(destinationPath, buffer);
+    let publicUrl = "";
 
-    const publicUrl = `/uploads/${folder}/${safeFilename}`;
+    // 1. Priority 1: Vercel Blob CDN (if configured via BLOB_READ_WRITE_TOKEN)
+    if (isBlobConfigured()) {
+      try {
+        publicUrl = await uploadFileToBlob(safeFilename, buffer, file.type, folder);
+      } catch (blobErr) {
+        console.warn("Notice: Vercel Blob upload failed, falling back:", blobErr);
+      }
+    }
+
+    // 2. Priority 2: Local writable filesystem (when running outside serverless Vercel)
+    if (!publicUrl && !process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      try {
+        const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const destinationPath = path.join(uploadDir, safeFilename);
+        fs.writeFileSync(destinationPath, buffer);
+        publicUrl = `/uploads/${folder}/${safeFilename}`;
+      } catch (fsErr) {
+        console.warn("Notice: Local filesystem write failed, fallback to Data URI:", fsErr);
+      }
+    }
+
+    // 3. Priority 3: Data URI (Instant, 100% online in Vercel serverless without storage dependencies)
+    if (!publicUrl) {
+      const base64 = buffer.toString("base64");
+      publicUrl = `data:${file.type};base64,${base64}`;
+    }
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(

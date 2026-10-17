@@ -13,26 +13,39 @@ export function isBlobConfigured(): boolean {
 }
 
 /**
- * Uploads an image file to Vercel Blob CDN.
- * Returns the permanent public CDN URL (e.g. https://...public.blob.vercel-storage.com/popups/...).
+ * Uploads an arbitrary file (image, pdf, document) to Vercel Blob CDN.
+ * Returns the permanent public CDN URL (e.g. https://...public.blob.vercel-storage.com/<folder>/...).
  */
-export async function uploadImageToBlob(
+export async function uploadFileToBlob(
   filename: string,
   data: Buffer | Blob,
-  contentType?: string
+  contentType?: string,
+  folder: string = "uploads"
 ): Promise<string> {
   if (!isBlobConfigured()) {
     throw new Error("Vercel Blob storage is not configured.");
   }
 
   const cleanFilename = filename.replace(/[^a-zA-Z0-9.-]/g, "_");
-  const blob = await put(`popups/${cleanFilename}`, data, {
+  const blob = await put(`${folder}/${cleanFilename}`, data, {
     access: "public",
     addRandomSuffix: true,
     contentType,
   });
 
   return blob.url;
+}
+
+/**
+ * Uploads an image file to Vercel Blob CDN specifically in the popups folder.
+ * Returns the permanent public CDN URL.
+ */
+export async function uploadImageToBlob(
+  filename: string,
+  data: Buffer | Blob,
+  contentType?: string
+): Promise<string> {
+  return uploadFileToBlob(filename, data, contentType, "popups");
 }
 
 /**

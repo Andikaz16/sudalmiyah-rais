@@ -3,6 +3,8 @@ import path from "path";
 import fs from "fs";
 import { checkRateLimit } from "@/lib/security";
 
+import { isBlobConfigured, uploadFileToBlob } from "@/lib/blobStorage";
+
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
 
@@ -47,39 +49,56 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    try {
-      const uploadDir = path.join(process.cwd(), "public", "uploads", "presensi");
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+    const ext = path.extname(file.name).toLowerCase() || ".jpg";
+    const safeFilename = `presensi_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext}`;
+
+    // 1. Priority 1: Vercel Blob CDN (if configured)
+    if (isBlobConfigured()) {
+      try {
+        const publicUrl = await uploadFileToBlob(safeFilename, buffer, file.type, "presensi");
+        return NextResponse.json({
+          success: true,
+          url: publicUrl,
+          filename: safeFilename,
+          size: file.size,
+        });
+      } catch (blobErr) {
+        console.warn("Notice: Presensi Blob upload fallback:", blobErr);
       }
-
-      const ext = path.extname(file.name).toLowerCase() || ".jpg";
-      const safeFilename = `presensi_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext}`;
-      const destinationPath = path.join(uploadDir, safeFilename);
-
-      fs.writeFileSync(destinationPath, buffer);
-
-      const publicUrl = `/uploads/presensi/${safeFilename}`;
-
-      return NextResponse.json({
-        success: true,
-        url: publicUrl,
-        filename: safeFilename,
-        size: file.size,
-      });
-    } catch (fsError) {
-      // Fallback to data URI if local filesystem write is not permitted
-      console.warn("Filesystem write fallback to data URI:", fsError);
-      const base64 = buffer.toString("base64");
-      const dataUri = `data:${file.type};base64,${base64}`;
-
-      return NextResponse.json({
-        success: true,
-        url: dataUri,
-        filename: file.name,
-        size: file.size,
-      });
     }
+
+    // 2. Priority 2: Local writable filesystem (when running outside Vercel)
+    if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      try {
+        const uploadDir = path.join(process.cwd(), "public", "uploads", "presensi");
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const destinationPath = path.join(uploadDir, safeFilename);
+        fs.writeFileSync(destinationPath, buffer);
+        const publicUrl = `/uploads/presensi/${safeFilename}`;
+
+        return NextResponse.json({
+          success: true,
+          url: publicUrl,
+          filename: safeFilename,
+          size: file.size,
+        });
+      } catch (fsError) {
+        console.warn("Filesystem write fallback to data URI:", fsError);
+      }
+    }
+
+    // 3. Priority 3: Fallback to data URI
+    const base64 = buffer.toString("base64");
+    const dataUri = `data:${file.type};base64,${base64}`;
+
+    return NextResponse.json({
+      success: true,
+      url: dataUri,
+      filename: file.name,
+      size: file.size,
+    });
   } catch (error: any) {
     console.error("Presensi Photo Upload Error:", error);
     return NextResponse.json(
