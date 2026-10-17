@@ -7,8 +7,8 @@ const PRESENSI_SECRET =
 export const ROTATION_INTERVAL_SECONDS = 10;
 
 // Batas toleransi maksimal token berlaku sejak digenerate (detik)
-// 10s rotasi + 20s toleransi latensi jaringan/kamera = 30 detik
-export const TOKEN_MAX_AGE_SECONDS = 30;
+// Diperketat tepat 10 detik sesuai pergantian layar agar hasil foto yang dikirim langsung ditutup keras
+export const TOKEN_MAX_AGE_SECONDS = 10;
 
 export interface TokenVerificationResult {
   valid: boolean;
@@ -105,7 +105,7 @@ export function verifyDynamicToken(
       timestamp,
       ageSeconds,
       error: "EXPIRED",
-      message: `Kode QR sudah kedaluwarsa (${ageSeconds} detik yang lalu). Kode QR berganti tiap ${ROTATION_INTERVAL_SECONDS} detik untuk mencegah titip absen. Silakan scan ulang kode QR terbaru di layar masjid.`,
+      message: `Akses ditutup: Kode QR sudah kedaluwarsa (${ageSeconds} detik yang lalu). Kode QR di layar masjid hanya berlaku ${ROTATION_INTERVAL_SECONDS} detik untuk mencegah titip presensi via foto. Silakan scan langsung kode QR terbaru yang sedang tayang di layar masjid.`,
     };
   }
 

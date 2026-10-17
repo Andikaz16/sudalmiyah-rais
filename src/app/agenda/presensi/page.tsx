@@ -77,6 +77,7 @@ function PresensiContent() {
 
   // Success Result
   const [attendanceResult, setAttendanceResult] = useState<AttendanceResult | null>(null);
+  const [formSecondsLeft, setFormSecondsLeft] = useState<number>(120);
 
   // Verifikasi token saat halaman pertama kali dimuat
   useEffect(() => {
@@ -101,7 +102,7 @@ function PresensiContent() {
             setStatus("EXPIRED");
             setErrorMessage(
               data.message ||
-                "Kode QR ini sudah kedaluwarsa. Kode QR di layar masjid berganti otomatis setiap 10 detik untuk memastikan kehadiran langsung."
+                "Akses ditutup: Kode QR ini sudah kedaluwarsa (> 10 detik). Kode QR di layar masjid berganti otomatis setiap 10 detik untuk memastikan kehadiran langsung di masjid."
             );
           } else {
             setStatus("INVALID");
@@ -117,6 +118,23 @@ function PresensiContent() {
 
     verifyToken();
   }, [token]);
+
+  // Countdown timer sesi pengisian form (maksimal 120 detik setelah lolos verifikasi scan)
+  useEffect(() => {
+    if (status !== "FORM") return;
+    const timer = setInterval(() => {
+      setFormSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setStatus("EXPIRED");
+          setErrorMessage("Sesi pengisian formulir presensi telah habis (batas waktu 2 menit). Silakan scan ulang kode QR terbaru yang sedang tayang di layar masjid.");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [status]);
 
   // Handler Unggah Foto Presensi
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -303,14 +321,14 @@ function PresensiContent() {
 
         {/* VIEW 2: EXPIRED STATE (KODE QR KEDALUWARSA) */}
         {status === "EXPIRED" && (
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-rose-200 text-center shadow-xl space-y-5 animate-fade-up">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-rose-300 text-center shadow-xl space-y-5 animate-fade-up">
             <div className="w-16 h-16 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto shadow-inner">
               <Clock className="w-8 h-8" />
             </div>
 
             <div>
               <div className="inline-block px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-[11px] font-extrabold uppercase tracking-wider mb-2 font-mono">
-                Waktu Berlaku Habis
+                Akses Ditutup Keras (Batas Waktu 10 Detik Habis)
               </div>
               <h2 className="text-xl sm:text-2xl font-bold font-serif text-stone-900 leading-tight">
                 Kode QR Sudah Kedaluwarsa
@@ -318,9 +336,10 @@ function PresensiContent() {
             </div>
 
             <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-stone-600 leading-relaxed text-left space-y-2">
-              <p className="font-semibold text-stone-900">Mengapa pesan ini muncul?</p>
+              <p className="font-semibold text-stone-900">Mengapa akses langsung ditutup?</p>
               <p>
-                Kode QR di layar proyektor masjid berganti secara otomatis setiap <strong>10 detik</strong> dengan enkripsi berbatas waktu untuk mencegah praktik titip absen atau pembagian foto melalui WhatsApp.
+                {errorMessage ||
+                  "Kode QR di layar proyektor masjid hanya berlaku maksimal 10 detik dan langsung ditutup secara ketat untuk mencegah kecurangan titip absen melalui pengiriman foto atau tangkapan layar."}
               </p>
             </div>
 
@@ -328,7 +347,7 @@ function PresensiContent() {
               <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 <span className="font-bold block mb-0.5">Langkah Solusi:</span>
-                Silakan arahkan kamera HP Anda kembali ke layar proyektor masjid dan scan kode QR terbaru yang sedang tampil.
+                Silakan arahkan kamera HP Anda langsung ke layar proyektor masjid dan scan kode QR terbaru yang sedang tayang aktif.
               </div>
             </div>
 
@@ -398,6 +417,22 @@ function PresensiContent() {
 
             {/* Form Input Card */}
             <div className="bg-white rounded-3xl p-5 sm:p-7 border border-stone-200 shadow-md">
+              <div className="flex items-center justify-between gap-2 mb-3 p-3 rounded-2xl bg-amber-50 border border-amber-200">
+                <div className="flex items-center gap-2 text-xs text-amber-900 font-medium">
+                  <Clock className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Sisa Waktu Sesi Pengisian:</span>
+                </div>
+                <span
+                  className={`font-mono text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                    formSecondsLeft <= 30
+                      ? "bg-rose-600 text-white animate-pulse"
+                      : "bg-amber-200 text-amber-950"
+                  }`}
+                >
+                  {formSecondsLeft} detik
+                </span>
+              </div>
+
               <h3 className="text-base font-bold font-serif text-stone-900 mb-1">
                 Formulir Presensi Kehadiran
               </h3>

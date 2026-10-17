@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
 
     const data = parseResult.data;
 
-    // Validasi token (diberi toleransi pengisian form hingga 180 detik / 3 menit sejak QR discan)
-    const verification = verifyDynamicToken(data.token, 180);
+    // Validasi token (diberi toleransi pengisian form maksimal 120 detik / 2 menit sejak QR discan)
+    const verification = verifyDynamicToken(data.token, 120);
 
     if (!verification.valid) {
       return NextResponse.json(
