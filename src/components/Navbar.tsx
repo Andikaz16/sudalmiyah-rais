@@ -168,7 +168,7 @@ export default function Navbar() {
                                 Formulir Peminjaman
                               </div>
                               <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
-                                Peminjaman aula, ruang serbaguna, dan fasilitas masjid
+                                Peminjaman ruang aula &amp; inventaris proyektor masjid
                               </div>
                             </div>
                           </Link>

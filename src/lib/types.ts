@@ -227,11 +227,13 @@ export interface FacilityBooking {
   organization: string;
   applicantPhone: string;
   nim: string;
-  facilityName: "Aula Utama Lt 1" | "Ruang Rapat Takmir" | "Serambi Timur" | "Sound & Multimedia";
+  facilityName: string;
   eventTitle: string;
   eventDate: string;
   startTime: string;
   endTime: string;
+  letterUrl?: string;
+  notes?: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   submittedAt: string;
 }
