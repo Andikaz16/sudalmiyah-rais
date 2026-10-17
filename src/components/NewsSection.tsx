@@ -80,56 +80,55 @@ export function formatClientTimeAgo(
 
 const initialNewsData: NewsItem[] = [
   {
-    id: "ums-1",
+    id: "ums-43448",
+    source: "UMS",
+    badge: "UMS NEWS",
+    badgeClass: "bg-[#003B73] text-white",
+    timeAgo: "Baru saja",
+    publishedAt: "2026-10-17T12:51:29+07:00",
+    sourceDomain: "news.ums.ac.id",
+    sourceUrl: "https://news.ums.ac.id/id/kabar-persyarikatan/71-siswa-smp-ump-ikuti-uji-skt-pandu-hizbul-wathan-di-alam-terbuka/",
+    title: "71 Siswa SMP UMP Ikuti Uji SKT Pandu Hizbul Wathan di Alam Terbuka",
+    excerpt: "ums.ac.id, SURAKARTA - SMP UMP menggelar Uji Syarat Kenaikan Tingkat (SKT) Pandu Hizbul Wathan Golongan Purwa di Germanggis, Cilongok, Kabupaten Banyumas pada Kamis-Jumat (15-16/10/2026). Kegiatan ini diikuti oleh 71 siswa kelas VIII sebagai sarana mengasah keterampilan kepanduan, mengevaluasi hasil latihan tahunan, serta membangun karakter dan kedisiplinan peserta didik di alam terbuka.",
+    content: [
+      "ums.ac.id, SURAKARTA - SMP UMP menggelar Uji Syarat Kenaikan Tingkat (SKT) Pandu Hizbul Wathan Golongan Purwa di Germanggis, Cilongok, Kabupaten Banyumas pada Kamis-Jumat (15-16/10/2026). Kegiatan ini diikuti oleh 71 siswa kelas VIII sebagai sarana mengasah keterampilan kepanduan, mengevaluasi hasil latihan tahunan, serta membangun karakter dan kedisiplinan peserta didik di alam terbuka.",
+      "Sebanyak 71 peserta tersebut mengikuti serangkaian uji kecakapan fisik, ketangkasan berkemah, serta pemahaman nilai-nilai kepanduan Hizbul Wathan yang berjiwa mandiri dan berakhlak mulia."
+    ],
+    imageUrl: "https://news.ums.ac.id/id/wp-content/uploads/sites/2/2026/10/71-Siswa-SMP-UMP-Ikuti-Uji-SKT-Pandu-Hizbul-Wathan-di-Alam-Terbuka-2.jpg",
+  },
+  {
+    id: "ums-43445",
+    source: "UMS",
+    badge: "UMS NEWS",
+    badgeClass: "bg-[#003B73] text-white",
+    timeAgo: "1 jam lalu",
+    publishedAt: "2026-10-17T12:46:23+07:00",
+    sourceDomain: "news.ums.ac.id",
+    sourceUrl: "https://news.ums.ac.id/id/kabar-persyarikatan/smp-ump-purwokerto-gelar-pertukaran-pelajar-dengan-sekolah-jepang/",
+    title: "SMP UMP Purwokerto Gelar Pertukaran Pelajar dengan Sekolah Jepang",
+    excerpt: "ums.ac.id, SURAKARTA - SMP Unggulan Muhammadiyah Purwokerto terpilih mengikuti program pertukaran pelajar internasional bersama Nishinooka Junior High School dari Kota Muko, Prefektur Kyoto, Jepang, pada Jumat (16/10/2026). Program yang difasilitasi oleh Coding First ini melibatkan delapan siswa kelas VII dan VIII.",
+    content: [
+      "ums.ac.id, SURAKARTA - SMP Unggulan Muhammadiyah Purwokerto terpilih mengikuti program pertukaran pelajar internasional bersama Nishinooka Junior High School dari Kota Muko, Prefektur Kyoto, Jepang, pada Jumat (16/10/2026). Program yang difasilitasi oleh Coding First ini melibatkan delapan siswa kelas VII dan VIII.",
+      "Program pertukaran ini membuka cakrawala global bagi para santri dan siswa untuk memperkenalkan budaya nusantara sekaligus mempelajari inovasi dan etos disiplin dari sekolah mitra di Jepang."
+    ],
+    imageUrl: "https://news.ums.ac.id/id/wp-content/uploads/sites/2/2026/10/SMP-UMP-Purwokerto-Gelar-Pertukaran-Pelajar-dengan-Sekolah-Jepang.jpg",
+  },
+  {
+    id: "ums-43439",
     source: "UMS",
     badge: "UMS NEWS",
     badgeClass: "bg-[#003B73] text-white",
     timeAgo: "2 jam lalu",
-    publishedAt: "2026-10-11T07:00:00Z",
+    publishedAt: "2026-10-17T12:29:53+07:00",
     sourceDomain: "news.ums.ac.id",
-    sourceUrl: "https://news.ums.ac.id/id/berita/dosen-ums-bahas-desain-ideal-sistem-pemilu-untuk-perkuat-kualitas-demokrasi/",
-    title: "Dosen UMS Bahas Desain Ideal Sistem Pemilu untuk Perkuat Kualitas Demokrasi",
-    excerpt: "ums.ac.id, SURAKARTA – Desain sistem pemilihan umum (pemilu) berperan penting dalam menentukan kualitas demokrasi, keterwakilan politik, dan efektivitas pemerintahan.... Karena itu, pembaruan siste",
+    sourceUrl: "https://news.ums.ac.id/id/berita/perkuat-layanan-bahasa-ppb-umkt-pelajari-tata-kelola-lpmb-ums/",
+    title: "Perkuat Layanan Bahasa, PPB UMKT Pelajari Tata Kelola LPMB UMS",
+    excerpt: "ums.ac.id, SURAKARTA - Lembaga Pengembangan Mata Kuliah dan Layanan Bahasa (LPMB) Universitas Muhammadiyah Surakarta (UMS) menerima kunjungan studi tiru dari Pusat Pengembangan Bahasa (PPB) Universitas Muhammadiyah Kalimantan Timur (UMKT) pada Rabu (14/10/2026). Momentum ini dimanfaatkan untuk memperkuat jejaring kebahasaan antarlembaga.",
     content: [
-      "ums.ac.id, SURAKARTA – Desain sistem pemilihan umum (pemilu) berperan penting dalam menentukan kualitas demokrasi, keterwakilan politik, dan efektivitas pemerintahan. Karena itu, pembaruan sistem pemilu perlu mempertimbangkan keadilan representasi, stabilitas politik, serta perlindungan hak konstitusional warga negara.",
-      "Hal tersebut menjadi salah satu pokok bahasan yang disampaikan Muhammad RM Fayasy Failaq, S.H., M.H., dari Fakultas Hukum dan Ilmu Politik (FHIP) Universitas Muhammadiyah Surakarta (UMS) dalam Seminar Konstitusi yang diselenggarakan Komunitas Pemerhati Konstitusi (KPK), Fakultas Syariah dan Hukum UIN Sunan Kalijaga Yogyakarta.",
-      "Tiga variabel utama dalam desain sistem pemilu yakni rumusan pemilu, struktur pemungutan suara yang mengatur teknis surat suara, serta besaran daerah pemilihan berdasarkan jumlah kursi yang diperebutkan."
+      "ums.ac.id, SURAKARTA - Lembaga Pengembangan Mata Kuliah dan Layanan Bahasa (LPMB) Universitas Muhammadiyah Surakarta (UMS) menerima kunjungan studi tiru dari Pusat Pengembangan Bahasa (PPB) Universitas Muhammadiyah Kalimantan Timur (UMKT) pada Rabu (14/10/2026). Momentum ini dimanfaatkan untuk memperkuat jejaring kebahasaan antarlembaga sekaligus berbagi pengalaman dalam pengelolaan layanan bahasa di lingkungan perguruan tinggi.",
+      "Kunjungan benchmarking ini menjadi wujud sinergi dan kolaborasi antar Perguruan Tinggi Muhammadiyah dan 'Aisyiyah (PTMA) dalam meningkatkan standarisasi mutu uji bahasa asing dan kemahiran akademik civitas kampus."
     ],
-    imageUrl: "/images/news/ums-pemilu.jpg",
-  },
-  {
-    id: "ums-2",
-    source: "UMS",
-    badge: "UMS NEWS",
-    badgeClass: "bg-[#003B73] text-white",
-    timeAgo: "5 jam lalu",
-    publishedAt: "2026-10-11T04:00:00Z",
-    sourceDomain: "news.ums.ac.id",
-    sourceUrl: "https://news.ums.ac.id/id/berita/health-innovation-hackathon-2026-ums-buka-peluang-bagi-peserta-multidisiplin/",
-    title: "Health Innovation Hackathon 2026, UMS Buka Peluang bagi Peserta Multidisiplin",
-    excerpt: "ums.ac.id, SURAKARTA – Universitas Muhammadiyah Surakarta (UMS) untuk pertama kalinya menjadi penyelenggara program Hackathon 2026 yang diluncurkan Kementerian... Pendidikan Tinggi, Sains, dan Tek",
-    content: [
-      "ums.ac.id, SURAKARTA – Universitas Muhammadiyah Surakarta (UMS) untuk pertama kalinya menjadi penyelenggara program Hackathon 2026 yang diluncurkan Kementerian Pendidikan Tinggi, Sains, dan Teknologi (Kemdiktisaintek). Melalui program bertajuk Health Innovation Hackathon 2026, UMS mendorong pengembangan solusi inovatif berbasis teknologi untuk menjawab permasalahan nyata di bidang kesehatan, obat, dan industri.",
-      "Ketua Tim Task Force Program Hackathon 2026 UMS, Prof. Dr. Ir. Suranto, S.T., M.M., M.Si., IPU., menjelaskan bahwa program tersebut terbuka bagi masyarakat dari berbagai latar belakang keahlian, mencakup dosen, mahasiswa, praktisi, dan profesional lintas ilmu."
-    ],
-    imageUrl: "/images/news/ums-hackathon.jpg",
-  },
-  {
-    id: "ums-3",
-    source: "UMS",
-    badge: "UMS NEWS",
-    badgeClass: "bg-[#003B73] text-white",
-    timeAgo: "8 jam lalu",
-    publishedAt: "2026-10-11T01:00:00Z",
-    sourceDomain: "news.ums.ac.id",
-    sourceUrl: "https://news.ums.ac.id/id/berita/belajar-toga-secara-langsung-siswa-mim-tawangsari-antusias-praktek-membuat-minuman-bunga-telang/",
-    title: "Belajar TOGA secara Langsung, Siswa MIM Tawangsari Antusias Praktek Membuat Minuman Bunga Telang",
-    excerpt: "ums.ac.id, SURAKARTA — Mengenalkan manfaat tanaman obat keluarga (TOGA) kepada anak usia sekolah dapat dilakukan melalui pembelajaran yang menyenangkan dan praktik secara...",
-    content: [
-      "ums.ac.id, SURAKARTA — Mengenalkan manfaat tanaman obat keluarga (TOGA) kepada anak usia sekolah dapat dilakukan melalui pembelajaran yang menyenangkan dan praktik secara langsung. Pendekatan tersebut diterapkan dalam kegiatan Pengabdian kepada Masyarakat (PkM) di Madrasah Ibtidaiyah Muhammadiyah (MIM) Tawangsari, Teras, Boyolali.",
-      "Kegiatan yang dipimpin oleh Ir. Dinda Safitri, S.T., M.Eng., Asisten Ahli Program Studi Teknik Industri, Fakultas Teknik (FT) UMS ini bertujuan mengedukasi anak-anak tentang ragam tanaman herbal pekarangan serta khasiatnya bagi imunitas tubuh."
-    ],
-    imageUrl: "/images/news/ums-toga.jpg",
+    imageUrl: "https://news.ums.ac.id/id/wp-content/uploads/sites/2/2026/10/Perkuat-Layanan-Bahasa-PPB-UMKT-Pelajari-Tata-Kelola-LPMB-UMS-2.jpg",
   },
   {
     id: "sm-init-1",
@@ -137,7 +136,7 @@ const initialNewsData: NewsItem[] = [
     badge: "SUARA MUHAMMADIYAH",
     badgeClass: "bg-[#800000] text-white",
     timeAgo: "1 jam lalu",
-    publishedAt: "2026-10-11T08:00:00Z",
+    publishedAt: "2026-10-17T08:00:00Z",
     sourceDomain: "suaramuhammadiyah.id",
     sourceUrl: "https://suaramuhammadiyah.id/read/seluruh-amal-usaha-muhammadiyah-harus-terus-naik-kelas-dan-jadi-center-of-excellence",
     title: "Seluruh Amal Usaha Muhammadiyah Harus Terus Naik Kelas dan Jadi Center of Excellence",
@@ -154,7 +153,7 @@ const initialNewsData: NewsItem[] = [
     badge: "LENSAMU",
     badgeClass: "bg-[#005A36] text-white",
     timeAgo: "3 jam lalu",
-    publishedAt: "2026-10-11T06:00:00Z",
+    publishedAt: "2026-10-17T06:00:00Z",
     sourceDomain: "lensamu.id",
     sourceUrl: "https://muhammadiyah.or.id/2026/10/haedar-nashir-pendidikan-kunci-membangun-persatuan-dan-peradaban-bangsa/",
     title: "Haedar Nashir: Pendidikan Kunci Membangun Persatuan dan Peradaban Bangsa",
@@ -214,19 +213,84 @@ export default function NewsSection() {
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch live articles from API route on mount and periodically every 5 minutes
+  // Fetch live articles from API route and direct UMS feed on mount and periodically every 5 minutes
   useEffect(() => {
     let isMounted = true;
+
     const fetchLiveNews = async () => {
+      // 1. Ambil dari API route internal yang mengagregasi 3 portal
       try {
-        const res = await fetch("/api/news");
-        if (!res.ok) return;
-        const data = await res.json();
-        if (isMounted && data.articles && Array.isArray(data.articles) && data.articles.length > 0) {
-          setNewsList(data.articles);
+        const res = await fetch("/api/news", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && data.articles && Array.isArray(data.articles) && data.articles.length > 0) {
+            setNewsList(data.articles);
+          }
         }
       } catch (err) {
-        console.error("Gagal memperbarui warta otomatis:", err);
+        console.warn("API route fetch notice:", err);
+      }
+
+      // 2. Ambil langsung dari WordPress REST API UMS dari browser pengguna (mendukung CORS)
+      // Ini memastikan warta kampus UMS selalu terupdate ke menit terakhir
+      try {
+        const umsRes = await fetch("https://news.ums.ac.id/id/wp-json/wp/v2/posts?_embed&per_page=6");
+        if (umsRes.ok) {
+          const umsData = await umsRes.json();
+          if (Array.isArray(umsData) && umsData.length > 0 && isMounted) {
+            const clientUmsArticles: NewsItem[] = umsData.map((p: any) => {
+              const rawExcerpt = (p.excerpt?.rendered || "")
+                .replace(/<[^>]+>/g, "")
+                .replace(/\[&hellip;\]/g, "...")
+                .replace(/&#8211;/g, "-")
+                .replace(/&#8217;/g, "'")
+                .trim();
+              const imgUrl =
+                p._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+                "/images/news/ums-pemilu.jpg";
+              const pubDateIso = p.date_gmt
+                ? `${p.date_gmt}Z`
+                : p.date
+                ? `${p.date}+07:00`
+                : new Date().toISOString();
+
+              const cleanTitle = (p.title?.rendered || "")
+                .replace(/&amp;/g, "&")
+                .replace(/&#8211;/g, "-")
+                .replace(/&#8212;/g, "-")
+                .replace(/&#8217;/g, "'")
+                .replace(/&#8220;/g, '"')
+                .replace(/&#8221;/g, '"')
+                .replace(/<[^>]+>/g, "")
+                .trim();
+
+              return {
+                id: `ums-${p.id}`,
+                source: "UMS",
+                badge: "UMS NEWS",
+                badgeClass: "bg-[#003B73] text-white",
+                timeAgo: formatClientTimeAgo(pubDateIso, "Baru saja", Date.now()),
+                publishedAt: pubDateIso,
+                sourceDomain: "news.ums.ac.id",
+                sourceUrl: p.link,
+                title: cleanTitle,
+                excerpt: rawExcerpt.slice(0, 220) + (rawExcerpt.length > 220 ? "..." : ""),
+                content: [
+                  rawExcerpt,
+                  "Informasi selengkapnya mengenai warta ini dapat dibaca langsung pada portal resmi Berita UMS melalui tautan rujukan resmi di bawah ini.",
+                ],
+                imageUrl: imgUrl,
+              };
+            });
+
+            setNewsList((prev) => {
+              const nonUms = prev.filter((item) => item.source !== "UMS");
+              return [...clientUmsArticles, ...nonUms];
+            });
+          }
+        }
+      } catch (clientErr) {
+        console.warn("Direct browser UMS fetch notice:", clientErr);
       }
     };
 
@@ -239,21 +303,11 @@ export default function NewsSection() {
     };
   }, []);
 
-  const [selectedSource, setSelectedSource] = useState<string>("ALL");
   const sliderRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const sourceTabs = [
-    { id: "ALL", label: "Semua Warta" },
-    { id: "UMS", label: "Warta Kampus UMS" },
-    { id: "SUARA_MUHAMMADIYAH", label: "Suara Muhammadiyah" },
-    { id: "LENSAMU", label: "Lensamu" },
-  ];
-
-  const displayNews = newsList
-    .filter((item) => (item.source as string) !== "MASJIDMU")
-    .filter((item) => selectedSource === "ALL" || item.source === selectedSource);
+  const displayNews = newsList.filter((item) => (item.source as string) !== "MASJIDMU");
 
   const checkScrollPosition = useCallback(() => {
     if (!sliderRef.current) return;
@@ -285,35 +339,13 @@ export default function NewsSection() {
     <section id="berita" className="py-12 sm:py-18 bg-[#FAF8F5] text-stone-900 border-t border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading - Centered to match other sections */}
-        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
             Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
             Warta aktual civitas akademika UMS serta rilis berita resmi langsung dari portal Suara Muhammadiyah dan Lensamu.
           </p>
-        </div>
-
-        {/* Source Filter Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-8 sm:mb-10 px-1">
-          {sourceTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setSelectedSource(tab.id);
-                if (sliderRef.current) {
-                  sliderRef.current.scrollTo({ left: 0, behavior: "smooth" });
-                }
-              }}
-              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                selectedSource === tab.id
-                  ? "bg-[#003B73] text-white shadow-md shadow-[#003B73]/20"
-                  : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50 shadow-2xs"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
         </div>
 
         {/* News Cards Horizontal Slider */}

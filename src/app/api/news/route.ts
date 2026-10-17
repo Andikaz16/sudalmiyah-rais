@@ -96,58 +96,73 @@ function calculateTimeAgo(dateString: string): string {
 
 // Fallback articles in case any external site is down or slow (3 official sources: UMS, Suara Muhammadiyah, Lensamu)
 const fallbackArticles: ApiNewsItem[] = [
-
   {
-    id: "ums-1",
+    id: "ums-43448",
+    source: "UMS",
+    badge: "UMS NEWS",
+    badgeClass: "bg-[#003B73] text-white",
+    timeAgo: "Baru saja",
+    publishedAt: "2026-10-17T12:51:29+07:00",
+    sourceDomain: "news.ums.ac.id",
+    sourceUrl: "https://news.ums.ac.id/id/kabar-persyarikatan/71-siswa-smp-ump-ikuti-uji-skt-pandu-hizbul-wathan-di-alam-terbuka/",
+    title: "71 Siswa SMP UMP Ikuti Uji SKT Pandu Hizbul Wathan di Alam Terbuka",
+    excerpt: "ums.ac.id, SURAKARTA - SMP UMP menggelar Uji Syarat Kenaikan Tingkat (SKT) Pandu Hizbul Wathan Golongan Purwa di Germanggis, Cilongok, Kabupaten Banyumas pada Kamis-Jumat (15-16/10/2026). Kegiatan ini diikuti oleh 71 siswa kelas VIII sebagai sarana mengasah keterampilan kepanduan, mengevaluasi hasil latihan tahunan, serta membangun karakter dan kedisiplinan peserta didik di alam terbuka.",
+    content: [
+      "ums.ac.id, SURAKARTA - SMP UMP menggelar Uji Syarat Kenaikan Tingkat (SKT) Pandu Hizbul Wathan Golongan Purwa di Germanggis, Cilongok, Kabupaten Banyumas pada Kamis-Jumat (15-16/10/2026). Kegiatan ini diikuti oleh 71 siswa kelas VIII sebagai sarana mengasah keterampilan kepanduan, mengevaluasi hasil latihan tahunan, serta membangun karakter dan kedisiplinan peserta didik di alam terbuka.",
+      "Sebanyak 71 peserta tersebut mengikuti serangkaian uji kecakapan fisik, ketangkasan berkemah, serta pemahaman nilai-nilai kepanduan Hizbul Wathan yang berjiwa mandiri dan berakhlak mulia."
+    ],
+    imageUrl: "https://news.ums.ac.id/id/wp-content/uploads/sites/2/2026/10/71-Siswa-SMP-UMP-Ikuti-Uji-SKT-Pandu-Hizbul-Wathan-di-Alam-Terbuka-2.jpg",
+  },
+  {
+    id: "ums-43445",
+    source: "UMS",
+    badge: "UMS NEWS",
+    badgeClass: "bg-[#003B73] text-white",
+    timeAgo: "1 jam lalu",
+    publishedAt: "2026-10-17T12:46:23+07:00",
+    sourceDomain: "news.ums.ac.id",
+    sourceUrl: "https://news.ums.ac.id/id/kabar-persyarikatan/smp-ump-purwokerto-gelar-pertukaran-pelajar-dengan-sekolah-jepang/",
+    title: "SMP UMP Purwokerto Gelar Pertukaran Pelajar dengan Sekolah Jepang",
+    excerpt: "ums.ac.id, SURAKARTA - SMP Unggulan Muhammadiyah Purwokerto terpilih mengikuti program pertukaran pelajar internasional bersama Nishinooka Junior High School dari Kota Muko, Prefektur Kyoto, Jepang, pada Jumat (16/10/2026). Program yang difasilitasi oleh Coding First ini melibatkan delapan siswa kelas VII dan VIII.",
+    content: [
+      "ums.ac.id, SURAKARTA - SMP Unggulan Muhammadiyah Purwokerto terpilih mengikuti program pertukaran pelajar internasional bersama Nishinooka Junior High School dari Kota Muko, Prefektur Kyoto, Jepang, pada Jumat (16/10/2026). Program yang difasilitasi oleh Coding First ini melibatkan delapan siswa kelas VII dan VIII.",
+      "Program pertukaran ini membuka cakrawala global bagi para santri dan siswa untuk memperkenalkan budaya nusantara sekaligus mempelajari inovasi dan etos disiplin dari sekolah mitra di Jepang."
+    ],
+    imageUrl: "https://news.ums.ac.id/id/wp-content/uploads/sites/2/2026/10/SMP-UMP-Purwokerto-Gelar-Pertukaran-Pelajar-dengan-Sekolah-Jepang.jpg",
+  },
+  {
+    id: "ums-43439",
     source: "UMS",
     badge: "UMS NEWS",
     badgeClass: "bg-[#003B73] text-white",
     timeAgo: "2 jam lalu",
-    publishedAt: "2026-10-11T07:00:00Z",
+    publishedAt: "2026-10-17T12:29:53+07:00",
     sourceDomain: "news.ums.ac.id",
-    sourceUrl: "https://news.ums.ac.id/id/berita/dosen-ums-bahas-desain-ideal-sistem-pemilu-untuk-perkuat-kualitas-demokrasi/",
-    title: "Dosen UMS Bahas Desain Ideal Sistem Pemilu untuk Perkuat Kualitas Demokrasi",
-    excerpt: "ums.ac.id, SURAKARTA – Desain sistem pemilihan umum (pemilu) berperan penting dalam menentukan kualitas demokrasi, keterwakilan politik, dan efektivitas pemerintahan.... Karena itu, pembaruan siste",
+    sourceUrl: "https://news.ums.ac.id/id/berita/perkuat-layanan-bahasa-ppb-umkt-pelajari-tata-kelola-lpmb-ums/",
+    title: "Perkuat Layanan Bahasa, PPB UMKT Pelajari Tata Kelola LPMB UMS",
+    excerpt: "ums.ac.id, SURAKARTA - Lembaga Pengembangan Mata Kuliah dan Layanan Bahasa (LPMB) Universitas Muhammadiyah Surakarta (UMS) menerima kunjungan studi tiru dari Pusat Pengembangan Bahasa (PPB) Universitas Muhammadiyah Kalimantan Timur (UMKT) pada Rabu (14/10/2026).",
     content: [
-      "ums.ac.id, SURAKARTA – Desain sistem pemilihan umum (pemilu) berperan penting dalam menentukan kualitas demokrasi, keterwakilan politik, dan efektivitas pemerintahan. Karena itu, pembaruan sistem pemilu perlu mempertimbangkan keadilan representasi, stabilitas politik, serta perlindungan hak konstitusional warga negara.",
-      "Hal tersebut menjadi salah satu pokok bahasan yang disampaikan Muhammad RM Fayasy Failaq, S.H., M.H., dari Fakultas Hukum dan Ilmu Politik (FHIP) Universitas Muhammadiyah Surakarta (UMS) dalam Seminar Konstitusi yang diselenggarakan Komunitas Pemerhati Konstitusi (KPK), Fakultas Syariah dan Hukum UIN Sunan Kalijaga Yogyakarta.",
-      "Tiga variabel utama dalam desain sistem pemilu yakni rumusan pemilu, struktur pemungutan suara yang mengatur teknis surat suara, serta besaran daerah pemilihan berdasarkan jumlah kursi yang diperebutkan."
+      "ums.ac.id, SURAKARTA - Lembaga Pengembangan Mata Kuliah dan Layanan Bahasa (LPMB) Universitas Muhammadiyah Surakarta (UMS) menerima kunjungan studi tiru dari Pusat Pengembangan Bahasa (PPB) Universitas Muhammadiyah Kalimantan Timur (UMKT) pada Rabu (14/10/2026). Momentum ini dimanfaatkan untuk memperkuat jejaring kebahasaan antarlembaga sekaligus berbagi pengalaman dalam pengelolaan layanan bahasa di lingkungan perguruan tinggi.",
+      "Kunjungan benchmarking ini menjadi wujud sinergi dan kolaborasi antar Perguruan Tinggi Muhammadiyah dan 'Aisyiyah (PTMA) dalam meningkatkan standarisasi mutu uji bahasa asing dan kemahiran akademik civitas kampus."
     ],
-    imageUrl: "/images/news/ums-pemilu.jpg",
+    imageUrl: "https://news.ums.ac.id/id/wp-content/uploads/sites/2/2026/10/Perkuat-Layanan-Bahasa-PPB-UMKT-Pelajari-Tata-Kelola-LPMB-UMS-2.jpg",
   },
   {
-    id: "ums-2",
+    id: "ums-43404",
     source: "UMS",
     badge: "UMS NEWS",
     badgeClass: "bg-[#003B73] text-white",
-    timeAgo: "5 jam lalu",
-    publishedAt: "2026-10-11T04:00:00Z",
+    timeAgo: "18 jam lalu",
+    publishedAt: "2026-10-16T18:34:18+07:00",
     sourceDomain: "news.ums.ac.id",
-    sourceUrl: "https://news.ums.ac.id/id/berita/health-innovation-hackathon-2026-ums-buka-peluang-bagi-peserta-multidisiplin/",
-    title: "Health Innovation Hackathon 2026, UMS Buka Peluang bagi Peserta Multidisiplin",
-    excerpt: "ums.ac.id, SURAKARTA – Universitas Muhammadiyah Surakarta (UMS) untuk pertama kalinya menjadi penyelenggara program Hackathon 2026 yang diluncurkan Kementerian... Pendidikan Tinggi, Sains, dan Tek",
+    sourceUrl: "https://news.ums.ac.id/id/berita/wakili-jawa-tengah-dua-mahasiswa-ums-borong-medali-kejurnas-panahan-senior/",
+    title: "Wakili Jawa Tengah, Dua Mahasiswa UMS Borong Medali Kejurnas Panahan Senior",
+    excerpt: "ums.ac.id, SURAKARTA - Dua mahasiswa Universitas Muhammadiyah Surakarta (UMS) berhasil memborong medali dalam Kejuaraan Nasional (Kejurnas) Panahan Senior di Stadion Ciracas, Jakarta, 7-13 Oktober 2026. Capaian tersebut semakin menambah deretan prestasi mahasiswa UMS di tingkat nasional.",
     content: [
-      "ums.ac.id, SURAKARTA – Universitas Muhammadiyah Surakarta (UMS) untuk pertama kalinya menjadi penyelenggara program Hackathon 2026 yang diluncurkan Kementerian Pendidikan Tinggi, Sains, dan Teknologi (Kemdiktisaintek). Melalui program bertajuk Health Innovation Hackathon 2026, UMS mendorong pengembangan solusi inovatif berbasis teknologi untuk menjawab permasalahan nyata di bidang kesehatan, obat, dan industri.",
-      "Ketua Tim Task Force Program Hackathon 2026 UMS, Prof. Dr. Ir. Suranto, S.T., M.M., M.Si., IPU., menjelaskan bahwa program tersebut terbuka bagi masyarakat dari berbagai latar belakang keahlian (multidisiplin)."
+      "ums.ac.id, SURAKARTA - Dua mahasiswa Universitas Muhammadiyah Surakarta (UMS) berhasil memborong medali dalam Kejuaraan Nasional (Kejurnas) Panahan Senior di Stadion Ciracas, Jakarta, 7-13 Oktober 2026. Capaian tersebut semakin menambah deretan prestasi mahasiswa UMS di tingkat nasional.",
+      "Kedua mahasiswa tersebut ialah Hanun Nailal Husna, mahasiswi Pendidikan Jasmani, dan Dimas Maulana Dzaki Kusuma, mahasiswa Teknik Informatika."
     ],
-    imageUrl: "/images/news/ums-hackathon.jpg",
-  },
-  {
-    id: "ums-3",
-    source: "UMS",
-    badge: "UMS NEWS",
-    badgeClass: "bg-[#003B73] text-white",
-    timeAgo: "8 jam lalu",
-    publishedAt: "2026-10-11T01:00:00Z",
-    sourceDomain: "news.ums.ac.id",
-    sourceUrl: "https://news.ums.ac.id/id/berita/belajar-toga-secara-langsung-siswa-mim-tawangsari-antusias-praktek-membuat-minuman-bunga-telang/",
-    title: "Belajar TOGA secara Langsung, Siswa MIM Tawangsari Antusias Praktek Membuat Minuman Bunga Telang",
-    excerpt: "ums.ac.id, SURAKARTA — Mengenalkan manfaat tanaman obat keluarga (TOGA) kepada anak usia sekolah dapat dilakukan melalui pembelajaran yang menyenangkan dan praktik secara...",
-    content: [
-      "ums.ac.id, SURAKARTA — Mengenalkan manfaat tanaman obat keluarga (TOGA) kepada anak usia sekolah dapat dilakukan melalui pembelajaran yang menyenangkan dan praktik secara langsung. Pendekatan tersebut diterapkan dalam kegiatan Pengabdian kepada Masyarakat (PkM) di Madrasah Ibtidaiyah Muhammadiyah (MIM) Tawangsari, Teras, Boyolali.",
-      "Kegiatan yang dipimpin oleh Ir. Dinda Safitri, S.T., M.Eng., Asisten Ahli Program Studi Teknik Industri, Fakultas Teknik (FT) UMS ini bertujuan mengenalkan berbagai jenis tanaman obat keluarga serta khasiatnya bagi imunitas tubuh."
-    ],
-    imageUrl: "/images/news/ums-toga.jpg",
+    imageUrl: "https://news.ums.ac.id/id/wp-content/uploads/sites/2/2026/10/Wakili-Jawa-Tengah-Dua-Mahasiswa-UMS-Borong-Medali-Kejurnas-Panahan-Senior.jpeg",
   },
   {
     id: "sm-fallback-1",
@@ -155,7 +170,7 @@ const fallbackArticles: ApiNewsItem[] = [
     badge: "SUARA MUHAMMADIYAH",
     badgeClass: "bg-[#800000] text-white",
     timeAgo: "1 jam lalu",
-    publishedAt: "2026-10-11T08:00:00Z",
+    publishedAt: "2026-10-17T08:00:00Z",
     sourceDomain: "suaramuhammadiyah.id",
     sourceUrl: "https://suaramuhammadiyah.id/read/seluruh-amal-usaha-muhammadiyah-harus-terus-naik-kelas-dan-jadi-center-of-excellence",
     title: "Seluruh Amal Usaha Muhammadiyah Harus Terus Naik Kelas dan Jadi Center of Excellence",
@@ -172,7 +187,7 @@ const fallbackArticles: ApiNewsItem[] = [
     badge: "LENSAMU",
     badgeClass: "bg-[#005A36] text-white",
     timeAgo: "3 jam lalu",
-    publishedAt: "2026-10-11T06:00:00Z",
+    publishedAt: "2026-10-17T06:00:00Z",
     sourceDomain: "lensamu.id",
     sourceUrl: "https://muhammadiyah.or.id/2026/10/haedar-nashir-pendidikan-kunci-membangun-persatuan-dan-peradaban-bangsa/",
     title: "Haedar Nashir: Pendidikan Kunci Membangun Persatuan dan Peradaban Bangsa",
@@ -259,12 +274,12 @@ async function fetchUmsNews(): Promise<ApiNewsItem[]> {
   // Strategi A: WordPress REST API resmi
   try {
     const res = await fetch("https://news.ums.ac.id/id/wp-json/wp/v2/posts?_embed&per_page=6", {
-      next: { revalidate: 1800 },
+      cache: "no-store",
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "application/json",
       },
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(8000),
     });
 
     if (res.ok) {
@@ -310,12 +325,12 @@ async function fetchUmsNews(): Promise<ApiNewsItem[]> {
   // Strategi B: RSS Feed Berita UMS
   try {
     const resRss = await fetch("https://news.ums.ac.id/id/feed/", {
-      next: { revalidate: 1800 },
+      cache: "no-store",
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "text/xml, application/rss+xml, */*",
       },
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(8000),
     });
 
     if (resRss.ok) {
@@ -337,11 +352,11 @@ async function fetchLensamuNews(): Promise<ApiNewsItem[]> {
 
   try {
     const res = await fetch("https://muhammadiyah.or.id/wp-json/wp/v2/posts?_embed&per_page=3", {
-      next: { revalidate: 3600 },
+      cache: "no-store",
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
       },
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(8000),
     });
 
     if (res.ok) {
@@ -393,11 +408,11 @@ async function fetchSuaraMuhammadiyahNews(): Promise<ApiNewsItem[]> {
 
   try {
     const res = await fetch("https://suaramuhammadiyah.id", {
-      next: { revalidate: 3600 },
+      cache: "no-store",
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
       },
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(8000),
     });
 
     if (res.ok) {
@@ -446,7 +461,7 @@ async function fetchSuaraMuhammadiyahNews(): Promise<ApiNewsItem[]> {
   return fallbackArticles.filter((a) => a.source === "SUARA_MUHAMMADIYAH");
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   // Ambil ketiga sumber secara paralel untuk efisiensi
   const [umsArticles, lensamuArticles, smArticles] = await Promise.all([
     fetchUmsNews(),
@@ -469,7 +484,9 @@ export async function GET() {
     },
     {
       headers: {
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
       },
     }
   );
