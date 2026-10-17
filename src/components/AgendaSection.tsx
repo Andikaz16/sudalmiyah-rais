@@ -34,8 +34,15 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
   const fetchAgendas = async (cat: string) => {
     setLoading(true);
     try {
-      const url = cat === "ALL" ? "/api/agendas" : `/api/agendas?category=${cat}`;
-      const res = await fetch(url);
+      const cacheBuster = `t=${Date.now()}`;
+      const url =
+        cat === "ALL"
+          ? `/api/agendas?${cacheBuster}`
+          : `/api/agendas?category=${cat}&${cacheBuster}`;
+      const res = await fetch(url, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache, no-store, must-revalidate" },
+      });
       const data = await res.json();
       setAgendas(data.agendas || []);
     } catch (e) {
@@ -47,6 +54,18 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
 
   useEffect(() => {
     fetchAgendas(activeCategory);
+
+    // Auto-refresh when tab gains focus so edits in /admin immediately show up
+    const handleFocus = () => {
+      fetchAgendas(activeCategory);
+    };
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("visibilitychange", handleFocus);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("visibilitychange", handleFocus);
+    };
   }, [activeCategory]);
 
   const categories: Array<{ id: string; label: string }> = [

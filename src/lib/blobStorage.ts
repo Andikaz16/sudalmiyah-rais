@@ -1,5 +1,5 @@
 import { put, list, del } from "@vercel/blob";
-import { PopupBanner } from "./types";
+import { PopupBanner, Agenda } from "./types";
 
 /**
  * Checks if Vercel Blob storage is enabled via BLOB_READ_WRITE_TOKEN or BLOB_STORE_ID (OIDC).
@@ -106,5 +106,55 @@ export async function deleteBlobByUrl(url: string): Promise<void> {
     await del(url);
   } catch (err) {
     console.warn("Notice: Could not delete blob:", err);
+  }
+}
+
+/**
+ * Persists the entire agendas array to Vercel Blob CDN.
+ * Ensures data modified via admin persists across all Vercel serverless lambda containers.
+ */
+export async function saveAgendasToBlob(agendas: Agenda[]): Promise<string | null> {
+  if (!isBlobConfigured()) return null;
+
+  try {
+    const jsonString = JSON.stringify(agendas, null, 2);
+    const blob = await put("database/agendas.json", jsonString, {
+      access: "public",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      cacheControlMaxAge: 0,
+      contentType: "application/json",
+    });
+    return blob.url;
+  } catch (err) {
+    console.warn("Notice: Could not write agendas to Vercel Blob:", err);
+    return null;
+  }
+}
+
+/**
+ * Reads agendas from Vercel Blob if available.
+ */
+export async function readAgendasFromBlob(): Promise<Agenda[] | null> {
+  if (!isBlobConfigured()) return null;
+
+  try {
+    const result = await list({ prefix: "database/agendas.json", limit: 1 });
+    const targetBlob = result.blobs.find((b) => b.pathname === "database/agendas.json");
+    if (!targetBlob) return null;
+
+    const res = await fetch(`${targetBlob.url}?t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return null;
+  } catch (err) {
+    console.warn("Notice: Could not read agendas from Vercel Blob:", err);
+    return null;
   }
 }

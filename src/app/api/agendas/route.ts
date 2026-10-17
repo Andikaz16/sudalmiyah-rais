@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, connection } from "next/server";
 import { z } from "zod";
 import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { Agenda, AgendaCategory } from "@/lib/types";
+import { isBlobConfigured, readAgendasFromBlob, saveAgendasToBlob } from "@/lib/blobStorage";
 
 const createAgendaSchema = z.object({
   title: z.string().min(5).max(150),
@@ -20,11 +21,29 @@ const createAgendaSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+  await connection();
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
 
-  const db = getDb();
-  let agendas = db.agendas;
+  let agendas: Agenda[] = [];
+
+  // Priority 1: Persistent Vercel Blob if active
+  if (isBlobConfigured()) {
+    try {
+      const blobAgendas = await readAgendasFromBlob();
+      if (Array.isArray(blobAgendas) && blobAgendas.length > 0) {
+        agendas = blobAgendas;
+      }
+    } catch (e) {
+      console.warn("Notice: Blob agendas read error:", e);
+    }
+  }
+
+  // Priority 2: Database fallback
+  if (agendas.length === 0) {
+    const db = getDb();
+    agendas = db.agendas;
+  }
 
   if (category && category !== "ALL") {
     agendas = agendas.filter((a) => a.category === category);
@@ -33,7 +52,16 @@ export async function GET(request: NextRequest) {
   // Sort by date ascending
   agendas = [...agendas].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  return NextResponse.json({ agendas });
+  return NextResponse.json(
+    { agendas },
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    }
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -82,6 +110,14 @@ export async function POST(request: NextRequest) {
 
     db.agendas.unshift(newAgenda);
     saveDb(db);
+
+    if (isBlobConfigured()) {
+      try {
+        await saveAgendasToBlob(db.agendas);
+      } catch (blobErr) {
+        console.warn("Notice: Failed to sync new agenda to Blob:", blobErr);
+      }
+    }
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent("CREATE_AGENDA", session.email, ip, "SUCCESS", `Agenda dibuat: ${newAgenda.title}`);
@@ -140,6 +176,14 @@ export async function PATCH(request: NextRequest) {
 
     db.agendas[targetIdx] = updatedAgenda;
     saveDb(db);
+
+    if (isBlobConfigured()) {
+      try {
+        await saveAgendasToBlob(db.agendas);
+      } catch (blobErr) {
+        console.warn("Notice: Failed to sync updated agenda to Blob:", blobErr);
+      }
+    }
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(

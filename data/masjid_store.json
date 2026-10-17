@@ -56,7 +56,16 @@
       "requiresRegistration": false,
       "targetAudience": "Fakultas Terjadwal: FHIP, FKI, FPSI",
       "createdAt": "2026-10-15T15:45:00.000Z",
-      "bannerUrl": "/uploads/agendas/cinta-subuh-mutohharun-jinan.png"
+      "bannerUrl": "/uploads/agendas/cinta-subuh-mutohharun-jinan.png",
+      "isCompleted": true,
+      "completedAt": "2026-10-17T06:00:00.000Z",
+      "actualAttendees": 1080,
+      "documentationPhotos": [
+        "/uploads/agendas/agenda-subuh.jpg",
+        "/uploads/agendas/agenda-tabligh.jpg",
+        "/images/masjid-sudalmiyah.jpg"
+      ],
+      "summaryNote": "Alhamdulillah agenda Cinta Subuh hari ini bersama Dr. Mutohharun Jinan, M.Ag. telah sukses terlaksana, dihadiri oleh 1080 mahasiswa dari Fakultas FHIP, FKI, dan FPSI."
     }
   ],
   "registrations": [],

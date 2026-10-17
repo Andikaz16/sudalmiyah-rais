@@ -354,7 +354,7 @@ export default function AdminDashboardPage() {
     try {
       const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes] = await Promise.all([
         fetch("/api/admin/stats"),
-        fetch("/api/agendas"),
+        fetch(`/api/agendas?t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/friday-schedule"),
         fetch("/api/qris"),
         fetch(`/api/popup?admin=1&t=${Date.now()}`, { cache: "no-store" }),

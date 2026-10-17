@@ -337,18 +337,10 @@ function getInitialData(): DatabaseSchema {
           "Program pembinaan Cinta Subuh LPPIK & Koordinator Mentoring Pusat UMS bersama Rektor UMS. Fakultas terjadwal: FIK, FK, FKG. Catatan: Wajib membawa tumbler masing-masing.",
         quota: 1000,
         registeredCount: 0,
-        isOpen: false,
+        isOpen: true,
         requiresRegistration: false,
         bannerUrl: "/uploads/agendas/cinta-subuh-harun-joko.png",
         createdAt: "2026-10-15T15:45:00.000Z",
-        isCompleted: true,
-        completedAt: "2026-10-10T06:00:00.000Z",
-        actualAttendees: 960,
-        documentationPhotos: [
-          "/uploads/agendas/agenda-subuh.jpg",
-          "/uploads/agendas/agenda-tabligh.jpg",
-        ],
-        summaryNote: "Program Cinta Subuh perdana semester ini bersama Rektor UMS Prof. Dr. Harun Joko Prayitno, M.Hum. berjalan lancar dan penuh berkah, dihadiri 960 mahasiswa dari FIK, FK, dan FKG.",
       },
       {
         id: "agn-cinsub-02",
@@ -363,19 +355,10 @@ function getInitialData(): DatabaseSchema {
           "Program pembinaan Cinta Subuh LPPIK & Koordinator Mentoring Pusat UMS bersama Dr. Mutohharun Jinan, M.Ag. Fakultas terjadwal: FHIP, FKI, FPSI. Catatan: Wajib membawa tumbler masing-masing.",
         quota: 1000,
         registeredCount: 0,
-        isOpen: false,
+        isOpen: true,
         requiresRegistration: false,
         bannerUrl: "/uploads/agendas/cinta-subuh-mutohharun-jinan.png",
         createdAt: "2026-10-15T15:45:00.000Z",
-        isCompleted: true,
-        completedAt: "2026-10-17T06:00:00.000Z",
-        actualAttendees: 875,
-        documentationPhotos: [
-          "/uploads/agendas/agenda-subuh.jpg",
-          "/uploads/agendas/agenda-tabligh.jpg",
-          "/images/masjid-sudalmiyah.jpg",
-        ],
-        summaryNote: "Alhamdulillah agenda Cinta Subuh hari ini bersama Dr. Mutohharun Jinan, M.Ag. telah sukses terlaksana, dihadiri oleh 875 mahasiswa dari Fakultas FHIP, FKI, dan FPSI.",
       },
     ],
     fridaySchedule: defaultSchedules[0],
@@ -625,25 +608,8 @@ export function getDb(): DatabaseSchema {
       const initial = getInitialData();
       memoryDb.agendas.forEach((a) => {
         const match = initial.agendas.find((ia) => ia.id === a.id);
-        if (match) {
-          if (!a.bannerUrl) {
-            a.bannerUrl = match.bannerUrl || "/uploads/agendas/agenda-jumat.jpg";
-          }
-          if (a.isCompleted === undefined && match.isCompleted !== undefined) {
-            a.isCompleted = match.isCompleted;
-          }
-          if (a.completedAt === undefined && match.completedAt !== undefined) {
-            a.completedAt = match.completedAt;
-          }
-          if (a.actualAttendees === undefined && match.actualAttendees !== undefined) {
-            a.actualAttendees = match.actualAttendees;
-          }
-          if ((!a.documentationPhotos || a.documentationPhotos.length === 0) && match.documentationPhotos) {
-            a.documentationPhotos = match.documentationPhotos;
-          }
-          if (!a.summaryNote && match.summaryNote) {
-            a.summaryNote = match.summaryNote;
-          }
+        if (match && !a.bannerUrl) {
+          a.bannerUrl = match.bannerUrl || "/uploads/agendas/agenda-jumat.jpg";
         }
       });
     }
