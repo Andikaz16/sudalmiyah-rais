@@ -118,8 +118,11 @@ const MARQUEE_QUOTES = [
 const fallbackQris: QrisSettings = {
   id: "qris-01",
   imageUrl: "/images/qris-sudalmiyah.png",
+  secondaryImageUrl: "/images/qris-bank-jateng.jpg",
   merchantName: "LAZ UMS-MSJD SUDALMIYAH",
+  secondaryMerchantName: "MASJID UMS",
   nmid: "ID2024353816125",
+  secondaryNmid: "-",
   institution: "Universitas Muhammadiyah Surakarta",
   updatedAt: new Date().toISOString(),
 };
@@ -146,7 +149,7 @@ export default function DonationSection() {
   }, [isHadithPaused, nextHadith]);
 
   useEffect(() => {
-    fetch("/api/qris")
+    fetch(`/api/qris?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.qris) {
@@ -158,8 +161,16 @@ export default function DonationSection() {
 
   const handleDownloadQRIS = () => {
     const link = document.createElement("a");
-    link.download = `QRIS-Masjid-Sudalmiyah.png`;
+    link.download = `QRIS-LAZ-UMS-Sudalmiyah.png`;
     link.href = qris.imageUrl || "/images/qris-sudalmiyah.png";
+    link.target = "_blank";
+    link.click();
+  };
+
+  const handleDownloadSecondaryQRIS = () => {
+    const link = document.createElement("a");
+    link.download = `QRIS-Masjid-UMS-Bank-Jateng.jpg`;
+    link.href = qris.secondaryImageUrl || "/images/qris-bank-jateng.jpg";
     link.target = "_blank";
     link.click();
   };
@@ -385,59 +396,65 @@ Infaq Digital: https://sudalmiyah-rais.vercel.app`;
         </div>
 
         {/* QRIS Feature Container */}
-        <div className="bg-white rounded-3xl border border-stone-200/90 shadow-md p-6 sm:p-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div className="bg-white rounded-3xl border border-stone-200/90 shadow-md p-6 sm:p-8 lg:p-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
-            {/* Left Column: Official QRIS Stand Card (5 Cols) */}
-            <div className="lg:col-span-5 flex flex-col items-center">
-              <div className="w-full max-w-sm rounded-3xl bg-white border border-stone-200 p-4 sm:p-5 shadow-xl text-center">
-                {/* Official QRIS Poster Image */}
-                <div className="relative w-full aspect-[1/1.414] rounded-2xl overflow-hidden border border-stone-200 bg-white shadow-inner flex items-center justify-center p-1">
-                  <Image
-                    src={qris.imageUrl || "/images/qris-sudalmiyah.png"}
-                    alt={`QRIS ${qris.merchantName || "LAZ UMS-MSJD SUDALMIYAH"}`}
-                    fill
-                    unoptimized
-                    priority
-                    className="object-contain"
-                  />
+            {/* Left Column: Official QRIS 1 Stand Card (LAZ UMS Sudalmiyah) */}
+            <div className="sm:col-span-1 lg:col-span-3 flex flex-col items-center order-1 lg:order-1">
+              <div className="w-full max-w-xs rounded-3xl bg-white border border-stone-200 p-4 sm:p-5 shadow-lg text-center flex flex-col justify-between h-full">
+                <div>
+                  <div className="mb-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] text-[11px] font-bold">
+                    <span>LAZ UMS Sudalmiyah</span>
+                  </div>
+
+                  {/* Official QRIS Poster Image */}
+                  <div className="relative w-full aspect-[1/1.414] rounded-2xl overflow-hidden border border-stone-200 bg-white shadow-inner flex items-center justify-center p-1">
+                    <Image
+                      src={qris.imageUrl || "/images/qris-sudalmiyah.png"}
+                      alt={`QRIS ${qris.merchantName || "LAZ UMS-MSJD SUDALMIYAH"}`}
+                      fill
+                      unoptimized
+                      priority
+                      className="object-contain"
+                    />
+                  </div>
                 </div>
 
-                {/* Download QRIS Button - Pure Text */}
-                <div className="mt-4">
+                {/* Download QRIS Button */}
+                <div className="mt-4 space-y-3">
                   <button
                     type="button"
                     onClick={handleDownloadQRIS}
-                    className="w-full text-center px-4 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/15 active:scale-[0.99]"
+                    className="w-full text-center px-4 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/15 active:scale-[0.99] cursor-pointer"
                   >
                     Unduh Gambar QRIS
                   </button>
-                </div>
 
-                {/* Supported Apps List */}
-                <div className="mt-4 pt-3 border-t border-stone-100 text-[10px] text-stone-500 leading-relaxed">
-                  Mendukung BCA, Mandiri, BSI, BRI, BNI, GoPay, OVO, ShopeePay, DANA, LinkAja, dan seluruh aplikasi perbankan berstandar QRIS.
+                  {/* Supported Apps List */}
+                  <div className="pt-2 border-t border-stone-100 text-[10px] text-stone-500 leading-tight">
+                    Mendukung BCA, Mandiri, BSI, BRI, BNI, GoPay, OVO, ShopeePay, DANA, LinkAja, &amp; seluruh aplikasi QRIS.
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Panduan Scan QRIS & Amanah Penyaluran (7 Cols) */}
-            <div className="lg:col-span-7 flex flex-col justify-center space-y-6">
+            {/* Center Column: Panduan Scan QRIS & Amanah Penyaluran (6 Cols) */}
+            <div className="sm:col-span-2 lg:col-span-6 flex flex-col justify-center space-y-5 order-3 lg:order-2">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-[#003B73]">
                   Kemudahan Berinfaq Digital
                 </span>
-                <h3 className="text-xl sm:text-3xl font-bold text-stone-900 mt-1 font-serif">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-stone-900 mt-1 font-serif">
                   Panduan Pembayaran QRIS
                 </h3>
                 <p className="text-xs sm:text-sm text-stone-600 mt-2 leading-relaxed">
-                  Infaq dapat ditunaikan secara langsung tanpa perlu repot mencatat nomor rekening. Cukup scan kode QRIS melalui ponsel pintar Anda kapan pun dan di mana pun.
+                  Infaq dapat ditunaikan secara langsung tanpa perlu repot mencatat nomor rekening. Cukup scan salah satu kode QRIS di samping atau unduh barcode melalui ponsel pintar Anda kapan pun dan di mana pun.
                 </p>
               </div>
 
               {/* Steps List */}
-              <div className="space-y-3.5">
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
+              <div className="space-y-3">
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
                   <div className="w-7 h-7 rounded-xl bg-[#003B73] text-white text-xs font-bold flex items-center justify-center shrink-0">
                     1
                   </div>
@@ -446,12 +463,12 @@ Infaq Digital: https://sudalmiyah-rais.vercel.app`;
                       Buka Aplikasi Mobile Banking atau E-Wallet
                     </h4>
                     <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                      Gunakan aplikasi perbankan favorit Anda (BSI Mobile, Livin Mandiri, BCA Mobile, BRImo) atau dompet digital (GoPay, OVO, DANA, ShopeePay, LinkAja).
+                      Gunakan aplikasi perbankan (BSI Mobile, Livin Mandiri, BCA Mobile, BRImo, Bank Jateng) atau dompet digital (GoPay, OVO, DANA, ShopeePay, LinkAja).
                     </p>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
                   <div className="w-7 h-7 rounded-xl bg-[#003B73] text-white text-xs font-bold flex items-center justify-center shrink-0">
                     2
                   </div>
@@ -460,12 +477,12 @@ Infaq Digital: https://sudalmiyah-rais.vercel.app`;
                       Pilih Menu Pindai (Scan) QRIS
                     </h4>
                     <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                      Arahkan kamera ponsel Anda ke kode QRIS di samping, atau pilih gambar QRIS yang telah diunduh dari galeri ponsel.
+                      Arahkan kamera ponsel Anda ke salah satu kode QRIS di samping, atau pilih gambar QRIS yang telah diunduh dari galeri ponsel.
                     </p>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
                   <div className="w-7 h-7 rounded-xl bg-[#003B73] text-white text-xs font-bold flex items-center justify-center shrink-0">
                     3
                   </div>
@@ -474,12 +491,12 @@ Infaq Digital: https://sudalmiyah-rais.vercel.app`;
                       Pastikan Nama Penerima &amp; Masukkan Nominal
                     </h4>
                     <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                      Periksa nama merchant: <strong className="text-stone-900">{qris.merchantName || "MASJID SUDALMIYAH RAIS UMS"}</strong>, kemudian ketik nominal infaq sesuai keikhlasan hati Anda.
+                      Periksa nama merchant: <strong className="text-stone-900">{qris.merchantName || "LAZ UMS-MSJD SUDALMIYAH"}</strong> atau <strong className="text-stone-900">{qris.secondaryMerchantName || "MASJID UMS"}</strong>, kemudian ketik nominal infaq sesuai keikhlasan hati Anda.
                     </p>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-start gap-3.5">
                   <div className="w-7 h-7 rounded-xl bg-[#003B73] text-white text-xs font-bold flex items-center justify-center shrink-0">
                     4
                   </div>
@@ -495,14 +512,14 @@ Infaq Digital: https://sudalmiyah-rais.vercel.app`;
               </div>
 
               {/* Amanah & Keamanan Card */}
-              <div className="p-4 rounded-2xl bg-white border border-[#D4AF37]/50 shadow-sm flex items-center justify-between gap-4">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-[#D4AF37]/50 shadow-sm flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-[#003B73]/10 text-[#003B73] flex items-center justify-center shrink-0">
                     <ShieldCheck className="w-5 h-5 text-[#003B73]" />
                   </div>
                   <div>
                     <div className="text-xs font-bold text-stone-900">
-                      Amanah & Standar Nasional Bank Indonesia
+                      Amanah &amp; Standar Nasional Bank Indonesia
                     </div>
                     <div className="text-[11px] text-stone-500">
                       Terdaftar resmi di bawah pengawasan Bank Indonesia dan ASPI.
@@ -512,6 +529,45 @@ Infaq Digital: https://sudalmiyah-rais.vercel.app`;
                 <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0 font-mono">
                   VERIFIED QRIS
                 </span>
+              </div>
+            </div>
+
+            {/* Right Column: Official QRIS 2 Stand Card (Bank Jateng - MASJID UMS) */}
+            <div className="sm:col-span-1 lg:col-span-3 flex flex-col items-center order-2 lg:order-3">
+              <div className="w-full max-w-xs rounded-3xl bg-white border border-stone-200 p-4 sm:p-5 shadow-lg text-center flex flex-col justify-between h-full">
+                <div>
+                  <div className="mb-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-900 text-[11px] font-bold">
+                    <span>Bank Jateng (Masjid UMS)</span>
+                  </div>
+
+                  {/* Official QRIS Poster Image */}
+                  <div className="relative w-full aspect-[1/1.414] rounded-2xl overflow-hidden border border-stone-200 bg-white shadow-inner flex items-center justify-center p-1">
+                    <Image
+                      src={qris.secondaryImageUrl || "/images/qris-bank-jateng.jpg"}
+                      alt={`QRIS ${qris.secondaryMerchantName || "MASJID UMS - Bank Jateng"}`}
+                      fill
+                      unoptimized
+                      priority
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
+
+                {/* Download QRIS Button */}
+                <div className="mt-4 space-y-3">
+                  <button
+                    type="button"
+                    onClick={handleDownloadSecondaryQRIS}
+                    className="w-full text-center px-4 py-2.5 rounded-full bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition-all shadow-md shadow-stone-900/15 active:scale-[0.99] cursor-pointer"
+                  >
+                    Unduh Gambar QRIS
+                  </button>
+
+                  {/* Supported Apps List */}
+                  <div className="pt-2 border-t border-stone-100 text-[10px] text-stone-500 leading-tight">
+                    Mendukung Bank Jateng BIMA, Mobile Banking, E-Wallet, &amp; seluruh aplikasi QRIS.
+                  </div>
+                </div>
               </div>
             </div>
 

@@ -184,6 +184,7 @@ export default function AdminDashboardPage() {
   const [qrisSettings, setQrisSettings] = useState<QrisSettings | null>(null);
   const [savingQris, setSavingQris] = useState(false);
   const [uploadingQrisImage, setUploadingQrisImage] = useState(false);
+  const [uploadingSecondaryQrisImage, setUploadingSecondaryQrisImage] = useState(false);
   const [qrisSaveSuccess, setQrisSaveSuccess] = useState(false);
 
   // Modal new agenda state
@@ -698,6 +699,35 @@ export default function AdminDashboardPage() {
       alert(err.message || "Gagal mengunggah gambar QRIS.");
     } finally {
       setUploadingQrisImage(false);
+      e.target.value = "";
+    }
+  };
+
+  // Upload Secondary QRIS Image (Bank Jateng / QRIS Kanan)
+  const handleSecondaryQrisImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
+    setUploadingSecondaryQrisImage(true);
+    try {
+      const file = await compressImageForUpload(rawFile);
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "qris");
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal mengunggah gambar QRIS kedua.");
+
+      if (qrisSettings) {
+        setQrisSettings({ ...qrisSettings, secondaryImageUrl: data.url });
+      }
+    } catch (err: any) {
+      alert(err.message || "Gagal mengunggah gambar QRIS kedua.");
+    } finally {
+      setUploadingSecondaryQrisImage(false);
       e.target.value = "";
     }
   };
@@ -1992,109 +2022,205 @@ export default function AdminDashboardPage() {
             {qrisSettings ? (
               <form onSubmit={handleUpdateQrisSettings} className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 space-y-6 shadow-sm">
                 
-                {/* QRIS Image & Upload Row */}
-                <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-stone-200/90 space-y-4">
-                  <span className="text-[11px] font-bold text-[#003B73] uppercase tracking-wider block">
-                    Gambar Kode QRIS Resmi Masjid
-                  </span>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* QRIS 1 (Kiri) - LAZ UMS Sudalmiyah */}
+                  <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-stone-200/90 space-y-4 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-[#003B73] uppercase tracking-wider block">
+                          QRIS 1: LAZ UMS Sudalmiyah (Sisi Kiri)
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#003B73]/10 text-[#003B73]">
+                          Utama
+                        </span>
+                      </div>
 
-                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                    {/* Live Preview Frame */}
-                    <div className="relative w-48 h-64 sm:w-56 sm:h-72 rounded-2xl overflow-hidden border-2 border-[#D4AF37]/50 shadow-md shrink-0 bg-white flex items-center justify-center p-2">
-                      <Image
-                        src={qrisSettings.imageUrl || "/images/qris-sudalmiyah.png"}
-                        alt="Pratinjau QRIS Masjid"
-                        fill
-                        unoptimized
-                        className="object-contain p-2"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 py-1 bg-gradient-to-t from-black/80 to-transparent text-center">
-                        <span className="text-[10px] text-white font-semibold">Pratinjau QRIS</span>
+                      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mt-3">
+                        {/* Live Preview Frame */}
+                        <div className="relative w-36 h-48 sm:w-40 sm:h-56 rounded-2xl overflow-hidden border-2 border-[#D4AF37]/50 shadow-md shrink-0 bg-white flex items-center justify-center p-2">
+                          <Image
+                            src={qrisSettings.imageUrl || "/images/qris-sudalmiyah.png"}
+                            alt="Pratinjau QRIS 1"
+                            fill
+                            unoptimized
+                            className="object-contain p-1"
+                          />
+                        </div>
+
+                        {/* Upload Controls */}
+                        <div className="flex-1 space-y-3 text-center sm:text-left">
+                          <div>
+                            <label className="block text-xs font-bold text-stone-800 mb-1">
+                              Unggah Gambar QRIS 1
+                            </label>
+                            <p className="text-[11px] text-stone-500 leading-relaxed">
+                              Format: PNG, JPG, WEBP.
+                            </p>
+                          </div>
+
+                          <div>
+                            <label className="inline-block px-4 py-2 rounded-full bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold cursor-pointer transition-colors shadow-sm active:scale-95">
+                              {uploadingQrisImage ? "Mengunggah..." : "Pilih Berkas QRIS 1"}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                disabled={uploadingQrisImage}
+                                onChange={handleQrisImageUpload}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-semibold text-stone-500 mb-0.5">
+                              Lokasi Berkas:
+                            </label>
+                            <input
+                              type="text"
+                              readOnly
+                              value={qrisSettings.imageUrl}
+                              className="w-full px-2.5 py-1.5 rounded-xl bg-stone-100 border border-stone-200 text-stone-600 font-mono text-[10px]"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Upload Controls */}
-                    <div className="flex-1 space-y-3 text-center sm:text-left">
+                    <div className="space-y-3 pt-3 border-t border-stone-200">
                       <div>
-                        <label className="block text-xs font-bold text-stone-800 mb-1">
-                          Unggah Berkas Gambar QRIS Baru (Media)
-                        </label>
-                        <p className="text-xs text-stone-500 leading-relaxed">
-                          Pilih berkas gambar barcode QRIS langsung dari perangkat komputer atau ponsel Anda tanpa perlu mengisi tautan URL manual. Format didukung: PNG, JPG, JPEG, WEBP (maksimal 5MB).
-                        </p>
-                      </div>
-
-                      <div className="pt-2">
-                        <label className="inline-block px-5 py-2.5 rounded-full bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold cursor-pointer transition-colors shadow-sm active:scale-95">
-                          {uploadingQrisImage ? "Mengunggah Berkas..." : "Pilih Berkas QRIS (Media)"}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            disabled={uploadingQrisImage}
-                            onChange={handleQrisImageUpload}
-                            className="hidden"
-                          />
-                        </label>
-                      </div>
-
-                      <div className="pt-2">
-                        <label className="block text-[11px] font-semibold text-stone-600 mb-1">
-                          Lokasi Berkas Aktif:
+                        <label className="block text-xs font-semibold text-stone-700 mb-1">
+                          Nama Merchant QRIS 1
                         </label>
                         <input
                           type="text"
-                          readOnly
-                          value={qrisSettings.imageUrl}
-                          className="w-full px-3 py-2 rounded-xl bg-stone-100 border border-stone-200 text-stone-600 font-mono text-[11px]"
+                          required
+                          value={qrisSettings.merchantName}
+                          onChange={(e) => setQrisSettings({ ...qrisSettings, merchantName: e.target.value })}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-semibold"
+                          placeholder="Contoh: LAZ UMS-MSJD SUDALMIYAH"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-stone-700 mb-1">
+                          NMID QRIS 1
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={qrisSettings.nmid}
+                          onChange={(e) => setQrisSettings({ ...qrisSettings, nmid: e.target.value })}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono"
+                          placeholder="Contoh: ID2024353816125"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* QRIS 2 (Kanan) - Bank Jateng / MASJID UMS */}
+                  <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-stone-200/90 space-y-4 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider block">
+                          QRIS 2: Bank Jateng (Sisi Kanan)
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-900">
+                          Kedua
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mt-3">
+                        {/* Live Preview Frame */}
+                        <div className="relative w-36 h-48 sm:w-40 sm:h-56 rounded-2xl overflow-hidden border-2 border-amber-500/50 shadow-md shrink-0 bg-white flex items-center justify-center p-2">
+                          <Image
+                            src={qrisSettings.secondaryImageUrl || "/images/qris-bank-jateng.jpg"}
+                            alt="Pratinjau QRIS 2"
+                            fill
+                            unoptimized
+                            className="object-contain p-1"
+                          />
+                        </div>
+
+                        {/* Upload Controls */}
+                        <div className="flex-1 space-y-3 text-center sm:text-left">
+                          <div>
+                            <label className="block text-xs font-bold text-stone-800 mb-1">
+                              Unggah Gambar QRIS 2
+                            </label>
+                            <p className="text-[11px] text-stone-500 leading-relaxed">
+                              Format: PNG, JPG, WEBP.
+                            </p>
+                          </div>
+
+                          <div>
+                            <label className="inline-block px-4 py-2 rounded-full bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold cursor-pointer transition-colors shadow-sm active:scale-95">
+                              {uploadingSecondaryQrisImage ? "Mengunggah..." : "Pilih Berkas QRIS 2"}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                disabled={uploadingSecondaryQrisImage}
+                                onChange={handleSecondaryQrisImageUpload}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-semibold text-stone-500 mb-0.5">
+                              Lokasi Berkas:
+                            </label>
+                            <input
+                              type="text"
+                              readOnly
+                              value={qrisSettings.secondaryImageUrl || "/images/qris-bank-jateng.jpg"}
+                              className="w-full px-2.5 py-1.5 rounded-xl bg-stone-100 border border-stone-200 text-stone-600 font-mono text-[10px]"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 pt-3 border-t border-stone-200">
+                      <div>
+                        <label className="block text-xs font-semibold text-stone-700 mb-1">
+                          Nama Merchant QRIS 2
+                        </label>
+                        <input
+                          type="text"
+                          value={qrisSettings.secondaryMerchantName || "MASJID UMS"}
+                          onChange={(e) => setQrisSettings({ ...qrisSettings, secondaryMerchantName: e.target.value })}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-semibold"
+                          placeholder="Contoh: MASJID UMS"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-stone-700 mb-1">
+                          NMID / Keterangan QRIS 2
+                        </label>
+                        <input
+                          type="text"
+                          value={qrisSettings.secondaryNmid || "-"}
+                          onChange={(e) => setQrisSettings({ ...qrisSettings, secondaryNmid: e.target.value })}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono"
+                          placeholder="Contoh: Bank Jateng Pedagang BIMA"
                         />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Merchant Details Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1">
-                      Nama Merchant QRIS
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={qrisSettings.merchantName}
-                      onChange={(e) => setQrisSettings({ ...qrisSettings, merchantName: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-semibold"
-                      placeholder="Contoh: LAZ UMS-MSJD SUDALMIYAH"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1">
-                      Kode NMID Nasional
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={qrisSettings.nmid}
-                      onChange={(e) => setQrisSettings({ ...qrisSettings, nmid: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono"
-                      placeholder="Contoh: ID2024353816125"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1">
-                      Institusi / Lokasi
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={qrisSettings.institution}
-                      onChange={(e) => setQrisSettings({ ...qrisSettings, institution: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
-                      placeholder="Contoh: Universitas Muhammadiyah Surakarta"
-                    />
-                  </div>
+                {/* Institution Row */}
+                <div className="p-4 rounded-2xl bg-white border border-stone-200">
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Institusi / Universitas Pengelola
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={qrisSettings.institution}
+                    onChange={(e) => setQrisSettings({ ...qrisSettings, institution: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
+                    placeholder="Contoh: Universitas Muhammadiyah Surakarta"
+                  />
                 </div>
 
                 {/* Submit Action */}

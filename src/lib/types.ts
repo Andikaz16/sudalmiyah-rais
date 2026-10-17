@@ -249,8 +249,11 @@ export interface SecurityAuditLog {
 export interface QrisSettings {
   id: string;
   imageUrl: string;
+  secondaryImageUrl?: string;
   merchantName: string;
+  secondaryMerchantName?: string;
   nmid: string;
+  secondaryNmid?: string;
   institution: string;
   updatedAt: string;
 }

@@ -366,8 +366,11 @@ function getInitialData(): DatabaseSchema {
     qrisSettings: {
       id: "qris-01",
       imageUrl: "/images/qris-sudalmiyah.png",
+      secondaryImageUrl: "/images/qris-bank-jateng.jpg",
       merchantName: "LAZ UMS-MSJD SUDALMIYAH",
+      secondaryMerchantName: "MASJID UMS",
       nmid: "ID2024353816125",
+      secondaryNmid: "-",
       institution: "Universitas Muhammadiyah Surakarta",
       updatedAt: new Date().toISOString(),
     },

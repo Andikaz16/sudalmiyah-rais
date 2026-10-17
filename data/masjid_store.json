@@ -389,10 +389,13 @@
   "qrisSettings": {
     "id": "qris-01",
     "imageUrl": "/images/qris-sudalmiyah.png",
+    "secondaryImageUrl": "/images/qris-bank-jateng.jpg",
     "merchantName": "LAZ UMS-MSJD SUDALMIYAH",
+    "secondaryMerchantName": "MASJID UMS",
     "nmid": "ID2024353816125",
+    "secondaryNmid": "-",
     "institution": "Universitas Muhammadiyah Surakarta",
-    "updatedAt": "2026-10-15T16:20:00.000Z"
+    "updatedAt": "2026-10-17T10:40:00.000Z"
   },
   "feedbacks": [
     {

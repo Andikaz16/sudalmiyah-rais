@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { connection } from "next/server";
 import { z } from "zod";
 import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
@@ -6,17 +7,28 @@ import { QrisSettings } from "@/lib/types";
 
 const updateQrisSchema = z.object({
   imageUrl: z.string().min(1, "URL gambar QRIS tidak boleh kosong."),
+  secondaryImageUrl: z.string().optional().default("/images/qris-bank-jateng.jpg"),
   merchantName: z.string().min(3).max(150),
-  nmid: z.string().min(5).max(50),
+  secondaryMerchantName: z.string().optional().default("MASJID UMS"),
+  nmid: z.string().min(1).max(50),
+  secondaryNmid: z.string().optional().default("-"),
   institution: z.string().min(2).max(150),
 });
 
 export async function GET() {
+  await connection();
   const db = getDb();
-  return NextResponse.json({
-    success: true,
-    qris: db.qrisSettings,
-  });
+  return NextResponse.json(
+    {
+      success: true,
+      qris: db.qrisSettings,
+    },
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+      },
+    }
+  );
 }
 
 export async function PUT(request: NextRequest) {
@@ -47,8 +59,11 @@ export async function PUT(request: NextRequest) {
     const updatedQris: QrisSettings = {
       id: db.qrisSettings?.id || `qris-${Date.now()}`,
       imageUrl: sanitizeString(data.imageUrl),
+      secondaryImageUrl: data.secondaryImageUrl ? sanitizeString(data.secondaryImageUrl) : (db.qrisSettings?.secondaryImageUrl || "/images/qris-bank-jateng.jpg"),
       merchantName: sanitizeString(data.merchantName),
+      secondaryMerchantName: data.secondaryMerchantName ? sanitizeString(data.secondaryMerchantName) : (db.qrisSettings?.secondaryMerchantName || "MASJID UMS"),
       nmid: sanitizeString(data.nmid),
+      secondaryNmid: data.secondaryNmid ? sanitizeString(data.secondaryNmid) : (db.qrisSettings?.secondaryNmid || "-"),
       institution: sanitizeString(data.institution),
       updatedAt: new Date().toISOString(),
     };
@@ -62,7 +77,7 @@ export async function PUT(request: NextRequest) {
       session.email,
       ip,
       "SUCCESS",
-      `Gambar & Pengaturan QRIS diperbarui: ${updatedQris.merchantName} (${updatedQris.nmid})`
+      `Gambar & Pengaturan QRIS diperbarui: ${updatedQris.merchantName} & ${updatedQris.secondaryMerchantName}`
     );
 
     return NextResponse.json({
