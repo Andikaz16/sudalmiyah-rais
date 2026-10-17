@@ -7,6 +7,7 @@ import Image from "next/image";
 import {
   Calendar,
   Users,
+  User,
   QrCode,
   Tv,
   ExternalLink,
@@ -1734,26 +1735,57 @@ export default function AdminDashboardPage() {
                 <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-stone-200/80 flex flex-col sm:flex-row items-center sm:items-start gap-6">
                   {/* Photo Preview & Upload Button */}
                   <div className="flex flex-col items-center gap-3 shrink-0">
-                    <div className="relative w-36 h-44 rounded-2xl overflow-hidden border-2 border-[#D4AF37] shadow-md bg-stone-100">
-                      <Image
-                        src={fridaySchedule.khatibPhotoUrl || "/uploads/khatib/prof-sofyan-anif.jpg"}
-                        alt="Foto Khatib"
-                        fill
-                        unoptimized
-                        className="object-cover"
-                      />
+                    <div className="relative w-36 h-44 rounded-2xl overflow-hidden border-2 border-stone-200 shadow-sm bg-stone-100 flex flex-col items-center justify-center">
+                      {fridaySchedule.khatibPhotoUrl ? (
+                        <Image
+                          src={fridaySchedule.khatibPhotoUrl}
+                          alt="Foto Khatib"
+                          fill
+                          unoptimized
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center p-3 text-center text-stone-400">
+                          <div className="w-12 h-12 rounded-full bg-stone-200 flex items-center justify-center mb-1.5 text-stone-500">
+                            <User className="w-6 h-6" />
+                          </div>
+                          <span className="text-[11px] font-bold text-stone-600">Belum Ada Foto</span>
+                          <span className="text-[9px] text-stone-400">Klik tombol di bawah</span>
+                        </div>
+                      )}
                     </div>
-                    {/* Media Upload Input */}
-                    <label className="cursor-pointer px-4 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-semibold text-center transition-colors shadow-sm">
-                      {uploadingKhatibPhoto ? "Mengunggah..." : "Ganti Foto Khatib (Media)"}
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        className="hidden"
-                        onChange={handleKhatibPhotoUpload}
-                        disabled={uploadingKhatibPhoto}
-                      />
-                    </label>
+                    {/* Media Upload & Remove Buttons */}
+                    <div className="flex flex-col items-center gap-1.5">
+                      <label className="cursor-pointer px-4 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-semibold text-center transition-colors shadow-xs">
+                        {uploadingKhatibPhoto
+                          ? "Mengunggah..."
+                          : fridaySchedule.khatibPhotoUrl
+                          ? "Ganti Foto Khatib"
+                          : "+ Unggah Foto Khatib"}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          onChange={handleKhatibPhotoUpload}
+                          disabled={uploadingKhatibPhoto}
+                        />
+                      </label>
+                      {fridaySchedule.khatibPhotoUrl && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = { ...fridaySchedule, khatibPhotoUrl: "" };
+                            setFridaySchedule(updated);
+                            setFridaySchedules((prev) =>
+                              prev.map((s) => ((s.mosqueId || s.id) === selectedMosqueId ? updated : s))
+                            );
+                          }}
+                          className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 hover:underline cursor-pointer"
+                        >
+                          Hapus Foto
+                        </button>
+                      )}
+                    </div>
                     <span className="text-[10px] text-stone-400 text-center">Format JPG, PNG, atau WEBP</span>
                   </div>
 
@@ -1765,11 +1797,10 @@ export default function AdminDashboardPage() {
                       </label>
                       <input
                         type="text"
-                        required
                         value={fridaySchedule.khatibName}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, khatibName: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-medium"
-                        placeholder="Contoh: Prof. Dr. Sofyan Anif, M.Si."
+                        placeholder="Nama lengkap khatib (contoh: Dalam Konfirmasi)"
                       />
                     </div>
 
@@ -1779,11 +1810,10 @@ export default function AdminDashboardPage() {
                       </label>
                       <input
                         type="text"
-                        required
                         value={fridaySchedule.khatibTitle}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, khatibTitle: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
-                        placeholder="Contoh: Rektor Universitas Muhammadiyah Surakarta"
+                        placeholder="Jabatan atau instansi khatib"
                       />
                     </div>
 
@@ -1793,11 +1823,10 @@ export default function AdminDashboardPage() {
                       </label>
                       <input
                         type="text"
-                        required
                         value={fridaySchedule.khutbahTheme}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, khutbahTheme: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-semibold"
-                        placeholder="Contoh: Membangun Integritas Moral di Era Digital"
+                        placeholder="Tema khutbah Jumat"
                       />
                     </div>
                   </div>
@@ -1811,11 +1840,10 @@ export default function AdminDashboardPage() {
                     </label>
                     <input
                       type="text"
-                      required
                       value={fridaySchedule.date}
                       onChange={(e) => setFridaySchedule({ ...fridaySchedule, date: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
-                      placeholder="Contoh: Jumat, 16 Oktober 2026"
+                      placeholder="Contoh: Jumat Pekan Ini"
                     />
                   </div>
                   <div>
@@ -1824,7 +1852,6 @@ export default function AdminDashboardPage() {
                     </label>
                     <input
                       type="text"
-                      required
                       value={fridaySchedule.hijriDate}
                       onChange={(e) => setFridaySchedule({ ...fridaySchedule, hijriDate: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
@@ -1837,7 +1864,6 @@ export default function AdminDashboardPage() {
                     </label>
                     <input
                       type="text"
-                      required
                       value={fridaySchedule.time}
                       onChange={(e) => setFridaySchedule({ ...fridaySchedule, time: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
@@ -1858,10 +1884,10 @@ export default function AdminDashboardPage() {
                       </label>
                       <input
                         type="text"
-                        required
                         value={fridaySchedule.imamName}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, imamName: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
+                        placeholder="Nama imam (contoh: Dalam Konfirmasi)"
                       />
                     </div>
                     <div>
@@ -1870,10 +1896,10 @@ export default function AdminDashboardPage() {
                       </label>
                       <input
                         type="text"
-                        required
                         value={fridaySchedule.imamRole}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, imamRole: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
+                        placeholder="Peran imam"
                       />
                     </div>
                   </div>
@@ -1888,10 +1914,10 @@ export default function AdminDashboardPage() {
                       </label>
                       <input
                         type="text"
-                        required
                         value={fridaySchedule.muadzinName}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, muadzinName: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
+                        placeholder="Nama muadzin (contoh: Dalam Konfirmasi)"
                       />
                     </div>
                     <div>
@@ -1900,10 +1926,10 @@ export default function AdminDashboardPage() {
                       </label>
                       <input
                         type="text"
-                        required
                         value={fridaySchedule.muadzinRole}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, muadzinRole: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
+                        placeholder="Peran muadzin"
                       />
                     </div>
                   </div>

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, connection } from "next/server";
 import { z } from "zod";
 import { getDb, logSecurityEvent, saveDb } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
@@ -9,21 +9,22 @@ const updateFridaySchema = z.object({
   mosqueId: z.string().optional(),
   mosqueName: z.string().optional(),
   mosqueLocation: z.string().optional(),
-  date: z.string().min(3).max(100),
-  hijriDate: z.string().min(3).max(100),
-  khatibName: z.string().min(3).max(150),
-  khatibTitle: z.string().min(3).max(200),
-  khatibPhotoUrl: z.string().min(1),
-  khutbahTheme: z.string().min(5).max(300),
-  imamName: z.string().min(3).max(150),
-  imamRole: z.string().min(3).max(150),
-  muadzinName: z.string().min(3).max(150),
-  muadzinRole: z.string().min(3).max(150),
-  time: z.string().min(3).max(50),
-  notes: z.string().max(1000).optional(),
+  date: z.string().min(1).max(100),
+  hijriDate: z.string().min(1).max(100),
+  khatibName: z.string().min(1).max(150),
+  khatibTitle: z.string().max(200).optional().or(z.literal("")),
+  khatibPhotoUrl: z.string().optional().or(z.literal("")),
+  khutbahTheme: z.string().max(300).optional().or(z.literal("")),
+  imamName: z.string().max(150).optional().or(z.literal("")),
+  imamRole: z.string().max(150).optional().or(z.literal("")),
+  muadzinName: z.string().max(150).optional().or(z.literal("")),
+  muadzinRole: z.string().max(150).optional().or(z.literal("")),
+  time: z.string().min(1).max(50),
+  notes: z.string().max(1000).optional().or(z.literal("")),
 });
 
 export async function GET(request: NextRequest) {
+  await connection();
   const db = getDb();
   const { searchParams } = new URL(request.url);
   const mosqueId = searchParams.get("mosqueId");
@@ -56,11 +57,20 @@ export async function GET(request: NextRequest) {
     ? schedules.find((s) => (s.mosqueId || s.id) === mosqueId) || db.fridaySchedule
     : db.fridaySchedule || schedules[0];
 
-  return NextResponse.json({
-    success: true,
-    schedule: activeSchedule,
-    schedules: schedules,
-  });
+  return NextResponse.json(
+    {
+      success: true,
+      schedule: activeSchedule,
+      schedules: schedules,
+    },
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    }
+  );
 }
 
 export async function PUT(request: NextRequest) {

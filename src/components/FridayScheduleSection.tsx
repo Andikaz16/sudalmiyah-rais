@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { User } from "lucide-react";
 import { FridayOfficerSchedule } from "@/lib/types";
 
 interface MosqueInfo {
@@ -56,18 +57,18 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueId: "sudalmiyah",
     mosqueName: "Masjid Hj. Sudalmiyah Rais",
     mosqueLocation: "Kampus 2 UMS",
-    date: "Jumat, 16 Oktober 2026",
+    date: "Jumat Pekan Ini",
     hijriDate: "5 Jumadilawal 1448 H",
-    khatibName: "Prof. Dr. Sofyan Anif, M.Si.",
-    khatibTitle: "Rektor Universitas Muhammadiyah Surakarta",
-    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
-    khutbahTheme: "Membangun Integritas Moral & Karakter Mahasiswa Muslim Berkemajuan di Era AI",
-    imamName: "Ustadz Muhammad Ridwan, Al-Hafizh",
-    imamRole: "Imam Rawatib Masjid Sudalmiyah Rais",
-    muadzinName: "Bilal Ramadhan, S.Kom.",
-    muadzinRole: "Muadzin Masjid Sudalmiyah Rais",
+    khatibName: "Dalam Konfirmasi",
+    khatibTitle: "Akan Diumumkan Takmir",
+    khatibPhotoUrl: "",
+    khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
+    imamName: "Dalam Konfirmasi",
+    imamRole: "Imam Shalat Jumat",
+    muadzinName: "Dalam Konfirmasi",
+    muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
-    notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid, serta menata alas kaki dengan rapi di loker yang disediakan.",
+    notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
   },
   {
@@ -75,16 +76,16 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueId: "fadhlurrahman",
     mosqueName: "Masjid Fadhlurrahman",
     mosqueLocation: "Kampus 1 UMS",
-    date: "Jumat, 16 Oktober 2026",
+    date: "Jumat Pekan Ini",
     hijriDate: "5 Jumadilawal 1448 H",
-    khatibName: "Dr. Syamsul Hidayat, M.Ag.",
-    khatibTitle: "Dekan FAI UMS / Majelis Tarjih",
-    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
-    khutbahTheme: "Meneladani Jejak Historis & Ruh Perjuangan Dakwah Islam Berkemajuan",
-    imamName: "Ustadz H. Ahmad Dahlan, S.Pd.I.",
-    imamRole: "Imam Rawatib Masjid Fadhlurrahman",
-    muadzinName: "Farhan Al-Ghifari",
-    muadzinRole: "Muadzin Masjid Fadhlurrahman",
+    khatibName: "Dalam Konfirmasi",
+    khatibTitle: "Akan Diumumkan Takmir",
+    khatibPhotoUrl: "",
+    khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
+    imamName: "Dalam Konfirmasi",
+    imamRole: "Imam Shalat Jumat",
+    muadzinName: "Dalam Konfirmasi",
+    muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
     notes: "Saf utama lantai 1 diprioritaskan bagi civitas akademika dan masyarakat sekitar. Harap parkir kendaraan dengan rapi.",
     updatedAt: new Date().toISOString(),
@@ -94,16 +95,16 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueId: "mas-mansur",
     mosqueName: "Masjid KH. Mas Mansur",
     mosqueLocation: "Kampus 4 UMS (Pesma)",
-    date: "Jumat, 16 Oktober 2026",
+    date: "Jumat Pekan Ini",
     hijriDate: "5 Jumadilawal 1448 H",
-    khatibName: "Drs. Dahlan Rais, M.Hum.",
-    khatibTitle: "Ketua BPH UMS / PP Muhammadiyah",
-    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
-    khutbahTheme: "Ukhuwah Islamiyah & Penguatan Karakter Mahasantri Berwawasan Global",
-    imamName: "Ustadz Mu'tashim Billah, Lc.",
-    imamRole: "Imam & Pembina Pesma KH. Mas Mansur",
-    muadzinName: "Zaidan Ilham, S.Ag.",
-    muadzinRole: "Muadzin Pesma KH. Mas Mansur",
+    khatibName: "Dalam Konfirmasi",
+    khatibTitle: "Akan Diumumkan Takmir",
+    khatibPhotoUrl: "",
+    khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
+    imamName: "Dalam Konfirmasi",
+    imamRole: "Imam Shalat Jumat",
+    muadzinName: "Dalam Konfirmasi",
+    muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
     notes: "Mahasantri Pesma wajib mengisi saf dari depan secara tertib. Dilarang membawa barang berharga tanpa pengawasan.",
     updatedAt: new Date().toISOString(),
@@ -113,18 +114,18 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueId: "mahad-abu-bakar",
     mosqueName: "Masjid Ma'had Abu Bakar",
     mosqueLocation: "Kampus 2 UMS",
-    date: "Jumat, 16 Oktober 2026",
+    date: "Jumat Pekan Ini",
     hijriDate: "5 Jumadilawal 1448 H",
-    khatibName: "Dr. Mirwan Akhmad Taufiq, M.S.I.",
-    khatibTitle: "Direktur Ma'had Abu Bakar Ash-Shiddiq",
-    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
-    khutbahTheme: "Urgensi Bahasa Al-Qur'an dan Keluhuran Adab dalam Menuntut Ilmu",
-    imamName: "Syaikh Hasan Al-Yamani, Lc.",
-    imamRole: "Imam Ma'had Abu Bakar",
-    muadzinName: "Abdullah Azzam",
-    muadzinRole: "Muadzin Ma'had Abu Bakar",
+    khatibName: "Dalam Konfirmasi",
+    khatibTitle: "Akan Diumumkan Takmir",
+    khatibPhotoUrl: "",
+    khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
+    imamName: "Dalam Konfirmasi",
+    imamRole: "Imam Shalat Jumat",
+    muadzinName: "Dalam Konfirmasi",
+    muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
-    notes: "Khutbah disampaikan dengan pengantar bahasa Arab fusha dan terjemah ringkas. Jamaah diharapkan menjaga ketenangan.",
+    notes: "Khutbah disampaikan dengan pengantar bahasa Arab dan terjemah ringkas. Jamaah diharapkan menjaga ketenangan.",
     updatedAt: new Date().toISOString(),
   },
   {
@@ -132,16 +133,16 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueId: "ar-razi",
     mosqueName: "Masjid Ar-Razi FKG",
     mosqueLocation: "Kampus 4 UMS (FKG)",
-    date: "Jumat, 16 Oktober 2026",
+    date: "Jumat Pekan Ini",
     hijriDate: "5 Jumadilawal 1448 H",
-    khatibName: "drg. Morita Sari, Sp.KG., Ph.D.",
-    khatibTitle: "Dosen FKG UMS / Praktisi Kesehatan Islam",
-    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
-    khutbahTheme: "Kesehatan Jasmani dan Ruhani sebagai Amanah Dakwah Kedokteran Islam",
-    imamName: "Ustadz Fathurrahman Al-Hafizh",
-    imamRole: "Imam Masjid Ar-Razi",
-    muadzinName: "Ilham Ramadhan, S.KG.",
-    muadzinRole: "Muadzin Masjid Ar-Razi",
+    khatibName: "Dalam Konfirmasi",
+    khatibTitle: "Akan Diumumkan Takmir",
+    khatibPhotoUrl: "",
+    khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
+    imamName: "Dalam Konfirmasi",
+    imamRole: "Imam Shalat Jumat",
+    muadzinName: "Dalam Konfirmasi",
+    muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
     notes: "Disediakan tempat wudhu higienis di sayap timur dan barat. Jamaah diimbau membawa sajadah pribadi.",
     updatedAt: new Date().toISOString(),
@@ -151,16 +152,16 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     mosqueId: "munajat-shabran",
     mosqueName: "Masjid Munajat Shabran",
     mosqueLocation: "Makamhaji (Pondok Shabran)",
-    date: "Jumat, 16 Oktober 2026",
+    date: "Jumat Pekan Ini",
     hijriDate: "5 Jumadilawal 1448 H",
-    khatibName: "Nurul Huda, M.Ag.",
-    khatibTitle: "Mudir Pondok Hajjah Nuriyah Shabran",
-    khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
-    khutbahTheme: "Menyiapkan Ulama Intelek dan Intelek Ulama untuk Kepemimpinan Umat",
-    imamName: "Ustadz Saifuddin, M.Ag.",
-    imamRole: "Imam Masjid Munajat Shabran",
-    muadzinName: "Ibrahim Maulana",
-    muadzinRole: "Muadzin Kader Shabran",
+    khatibName: "Dalam Konfirmasi",
+    khatibTitle: "Akan Diumumkan Takmir",
+    khatibPhotoUrl: "",
+    khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
+    imamName: "Dalam Konfirmasi",
+    imamRole: "Imam Shalat Jumat",
+    muadzinName: "Dalam Konfirmasi",
+    muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
     notes: "Shalat Jumat terbuka bagi santri, asatidz, dan masyarakat Makamhaji sekitarnya.",
     updatedAt: new Date().toISOString(),
@@ -172,9 +173,12 @@ export default function FridayScheduleSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
-  // Fetch schedules from API
-  useEffect(() => {
-    fetch("/api/friday-schedule")
+  // Fetch schedules from API with anti-cache
+  const fetchSchedules = useCallback(() => {
+    fetch(`/api/friday-schedule?t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    })
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.schedules) && data.schedules.length > 0) {
@@ -197,6 +201,17 @@ export default function FridayScheduleSection() {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    fetchSchedules();
+    const handleFocus = () => fetchSchedules();
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("visibilitychange", handleFocus);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("visibilitychange", handleFocus);
+    };
+  }, [fetchSchedules]);
 
   // Safe navigation handlers
   const totalSlides = MOSQUE_LIST.length;
@@ -347,18 +362,30 @@ export default function FridayScheduleSection() {
                   {/* Khatib Profile & Khutbah Info */}
                   <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-5">
                     {/* Khatib Photo Frame */}
-                    <div className="relative w-36 h-44 sm:w-40 sm:h-52 rounded-2xl overflow-hidden border-2 border-[#D4AF37]/60 shadow-md shrink-0 bg-stone-100">
-                      <Image
-                        src={activeSchedule.khatibPhotoUrl || "/uploads/khatib/prof-sofyan-anif.jpg"}
-                        alt={activeSchedule.khatibName}
-                        fill
-                        unoptimized
-                        sizes="160px"
-                        className="object-cover"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 py-1 bg-gradient-to-t from-black/80 to-transparent text-center">
-                        <span className="text-[10px] text-white font-semibold">Khatib Resmi</span>
-                      </div>
+                    <div className="relative w-36 h-44 sm:w-40 sm:h-52 rounded-2xl overflow-hidden border-2 border-[#D4AF37]/60 shadow-md shrink-0 bg-stone-100 flex flex-col items-center justify-center">
+                      {activeSchedule.khatibPhotoUrl ? (
+                        <>
+                          <Image
+                            src={activeSchedule.khatibPhotoUrl}
+                            alt={activeSchedule.khatibName || "Khatib"}
+                            fill
+                            unoptimized
+                            sizes="160px"
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-x-0 bottom-0 py-1 bg-gradient-to-t from-black/80 to-transparent text-center">
+                            <span className="text-[10px] text-white font-semibold">Khatib Resmi</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center p-3 text-center text-stone-400">
+                          <div className="w-14 h-14 rounded-full bg-stone-200/80 flex items-center justify-center mb-2 text-stone-500">
+                            <User className="w-7 h-7" />
+                          </div>
+                          <span className="text-[11px] font-bold text-stone-600">Foto Khatib</span>
+                          <span className="text-[10px] text-stone-400 mt-0.5">Menunggu Takmir</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Khutbah Details */}
