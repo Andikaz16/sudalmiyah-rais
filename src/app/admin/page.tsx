@@ -584,14 +584,14 @@ export default function AdminDashboardPage() {
         hijriDate: "5 Jumadilawal 1448 H",
         khatibName: "",
         khatibTitle: "",
-        khatibPhotoUrl: "/uploads/khatib/prof-sofyan-anif.jpg",
+        khatibPhotoUrl: "",
         khutbahTheme: "",
         imamName: "",
         imamRole: `Imam ${meta?.name || "Masjid"}`,
         muadzinName: "",
         muadzinRole: `Muadzin ${meta?.name || "Masjid"}`,
         time: "11:35 WIB",
-        notes: "",
+        notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
         updatedAt: new Date().toISOString(),
       };
       setFridaySchedule(newSchedule);
@@ -1965,7 +1965,7 @@ export default function AdminDashboardPage() {
                     value={fridaySchedule.notes || ""}
                     onChange={(e) => setFridaySchedule({ ...fridaySchedule, notes: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
-                    placeholder="Contoh: Jamaah diimbau hadir lebih awal sebelum adzan berkumandang..."
+                    placeholder="Contoh: Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid."
                   />
                 </div>
 

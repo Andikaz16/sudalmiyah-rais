@@ -99,7 +99,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     muadzinName: "Dalam Konfirmasi",
     muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
-    notes: "Saf utama lantai 1 diprioritaskan bagi civitas akademika dan masyarakat sekitar. Harap parkir kendaraan dengan rapi.",
+    notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
   };
 
@@ -119,7 +119,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     muadzinName: "Dalam Konfirmasi",
     muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
-    notes: "Mahasantri Pesma wajib mengisi saf dari depan secara tertib. Dilarang membawa barang berharga tanpa pengawasan.",
+    notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
   };
 
@@ -139,7 +139,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     muadzinName: "Dalam Konfirmasi",
     muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
-    notes: "Khutbah disampaikan dengan pengantar bahasa Arab dan terjemah ringkas. Jamaah diharapkan menjaga ketenangan.",
+    notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
   };
 
@@ -159,7 +159,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     muadzinName: "Dalam Konfirmasi",
     muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
-    notes: "Disediakan tempat wudhu higienis di sayap timur dan barat. Jamaah diimbau membawa sajadah pribadi.",
+    notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
   };
 
@@ -179,7 +179,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     muadzinName: "Dalam Konfirmasi",
     muadzinRole: "Muadzin Shalat Jumat",
     time: "11:35 WIB",
-    notes: "Shalat Jumat terbuka bagi santri, asatidz, dan masyarakat Makamhaji sekitarnya.",
+    notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
   };
 
