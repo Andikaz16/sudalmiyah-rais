@@ -914,7 +914,7 @@ export default function AdminDashboardPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal mengunggah foto dokumentasi.");
-      setDocPhotos((prev) => [...prev, data.url]);
+      setDocPhotos((prev) => [data.url, ...prev]);
     } catch (err: any) {
       alert(err.message || "Gagal mengunggah foto.");
     } finally {

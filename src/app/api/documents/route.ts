@@ -24,6 +24,11 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Urutkan dokumen terbaru di sebelah kiri/atas (descending)
+  documents = [...documents].sort(
+    (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+  );
+
   return NextResponse.json({
     success: true,
     documents,

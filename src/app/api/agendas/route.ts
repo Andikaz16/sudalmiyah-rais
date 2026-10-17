@@ -49,8 +49,17 @@ export async function GET(request: NextRequest) {
     agendas = agendas.filter((a) => a.category === category);
   }
 
-  // Sort by date ascending
-  agendas = [...agendas].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  // Urutkan agenda terbaru di sebelah kiri (descending): tanggal terbaru di awal/kiri, yang lebih lama bergeser ke kanan
+  agendas = [...agendas].sort((a, b) => {
+    const timeA = new Date(a.date).getTime();
+    const timeB = new Date(b.date).getTime();
+    if (!isNaN(timeA) && !isNaN(timeB) && timeB !== timeA) {
+      return timeB - timeA;
+    }
+    const createdA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const createdB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return createdB - createdA;
+  });
 
   return NextResponse.json(
     { agendas },
