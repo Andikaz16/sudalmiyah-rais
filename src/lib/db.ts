@@ -468,7 +468,7 @@ function getInitialData(): DatabaseSchema {
         organization: "Ikatan Mahasiswa Muhammadiyah (IMM) Komisariat FKI UMS",
         applicantPhone: "081399887766",
         nim: "L200220045",
-        facilityName: "Aula Utama Serbaguna Lt 1",
+        facilityName: "Proyektor (LCD Projector Masjid)",
         eventTitle: "Darul Arqam Dasar (DAD) Calon Kader IMM",
         eventDate: "2026-10-24",
         startTime: "08:00",

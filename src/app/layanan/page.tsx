@@ -13,16 +13,12 @@ import {
   Loader2,
   Projector,
   Presentation,
-  Building2,
   MessageSquare,
   Clock,
   Phone,
   ShieldCheck,
   ExternalLink,
   Info,
-  ChevronDown,
-  ArrowDown,
-  Check,
   Users,
 } from "lucide-react";
 import { FacilityBooking } from "@/lib/types";
@@ -126,13 +122,10 @@ export default function LayananPage() {
 
   const getBookingIcon = (facilityName: string) => {
     const lower = facilityName.toLowerCase();
-    if (lower.includes("proyektor") || lower.includes("lcd")) {
-      return <Projector className="w-4 h-4 text-[#003B73]" />;
-    }
     if (lower.includes("layar") || lower.includes("papan") || lower.includes("screen")) {
       return <Presentation className="w-4 h-4 text-[#B58A1E]" />;
     }
-    return <Building2 className="w-4 h-4 text-emerald-700" />;
+    return <Projector className="w-4 h-4 text-[#003B73]" />;
   };
 
   const formatDateDisplay = (dateStr: string) => {
@@ -155,42 +148,15 @@ export default function LayananPage() {
       <Navbar />
 
       <main className="flex-1 w-full">
-        {/* Header Banner - Presisi & Sesuai Identitas Masjid Kampus UMS */}
+        {/* Header Banner - Khusus Peminjaman Proyektor & Screen */}
         <section className="bg-white border-b border-stone-200/90 py-10 sm:py-14 text-center relative overflow-hidden">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] text-xs font-bold uppercase tracking-wider mb-3.5 border border-[#003B73]/20">
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Layanan Civitas &amp; Ormawa Kampus UMS</span>
-            </div>
             <h1 className="text-3xl sm:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-              Peminjaman Ruang &amp; <span className="text-[#003B73]">Inventaris Masjid</span>
+              Peminjaman Proyektor &amp; <span className="text-[#003B73]">Layar Masjid</span>
             </h1>
             <p className="text-xs sm:text-sm md:text-base text-stone-600 mt-3.5 leading-relaxed max-w-3xl mx-auto">
-              Layanan permohonan peminjaman fasilitas ruang serta inventaris resmi takmir khusus <strong>Proyektor (LCD)</strong> dan <strong>Papan/Layar Proyektor (Screen)</strong> Masjid Kampus UMS (Masjid Hj. Sudalmiyah Rais &amp; Masjid Fadhlurrahman). Fasilitas ini diperuntukkan bagi Ortom (IMM, HW, Tapak Suci), HMP, UKM, fakultas, dan sivitas akademika UMS untuk mendukung syiar Islam, kajian ilmiah, rapat, dan pelatihan kader persyarikatan.
+              Layanan permohonan peminjaman inventaris resmi takmir khusus <strong>Proyektor (LCD)</strong> dan <strong>Papan/Layar Proyektor (Tripod Screen)</strong> Masjid Kampus UMS (Masjid Hj. Sudalmiyah Rais Kampus 2 &amp; Masjid Fadhlurrahman Kampus 1). Fasilitas ini diperuntukkan bagi Ortom (IMM, HW, Tapak Suci), HMP, UKM, fakultas, dan sivitas akademika UMS untuk mendukung kelancaran kegiatan syiar Islam, kajian ilmiah, presentasi, rapat koordinasi, serta pelatihan kader persyarikatan.
             </p>
-
-            {/* Quick Actions & Badges */}
-            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 mt-6">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] border border-stone-200 text-stone-700 text-xs font-semibold">
-                <Projector className="w-3.5 h-3.5 text-[#003B73]" />
-                <span>Proyektor (LCD)</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] border border-stone-200 text-stone-700 text-xs font-semibold">
-                <Presentation className="w-3.5 h-3.5 text-[#B58A1E]" />
-                <span>Papan / Layar Proyektor</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] border border-stone-200 text-stone-700 text-xs font-semibold">
-                <Building2 className="w-3.5 h-3.5 text-emerald-700" />
-                <span>Aula &amp; Ruang Takmir</span>
-              </span>
-              <a
-                href="#jadwal-terverifikasi"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-colors cursor-pointer"
-              >
-                <span>Lihat Jadwal Terverifikasi</span>
-                <ArrowDown className="w-3 h-3" />
-              </a>
-            </div>
           </div>
         </section>
 
@@ -204,7 +170,7 @@ export default function LayananPage() {
                   <div className="mb-5">
                     <h2 className="text-xl font-bold text-stone-900 flex items-center gap-2 font-serif">
                       <FileText className="w-5 h-5 text-[#B58A1E]" />
-                      <span>Formulir Permohonan Izin Ruang &amp; Inventaris</span>
+                      <span>Formulir Permohonan Peminjaman Proyektor &amp; Layar</span>
                     </h2>
                     <p className="text-xs text-stone-500 mt-1">
                       Silakan isi data lengkap penanggung jawab acara dari sivitas akademika UMS.
@@ -233,7 +199,7 @@ export default function LayananPage() {
                               `• Nama Penanggung Jawab: ${submittedData.applicantName}\n` +
                               `• NIM: ${submittedData.nim}\n` +
                               `• Lembaga / Ortom / UKM: ${submittedData.organization}\n` +
-                              `• Fasilitas / Barang: ${submittedData.facilityName}\n` +
+                              `• Barang Inventaris: ${submittedData.facilityName}\n` +
                               `• Nama Agenda: ${submittedData.eventTitle}\n` +
                               `• Tanggal: ${submittedData.eventDate} (${submittedData.startTime} - ${submittedData.endTime} WIB)\n\n` +
                               `Mohon untuk dapat ditinjau dan di-ACC. Terima kasih. Jazakallahu khair.`
@@ -316,10 +282,10 @@ export default function LayananPage() {
                       </div>
                     </div>
 
-                    {/* Pilihan Fasilitas Ruang & Barang Inventaris (Proyektor + Papan Layar) */}
+                    {/* Pilihan Khusus Barang Inventaris Proyektor & Screen */}
                     <div>
                       <label className="block text-xs font-semibold text-stone-700 mb-1">
-                        Fasilitas Ruang / Barang Inventaris yang Dipinjam *
+                        Barang Inventaris yang Dipinjam *
                       </label>
                       <select
                         value={formData.facilityName}
@@ -331,42 +297,18 @@ export default function LayananPage() {
                         }
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
                       >
-                        <optgroup label="Barang Inventaris Masjid (Sesuai Ketentuan Takmir)">
-                          <option value="Paket Proyektor + Papan Layar (Screen)">
-                            Paket Proyektor (LCD) + Papan/Layar Proyektor (Tripod Screen)
-                          </option>
-                          <option value="Proyektor (LCD Projector)">
-                            Proyektor (LCD Projector Masjid)
-                          </option>
-                          <option value="Papan / Layar Proyektor (Tripod Screen)">
-                            Papan / Layar Proyektor (Tripod Screen Projector)
-                          </option>
-                        </optgroup>
-                        <optgroup label="Fasilitas Ruang Masjid">
-                          <option value="Aula Utama Serbaguna Lt 1">
-                            Aula Utama Serbaguna Lantai 1 (Kapasitas 300 org)
-                          </option>
-                          <option value="Ruang Rapat Takmir">
-                            Ruang Rapat Takmir Lantai 1 (Kapasitas 25 org)
-                          </option>
-                          <option value="Serambi Sayap Timur Lt 2">
-                            Serambi Sayap Timur Lantai 2 (Kajian / Tahsin)
-                          </option>
-                        </optgroup>
-                        <optgroup label="Paket Ruang + Proyektor & Layar">
-                          <option value="Aula Utama Lt 1 + Proyektor & Layar">
-                            Aula Utama Serbaguna + Proyektor &amp; Papan Layar
-                          </option>
-                          <option value="Ruang Rapat Takmir + Proyektor & Layar">
-                            Ruang Rapat Takmir + Proyektor &amp; Papan Layar
-                          </option>
-                          <option value="Sound System & Multimedia Lengkap">
-                            Sound System &amp; Fasilitas Multimedia Lengkap
-                          </option>
-                        </optgroup>
+                        <option value="Paket Proyektor + Papan Layar (Screen)">
+                          Paket Proyektor (LCD) + Papan/Layar Proyektor (Tripod Screen)
+                        </option>
+                        <option value="Proyektor (LCD Projector)">
+                          Proyektor (LCD Projector Masjid)
+                        </option>
+                        <option value="Papan / Layar Proyektor (Tripod Screen)">
+                          Papan / Layar Proyektor (Tripod Screen Projector)
+                        </option>
                       </select>
                       <p className="text-[11px] text-stone-500 mt-1">
-                        * Sesuai ketentuan takmir, barang inventaris yang diperbolehkan dipinjam khusus <strong>Proyektor (LCD)</strong> dan <strong>Papan / Layar Proyektor</strong>.
+                        * Layanan peminjaman saat ini dikhususkan untuk inventaris <strong>Proyektor (LCD)</strong> dan <strong>Papan / Layar Proyektor</strong> Masjid Kampus UMS.
                       </p>
                     </div>
 
@@ -446,7 +388,7 @@ export default function LayananPage() {
                         disabled={loading}
                         className="w-full text-center px-6 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] disabled:bg-stone-300 text-white font-bold text-sm shadow-md transition-colors cursor-pointer"
                       >
-                        {loading ? "Mengirim Permohonan..." : "Kirim Permohonan Izin Fasilitas & Inventaris"}
+                        {loading ? "Mengirim Permohonan..." : "Kirim Permohonan Peminjaman Proyektor & Layar"}
                       </button>
                     </div>
                   </form>
@@ -460,7 +402,7 @@ export default function LayananPage() {
               <div className="p-5 sm:p-6 rounded-3xl bg-[#FAF8F5] border border-stone-300/80 space-y-3 shadow-xs">
                 <h3 className="text-sm sm:text-base font-bold text-stone-900 flex items-center gap-2 font-serif">
                   <Info className="w-4 h-4 text-[#003B73]" />
-                  <span>Alur Peminjaman Masjid Kampus UMS</span>
+                  <span>Alur Peminjaman Proyektor &amp; Layar UMS</span>
                 </h3>
                 <div className="space-y-2.5 text-xs text-stone-700 leading-relaxed">
                   <div className="flex items-start gap-2.5">
@@ -498,15 +440,15 @@ export default function LayananPage() {
                 </div>
               </div>
 
-              {/* Ketentuan Peminjaman Ruang & Inventaris */}
+              {/* Ketentuan Peminjaman Proyektor & Layar */}
               <div className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200 space-y-2.5 shadow-sm">
                 <h3 className="text-sm sm:text-base font-bold text-stone-900 flex items-center gap-2 font-serif">
                   <GraduationCap className="w-4 h-4 text-[#B58A1E]" />
-                  <span>Ketentuan Penggunaan &amp; Peminjaman</span>
+                  <span>Ketentuan Peminjaman Proyektor &amp; Layar</span>
                 </h3>
                 <ul className="space-y-1.5 text-xs text-stone-600 leading-relaxed list-disc list-inside">
                   <li>
-                    <strong>Inventaris yang Boleh Dipinjam:</strong> Khusus inventaris barang, Takmir hanya mengizinkan <strong>Proyektor (LCD)</strong> dan <strong>Papan/Layar Proyektor</strong>.
+                    <strong>Inventaris yang Boleh Dipinjam:</strong> Khusus barang inventaris, Takmir hanya melayani peminjaman <strong>Proyektor (LCD)</strong> dan <strong>Papan/Layar Proyektor</strong>.
                   </li>
                   <li>
                     <strong>Tanggung Jawab Alat:</strong> Wajib menjaga keutuhan dan kebersihan proyektor serta mengembalikan tepat waktu setelah acara selesai.
@@ -567,10 +509,10 @@ export default function LayananPage() {
                   <span>Sinkronisasi Transparan &amp; Aman</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-serif">
-                  Jadwal Peminjaman Terverifikasi
+                  Jadwal Peminjaman Proyektor Terverifikasi
                 </h2>
                 <p className="text-xs sm:text-sm text-stone-600 mt-1 max-w-2xl">
-                  Pantau ketersediaan ruang aula dan inventaris proyektor secara aman tanpa mengekspos isi surat permohonan atau privasi kontak pemohon.
+                  Pantau ketersediaan inventaris proyektor dan layar secara aman tanpa mengekspos isi surat permohonan atau privasi kontak pemohon.
                 </p>
               </div>
 
@@ -618,7 +560,7 @@ export default function LayananPage() {
                 <Calendar className="w-12 h-12 text-stone-300 mx-auto mb-3" />
                 <h4 className="text-sm font-bold text-stone-800">Belum Ada Jadwal Pada Kategori Ini</h4>
                 <p className="text-xs text-stone-500 mt-1">
-                  Seluruh tanggal masih terbuka untuk diajukan peminjaman ruang atau proyektor.
+                  Seluruh tanggal masih terbuka untuk diajukan peminjaman proyektor atau layar.
                 </p>
               </div>
             ) : (
