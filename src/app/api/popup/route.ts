@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import { getDb, saveDb } from "@/lib/db";
-import { PopupBanner } from "@/lib/types";
+import { PopupBanner, isPopupExpired } from "@/lib/types";
 import { isBlobConfigured, readPopupsFromBlob, savePopupsToBlob } from "@/lib/blobStorage";
 import { POST as adminPost, PATCH as adminPatch, DELETE as adminDelete } from "@/app/api/admin/popup/route";
 
@@ -53,7 +53,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const filteredPopups = isAdminQuery ? allPopups : allPopups.filter((p) => p.isActive);
+    const filteredPopups = isAdminQuery
+      ? allPopups
+      : allPopups.filter((p) => p.isActive && !isPopupExpired(p));
     const primaryPopup = filteredPopups[0] || null;
 
     return NextResponse.json(

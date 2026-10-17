@@ -104,6 +104,90 @@ export interface PopupBanner {
   aiReasoning?: string;
   isActive: boolean;
   updatedAt: string;
+  startDate?: string;
+  expiresAt?: string | null;
+  durationDays?: number | null;
+  linkedAgendaId?: string;
+  linkedAgendaTitle?: string;
+}
+
+export function isPopupExpired(popup: { expiresAt?: string | null } | null | undefined): boolean {
+  if (!popup || !popup.expiresAt) return false;
+  const expiryTime = new Date(popup.expiresAt).getTime();
+  if (isNaN(expiryTime)) return false;
+  return Date.now() > expiryTime;
+}
+
+export function getPopupRemainingTime(popup: { expiresAt?: string | null } | null | undefined): {
+  isExpired: boolean;
+  isUnlimited: boolean;
+  label: string;
+  shortLabel: string;
+  days: number;
+  hours: number;
+  minutes: number;
+} {
+  if (!popup || !popup.expiresAt) {
+    return {
+      isExpired: false,
+      isUnlimited: true,
+      label: "Tayang tanpa batas waktu",
+      shortLabel: "Tanpa Batas",
+      days: 0,
+      hours: 0,
+      minutes: 0,
+    };
+  }
+
+  const expiryTime = new Date(popup.expiresAt).getTime();
+  if (isNaN(expiryTime)) {
+    return {
+      isExpired: false,
+      isUnlimited: true,
+      label: "Tayang tanpa batas waktu",
+      shortLabel: "Tanpa Batas",
+      days: 0,
+      hours: 0,
+      minutes: 0,
+    };
+  }
+
+  const diffMs = expiryTime - Date.now();
+  if (diffMs <= 0) {
+    return {
+      isExpired: true,
+      isUnlimited: false,
+      label: "Masa tayang telah selesai (Kedaluwarsa)",
+      shortLabel: "Kedaluwarsa",
+      days: 0,
+      hours: 0,
+      minutes: 0,
+    };
+  }
+
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const minutes = totalMinutes % 60;
+
+  let timeString = "";
+  if (days > 0) {
+    timeString = `${days} hari ${hours} jam`;
+  } else if (hours > 0) {
+    timeString = `${hours} jam ${minutes} menit`;
+  } else {
+    timeString = `${Math.max(1, minutes)} menit`;
+  }
+
+  return {
+    isExpired: false,
+    isUnlimited: false,
+    label: `Sisa waktu: ${timeString}`,
+    shortLabel: `${timeString} lagi`,
+    days,
+    hours,
+    minutes,
+  };
 }
 
 export type TransactionType = "INCOME" | "EXPENSE";

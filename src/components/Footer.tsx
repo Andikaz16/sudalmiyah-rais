@@ -190,9 +190,9 @@ export default function Footer() {
             Hak Cipta © 2026 Masjid Kampus - Universitas Muhammadiyah Surakarta. Seluruh Hak Dilindungi.
           </div>
           <div className="flex items-center gap-4 text-[11px] text-stone-300">
-            <span>Integritas</span>
-            <span>Syariah</span>
-            <span>Berkemajuan</span>
+            <span>Jama&apos;ah</span>
+            <span>Jam&apos;iyah</span>
+            <span>Jariyah</span>
             <span className="text-stone-500">•</span>
             <Link href="/auth/login" className="hover:text-amber-300 transition-colors">
               Akses Takmir

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
-import { PopupBanner } from "@/lib/types";
+import { PopupBanner, isPopupExpired } from "@/lib/types";
 
 export const POPUP_CACHE_KEY = "sudalmiyah_popup_cache";
 
@@ -25,11 +25,11 @@ export default function AnnouncementPopup() {
       if (rawCache) {
         const parsed = JSON.parse(rawCache);
         if (Array.isArray(parsed.popups) && parsed.popups.length > 0) {
-          const list = parsed.popups.filter((p: PopupBanner) => p && p.isActive);
+          const list = parsed.popups.filter((p: PopupBanner) => p && p.isActive && !isPopupExpired(p));
           sessionActivePopups = list;
           return list;
         }
-        if (parsed.popup && parsed.popup.isActive) {
+        if (parsed.popup && parsed.popup.isActive && !isPopupExpired(parsed.popup)) {
           const list = [parsed.popup];
           sessionActivePopups = list;
           return list;
@@ -65,8 +65,8 @@ export default function AnnouncementPopup() {
           const data = await res.json();
           let serverList: PopupBanner[] = [];
           if (Array.isArray(data.popups) && data.popups.length > 0) {
-            serverList = data.popups.filter((p: PopupBanner) => p.isActive);
-          } else if (data.popup && data.popup.isActive) {
+            serverList = data.popups.filter((p: PopupBanner) => p.isActive && !isPopupExpired(p));
+          } else if (data.popup && data.popup.isActive && !isPopupExpired(data.popup)) {
             serverList = [data.popup];
           }
 
@@ -78,9 +78,9 @@ export default function AnnouncementPopup() {
               const parsed = JSON.parse(rawCache);
               const hasCachedPopups = Array.isArray(parsed.popups) && parsed.popups.length > 0;
               if (hasCachedPopups && !parsed.explicitlyDeleted) {
-                // Keep local cache
+                // Keep local cache if not expired
                 if (!sessionDismissed) {
-                  const kept = parsed.popups.filter((p: PopupBanner) => p && p.isActive);
+                  const kept = parsed.popups.filter((p: PopupBanner) => p && p.isActive && !isPopupExpired(p));
                   setPopups(kept);
                   sessionActivePopups = kept;
                 }

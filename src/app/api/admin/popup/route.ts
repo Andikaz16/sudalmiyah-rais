@@ -121,8 +121,19 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File | null;
     const rawTargetUrl = formData.get("targetUrl");
     const rawReplaceId = formData.get("replaceId");
+    const rawExpiresAt = formData.get("expiresAt");
+    const rawStartDate = formData.get("startDate");
+    const rawDurationDays = formData.get("durationDays");
+    const rawLinkedAgendaId = formData.get("linkedAgendaId");
+    const rawLinkedAgendaTitle = formData.get("linkedAgendaTitle");
+
     const manualTargetUrl = typeof rawTargetUrl === "string" ? rawTargetUrl.trim() : "";
     const replaceId = typeof rawReplaceId === "string" ? rawReplaceId.trim() : "";
+    const expiresAt = typeof rawExpiresAt === "string" && rawExpiresAt.trim() ? rawExpiresAt.trim() : null;
+    const startDate = typeof rawStartDate === "string" && rawStartDate.trim() ? rawStartDate.trim() : new Date().toISOString();
+    const durationDays = rawDurationDays ? Number(rawDurationDays) : null;
+    const linkedAgendaId = typeof rawLinkedAgendaId === "string" && rawLinkedAgendaId.trim() ? rawLinkedAgendaId.trim() : undefined;
+    const linkedAgendaTitle = typeof rawLinkedAgendaTitle === "string" && rawLinkedAgendaTitle.trim() ? rawLinkedAgendaTitle.trim() : undefined;
 
     if (!file) {
       return NextResponse.json({ error: "Berkas gambar pop-up tidak ditemukan." }, { status: 400 });
@@ -204,6 +215,11 @@ export async function POST(request: NextRequest) {
       targetUrl: manualTargetUrl,
       isActive: true,
       updatedAt: new Date().toISOString(),
+      startDate,
+      expiresAt,
+      durationDays,
+      linkedAgendaId,
+      linkedAgendaTitle,
     };
 
     let updatedList: PopupBanner[];
@@ -214,6 +230,11 @@ export async function POST(request: NextRequest) {
               ...p,
               imageUrl: finalImageUrl,
               targetUrl: manualTargetUrl !== "" ? manualTargetUrl : p.targetUrl,
+              expiresAt: expiresAt !== undefined ? expiresAt : p.expiresAt,
+              startDate: startDate !== undefined ? startDate : p.startDate,
+              durationDays: durationDays !== undefined ? durationDays : p.durationDays,
+              linkedAgendaId: linkedAgendaId !== undefined ? linkedAgendaId : p.linkedAgendaId,
+              linkedAgendaTitle: linkedAgendaTitle !== undefined ? linkedAgendaTitle : p.linkedAgendaTitle,
               updatedAt: popupRecord.updatedAt,
             }
           : p
@@ -333,6 +354,11 @@ export async function PATCH(request: NextRequest) {
           body.title !== undefined && typeof body.title === "string"
             ? body.title.trim()
             : item.title,
+        startDate: body.startDate !== undefined ? body.startDate : item.startDate,
+        expiresAt: body.expiresAt !== undefined ? (body.expiresAt || null) : item.expiresAt,
+        durationDays: body.durationDays !== undefined ? body.durationDays : item.durationDays,
+        linkedAgendaId: body.linkedAgendaId !== undefined ? body.linkedAgendaId : item.linkedAgendaId,
+        linkedAgendaTitle: body.linkedAgendaTitle !== undefined ? body.linkedAgendaTitle : item.linkedAgendaTitle,
         updatedAt: nowIso,
       };
     });

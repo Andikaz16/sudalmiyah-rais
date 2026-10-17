@@ -371,7 +371,7 @@ export default function SejarahPage() {
 
                   <div className="pt-2">
                     <h3 className="font-serif font-bold text-stone-900 text-lg sm:text-xl text-[#003B73]">
-                      Mandat Resmi Masjid Percontohan Nasional AUM
+                      Mandat Resmi Masjid Percontohan Nasional LPCR-PM
                     </h3>
                     <p className="mt-2">
                       Melalui <strong>Surat Keputusan LPCR-PM Pimpinan Pusat Muhammadiyah No. 198/KEP/I.15/A/2026</strong>, 
@@ -389,7 +389,7 @@ export default function SejarahPage() {
                         Ramah Aktivis
                       </span>
                       <p className="text-[11px] text-stone-600 leading-snug">
-                        Menjadi markas dakwah terbuka bagi kader persyarikatan, IMM, Tapak Suci, HW, dan pembinaan AIK.
+                        Menjadi markas dakwah terbuka bagi kader persyarikatan, IMM, Tapak Suci, HW, ORMAWA, UKM, dan pembinaan AIK.
                       </p>
                     </div>
                     <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">

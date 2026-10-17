@@ -29,6 +29,9 @@ import {
   Download,
   Plus,
   Edit2,
+  Hourglass,
+  Timer,
+  RotateCcw,
 } from "lucide-react";
 import {
   Agenda,
@@ -41,6 +44,8 @@ import {
   PopupBanner,
   DownloadDocument,
   DocumentCategory,
+  isPopupExpired,
+  getPopupRemainingTime,
 } from "@/lib/types";
 
 const ADMIN_MOSQUES = [
@@ -49,7 +54,7 @@ const ADMIN_MOSQUES = [
   { id: "mas-mansur", name: "Masjid KH. Mas Mansur", location: "Kampus 4 UMS (Pesma)" },
   { id: "mahad-abu-bakar", name: "Masjid Ma'had Abu Bakar", location: "Kampus 2 UMS" },
   { id: "ar-razi", name: "Masjid Ar-Razi FKG", location: "Kampus 4 UMS (FKG)" },
-  { id: "munajat-shabran", name: "Masjid Munajat Shabran", location: "Makamhaji (Pondok Shabran)" },
+  { id: "munajat-shabran", name: "Masjid Al-Munajat Pondok Shabran", location: "Makamhaji (Pondok Shabran)" },
 ];
 
 const DOCUMENT_CATEGORIES: { value: DocumentCategory; label: string }[] = [
@@ -144,6 +149,112 @@ export default function AdminDashboardPage() {
   const [popupTitle, setPopupTitle] = useState("");
   const [popupSaveSuccess, setPopupSaveSuccess] = useState(false);
   const [savedPopupId, setSavedPopupId] = useState<string | null>(null);
+
+  // Pop-up Duration Settings for New Upload
+  const [uploadDurationType, setUploadDurationType] = useState<
+    "UNLIMITED" | "1_DAY" | "3_DAYS" | "7_DAYS" | "14_DAYS" | "30_DAYS" | "AGENDA" | "CUSTOM"
+  >("UNLIMITED");
+  const [uploadCustomDate, setUploadCustomDate] = useState<string>("");
+  const [uploadAgendaId, setUploadAgendaId] = useState<string>("");
+
+  const formatIndoDateTime = (dateStr?: string | null): string => {
+    if (!dateStr) return "-";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "-";
+    return (
+      d.toLocaleDateString("id-ID", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }) + " WIB"
+    );
+  };
+
+  const toDatetimeLocal = (dateStr?: string | null): string => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const year = d.getFullYear();
+    const month = pad(d.getMonth() + 1);
+    const day = pad(d.getDate());
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  const calculateExpiresAt = (
+    type: string,
+    customDateTime?: string,
+    agendaId?: string
+  ): {
+    expiresAt: string | null;
+    durationDays: number | null;
+    linkedAgendaId?: string;
+    linkedAgendaTitle?: string;
+  } => {
+    const now = Date.now();
+    if (type === "UNLIMITED") {
+      return { expiresAt: null, durationDays: null };
+    }
+    if (type === "1_DAY") {
+      return { expiresAt: new Date(now + 1 * 86400000).toISOString(), durationDays: 1 };
+    }
+    if (type === "3_DAYS") {
+      return { expiresAt: new Date(now + 3 * 86400000).toISOString(), durationDays: 3 };
+    }
+    if (type === "7_DAYS") {
+      return { expiresAt: new Date(now + 7 * 86400000).toISOString(), durationDays: 7 };
+    }
+    if (type === "14_DAYS") {
+      return { expiresAt: new Date(now + 14 * 86400000).toISOString(), durationDays: 14 };
+    }
+    if (type === "30_DAYS") {
+      return { expiresAt: new Date(now + 30 * 86400000).toISOString(), durationDays: 30 };
+    }
+    if (type === "AGENDA" && agendaId) {
+      const selected = agendas.find((a) => a.id === agendaId);
+      if (selected && selected.date) {
+        let targetIso = "";
+        try {
+          const parts = selected.date.split("-");
+          if (parts.length === 3) {
+            const endOfDay = new Date(
+              Number(parts[0]),
+              Number(parts[1]) - 1,
+              Number(parts[2]),
+              23,
+              59,
+              59
+            );
+            targetIso = endOfDay.toISOString();
+          } else {
+            const parsed = new Date(selected.date);
+            parsed.setHours(23, 59, 59);
+            targetIso = parsed.toISOString();
+          }
+        } catch {
+          targetIso = new Date(now + 3 * 86400000).toISOString();
+        }
+        return {
+          expiresAt: targetIso,
+          durationDays: null,
+          linkedAgendaId: selected.id,
+          linkedAgendaTitle: selected.title,
+        };
+      }
+    }
+    if (type === "CUSTOM" && customDateTime) {
+      const parsed = new Date(customDateTime);
+      if (!isNaN(parsed.getTime())) {
+        return { expiresAt: parsed.toISOString(), durationDays: null };
+      }
+    }
+    return { expiresAt: null, durationDays: null };
+  };
 
   // Document Management State
   const [documents, setDocuments] = useState<DownloadDocument[]>([]);
@@ -616,8 +727,26 @@ export default function AdminDashboardPage() {
       if (replaceId) {
         fd.append("replaceId", replaceId);
       }
-      // Never attach automatic URLs when uploading a new poster.
-      // Every new poster begins with targetUrl: "" (pure display poster).
+
+      const durationConfig = calculateExpiresAt(
+        uploadDurationType,
+        uploadCustomDate,
+        uploadAgendaId
+      );
+
+      if (durationConfig.expiresAt) {
+        fd.append("expiresAt", durationConfig.expiresAt);
+      }
+      if (durationConfig.durationDays !== null && durationConfig.durationDays !== undefined) {
+        fd.append("durationDays", String(durationConfig.durationDays));
+      }
+      if (durationConfig.linkedAgendaId) {
+        fd.append("linkedAgendaId", durationConfig.linkedAgendaId);
+      }
+      if (durationConfig.linkedAgendaTitle) {
+        fd.append("linkedAgendaTitle", durationConfig.linkedAgendaTitle);
+      }
+      fd.append("startDate", new Date().toISOString());
 
       const res = await fetch("/api/popup", {
         method: "POST",
@@ -662,6 +791,11 @@ export default function AdminDashboardPage() {
           imageUrl: target.imageUrl,
           title: target.title,
           targetUrl: target.targetUrl,
+          expiresAt: target.expiresAt,
+          startDate: target.startDate,
+          durationDays: target.durationDays,
+          linkedAgendaId: target.linkedAgendaId,
+          linkedAgendaTitle: target.linkedAgendaTitle,
         }),
       });
       const data = await res.json();
@@ -679,11 +813,19 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Save popup settings (optional targetUrl)
+  // Save popup settings (targetUrl, duration, expiresAt, etc.)
   const handleSavePopupSettings = async (
     e?: React.FormEvent,
     id?: string,
-    customUrl?: string
+    updates?: {
+      targetUrl?: string;
+      expiresAt?: string | null;
+      startDate?: string;
+      durationDays?: number | null;
+      linkedAgendaId?: string;
+      linkedAgendaTitle?: string;
+      isActive?: boolean;
+    }
   ) => {
     if (e && e.preventDefault) e.preventDefault();
     const targetId = id || popupBanner?.id;
@@ -692,16 +834,35 @@ export default function AdminDashboardPage() {
     setSavingPopup(true);
     setPopupSaveSuccess(false);
     try {
-      const urlToSave = customUrl !== undefined ? customUrl : popupTargetUrl;
+      const urlToSave =
+        updates?.targetUrl !== undefined
+          ? updates.targetUrl
+          : popupTargetUrl !== undefined && popupTargetUrl !== ""
+          ? popupTargetUrl
+          : currentItem?.targetUrl || "";
+
+      const expiresAtToSave =
+        updates !== undefined && "expiresAt" in updates
+          ? updates.expiresAt
+          : currentItem?.expiresAt;
+
+      const isActiveToSave =
+        updates?.isActive !== undefined ? updates.isActive : currentItem?.isActive;
+
       const res = await fetch("/api/popup", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: targetId,
-          targetUrl: urlToSave.trim(),
+          targetUrl: typeof urlToSave === "string" ? urlToSave.trim() : "",
           imageUrl: currentItem?.imageUrl,
           title: currentItem?.title,
-          isActive: currentItem?.isActive,
+          isActive: isActiveToSave,
+          expiresAt: expiresAtToSave,
+          startDate: updates?.startDate !== undefined ? updates.startDate : currentItem?.startDate,
+          durationDays: updates?.durationDays !== undefined ? updates.durationDays : currentItem?.durationDays,
+          linkedAgendaId: updates?.linkedAgendaId !== undefined ? updates.linkedAgendaId : currentItem?.linkedAgendaId,
+          linkedAgendaTitle: updates?.linkedAgendaTitle !== undefined ? updates.linkedAgendaTitle : currentItem?.linkedAgendaTitle,
         }),
       });
       const data = await res.json();
@@ -710,12 +871,27 @@ export default function AdminDashboardPage() {
         Array.isArray(data.popups) && data.popups.length > 0
           ? data.popups
           : popupBanners.map((p) =>
-              p.id === targetId ? { ...p, targetUrl: urlToSave.trim() } : p
+              p.id === targetId
+                ? {
+                    ...p,
+                    targetUrl: typeof urlToSave === "string" ? urlToSave.trim() : p.targetUrl,
+                    expiresAt: expiresAtToSave,
+                    isActive: isActiveToSave !== undefined ? isActiveToSave : p.isActive,
+                  }
+                : p
             );
 
       // Guard: ensure targetId is never dropped
       if (!updatedList.some((p) => p.id === targetId) && currentItem) {
-        updatedList = [{ ...currentItem, targetUrl: urlToSave.trim() }, ...updatedList];
+        updatedList = [
+          {
+            ...currentItem,
+            targetUrl: typeof urlToSave === "string" ? urlToSave.trim() : currentItem.targetUrl,
+            expiresAt: expiresAtToSave,
+            isActive: isActiveToSave !== undefined ? isActiveToSave : currentItem.isActive,
+          },
+          ...updatedList,
+        ];
       }
 
       const primary = updatedList[0] || null;
@@ -733,6 +909,45 @@ export default function AdminDashboardPage() {
     } finally {
       setSavingPopup(false);
     }
+  };
+
+  // Quick extend duration (adds days to current expiry or from now if already expired)
+  const handleQuickExtend = async (id: string, additionalDays: number) => {
+    const item = popupBanners.find((p) => p.id === id) || popupBanner;
+    if (!item) return;
+    const now = Date.now();
+    let baseTime = now;
+    if (item.expiresAt) {
+      const currentExpiry = new Date(item.expiresAt).getTime();
+      if (!isNaN(currentExpiry) && currentExpiry > now) {
+        baseTime = currentExpiry;
+      }
+    }
+    const newExpiresAt = new Date(baseTime + additionalDays * 86400000).toISOString();
+    await handleSavePopupSettings(undefined, id, {
+      expiresAt: newExpiresAt,
+      isActive: true,
+      durationDays: additionalDays,
+      linkedAgendaId: undefined,
+      linkedAgendaTitle: undefined,
+    });
+  };
+
+  // Quick set duration preset or clear expiry
+  const handleQuickSetDuration = async (
+    id: string,
+    type: string,
+    customDate?: string,
+    agendaId?: string
+  ) => {
+    const config = calculateExpiresAt(type, customDate, agendaId);
+    await handleSavePopupSettings(undefined, id, {
+      expiresAt: config.expiresAt,
+      isActive: true,
+      durationDays: config.durationDays,
+      linkedAgendaId: config.linkedAgendaId,
+      linkedAgendaTitle: config.linkedAgendaTitle,
+    });
   };
 
   // Delete popup banner
@@ -2073,15 +2288,142 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Column: Upload New Banner */}
+              {/* Left Column: Upload New Banner with Duration */}
               <div className="lg:col-span-5 space-y-4">
                 <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-sm space-y-4">
                   <h3 className="text-sm font-bold text-stone-900 font-serif">
                     Unggah Poster / Banner Baru
                   </h3>
                   <p className="text-xs text-stone-500 leading-relaxed">
-                    Pilih berkas gambar poster pengumuman yang ingin ditampilkan pada pop-up beranda. Setelah diunggah, pop-up akan langsung tayang dan Anda dapat mengatur URL tujuan (opsional) di sebelah kanan.
+                    Pilih poster pengumuman yang ingin ditampilkan sebagai pop-up di beranda. Anda dapat menentukan masa tayang otomatis (misal: 1 hari, hingga agenda selesai, atau tanggal kustom).
                   </p>
+
+                  {/* Pengaturan Durasi Sebelum Unggah */}
+                  <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
+                        <Timer className="w-3.5 h-3.5 text-[#003B73]" />
+                        Atur Durasi Tayang:
+                      </span>
+                      <span className="text-[10px] font-semibold text-[#003B73] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        {uploadDurationType === "UNLIMITED" && "Tanpa Batas"}
+                        {uploadDurationType === "1_DAY" && "1 Hari (24 Jam)"}
+                        {uploadDurationType === "3_DAYS" && "3 Hari"}
+                        {uploadDurationType === "7_DAYS" && "7 Hari (1 Pekan)"}
+                        {uploadDurationType === "AGENDA" && "Selesai Ikut Agenda"}
+                        {uploadDurationType === "CUSTOM" && "Kustom Tanggal"}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-1.5 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setUploadDurationType("UNLIMITED")}
+                        className={`px-2 py-1.5 rounded-xl font-semibold text-[11px] transition-all cursor-pointer border text-center ${
+                          uploadDurationType === "UNLIMITED"
+                            ? "bg-[#003B73] text-white border-[#003B73] shadow-xs"
+                            : "bg-white text-stone-700 border-stone-200 hover:bg-stone-50"
+                        }`}
+                      >
+                        Tanpa Batas
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUploadDurationType("1_DAY")}
+                        className={`px-2 py-1.5 rounded-xl font-semibold text-[11px] transition-all cursor-pointer border text-center ${
+                          uploadDurationType === "1_DAY"
+                            ? "bg-[#003B73] text-white border-[#003B73] shadow-xs"
+                            : "bg-white text-stone-700 border-stone-200 hover:bg-stone-50"
+                        }`}
+                      >
+                        1 Hari
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUploadDurationType("3_DAYS")}
+                        className={`px-2 py-1.5 rounded-xl font-semibold text-[11px] transition-all cursor-pointer border text-center ${
+                          uploadDurationType === "3_DAYS"
+                            ? "bg-[#003B73] text-white border-[#003B73] shadow-xs"
+                            : "bg-white text-stone-700 border-stone-200 hover:bg-stone-50"
+                        }`}
+                      >
+                        3 Hari
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUploadDurationType("7_DAYS")}
+                        className={`px-2 py-1.5 rounded-xl font-semibold text-[11px] transition-all cursor-pointer border text-center ${
+                          uploadDurationType === "7_DAYS"
+                            ? "bg-[#003B73] text-white border-[#003B73] shadow-xs"
+                            : "bg-white text-stone-700 border-stone-200 hover:bg-stone-50"
+                        }`}
+                      >
+                        7 Hari
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUploadDurationType("AGENDA")}
+                        className={`px-2 py-1.5 rounded-xl font-semibold text-[11px] transition-all cursor-pointer border text-center ${
+                          uploadDurationType === "AGENDA"
+                            ? "bg-[#003B73] text-white border-[#003B73] shadow-xs"
+                            : "bg-white text-stone-700 border-stone-200 hover:bg-stone-50"
+                        }`}
+                      >
+                        Ikut Agenda
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUploadDurationType("CUSTOM")}
+                        className={`px-2 py-1.5 rounded-xl font-semibold text-[11px] transition-all cursor-pointer border text-center ${
+                          uploadDurationType === "CUSTOM"
+                            ? "bg-[#003B73] text-white border-[#003B73] shadow-xs"
+                            : "bg-white text-stone-700 border-stone-200 hover:bg-stone-50"
+                        }`}
+                      >
+                        Kustom
+                      </button>
+                    </div>
+
+                    {uploadDurationType === "AGENDA" && (
+                      <div className="space-y-1.5 pt-1 animate-fade-in">
+                        <label className="block text-[11px] font-semibold text-stone-700">
+                          Pilih Agenda Masjid yang Bersangkutan:
+                        </label>
+                        <select
+                          value={uploadAgendaId}
+                          onChange={(e) => setUploadAgendaId(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-xs text-stone-900 focus:ring-2 focus:ring-[#003B73]"
+                        >
+                          <option value="">-- Pilih Agenda --</option>
+                          {agendas.map((ag) => (
+                            <option key={ag.id} value={ag.id}>
+                              {ag.title} ({ag.date})
+                            </option>
+                          ))}
+                        </select>
+                        <p className="text-[10px] text-stone-500 leading-snug">
+                          Pop-up akan otomatis berhenti tayang pada pukul 23:59 WIB di hari agenda tersebut selesai.
+                        </p>
+                      </div>
+                    )}
+
+                    {uploadDurationType === "CUSTOM" && (
+                      <div className="space-y-1.5 pt-1 animate-fade-in">
+                        <label className="block text-[11px] font-semibold text-stone-700">
+                          Tanggal &amp; Waktu Berakhir:
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={uploadCustomDate}
+                          onChange={(e) => setUploadCustomDate(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-xs text-stone-900 font-mono focus:ring-2 focus:ring-[#003B73]"
+                        />
+                        <p className="text-[10px] text-stone-500 leading-snug">
+                          Pilih tanggal dan jam persis kapan pop-up otomatis ditutup dan tidak tayang di beranda.
+                        </p>
+                      </div>
+                    )}
+                  </div>
 
                   <label className="relative border-2 border-dashed border-stone-300 hover:border-[#003B73] rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors bg-stone-50/60 hover:bg-stone-50 group">
                     <div className="w-12 h-12 rounded-full bg-blue-50 text-[#003B73] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
@@ -2112,157 +2454,348 @@ export default function AdminDashboardPage() {
                   <div className="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-100 text-xs text-blue-950 space-y-1">
                     <span className="font-bold block">Ketentuan Pop-up:</span>
                     <p className="text-[11px] text-stone-600">
-                      Jika admin tidak mengunggah gambar pop-up atau menonaktifkannya, maka tidak ada pop-up pengumuman yang muncul di halaman beranda. Tautan URL bersifat opsional (tidak wajib).
+                      Jika admin tidak mengunggah gambar pop-up, menonaktifkannya, atau durasinya telah habis (kedaluwarsa), maka pop-up pengumuman otomatis tidak muncul di halaman beranda publik.
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Right Column: Active Banners Preview & Settings */}
+              {/* Right Column: Active Banners Preview, Expiration Status & Settings */}
               <div className="lg:col-span-7 space-y-6">
                 {popupBanners.length > 0 ? (
-                  popupBanners.map((item, idx) => (
-                    <div
-                      key={item.id}
-                      className="p-6 rounded-3xl bg-white border border-stone-200 shadow-sm space-y-5"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-full bg-[#003B73] text-white flex items-center justify-center text-xs font-bold font-mono">
-                            {idx + 1}
-                          </span>
-                          <div>
-                            <h3 className="text-sm font-bold text-stone-900 font-serif">
-                              Pop-up #{idx + 1}{" "}
-                              <span className="text-xs font-normal text-stone-500">
-                                {idx === 0
-                                  ? "(Tampil Paling Depan)"
-                                  : "(Lapisan Kedua - Tampil Setelah Pop-up 1 Ditutup)"}
-                              </span>
-                            </h3>
-                            <p className="text-[11px] text-stone-400">
-                              Diperbarui pada {new Date(item.updatedAt).toLocaleString("id-ID")}
-                            </p>
-                          </div>
-                        </div>
+                  popupBanners.map((item, idx) => {
+                    const remaining = getPopupRemainingTime(item);
+                    const isExpired = isPopupExpired(item);
 
-                        <div className="flex items-center gap-2 self-start sm:self-auto">
-                          <button
-                            type="button"
-                            onClick={() => handleTogglePopupActive(item.id)}
-                            className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
-                              item.isActive
-                                ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-                                : "bg-stone-200 text-stone-600 hover:bg-stone-300"
-                            }`}
-                          >
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                item.isActive ? "bg-emerald-600 animate-pulse" : "bg-stone-400"
-                              }`}
-                            />
-                            <span>{item.isActive ? "Tayang di Beranda" : "Dinonaktifkan"}</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleDeletePopup(item.id)}
-                            className="p-1.5 rounded-full hover:bg-rose-50 text-rose-600 transition-colors cursor-pointer"
-                            title="Hapus Pop-up ini"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Banner Image Preview Container */}
-                      <div className="relative rounded-2xl overflow-hidden bg-stone-900/10 border border-stone-200 shadow-inner flex items-center justify-center p-4">
-                        <div className="relative inline-block rounded-2xl overflow-hidden shadow-xl bg-white border border-stone-200">
-                          <span className="absolute top-2 right-2 z-10 w-6 h-6 bg-white/95 text-stone-900 border border-stone-800 flex items-center justify-center text-xs font-bold shadow-xs rounded-sm">
-                            &times;
-                          </span>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={item.imageUrl}
-                            alt={`Poster Pop-up #${idx + 1}`}
-                            className="block w-auto h-auto max-h-72 object-contain"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Settings Form for Optional Target Link */}
-                      <form
-                        key={`popup-form-${item.id}-${item.targetUrl || "none"}`}
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          const inputEl = e.currentTarget.elements.namedItem(
-                            `url-${item.id}`
-                          ) as HTMLInputElement;
-                          handleSavePopupSettings(e, item.id, inputEl?.value || "");
-                        }}
-                        className="space-y-3 pt-2 border-t border-stone-100"
+                    return (
+                      <div
+                        key={item.id}
+                        className={`p-6 rounded-3xl bg-white border shadow-sm space-y-5 transition-all ${
+                          isExpired ? "border-rose-200 bg-rose-50/10" : "border-stone-200"
+                        }`}
                       >
-                        <div>
-                          <div className="flex items-center justify-between gap-2 mb-1">
-                            <label className="block text-xs font-semibold text-stone-700">
-                              Tautan / URL Tujuan Pop-up #{idx + 1}{" "}
-                              <span className="text-stone-400 font-normal">(Opsional / Tidak Wajib)</span>
-                            </label>
-                            {item.targetUrl ? (
-                              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 truncate max-w-[200px]" title={item.targetUrl}>
-                                Link: {item.targetUrl}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-full bg-[#003B73] text-white flex items-center justify-center text-xs font-bold font-mono">
+                              {idx + 1}
+                            </span>
+                            <div>
+                              <h3 className="text-sm font-bold text-stone-900 font-serif">
+                                Pop-up #{idx + 1}{" "}
+                                <span className="text-xs font-normal text-stone-500">
+                                  {idx === 0
+                                    ? "(Tampil Paling Depan)"
+                                    : "(Lapisan Kedua - Tampil Setelah Pop-up 1 Ditutup)"}
+                                </span>
+                              </h3>
+                              <p className="text-[11px] text-stone-400">
+                                Diperbarui pada {new Date(item.updatedAt).toLocaleString("id-ID")}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                            {isExpired ? (
+                              <span className="px-3 py-1.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200 flex items-center gap-1.5 shadow-xs">
+                                <Hourglass className="w-3.5 h-3.5 text-rose-600" />
+                                <span>Kedaluwarsa (Selesai Otomatis)</span>
                               </span>
                             ) : (
-                              <span className="text-[10px] font-semibold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md border border-stone-200">
-                                Tanpa Link (Hanya Gambar)
-                              </span>
-                            )}
-                          </div>
-                          <input
-                            type="text"
-                            name={`url-${item.id}`}
-                            defaultValue={item.targetUrl || ""}
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono focus:ring-2 focus:ring-[#003B73]"
-                            placeholder="Biarkan kosong jika hanya gambar poster (tidak mengarah ke web)"
-                          />
-                          <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
-                            Biarkan kosong agar pop-up hanya berupa gambar poster tanpa link. Jika ingin mengarahkan ke link luar, isi contoh: <span className="font-mono text-stone-700">https://wa.me/...</span> atau link lainnya.
-                          </p>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
-                          <div className="flex items-center gap-2">
-                            {(popupSaveSuccess || savedPopupId === item.id) && (
-                              <span className="text-xs font-bold text-emerald-600 flex items-center gap-1 animate-fade-in">
-                                <CheckCircle2 className="w-4 h-4" />
-                                <span>Pengaturan tersimpan!</span>
-                              </span>
-                            )}
-                            {item.targetUrl && (
                               <button
                                 type="button"
-                                disabled={savingPopup}
-                                onClick={(e) => handleSavePopupSettings(e, item.id, "")}
-                                className="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold border border-rose-200 transition-colors cursor-pointer"
-                                title="Hapus tautan dari pop-up ini agar murni hanya gambar"
+                                onClick={() => handleTogglePopupActive(item.id)}
+                                className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
+                                  item.isActive
+                                    ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
+                                    : "bg-stone-200 text-stone-600 hover:bg-stone-300"
+                                }`}
                               >
-                                Kosongkan Tautan
+                                <span
+                                  className={`w-1.5 h-1.5 rounded-full ${
+                                    item.isActive ? "bg-emerald-600 animate-pulse" : "bg-stone-400"
+                                  }`}
+                                />
+                                <span>{item.isActive ? "Tayang di Beranda" : "Dinonaktifkan"}</span>
                               </button>
                             )}
-                          </div>
-                          <div className="ml-auto">
+
                             <button
-                              type="submit"
-                              disabled={savingPopup}
-                              className="px-5 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md disabled:opacity-50 cursor-pointer"
+                              type="button"
+                              onClick={() => handleDeletePopup(item.id)}
+                              className="p-1.5 rounded-full hover:bg-rose-50 text-rose-600 transition-colors cursor-pointer"
+                              title="Hapus Pop-up ini"
                             >
-                              {savingPopup ? "Menyimpan..." : "Simpan Tautan Pop-up"}
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
-                      </form>
-                    </div>
-                  ))
+
+                        {/* Banner Image Preview Container */}
+                        <div className="relative rounded-2xl overflow-hidden bg-stone-900/10 border border-stone-200 shadow-inner flex items-center justify-center p-4">
+                          <div className="relative inline-block rounded-2xl overflow-hidden shadow-xl bg-white border border-stone-200">
+                            <span className="absolute top-2 right-2 z-10 w-6 h-6 bg-white/95 text-stone-900 border border-stone-800 flex items-center justify-center text-xs font-bold shadow-xs rounded-sm">
+                              &times;
+                            </span>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={item.imageUrl}
+                              alt={`Poster Pop-up #${idx + 1}`}
+                              className="block w-auto h-auto max-h-72 object-contain"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Alert jika sudah kedaluwarsa */}
+                        {isExpired && (
+                          <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                              <span>
+                                Masa tayang pop-up ini telah habis pada <strong>{formatIndoDateTime(item.expiresAt)}</strong>. Pop-up otomatis tidak tampil di beranda.
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleQuickExtend(item.id, 1)}
+                              className="px-3 py-1 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] whitespace-nowrap shadow-xs cursor-pointer flex items-center justify-center gap-1 self-start sm:self-auto"
+                            >
+                              <RotateCcw className="w-3 h-3" />
+                              <span>Perpanjang +1 Hari</span>
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Box Informasi Masa Tayang & Countdown */}
+                        <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 text-xs space-y-2">
+                          <div className="flex items-center justify-between border-b border-stone-200/80 pb-2">
+                            <span className="font-bold text-stone-800 flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-[#003B73]" />
+                              Status Masa Tayang:
+                            </span>
+                            <span
+                              className={`px-2.5 py-0.5 rounded-md font-semibold text-[11px] ${
+                                isExpired
+                                  ? "bg-rose-100 text-rose-800"
+                                  : remaining.isUnlimited
+                                  ? "bg-stone-200 text-stone-700"
+                                  : "bg-emerald-100 text-emerald-800"
+                              }`}
+                            >
+                              {remaining.label}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-stone-600 pt-1">
+                            <div>
+                              <span className="text-stone-400 block">Waktu Mulai Tayang:</span>
+                              <span className="font-semibold text-stone-800">
+                                {formatIndoDateTime(item.startDate || item.updatedAt)}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-stone-400 block">Waktu Berakhir (Selesai):</span>
+                              <span className="font-semibold text-stone-800">
+                                {item.expiresAt ? formatIndoDateTime(item.expiresAt) : "Tanpa batas waktu (selamanya)"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {item.linkedAgendaTitle && (
+                            <div className="text-[11px] text-[#003B73] bg-blue-50/80 px-2.5 py-1 rounded-lg border border-blue-200">
+                              <strong>Terkait Agenda:</strong> {item.linkedAgendaTitle}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Form Pengaturan Durasi & Tautan */}
+                        <form
+                          key={`popup-form-${item.id}-${item.targetUrl || "none"}-${item.expiresAt || "none"}`}
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            const form = e.currentTarget;
+                            const urlInput = form.elements.namedItem(`url-${item.id}`) as HTMLInputElement;
+                            const expiresInput = form.elements.namedItem(`expires-${item.id}`) as HTMLInputElement;
+                            const agendaSelect = form.elements.namedItem(`agenda-${item.id}`) as HTMLSelectElement;
+
+                            let newExpiresAt: string | null = item.expiresAt || null;
+                            let newAgendaId: string | undefined = item.linkedAgendaId;
+                            let newAgendaTitle: string | undefined = item.linkedAgendaTitle;
+
+                            if (agendaSelect && agendaSelect.value) {
+                              const config = calculateExpiresAt("AGENDA", undefined, agendaSelect.value);
+                              newExpiresAt = config.expiresAt;
+                              newAgendaId = config.linkedAgendaId;
+                              newAgendaTitle = config.linkedAgendaTitle;
+                            } else if (expiresInput && expiresInput.value) {
+                              const parsed = new Date(expiresInput.value);
+                              if (!isNaN(parsed.getTime())) {
+                                newExpiresAt = parsed.toISOString();
+                                newAgendaId = undefined;
+                                newAgendaTitle = undefined;
+                              }
+                            }
+
+                            handleSavePopupSettings(e, item.id, {
+                              targetUrl: urlInput?.value || "",
+                              expiresAt: newExpiresAt,
+                              linkedAgendaId: newAgendaId,
+                              linkedAgendaTitle: newAgendaTitle,
+                              isActive: true, // auto-reactivate if admin saves
+                            });
+                          }}
+                          className="space-y-4 pt-2 border-t border-stone-100"
+                        >
+                          {/* Pilihan Cepat Durasi / Perpanjang */}
+                          <div>
+                            <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                              Pilihan Cepat Ubah / Perpanjang Durasi Tayang:
+                            </label>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleQuickExtend(item.id, 1)}
+                                className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 text-[11px] font-semibold border border-stone-200 transition-colors cursor-pointer"
+                                title="Perpanjang 1 hari lagi"
+                              >
+                                +1 Hari
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleQuickExtend(item.id, 3)}
+                                className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 text-[11px] font-semibold border border-stone-200 transition-colors cursor-pointer"
+                                title="Perpanjang 3 hari lagi"
+                              >
+                                +3 Hari
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleQuickExtend(item.id, 7)}
+                                className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 text-[11px] font-semibold border border-stone-200 transition-colors cursor-pointer"
+                                title="Perpanjang 7 hari (1 pekan) lagi"
+                              >
+                                +7 Hari
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleQuickSetDuration(item.id, "UNLIMITED")}
+                                className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 text-[11px] font-semibold border border-stone-200 transition-colors cursor-pointer"
+                                title="Jadikan tayang tanpa batas waktu"
+                              >
+                                Set Tanpa Batas
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Sesuaikan Agenda & Custom Date */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-semibold text-stone-700 mb-1">
+                                Sesuaikan Selesai Agenda:
+                              </label>
+                              <select
+                                name={`agenda-${item.id}`}
+                                defaultValue={item.linkedAgendaId || ""}
+                                onChange={(e) => {
+                                  if (e.target.value) {
+                                    handleQuickSetDuration(item.id, "AGENDA", undefined, e.target.value);
+                                  }
+                                }}
+                                className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-xs text-stone-900 focus:ring-2 focus:ring-[#003B73]"
+                              >
+                                <option value="">-- Tidak Terkait Agenda --</option>
+                                {agendas.map((ag) => (
+                                  <option key={ag.id} value={ag.id}>
+                                    {ag.title} ({ag.date})
+                                  </option>
+                                ))}
+                              </select>
+                              <span className="text-[10px] text-stone-400 mt-0.5 block">
+                                Selesai jam 23:59 WIB pada hari agenda.
+                              </span>
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-semibold text-stone-700 mb-1">
+                                Kustom Tanggal &amp; Jam Berakhir:
+                              </label>
+                              <input
+                                type="datetime-local"
+                                name={`expires-${item.id}`}
+                                defaultValue={toDatetimeLocal(item.expiresAt)}
+                                className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-xs text-stone-900 font-mono focus:ring-2 focus:ring-[#003B73]"
+                              />
+                              <span className="text-[10px] text-stone-400 mt-0.5 block">
+                                Kosongkan jika ingin tanpa batas.
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* URL Tujuan */}
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <label className="block text-xs font-semibold text-stone-700">
+                                Tautan / URL Tujuan Pop-up #{idx + 1}{" "}
+                                <span className="text-stone-400 font-normal">(Opsional / Tidak Wajib)</span>
+                              </label>
+                              {item.targetUrl ? (
+                                <span
+                                  className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 truncate max-w-[200px]"
+                                  title={item.targetUrl}
+                                >
+                                  Link: {item.targetUrl}
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-semibold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md border border-stone-200">
+                                  Tanpa Link (Hanya Gambar)
+                                </span>
+                              )}
+                            </div>
+                            <input
+                              type="text"
+                              name={`url-${item.id}`}
+                              defaultValue={item.targetUrl || ""}
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono focus:ring-2 focus:ring-[#003B73]"
+                              placeholder="Biarkan kosong jika hanya gambar poster (tidak mengarah ke web)"
+                            />
+                            <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
+                              Biarkan kosong agar pop-up hanya berupa poster. Jika ingin mengarahkan link luar: <span className="font-mono text-stone-700">https://wa.me/...</span> atau link lainnya.
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
+                            <div className="flex items-center gap-2">
+                              {(popupSaveSuccess || savedPopupId === item.id) && (
+                                <span className="text-xs font-bold text-emerald-600 flex items-center gap-1 animate-fade-in">
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  <span>Pengaturan tersimpan!</span>
+                                </span>
+                              )}
+                              {item.targetUrl && (
+                                <button
+                                  type="button"
+                                  disabled={savingPopup}
+                                  onClick={(e) => handleSavePopupSettings(e, item.id, { targetUrl: "" })}
+                                  className="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold border border-rose-200 transition-colors cursor-pointer"
+                                  title="Hapus tautan dari pop-up ini agar murni hanya gambar"
+                                >
+                                  Kosongkan Tautan
+                                </button>
+                              )}
+                            </div>
+                            <div className="ml-auto">
+                              <button
+                                type="submit"
+                                disabled={savingPopup}
+                                className="px-5 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md disabled:opacity-50 cursor-pointer"
+                              >
+                                {savingPopup ? "Menyimpan..." : "Simpan Pengaturan Pop-up"}
+                              </button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    );
+                  })
                 ) : (
                   <div className="p-10 text-center rounded-3xl bg-white border border-stone-200 shadow-sm space-y-3">
                     <div className="w-14 h-14 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
