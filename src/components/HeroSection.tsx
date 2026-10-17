@@ -193,7 +193,7 @@ export default function HeroSection() {
             href="/donasi"
             className="px-7 py-3.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-stone-200 hover:text-white text-sm sm:text-base font-semibold backdrop-blur-md border border-stone-600/70 hover:border-amber-400/60 transition-all duration-300 hover:scale-105"
           >
-            Salurkan Infaq Digital
+            Donasi Kebaikan
           </Link>
         </div>
       </div>
