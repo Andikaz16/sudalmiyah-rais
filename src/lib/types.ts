@@ -52,6 +52,11 @@ export interface Agenda {
   bannerUrl?: string;
   targetAudience?: string;
   createdAt: string;
+  isCompleted?: boolean;
+  completedAt?: string;
+  actualAttendees?: number | null;
+  documentationPhotos?: string[];
+  summaryNote?: string;
 }
 
 export interface FridayOfficerSchedule {

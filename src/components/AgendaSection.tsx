@@ -12,6 +12,8 @@ import {
   GraduationCap,
   Eye,
   ArrowRight,
+  CheckCircle2,
+  Camera,
 } from "lucide-react";
 import { Agenda, AgendaCategory } from "@/lib/types";
 import RegistrationModal from "./RegistrationModal";
@@ -138,7 +140,12 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                         </span>
                       </div>
                       <div className="absolute top-3 right-3">
-                        {item.requiresRegistration ? (
+                        {item.isCompleted ? (
+                          <span className="text-[10px] text-white bg-emerald-700 font-bold px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1 border border-emerald-500/40">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-200" />
+                            <span>Selesai / Terlaksana</span>
+                          </span>
+                        ) : item.requiresRegistration ? (
                           <span className="text-[10px] text-white bg-[#B58A1E] font-semibold px-2.5 py-1 rounded-full shadow-sm">
                             Wajib Registrasi
                           </span>
@@ -152,8 +159,17 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                       {/* Hover Overlay */}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                         <span className="px-3.5 py-1.5 rounded-full bg-white text-[#003B73] text-xs font-bold shadow-lg flex items-center gap-1.5">
-                          <Eye className="w-3.5 h-3.5 text-[#003B73]" />
-                          <span>Buka Detail</span>
+                          {item.isCompleted ? (
+                            <>
+                              <Camera className="w-3.5 h-3.5 text-emerald-700" />
+                              <span>Lihat Hasil &amp; Foto</span>
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="w-3.5 h-3.5 text-[#003B73]" />
+                              <span>Buka Detail</span>
+                            </>
+                          )}
                         </span>
                       </div>
                     </div>
@@ -181,6 +197,32 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                               {item.targetAudience}
                             </span>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Highlight Hasil Kegiatan jika agenda sudah selesai */}
+                      {item.isCompleted && (
+                        <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-200/90 mb-4 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className="p-1.5 rounded-xl bg-emerald-600 text-white shrink-0">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            </div>
+                            <div>
+                              <span className="text-[10px] font-bold text-emerald-950 uppercase tracking-wider block">
+                                Hasil Kegiatan:
+                              </span>
+                              <span className="text-xs font-extrabold text-emerald-900 block">
+                                {item.actualAttendees
+                                  ? `${item.actualAttendees.toLocaleString("id-ID")} Peserta Hadir`
+                                  : "Kegiatan Selesai"}
+                              </span>
+                            </div>
+                          </div>
+                          {item.documentationPhotos && item.documentationPhotos.length > 0 && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                              {item.documentationPhotos.length} Foto
+                            </span>
+                          )}
                         </div>
                       )}
 
@@ -242,7 +284,17 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
 
                 {/* Action Buttons */}
                 <div className="p-6 pt-0 space-y-2.5">
-                  {item.requiresRegistration ? (
+                  {item.isCompleted ? (
+                    <button
+                      type="button"
+                      onClick={() => setViewingDetailAgenda(item)}
+                      className="w-full text-center px-4 py-3 rounded-full text-xs sm:text-sm font-bold bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white shadow-md shadow-emerald-700/15 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] group/btn"
+                    >
+                      <Camera className="w-4 h-4 text-emerald-200" />
+                      <span>Lihat Hasil &amp; Foto Kegiatan</span>
+                      <ArrowRight className="w-4 h-4 text-emerald-200 group-hover/btn:translate-x-1 transition-transform" />
+                    </button>
+                  ) : item.requiresRegistration ? (
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
@@ -276,11 +328,13 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                       <ArrowRight className="w-4 h-4 text-amber-300 group-hover/btn:translate-x-1 transition-transform" />
                     </button>
                   )}
-                  {!item.requiresRegistration && (
-                    <div className="text-center text-[11px] text-stone-500 font-medium">
-                      Hadir Langsung di Lokasi • Presensi QR di Masjid
-                    </div>
-                  )}
+                  <div className="text-center text-[11px] text-stone-500 font-medium">
+                    {item.isCompleted
+                      ? "Dokumentasi & Laporan Kehadiran Tersedia"
+                      : !item.requiresRegistration
+                      ? "Hadir Langsung di Lokasi • Presensi QR di Masjid"
+                      : "Pendaftaran Online Mahasiswa Mandiri"}
+                  </div>
                 </div>
               </div>
               );

@@ -11,6 +11,10 @@ import {
   GraduationCap,
   ExternalLink,
   Info,
+  CheckCircle2,
+  Users,
+  Camera,
+  ZoomIn,
 } from "lucide-react";
 import { Agenda } from "@/lib/types";
 
@@ -26,6 +30,7 @@ export default function AgendaDetailModal({
   onRegisterClick,
 }: AgendaDetailModalProps) {
   const [mounted, setMounted] = useState<boolean>(false);
+  const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -64,7 +69,12 @@ export default function AgendaDetailModal({
             <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#003B73] text-white">
               {agenda.category?.replace(/_/g, " ")}
             </span>
-            {agenda.requiresRegistration ? (
+            {agenda.isCompleted ? (
+              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-700 text-white flex items-center gap-1 shadow-2xs">
+                <CheckCircle2 className="w-3 h-3 text-emerald-200" />
+                <span>Kegiatan Selesai Terlaksana</span>
+              </span>
+            ) : agenda.requiresRegistration ? (
               <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-white">
                 Pendaftaran Online Mandiri
               </span>
@@ -114,6 +124,100 @@ export default function AgendaDetailModal({
               {agenda.title}
             </h2>
           </div>
+
+          {/* Laporan Hasil & Dokumentasi Acara (Jika Agenda Sudah Selesai) */}
+          {agenda.isCompleted && (
+            <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-50/90 via-white to-teal-50/50 border border-emerald-300/80 shadow-sm space-y-4 animate-fade-in">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-100 pb-3">
+                <div className="flex items-center gap-2 text-emerald-950 font-bold text-sm">
+                  <div className="p-1.5 rounded-xl bg-emerald-600 text-white shadow-2xs">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <span>Laporan Hasil &amp; Dokumentasi Kegiatan</span>
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  Status: Terlaksana
+                </span>
+              </div>
+
+              {/* Stat Jamaah Hadir & Foto Count */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-2xl bg-white border border-emerald-200/80 shadow-2xs flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-emerald-100 text-emerald-800 shrink-0">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
+                      Jumlah Peserta Hadir (Aktual)
+                    </span>
+                    <span className="text-base font-extrabold text-emerald-950">
+                      {agenda.actualAttendees
+                        ? `${agenda.actualAttendees.toLocaleString("id-ID")} Jamaah`
+                        : "Selesai Terlaksana"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white border border-emerald-200/80 shadow-2xs flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-blue-100 text-[#003B73] shrink-0">
+                    <Camera className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
+                      Dokumentasi Foto
+                    </span>
+                    <span className="text-sm font-extrabold text-stone-800">
+                      {agenda.documentationPhotos?.length
+                        ? `${agenda.documentationPhotos.length} Foto Tersedia`
+                        : "Dokumentasi Tersimpan"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary / Ringkasan Acara */}
+              {agenda.summaryNote && (
+                <div className="p-3.5 rounded-2xl bg-white/90 border border-emerald-200/80 text-xs text-stone-700 leading-relaxed">
+                  <span className="font-bold text-emerald-950 block mb-1">
+                    Ringkasan Pelaksanaan:
+                  </span>
+                  <p>{agenda.summaryNote}</p>
+                </div>
+              )}
+
+              {/* Galeri Foto Dokumentasi */}
+              {agenda.documentationPhotos && agenda.documentationPhotos.length > 0 && (
+                <div className="space-y-2 pt-1">
+                  <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+                    <Camera className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Galeri Foto Hasil Kegiatan:</span>
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                    {agenda.documentationPhotos.map((photoUrl, pIdx) => (
+                      <div
+                        key={pIdx}
+                        onClick={() => setPreviewPhoto(photoUrl)}
+                        className="relative h-28 sm:h-32 rounded-2xl overflow-hidden bg-stone-900 border border-emerald-200 group/item cursor-pointer shadow-2xs hover:shadow-md transition-all"
+                        title="Klik untuk memperbesar foto dokumentasi"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photoUrl}
+                          alt={`Dokumentasi kegiatan ${pIdx + 1}`}
+                          className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-black/35 opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="p-1.5 rounded-full bg-white/90 text-stone-900 shadow-sm">
+                            <ZoomIn className="w-4 h-4" />
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Target Audience / Fakultas Terjadwal Section */}
           {agenda.targetAudience && (
@@ -211,7 +315,7 @@ export default function AgendaDetailModal({
             Tutup
           </button>
 
-          {agenda.requiresRegistration && onRegisterClick && (
+          {!agenda.isCompleted && agenda.requiresRegistration && onRegisterClick && (
             <div className="w-full sm:w-auto flex items-center gap-2">
               <button
                 onClick={() => onRegisterClick(agenda)}
@@ -221,7 +325,39 @@ export default function AgendaDetailModal({
               </button>
             </div>
           )}
+          {agenda.isCompleted && (
+            <span className="text-xs font-semibold text-emerald-800 bg-emerald-100 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 border border-emerald-200">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Kegiatan Telah Terlaksana</span>
+            </span>
+          )}
         </div>
+
+        {/* Lightbox Preview */}
+        {previewPhoto && (
+          <div
+            className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+            onClick={() => setPreviewPhoto(null)}
+          >
+            <div className="relative max-w-4xl max-h-[90vh] flex flex-col items-center justify-center">
+              <button
+                type="button"
+                onClick={() => setPreviewPhoto(null)}
+                className="absolute -top-10 right-0 w-8 h-8 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center cursor-pointer transition-colors"
+                title="Tutup foto"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={previewPhoto}
+                alt="Dokumentasi foto pembesar"
+                className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/20 shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>,
     document.body

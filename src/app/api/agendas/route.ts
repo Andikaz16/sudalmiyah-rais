@@ -92,3 +92,67 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Gagal menyimpan agenda." }, { status: 500 });
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  const token = request.cookies.get("sudalmiyah_session")?.value;
+  if (!token) {
+    return NextResponse.json({ error: "Otentikasi dibutuhkan." }, { status: 401 });
+  }
+
+  const session = await verifySessionToken(token);
+  if (!session || (session.role !== "ADMIN_TAKMIR" && session.role !== "PENGURUS_AGENDA")) {
+    return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+  }
+
+  try {
+    const body = await request.json();
+    const { id, isCompleted, actualAttendees, documentationPhotos, summaryNote, title, description } = body;
+    if (!id) {
+      return NextResponse.json({ error: "ID agenda diperlukan." }, { status: 400 });
+    }
+
+    const db = getDb();
+    const targetIdx = db.agendas.findIndex((a) => a.id === id);
+    if (targetIdx === -1) {
+      return NextResponse.json({ error: "Agenda tidak ditemukan." }, { status: 404 });
+    }
+
+    const current = db.agendas[targetIdx];
+    const updatedAgenda: Agenda = {
+      ...current,
+      ...(isCompleted !== undefined && { isCompleted: Boolean(isCompleted) }),
+      ...(actualAttendees !== undefined && {
+        actualAttendees:
+          actualAttendees === null || actualAttendees === "" ? null : Number(actualAttendees),
+      }),
+      ...(documentationPhotos !== undefined && {
+        documentationPhotos: Array.isArray(documentationPhotos)
+          ? documentationPhotos.map((url: string) => sanitizeString(String(url)))
+          : [],
+      }),
+      ...(summaryNote !== undefined && {
+        summaryNote: sanitizeString(String(summaryNote)),
+      }),
+      ...(title !== undefined && { title: sanitizeString(String(title)) }),
+      ...(description !== undefined && { description: sanitizeString(String(description)) }),
+      ...(Boolean(isCompleted) && !current.completedAt && { completedAt: new Date().toISOString() }),
+    };
+
+    db.agendas[targetIdx] = updatedAgenda;
+    saveDb(db);
+
+    const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
+    logSecurityEvent(
+      "UPDATE_AGENDA",
+      session.email,
+      ip,
+      "SUCCESS",
+      `Agenda diperbarui: ${updatedAgenda.title} (Selesai: ${updatedAgenda.isCompleted ? "Ya" : "Tidak"})`
+    );
+
+    return NextResponse.json({ success: true, agenda: updatedAgenda });
+  } catch (error) {
+    console.error("Update Agenda Error:", error);
+    return NextResponse.json({ error: "Gagal memperbarui agenda." }, { status: 500 });
+  }
+}
