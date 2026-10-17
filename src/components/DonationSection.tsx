@@ -182,8 +182,8 @@ export default function DonationSection() {
       year: "numeric",
     }).format(today);
 
-    return `MUTIARA HADITS: ${hadith.theme}
-${masehiDate} / ${hijriDate} (KHGT)
+    return `*MUTIARA HADITS: ${hadith.theme}*
+${hijriDate} (KHGT) / ${masehiDate}
 
 ${hadith.arabic}
 
@@ -192,8 +192,7 @@ ${hadith.arabic}
 (${hadith.source} — ${hadith.fadhilah})
 
 Disiarkan oleh Masjid Sudalmiyah Rais - Universitas Muhammadiyah Surakarta
-Penanggalan: ${hijriDate} (Kalender Hijriyah Global Tunggal - KHGT)
-Infaq Digital: https://masjidsudalmiyah.ums.ac.id/#donasi`;
+Infaq Digital: https://sudalmiyah-rais.vercel.app`;
   };
 
   const handleOpenShare = (hadithIndex?: number) => {
@@ -236,7 +235,7 @@ Infaq Digital: https://masjidsudalmiyah.ums.ac.id/#donasi`;
   };
 
   const handleShareFB = () => {
-    const pageUrl = typeof window !== "undefined" ? window.location.href : "https://masjidsudalmiyah.ums.ac.id/#donasi";
+    const pageUrl = typeof window !== "undefined" ? window.location.href : "https://sudalmiyah-rais.vercel.app";
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}&quote=${encodeURIComponent(customShareText)}`;
     window.open(url, "_blank");
   };

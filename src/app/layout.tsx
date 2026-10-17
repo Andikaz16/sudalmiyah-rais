@@ -21,13 +21,14 @@ const amiri = Amiri({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://sudalmiyah-rais.vercel.app"),
   title: "Masjid UMS | Masjid Sudalmiyah Rais Kampus 2",
   description:
-    "Portal Resmi Masjid UMS - Model Masjid Percontohan Amal Usaha Muhammadiyah (AUM). Jadwal shalat standar MASA Tarjih, ruang ibadah digital, warta persyarikatan, dan transparansi infaq.",
+    "Portal Resmi Masjid UMS - Model Masjid Percontohan LPCR-PM & PTMA. Jadwal shalat standar MASA Tarjih, ruang ibadah digital, warta persyarikatan, dan transparansi infaq.",
   authors: [{ name: "Takmir Masjid UMS" }],
   keywords: [
     "Masjid UMS",
-    "Masjid Percontohan AUM",
+    "Masjid Percontohan LPCR-PM",
     "Masjid Sudalmiyah Rais",
     "Amal Usaha Muhammadiyah",
     "UMS",
@@ -45,6 +46,30 @@ export const metadata: Metadata = {
     ],
     shortcut: "/images/logo/logo-masjid.png",
     apple: "/images/logo/logo-masjid.png",
+  },
+  openGraph: {
+    title: "Masjid Hj. Sudalmiyah Rais - Universitas Muhammadiyah Surakarta",
+    description:
+      "Portal Resmi Masjid Kampus Universitas Muhammadiyah Surakarta - Model Masjid Percontohan LPCR-PM PP Muhammadiyah.",
+    url: "https://sudalmiyah-rais.vercel.app",
+    siteName: "Masjid Sudalmiyah Rais UMS",
+    images: [
+      {
+        url: "/images/logo/logo-masjid.png",
+        width: 800,
+        height: 800,
+        alt: "Logo Resmi Masjid Hj. Sudalmiyah Rais UMS",
+      },
+    ],
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Masjid Hj. Sudalmiyah Rais - Universitas Muhammadiyah Surakarta",
+    description:
+      "Portal Resmi Masjid Kampus Universitas Muhammadiyah Surakarta - Model Masjid Percontohan LPCR-PM PP Muhammadiyah.",
+    images: ["/images/logo/logo-masjid.png"],
   },
   appleWebApp: {
     capable: true,
