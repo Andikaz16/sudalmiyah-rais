@@ -281,12 +281,9 @@ export default function FridayScheduleSection() {
                 {currentIndex + 1}/6
               </div>
               <div>
-                <h3 className="text-base sm:text-xl font-bold tracking-tight font-serif text-white">
+                <h3 className="text-lg sm:text-2xl font-bold tracking-tight font-serif text-white">
                   {activeMosqueInfo.name}
                 </h3>
-                <p className="text-xs text-white/80 font-medium">
-                  Lokasi: {activeMosqueInfo.location}
-                </p>
               </div>
             </div>
 

@@ -1726,13 +1726,6 @@ export default function AdminDashboardPage() {
                           {m.name}
                         </span>
                       </div>
-                      <span
-                        className={`text-[10px] truncate ${
-                          isSelected ? "text-white/80" : "text-stone-400"
-                        }`}
-                      >
-                        {m.location}
-                      </span>
                     </button>
                   );
                 })}
@@ -1756,9 +1749,6 @@ export default function AdminDashboardPage() {
                       Form Jadwal: {activeMosqueMeta.name}
                     </span>
                   </div>
-                  <span className="text-[11px] text-stone-500 font-medium">
-                    Lokasi: {activeMosqueMeta.location}
-                  </span>
                 </div>
 
                 {/* Photo & Khatib Highlight */}
