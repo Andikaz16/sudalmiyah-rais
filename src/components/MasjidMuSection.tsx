@@ -102,7 +102,7 @@ export default function MasjidMuSection() {
           </p>
 
           <p className="mt-4 text-sm sm:text-base text-stone-600 leading-relaxed">
-            Masjid UMS hadir sebagai teladan dan standar <strong>Masjid Percontohan LPCR-PM (Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid) Pimpinan Pusat Muhammadiyah</strong> di lingkungan Perguruan Tinggi Muhammadiyah dan &apos;Aisyiyah (PTMA) serta institusi persyarikatan. Menjadi episentrum pembinaan spiritual, integrasi Al-Islam &amp; Kemuhammadiyahan (AIK), pengkaderan persyarikatan, serta tata kelola modern berbasis Idarah, Imarah, dan Ri&apos;ayah.
+            Masjid UMS hadir sebagai teladan dan standar <strong>Masjid Percontohan LPCR-PM (Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid) Pimpinan Pusat Muhammadiyah</strong> di lingkungan Perguruan Tinggi Muhammadiyah dan &apos;Aisyiyah (PTMA) serta institusi persyarikatan. Menjadi episentrum pembinaan spiritual, integrasi Al-Islam &amp; Kemuhammadiyahan (AIK), pengkaderan persyarikatan, serta tata kelola modern berbasis pilar <strong>3J (Jama&apos;ah, Jam&apos;iyah, dan Jariyah)</strong>.
           </p>
         </div>
 
