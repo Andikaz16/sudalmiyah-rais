@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ArrowRight, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, ExternalLink, Play } from "lucide-react";
 
 interface NewsItem {
   id: string;
@@ -18,6 +18,8 @@ interface NewsItem {
   excerpt: string;
   content: string[];
   imageUrl: string;
+  isLive?: boolean;
+  youtubeId?: string;
 }
 
 export function formatClientTimeAgo(
@@ -78,7 +80,29 @@ export function formatClientTimeAgo(
   }
 }
 
+export const tablighAkbarLiveItem: NewsItem = {
+  id: "ums-live-tabligh-akbar-68",
+  source: "UMS",
+  badge: "SIARAN LANGSUNG",
+  badgeClass: "bg-red-600 text-white animate-pulse",
+  timeAgo: "Sedang Berlangsung",
+  publishedAt: "2026-10-18T08:30:00+07:00",
+  sourceDomain: "youtube.com",
+  sourceUrl: "https://www.youtube.com/live/KVGneiEIdgo?si=LLB6Q6zLVrdVyjbw",
+  title: "Tabligh Akbar Harijadi ke-68 UMS bersama Ustadz Dr. H. Das'ad Latif",
+  excerpt: "ums.ac.id, SURAKARTA - Siaran langsung Tabligh Akbar Milad ke-68 Universitas Muhammadiyah Surakarta menghadirkan mubaligh kondang Ustadz Dr. H. Das'ad Latif, S.Sos., S.Ag., M.Si., Ph.D. langsung dari Edutorium KH Ahmad Dahlan UMS.",
+  content: [
+    "SURAKARTA - Menyemarakkan peringatan Hari Jadi ke-68 Universitas Muhammadiyah Surakarta (UMS), Lembaga Pengembangan Pondok, Al-Islam dan Kemuhammadiyahan (LPPIK) UMS menggelar Tabligh Akbar bertempat di Gedung Edutorium KH Ahmad Dahlan UMS pada Ahad, 18 Oktober 2026.",
+    "Tabligh Akbar ini menghadirkan dai kondang nasional Ustadz Dr. H. Das'ad Latif, S.Sos., S.Ag., M.Si., Ph.D. dengan mengusung tema 'Meneguhkan Sinergi, Menebar Kebermanfaatan dan Menguatkan Peradaban'. Majelis ilmu ini dihadiri ribuan jamaah sivitas akademika UMS, warga persyarikatan se-Solo Raya, serta masyarakat luas.",
+    "Bagi segenap jamaah dan warga persyarikatan yang berhalangan hadir langsung di Edutorium, siaran langsung dan rekaman lengkap pengajian dapat disaksikan secara daring melalui pemutar video di bawah ini atau melalui kanal YouTube resmi."
+  ],
+  imageUrl: "/images/news/tabligh-akbar-poster.jpg",
+  isLive: true,
+  youtubeId: "KVGneiEIdgo",
+};
+
 const initialNewsData: NewsItem[] = [
+  tablighAkbarLiveItem,
   {
     id: "ums-43448",
     source: "UMS",
@@ -224,7 +248,8 @@ export default function NewsSection() {
         if (res.ok) {
           const data = await res.json();
           if (isMounted && data.articles && Array.isArray(data.articles) && data.articles.length > 0) {
-            setNewsList(data.articles);
+            const hasLive = data.articles.some((a: NewsItem) => a.id === tablighAkbarLiveItem.id);
+            setNewsList(hasLive ? data.articles : [tablighAkbarLiveItem, ...data.articles]);
           }
         }
       } catch (err) {
@@ -284,8 +309,9 @@ export default function NewsSection() {
             });
 
             setNewsList((prev) => {
-              const nonUms = prev.filter((item) => item.source !== "UMS");
-              return [...clientUmsArticles, ...nonUms];
+              const nonUms = prev.filter((item) => item.source !== "UMS" && item.id !== tablighAkbarLiveItem.id);
+              const filteredClient = clientUmsArticles.filter((item) => item.id !== tablighAkbarLiveItem.id);
+              return [tablighAkbarLiveItem, ...filteredClient, ...nonUms];
             });
           }
         }
@@ -385,11 +411,13 @@ export default function NewsSection() {
                 <article
                   key={item.id}
                   onClick={() => setSelectedArticle(item)}
-                  className="w-[84vw] sm:w-[360px] md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] shrink-0 snap-start bg-white border border-stone-200/90 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:border-[#003B73]/50 transition-all duration-300 flex flex-col justify-between group cursor-pointer"
+                  className={`w-[84vw] sm:w-[360px] md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] shrink-0 snap-start bg-white border ${
+                    item.isLive ? "border-red-300 ring-2 ring-red-500/20 shadow-md" : "border-stone-200/90 shadow-xs"
+                  } rounded-3xl overflow-hidden hover:shadow-xl hover:border-[#003B73]/50 transition-all duration-300 flex flex-col justify-between group cursor-pointer`}
                 >
                   <div>
                     {/* Thumbnail Image Container */}
-                    <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-stone-100 group-hover:opacity-95 transition-opacity">
+                    <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-stone-900 group-hover:opacity-95 transition-opacity">
                       <Image
                         src={item.imageUrl}
                         alt={item.title}
@@ -398,6 +426,22 @@ export default function NewsSection() {
                         sizes="(max-width: 640px) 84vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
+                      {item.isLive && (
+                        <>
+                          <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600 text-white text-[10px] sm:text-[11px] font-bold shadow-lg tracking-wider uppercase">
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                            </span>
+                            <span>SIARAN LANGSUNG</span>
+                          </div>
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="w-12 h-12 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-xl backdrop-blur-xs group-hover:scale-110 group-hover:bg-red-600 transition-all">
+                              <Play className="w-5 h-5 fill-current ml-0.5 text-white" />
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {/* Card Body */}
@@ -409,8 +453,12 @@ export default function NewsSection() {
                         >
                           {item.badge}
                         </span>
-                        <span className="text-stone-400 text-xs font-normal">
-                          {formatClientTimeAgo(item.publishedAt, item.timeAgo, now)}
+                        <span
+                          className={`${
+                            item.isLive ? "text-red-600 font-bold" : "text-stone-400 font-normal"
+                          } text-xs`}
+                        >
+                          {item.isLive ? item.timeAgo : formatClientTimeAgo(item.publishedAt, item.timeAgo, now)}
                         </span>
                       </div>
 
@@ -434,18 +482,32 @@ export default function NewsSection() {
                         e.stopPropagation();
                         setSelectedArticle(item);
                       }}
-                      className="text-stone-600 group-hover:text-[#003B73] transition-colors text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 focus:outline-none cursor-pointer group/btn"
+                      className={`${
+                        item.isLive
+                          ? "text-red-600 group-hover:text-red-700"
+                          : "text-stone-600 group-hover:text-[#003B73]"
+                      } transition-colors text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 focus:outline-none cursor-pointer group/btn`}
                     >
-                      <span>BACA SELENGKAPNYA</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-[#003B73] group-hover/btn:translate-x-1 transition-all" />
+                      <span>{item.isLive ? "TONTON SIARAN" : "BACA SELENGKAPNYA"}</span>
+                      <ArrowRight
+                        className={`w-3.5 h-3.5 ${
+                          item.isLive
+                            ? "text-red-500 group-hover:text-red-700"
+                            : "text-stone-400 group-hover:text-[#003B73]"
+                        } group-hover/btn:translate-x-1 transition-all`}
+                      />
                     </button>
                     <a
                       href={item.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      title="Buka sumber resmi di tab baru"
-                      className="p-1.5 rounded-full hover:bg-stone-100 text-stone-400 hover:text-[#003B73] transition-colors"
+                      title={item.isLive ? "Buka YouTube di tab baru" : "Buka sumber resmi di tab baru"}
+                      className={`p-1.5 rounded-full hover:bg-stone-100 ${
+                        item.isLive
+                          ? "text-red-500 hover:text-red-700"
+                          : "text-stone-400 hover:text-[#003B73]"
+                      } transition-colors`}
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
@@ -497,8 +559,14 @@ export default function NewsSection() {
                 >
                   {selectedArticle.badge}
                 </span>
-                <span className="text-xs text-stone-500">
-                  {formatClientTimeAgo(selectedArticle.publishedAt, selectedArticle.timeAgo, now)}
+                <span
+                  className={`${
+                    selectedArticle.isLive ? "text-red-600 font-bold" : "text-stone-500 font-normal"
+                  } text-xs`}
+                >
+                  {selectedArticle.isLive
+                    ? selectedArticle.timeAgo
+                    : formatClientTimeAgo(selectedArticle.publishedAt, selectedArticle.timeAgo, now)}
                 </span>
               </div>
               <button
@@ -511,16 +579,28 @@ export default function NewsSection() {
 
             {/* Modal Scrollable Body */}
             <div className="p-6 sm:p-8 overflow-y-auto space-y-5">
-              {/* Image */}
-              <div className="relative h-60 sm:h-72 w-full rounded-xl overflow-hidden bg-stone-100 shadow-inner">
-                <Image
-                  src={selectedArticle.imageUrl}
-                  alt={selectedArticle.title}
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
-              </div>
+              {/* Media Container: Responsive YouTube Player or Static Image */}
+              {selectedArticle.youtubeId ? (
+                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-lg border border-stone-200">
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${selectedArticle.youtubeId}?autoplay=1&rel=0`}
+                    title={selectedArticle.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  />
+                </div>
+              ) : (
+                <div className="relative h-60 sm:h-72 w-full rounded-xl overflow-hidden bg-stone-100 shadow-inner">
+                  <Image
+                    src={selectedArticle.imageUrl}
+                    alt={selectedArticle.title}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                  />
+                </div>
+              )}
 
               {/* Title */}
               <h2 className="text-xl sm:text-2xl font-bold text-stone-900 font-sans leading-snug">
@@ -537,15 +617,30 @@ export default function NewsSection() {
               {/* Source Link */}
               <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF8F5] p-4 rounded-xl">
                 <div className="text-xs text-stone-600">
-                  Portal Resmi: <strong className="text-stone-900">{selectedArticle.sourceDomain}</strong>
+                  {selectedArticle.isLive ? (
+                    <span>Siaran Resmi: <strong className="text-stone-900">YouTube Official UMS</strong></span>
+                  ) : (
+                    <span>Portal Resmi: <strong className="text-stone-900">{selectedArticle.sourceDomain}</strong></span>
+                  )}
                 </div>
                 <a
                   href={selectedArticle.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold text-center transition-colors cursor-pointer"
+                  className={`px-5 py-2.5 rounded-full ${
+                    selectedArticle.isLive
+                      ? "bg-red-600 hover:bg-red-700 text-white"
+                      : "bg-[#003B73] hover:bg-[#002855] text-white"
+                  } text-xs font-bold text-center inline-flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs`}
                 >
-                  Kunjungi Sumber Resmi
+                  {selectedArticle.isLive ? (
+                    <>
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                      <span>Buka di YouTube</span>
+                    </>
+                  ) : (
+                    <span>Kunjungi Sumber Resmi</span>
+                  )}
                 </a>
               </div>
             </div>

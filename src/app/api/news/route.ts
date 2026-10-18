@@ -13,7 +13,30 @@ export interface ApiNewsItem {
   excerpt: string;
   content: string[];
   imageUrl: string;
+  isLive?: boolean;
+  youtubeId?: string;
 }
+
+export const tablighAkbarLiveArticle: ApiNewsItem = {
+  id: "ums-live-tabligh-akbar-68",
+  source: "UMS",
+  badge: "SIARAN LANGSUNG",
+  badgeClass: "bg-red-600 text-white animate-pulse",
+  timeAgo: "Sedang Berlangsung",
+  publishedAt: "2026-10-18T08:30:00+07:00",
+  sourceDomain: "youtube.com",
+  sourceUrl: "https://www.youtube.com/live/KVGneiEIdgo?si=LLB6Q6zLVrdVyjbw",
+  title: "Tabligh Akbar Harijadi ke-68 UMS bersama Ustadz Dr. H. Das'ad Latif",
+  excerpt: "ums.ac.id, SURAKARTA - Siaran langsung Tabligh Akbar dalam rangka peringatan Hari Jadi (Milad) ke-68 Universitas Muhammadiyah Surakarta menghadirkan mubaligh nasional Ustadz Dr. H. Das'ad Latif, S.Sos., S.Ag., M.Si., Ph.D. langsung dari Gedung Edutorium KH Ahmad Dahlan UMS.",
+  content: [
+    "SURAKARTA - Menyemarakkan peringatan Hari Jadi ke-68 Universitas Muhammadiyah Surakarta (UMS), Lembaga Pengembangan Pondok, Al-Islam dan Kemuhammadiyahan (LPPIK) UMS menggelar Tabligh Akbar bertempat di Gedung Edutorium KH Ahmad Dahlan UMS pada Ahad, 18 Oktober 2026.",
+    "Tabligh Akbar ini menghadirkan dai kondang nasional Ustadz Dr. H. Das'ad Latif, S.Sos., S.Ag., M.Si., Ph.D. dengan mengusung tema 'Meneguhkan Sinergi, Menebar Kebermanfaatan dan Menguatkan Peradaban'. Majelis ilmu ini dihadiri ribuan jamaah sivitas akademika UMS, warga persyarikatan se-Solo Raya, serta masyarakat luas.",
+    "Bagi segenap jamaah dan warga persyarikatan yang berhalangan hadir langsung di Edutorium, siaran langsung dan rekaman lengkap pengajian dapat disaksikan secara daring melalui kanal siaran langsung resmi."
+  ],
+  imageUrl: "/images/news/tabligh-akbar-poster.jpg",
+  isLive: true,
+  youtubeId: "KVGneiEIdgo",
+};
 
 function decodeHtmlEntities(str: string): string {
   return str
@@ -96,6 +119,7 @@ function calculateTimeAgo(dateString: string): string {
 
 // Fallback articles in case any external site is down or slow (3 official sources: UMS, Suara Muhammadiyah, Lensamu)
 const fallbackArticles: ApiNewsItem[] = [
+  tablighAkbarLiveArticle,
   {
     id: "ums-43448",
     source: "UMS",
@@ -469,9 +493,10 @@ export async function GET(request: Request) {
     fetchSuaraMuhammadiyahNews(),
   ]);
 
-  // UTAMAKAN BERITA KAMPUS UMS DI URUTAN TERDEPAN (Posisi 0, 1, 2, dst.)
+  // UTAMAKAN SIARAN LANGSUNG & BERITA KAMPUS UMS DI URUTAN TERDEPAN (Posisi 0, 1, 2, dst.)
   const officialArticles = [
-    ...umsArticles,
+    tablighAkbarLiveArticle,
+    ...umsArticles.filter((a) => a.id !== tablighAkbarLiveArticle.id),
     ...smArticles,
     ...lensamuArticles,
   ];
