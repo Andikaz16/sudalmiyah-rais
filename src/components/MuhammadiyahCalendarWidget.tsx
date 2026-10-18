@@ -17,6 +17,7 @@ import {
 import {
   getHijriDate,
   getPasaranJawa,
+  getIslamicDayName,
   getMuhammadiyahCalendarDetails,
 } from "@/lib/prayer-times";
 
@@ -143,7 +144,7 @@ export default function MuhammadiyahCalendarWidget() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-stone-300 font-medium">Pasaran Jawa:</span>
                   <span className="font-bold text-[#FCD34D] bg-[#001f3f]/60 px-2.5 py-0.5 rounded-md border border-amber-400/20 font-mono">
-                    {pasaranText ? `${masehiText.split(",")[0]} ${pasaranText}` : "..."}
+                    {pasaranText ? `${getIslamicDayName(currentDate || new Date())} ${pasaranText}` : "..."}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">

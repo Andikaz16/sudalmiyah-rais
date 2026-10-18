@@ -332,8 +332,27 @@ export function calculateDeterministicHijri(date: Date = new Date()): {
   };
 }
 
+// Daftar nama hari penanggalan Islam resmi (standar bahasa Indonesia & Majelis Tarjih)
+export const ISLAMIC_DAY_NAMES = [
+  "Ahad",
+  "Senin",
+  "Selasa",
+  "Rabu",
+  "Kamis",
+  "Jumat",
+  "Sabtu",
+] as const;
+
+export function getIslamicDayName(date: Date = new Date()): string {
+  const day = date.getDay();
+  return ISLAMIC_DAY_NAMES[day] || "Ahad";
+}
+
 // Konversi tanggal Masehi ke Penanggalan Hijriyah (KHGT & Standar Majelis Tarjih)
-export function getHijriDate(date: Date = new Date()): string {
+export function getHijriDate(date: Date = new Date(), includeDayName: boolean = true): string {
+  const dayName = getIslamicDayName(date);
+  let hijriBase = "";
+
   try {
     const fParts = new Intl.DateTimeFormat("id-ID-u-ca-islamic-umalqura", {
       day: "numeric",
@@ -349,24 +368,32 @@ export function getHijriDate(date: Date = new Date()): string {
       const mIdx = parseInt(monthPart, 10);
       if (mIdx >= 1 && mIdx <= 12) {
         const mName = HIJRI_MONTH_NAMES[mIdx - 1];
-        return `${dayPart} ${mName} ${yearPart} H`;
+        hijriBase = `${dayPart} ${mName} ${yearPart} H`;
       }
     }
   } catch {
     // Abaikan jika lingkungan peramban tidak mendukung Intl Islamic
   }
 
-  // Fallback deterministik independen
-  const calc = calculateDeterministicHijri(date);
-  return `${calc.day} ${calc.monthName} ${calc.year} H`;
+  if (!hijriBase) {
+    // Fallback deterministik independen
+    const calc = calculateDeterministicHijri(date);
+    hijriBase = `${calc.day} ${calc.monthName} ${calc.year} H`;
+  }
+
+  return includeDayName ? `${dayName}, ${hijriBase}` : hijriBase;
 }
 
 // Rincian Kalender Hijriyah Resmi Muhammadiyah (KHGT)
 export function getMuhammadiyahCalendarDetails(date: Date = new Date()) {
-  const hijri = getHijriDate(date);
+  const dayName = getIslamicDayName(date);
+  const hijri = getHijriDate(date, true);
+  const hijriWithoutDay = getHijriDate(date, false);
   const pasaran = getPasaranJawa(date);
   return {
+    dayName,
     hijri,
+    hijriWithoutDay,
     pasaran,
     combined: `${hijri} (${pasaran})`,
     standard: "Kalender Hijriyah Global Tunggal (KHGT)",
