@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, ArrowRight, ExternalLink, Play } from "lucid
 
 interface NewsItem {
   id: string;
-  source: "MASJIDMU" | "UMS" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
+  source: "MASJIDMU" | "UMS" | "MUHAMMADIYAH_SOLO" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
   badge: string;
   badgeClass: string;
   timeAgo: string;
@@ -119,6 +119,23 @@ const initialNewsData: NewsItem[] = [
       "Sebanyak 71 peserta tersebut mengikuti serangkaian uji kecakapan fisik, ketangkasan berkemah, serta pemahaman nilai-nilai kepanduan Hizbul Wathan yang berjiwa mandiri dan berakhlak mulia."
     ],
     imageUrl: "https://news.ums.ac.id/id/wp-content/uploads/sites/2/2026/10/71-Siswa-SMP-UMP-Ikuti-Uji-SKT-Pandu-Hizbul-Wathan-di-Alam-Terbuka-2.jpg",
+  },
+  {
+    id: "solo-17939",
+    source: "MUHAMMADIYAH_SOLO",
+    badge: "MUHAMMADIYAH SOLO",
+    badgeClass: "bg-[#1E5F3B] text-white",
+    timeAgo: "Baru saja",
+    publishedAt: "2026-10-18T13:54:19+07:00",
+    sourceDomain: "muhammadiyahsolo.com",
+    sourceUrl: "https://muhammadiyahsolo.com/20261018/ribuan-anggota-jemaah-hadiri-tabligh-akbar-hari-jadi-ke-68-ums-17939",
+    title: "Ribuan Anggota Jemaah Hadiri Tabligh Akbar Hari Jadi ke-68 UMS",
+    excerpt: "SOLO, MUHAMMADIYAHSOLO.COM - Universitas Muhammadiyah Surakarta (UMS) memperkuat komitmen dalam membangun generasi berlandaskan nilai-nilai Islam melalui Tablig Akbar dalam rangka Hari Jadi ke-68 UMS. Kegiatan yang menghadirkan Ustaz Das'ad Latif tersebut berlangsung di Gedung Edutorium KH Ahmad Dahlan UMS.",
+    content: [
+      "SOLO, MUHAMMADIYAHSOLO.COM - Universitas Muhammadiyah Surakarta (UMS) memperkuat komitmen dalam membangun generasi berlandaskan nilai-nilai Islam melalui Tablig Akbar dalam rangka Hari Jadi ke-68 UMS. Kegiatan yang menghadirkan Ustaz Das'ad Latif tersebut berlangsung di Gedung Edutorium KH Ahmad Dahlan UMS pada Ahad (18/10/2026).",
+      "Ribuan jemaah dari berbagai elemen civitas akademika, warga persyarikatan se-Solo Raya, serta masyarakat umum memadati lokasi dengan penuh antusias mendengarkan tausiyah kebangsaan dan keagamaan yang mencerahkan."
+    ],
+    imageUrl: "https://muhammadiyahsolo.com/files/2026/10/1810-UMS-1.jpeg",
   },
   {
     id: "ums-43445",
@@ -319,14 +336,88 @@ export default function NewsSection() {
       } catch (clientErr) {
         console.warn("Direct browser UMS fetch notice:", clientErr);
       }
+
+      // 3. Ambil langsung dari WordPress REST API Muhammadiyah Solo dari browser pengguna (mendukung CORS)
+      try {
+        const soloRes = await fetch("https://muhammadiyahsolo.com/wp-json/wp/v2/posts?_embed&per_page=6");
+        if (soloRes.ok) {
+          const soloData = await soloRes.json();
+          if (Array.isArray(soloData) && soloData.length > 0 && isMounted) {
+            const clientSoloArticles: NewsItem[] = soloData.map((p: any) => {
+              const rawExcerpt = (p.excerpt?.rendered || "")
+                .replace(/<[^>]+>/g, "")
+                .replace(/\[&hellip;\]/g, "...")
+                .replace(/&#8211;/g, "-")
+                .replace(/&#8217;/g, "'")
+                .trim();
+              const imgUrl =
+                p._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+                "/images/news/news-lensamu-1.jpg";
+              const pubDateIso = p.date_gmt
+                ? `${p.date_gmt}Z`
+                : p.date
+                ? `${p.date}+07:00`
+                : new Date().toISOString();
+
+              const cleanTitle = (p.title?.rendered || "")
+                .replace(/&amp;/g, "&")
+                .replace(/&#8211;/g, "-")
+                .replace(/&#8212;/g, "-")
+                .replace(/&#8217;/g, "'")
+                .replace(/&#8220;/g, '"')
+                .replace(/&#8221;/g, '"')
+                .replace(/<[^>]+>/g, "")
+                .trim();
+
+              return {
+                id: `solo-${p.id}`,
+                source: "MUHAMMADIYAH_SOLO",
+                badge: "MUHAMMADIYAH SOLO",
+                badgeClass: "bg-[#1E5F3B] text-white",
+                timeAgo: formatClientTimeAgo(pubDateIso, "Baru saja", Date.now()),
+                publishedAt: pubDateIso,
+                sourceDomain: "muhammadiyahsolo.com",
+                sourceUrl: p.link,
+                title: cleanTitle,
+                excerpt: rawExcerpt.slice(0, 220) + (rawExcerpt.length > 220 ? "..." : ""),
+                content: [
+                  rawExcerpt,
+                  "Warta resmi persyarikatan dan kegiatan civitas se-Solo Raya ini diliput langsung oleh portal Pimpinan Daerah Muhammadiyah Kota Surakarta.",
+                ],
+                imageUrl: imgUrl,
+              };
+            });
+
+            setNewsList((prev) => {
+              const currentLive = prev.find((item) => item.id === tablighAkbarLiveItem.id) || tablighAkbarLiveItem;
+              const nonSolo = prev.filter((item) => item.source !== "MUHAMMADIYAH_SOLO" && item.id !== tablighAkbarLiveItem.id);
+              const umsItems = nonSolo.filter((item) => item.source === "UMS");
+              const otherItems = nonSolo.filter((item) => item.source !== "UMS");
+              return [currentLive, ...umsItems, ...clientSoloArticles, ...otherItems];
+            });
+          }
+        }
+      } catch (clientSoloErr) {
+        console.warn("Direct browser Solo fetch notice:", clientSoloErr);
+      }
     };
 
     fetchLiveNews();
-    const pollInterval = setInterval(fetchLiveNews, 300000);
+    const pollInterval = setInterval(fetchLiveNews, 60000);
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchLiveNews();
+      }
+    };
+    window.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("focus", fetchLiveNews);
 
     return () => {
       isMounted = false;
       clearInterval(pollInterval);
+      window.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("focus", fetchLiveNews);
     };
   }, []);
 
@@ -367,11 +458,18 @@ export default function NewsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading - Centered to match other sections */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] sm:text-xs font-semibold mb-3.5 shadow-2xs">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+            </span>
+            <span>Sinkronisasi Otomatis Real-Time (UMS, PDM Solo, SM, Lensamu)</span>
+          </div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
             Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
-            Warta aktual civitas akademika UMS serta rilis berita resmi langsung dari portal Suara Muhammadiyah dan Lensamu.
+            Warta aktual civitas akademika UMS, liputan resmi persyarikatan Solo Raya (Muhammadiyah Solo), serta rilis berita Suara Muhammadiyah dan Lensamu yang terupdate otomatis dari sumber resminya.
           </p>
         </div>
 

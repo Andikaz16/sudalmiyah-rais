@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export interface ApiNewsItem {
   id: string;
-  source: "MASJIDMU" | "UMS" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
+  source: "MASJIDMU" | "UMS" | "MUHAMMADIYAH_SOLO" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
   badge: string;
   badgeClass: string;
   timeAgo: string;
@@ -222,9 +222,46 @@ const fallbackArticles: ApiNewsItem[] = [
     ],
     imageUrl: "/images/news/news-lensamu-1.jpg",
   },
+  {
+    id: "solo-17939",
+    source: "MUHAMMADIYAH_SOLO",
+    badge: "MUHAMMADIYAH SOLO",
+    badgeClass: "bg-[#1E5F3B] text-white",
+    timeAgo: "Baru saja",
+    publishedAt: "2026-10-18T13:54:19+07:00",
+    sourceDomain: "muhammadiyahsolo.com",
+    sourceUrl: "https://muhammadiyahsolo.com/20261018/ribuan-anggota-jemaah-hadiri-tabligh-akbar-hari-jadi-ke-68-ums-17939",
+    title: "Ribuan Anggota Jemaah Hadiri Tabligh Akbar Hari Jadi ke-68 UMS",
+    excerpt: "SOLO, MUHAMMADIYAHSOLO.COM - Universitas Muhammadiyah Surakarta (UMS) memperkuat komitmen dalam membangun generasi berlandaskan nilai-nilai Islam melalui Tablig Akbar dalam rangka Hari Jadi ke-68 UMS. Kegiatan yang menghadirkan Ustaz Das'ad Latif tersebut berlangsung di Gedung Edutorium KH Ahmad Dahlan UMS.",
+    content: [
+      "SOLO, MUHAMMADIYAHSOLO.COM - Universitas Muhammadiyah Surakarta (UMS) memperkuat komitmen dalam membangun generasi berlandaskan nilai-nilai Islam melalui Tablig Akbar dalam rangka Hari Jadi ke-68 UMS. Kegiatan yang menghadirkan Ustaz Das'ad Latif tersebut berlangsung di Gedung Edutorium KH Ahmad Dahlan UMS pada Ahad (18/10/2026).",
+      "Ribuan jemaah dari berbagai elemen civitas akademika, warga persyarikatan se-Solo Raya, serta masyarakat umum memadati lokasi dengan penuh antusias mendengarkan tausiyah kebangsaan dan keagamaan yang mencerahkan."
+    ],
+    imageUrl: "https://muhammadiyahsolo.com/files/2026/10/1810-UMS-1.jpeg",
+  },
+  {
+    id: "solo-17942",
+    source: "MUHAMMADIYAH_SOLO",
+    badge: "MUHAMMADIYAH SOLO",
+    badgeClass: "bg-[#1E5F3B] text-white",
+    timeAgo: "2 jam lalu",
+    publishedAt: "2026-10-18T14:18:07+07:00",
+    sourceDomain: "muhammadiyahsolo.com",
+    sourceUrl: "https://muhammadiyahsolo.com/20261018/tablig-akbar-hari-jadi-ke-68-ums-dasad-latif-ajak-jaga-akidah-dan-amalkan-nilai-islam-dalam-kehidupan-17942",
+    title: "Tablig Akbar Hari Jadi ke-68 UMS, Das'ad Latif Ajak Jaga Akidah dan Amalkan Nilai Islam dalam Kehidupan",
+    excerpt: "SOLO, MUHAMMADIYAHSOLO.COM - Semarak Hari Jadi ke-68 Universitas Muhammadiyah Surakarta (UMS) terus berlanjut melalui gelaran Tablig Akbar yang sarat pesan keagamaan dan kebangsaan oleh mubaligh nasional Ustaz Dr. H. Das'ad Latif.",
+    content: [
+      "SOLO, MUHAMMADIYAHSOLO.COM - Semarak Hari Jadi ke-68 Universitas Muhammadiyah Surakarta (UMS) terus berlanjut melalui gelaran Tablig Akbar yang sarat pesan keagamaan dan kebangsaan oleh mubaligh nasional Ustaz Dr. H. Das'ad Latif.",
+      "Dalam tausiyahnya di hadapan ribuan hadirin, Ustaz Das'ad Latif mengingatkan pentingnya meneguhkan akidah, mempererat tali ukhuwah persyarikatan, serta membumikan nilai-nilai Islam berkemajuan dalam amal perbuatan nyata sehari-hari."
+    ],
+    imageUrl: "https://muhammadiyahsolo.com/files/2026/10/1810-UMS-2.jpg",
+  },
 ];
 
-function parseRssFeed(xml: string, source: "UMS" | "SUARA_MUHAMMADIYAH" | "LENSAMU"): ApiNewsItem[] {
+function parseRssFeed(
+  xml: string,
+  source: "UMS" | "MUHAMMADIYAH_SOLO" | "SUARA_MUHAMMADIYAH" | "LENSAMU"
+): ApiNewsItem[] {
   const items: ApiNewsItem[] = [];
   const itemRegex = /<item>([\s\S]*?)<\/item>/g;
   let match;
@@ -256,20 +293,35 @@ function parseRssFeed(xml: string, source: "UMS" | "SUARA_MUHAMMADIYAH" | "LENSA
 
     if (rawTitle && rawLink) {
       const isUms = source === "UMS";
+      const isSolo = source === "MUHAMMADIYAH_SOLO";
       const isSm = source === "SUARA_MUHAMMADIYAH";
 
       items.push({
-        id: `${source.toLowerCase()}-rss-${items.length + 1}`,
+        id: `${source.toLowerCase().replace(/_/g, "-")}-rss-${items.length + 1}`,
         source,
-        badge: isUms ? "UMS NEWS" : isSm ? "SUARA MUHAMMADIYAH" : "LENSAMU",
+        badge: isUms
+          ? "UMS NEWS"
+          : isSolo
+          ? "MUHAMMADIYAH SOLO"
+          : isSm
+          ? "SUARA MUHAMMADIYAH"
+          : "LENSAMU",
         badgeClass: isUms
           ? "bg-[#003B73] text-white"
+          : isSolo
+          ? "bg-[#1E5F3B] text-white"
           : isSm
           ? "bg-[#800000] text-white"
           : "bg-[#005A36] text-white",
         timeAgo: calculateTimeAgo(pubDateIso),
         publishedAt: pubDateIso,
-        sourceDomain: isUms ? "news.ums.ac.id" : isSm ? "suaramuhammadiyah.id" : "lensamu.id",
+        sourceDomain: isUms
+          ? "news.ums.ac.id"
+          : isSolo
+          ? "muhammadiyahsolo.com"
+          : isSm
+          ? "suaramuhammadiyah.id"
+          : "lensamu.id",
         sourceUrl: rawLink,
         title: rawTitle,
         excerpt: rawDesc.slice(0, 240) + (rawDesc.length > 240 ? "..." : ""),
@@ -281,6 +333,8 @@ function parseRssFeed(xml: string, source: "UMS" | "SUARA_MUHAMMADIYAH" | "LENSA
           ? imgMatch[1]
           : isUms
           ? "/images/news/ums-pemilu.jpg"
+          : isSolo
+          ? "/images/news/news-lensamu-1.jpg"
           : isSm
           ? "/images/news/news-sm-1.jpg"
           : "/images/news/news-lensamu-1.jpg",
@@ -370,7 +424,86 @@ async function fetchUmsNews(): Promise<ApiNewsItem[]> {
   return fallbackArticles.filter((a) => a.source === "UMS");
 }
 
-// 2. Fetcher Lensamu (Muhammadiyah.or.id)
+// 2. Fetcher Khusus Berita Muhammadiyah Solo (muhammadiyahsolo.com)
+async function fetchMuhammadiyahSoloNews(): Promise<ApiNewsItem[]> {
+  const items: ApiNewsItem[] = [];
+
+  // Strategi A: WordPress REST API resmi muhammadiyahsolo.com
+  try {
+    const res = await fetch("https://muhammadiyahsolo.com/wp-json/wp/v2/posts?_embed&per_page=6", {
+      cache: "no-store",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach((p) => {
+          const rawExcerpt = p.excerpt?.rendered || "";
+          const imgUrl =
+            p._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+            "/images/news/news-lensamu-1.jpg";
+          const pubDateIso = p.date_gmt
+            ? `${p.date_gmt}Z`
+            : p.date
+            ? `${p.date}+07:00`
+            : new Date().toISOString();
+
+          items.push({
+            id: `solo-${p.id}`,
+            source: "MUHAMMADIYAH_SOLO",
+            badge: "MUHAMMADIYAH SOLO",
+            badgeClass: "bg-[#1E5F3B] text-white",
+            timeAgo: calculateTimeAgo(pubDateIso),
+            publishedAt: pubDateIso,
+            sourceDomain: "muhammadiyahsolo.com",
+            sourceUrl: p.link,
+            title: decodeHtmlEntities(p.title?.rendered || ""),
+            excerpt: decodeHtmlEntities(rawExcerpt),
+            content: [
+              decodeHtmlEntities(rawExcerpt),
+              "Warta resmi persyarikatan dan kegiatan civitas se-Solo Raya ini diliput langsung oleh portal Pimpinan Daerah Muhammadiyah Kota Surakarta.",
+            ],
+            imageUrl: imgUrl,
+          });
+        });
+
+        if (items.length > 0) return items;
+      }
+    }
+  } catch (err) {
+    console.warn("Notice: Muhammadiyah Solo REST API failed, trying RSS:", err);
+  }
+
+  // Strategi B: RSS Feed muhammadiyahsolo.com/feed
+  try {
+    const resRss = await fetch("https://muhammadiyahsolo.com/feed", {
+      cache: "no-store",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        Accept: "text/xml, application/rss+xml, */*",
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (resRss.ok) {
+      const xml = await resRss.text();
+      const parsed = parseRssFeed(xml, "MUHAMMADIYAH_SOLO");
+      if (parsed.length > 0) return parsed;
+    }
+  } catch (err) {
+    console.warn("Notice: Muhammadiyah Solo RSS failed:", err);
+  }
+
+  // Strategi C: Fallback Lokal
+  return fallbackArticles.filter((a) => a.source === "MUHAMMADIYAH_SOLO");
+}
+
+// 3. Fetcher Lensamu (Muhammadiyah.or.id)
 async function fetchLensamuNews(): Promise<ApiNewsItem[]> {
   const items: ApiNewsItem[] = [];
 
@@ -508,9 +641,10 @@ async function checkYouTubeLiveStatus(videoId: string): Promise<boolean> {
 }
 
 export async function GET(request: Request) {
-  // Ambil sumber berita dan status live secara paralel
-  const [umsArticles, lensamuArticles, smArticles, isLive] = await Promise.all([
+  // Ambil semua sumber berita dan status live secara paralel
+  const [umsArticles, soloArticles, lensamuArticles, smArticles, isLive] = await Promise.all([
     fetchUmsNews(),
+    fetchMuhammadiyahSoloNews(),
     fetchLensamuNews(),
     fetchSuaraMuhammadiyahNews(),
     checkYouTubeLiveStatus("KVGneiEldgo"),
@@ -524,10 +658,13 @@ export async function GET(request: Request) {
     timeAgo: isLive ? "Sedang Berlangsung" : "Siaran Ulang",
   };
 
-  // UTAMAKAN KAJIAN & BERITA KAMPUS UMS DI URUTAN TERDEPAN (Posisi 0, 1, 2, dst.)
+  // Prioritas utama: Siaran / Rekaman Tabligh Akbar
+  // Diikuti Berita Kampus UMS & Liputan Persyarikatan Solo (muhammadiyahsolo.com)
+  // Kemudian Suara Muhammadiyah & Lensamu
   const officialArticles = [
     liveArticleItem,
     ...umsArticles.filter((a) => a.id !== tablighAkbarLiveArticle.id),
+    ...soloArticles,
     ...smArticles,
     ...lensamuArticles,
   ];
@@ -540,7 +677,7 @@ export async function GET(request: Request) {
     },
     {
       headers: {
-        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
         Pragma: "no-cache",
         Expires: "0",
       },
