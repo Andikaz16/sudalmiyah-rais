@@ -186,16 +186,16 @@ export default function LayananPage() {
                             Permohonan Peminjaman Berhasil Diajukan!
                           </h4>
                           <p className="text-xs sm:text-sm text-emerald-800 leading-relaxed">
-                            Data permohonan Anda telah tercatat aman di sistem Takmir Masjid Kampus UMS. Sesuai alur resmi Masjid UMS, silakan kirimkan konfirmasi ke narahubung takmir (Mas Faris) agar pengajuan Anda segera diverifikasi dan di-ACC.
+                            Data permohonan Anda telah tercatat aman di sistem Takmir Masjid Kampus UMS. Sesuai alur resmi Masjid UMS, silakan kirimkan konfirmasi ke narahubung takmir (Aryawan untuk Masjid Sudalmiyah atau Mas Faris untuk Masjid Fadlurohman) agar pengajuan Anda segera diverifikasi dan di-ACC.
                           </p>
                         </div>
                       </div>
 
                       {submittedData && (
-                        <div className="pt-2">
+                        <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
                           <a
-                            href={`https://wa.me/6285848601435?text=${encodeURIComponent(
-                              `Assalamu'alaikum Mas Faris, saya telah mengajukan permohonan peminjaman di Portal Resmi Masjid Kampus UMS:\n\n` +
+                            href={`https://wa.me/6282181488897?text=${encodeURIComponent(
+                              `Assalamu'alaikum Mas Aryawan (Takmir Masjid Sudalmiyah), saya telah mengajukan permohonan peminjaman inventaris di Portal Resmi Masjid Kampus UMS:\n\n` +
                               `• Nama Penanggung Jawab: ${submittedData.applicantName}\n` +
                               `• NIM: ${submittedData.nim}\n` +
                               `• Lembaga / Ortom / UKM: ${submittedData.organization}\n` +
@@ -206,10 +206,29 @@ export default function LayananPage() {
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
                           >
                             <MessageSquare className="w-4 h-4" />
-                            <span>Kirim Konfirmasi ke WA Mas Faris (085848601435)</span>
+                            <span>Konfirmasi ke Aryawan (Masjid Sudalmiyah)</span>
+                          </a>
+
+                          <a
+                            href={`https://wa.me/6285848601435?text=${encodeURIComponent(
+                              `Assalamu'alaikum Mas Faris (Takmir Masjid Fadlurohman), saya telah mengajukan permohonan peminjaman inventaris di Portal Resmi Masjid Kampus UMS:\n\n` +
+                              `• Nama Penanggung Jawab: ${submittedData.applicantName}\n` +
+                              `• NIM: ${submittedData.nim}\n` +
+                              `• Lembaga / Ortom / UKM: ${submittedData.organization}\n` +
+                              `• Barang Inventaris: ${submittedData.facilityName}\n` +
+                              `• Nama Agenda: ${submittedData.eventTitle}\n` +
+                              `• Tanggal: ${submittedData.eventDate} (${submittedData.startTime} - ${submittedData.endTime} WIB)\n\n` +
+                              `Mohon untuk dapat ditinjau dan di-ACC. Terima kasih. Jazakallahu khair.`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                            <span>Konfirmasi ke Mas Faris (Masjid Fadlurohman)</span>
                           </a>
                         </div>
                       )}
@@ -469,28 +488,56 @@ export default function LayananPage() {
               </div>
 
               {/* Narahubung Takmir Card */}
-              <div className="p-5 rounded-3xl bg-gradient-to-br from-[#002855] to-[#003B73] text-white space-y-2.5 shadow-md">
+              <div className="p-5 rounded-3xl bg-gradient-to-br from-[#002855] to-[#003B73] text-white space-y-3 shadow-md">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-white border border-white/20 shrink-0">
                     <Phone className="w-5 h-5 text-amber-300" />
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-white">Narahubung Takmir (Konfirmasi &amp; ACC)</h4>
-                    <p className="text-xs text-stone-200">Mas Faris (Layanan Peminjaman Masjid UMS)</p>
+                    <p className="text-xs text-stone-200">Layanan Peminjaman Inventaris Masjid Kampus UMS</p>
                   </div>
                 </div>
                 <p className="text-[11px] text-stone-200 leading-relaxed">
-                  Hubungi narahubung takmir setelah mengirim formulir untuk konfirmasi ketersediaan dan percepatan persetujuan (ACC).
+                  Hubungi narahubung takmir sesuai lokasi masjid setelah mengirim formulir untuk konfirmasi ketersediaan dan percepatan persetujuan (ACC):
                 </p>
-                <div className="pt-1">
+                <div className="space-y-2.5 pt-1">
+                  {/* Kontak 1: Masjid Sudalmiyah */}
+                  <a
+                    href="https://wa.me/6282181488897"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between gap-2 w-full p-2.5 sm:px-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-95 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5 text-left">
+                      <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                        <MessageSquare className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <div>
+                        <span className="block text-[10px] text-emerald-100 font-normal uppercase tracking-wider">Masjid Sudalmiyah (Kampus 2)</span>
+                        <span className="text-xs font-bold text-white">Aryawan (+62 821-8148-8897)</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white shrink-0 font-semibold">Hubungi</span>
+                  </a>
+
+                  {/* Kontak 2: Masjid Fadlurohman */}
                   <a
                     href="https://wa.me/6285848601435"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer"
+                    className="flex items-center justify-between gap-2 w-full p-2.5 sm:px-3 rounded-2xl bg-emerald-700/80 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-95 cursor-pointer"
                   >
-                    <MessageSquare className="w-4 h-4" />
-                    <span>WhatsApp: 085848601435 (Mas Faris)</span>
+                    <div className="flex items-center gap-2.5 text-left">
+                      <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                        <MessageSquare className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <div>
+                        <span className="block text-[10px] text-emerald-100 font-normal uppercase tracking-wider">Masjid Fadlurohman (Kampus 1)</span>
+                        <span className="text-xs font-bold text-white">Mas Faris (0858-4860-1435)</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white shrink-0 font-semibold">Hubungi</span>
                   </a>
                 </div>
               </div>
