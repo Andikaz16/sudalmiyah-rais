@@ -1,5 +1,5 @@
 import { put, list, del } from "@vercel/blob";
-import { PopupBanner, Agenda } from "./types";
+import { PopupBanner, Agenda, ManualNewsItem } from "./types";
 
 /**
  * Checks if Vercel Blob storage is enabled via BLOB_READ_WRITE_TOKEN or BLOB_STORE_ID (OIDC).
@@ -155,6 +155,55 @@ export async function readAgendasFromBlob(): Promise<Agenda[] | null> {
     return null;
   } catch (err) {
     console.warn("Notice: Could not read agendas from Vercel Blob:", err);
+    return null;
+  }
+}
+
+/**
+ * Persists manual news array to Vercel Blob CDN.
+ */
+export async function saveManualNewsToBlob(news: ManualNewsItem[]): Promise<string | null> {
+  if (!isBlobConfigured()) return null;
+
+  try {
+    const jsonString = JSON.stringify(news, null, 2);
+    const blob = await put("database/manual_news.json", jsonString, {
+      access: "public",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      cacheControlMaxAge: 0,
+      contentType: "application/json",
+    });
+    return blob.url;
+  } catch (err) {
+    console.warn("Notice: Could not write manual news to Vercel Blob:", err);
+    return null;
+  }
+}
+
+/**
+ * Reads manual news from Vercel Blob if available.
+ */
+export async function readManualNewsFromBlob(): Promise<ManualNewsItem[] | null> {
+  if (!isBlobConfigured()) return null;
+
+  try {
+    const result = await list({ prefix: "database/manual_news.json", limit: 1 });
+    const targetBlob = result.blobs.find((b) => b.pathname === "database/manual_news.json");
+    if (!targetBlob) return null;
+
+    const res = await fetch(`${targetBlob.url}?t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return null;
+  } catch (err) {
+    console.warn("Notice: Could not read manual news from Vercel Blob:", err);
     return null;
   }
 }

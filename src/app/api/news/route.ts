@@ -1,4 +1,5 @@
 import { NextResponse, connection } from "next/server";
+import { getDbAsync } from "@/lib/db";
 
 export interface ApiNewsItem {
   id: string;
@@ -652,14 +653,33 @@ async function checkYouTubeLiveStatus(videoId: string): Promise<boolean> {
 
 export async function GET(request: Request) {
   await connection();
-  // Ambil semua sumber berita dan status live secara paralel
-  const [umsArticles, soloArticles, lensamuArticles, smArticles, isLive] = await Promise.all([
+  // Ambil berita manual dari basis data dan semua sumber berita eksternal secara paralel
+  const [db, umsArticles, soloArticles, lensamuArticles, smArticles, isLive] = await Promise.all([
+    getDbAsync(),
     fetchUmsNews(),
     fetchMuhammadiyahSoloNews(),
     fetchLensamuNews(),
     fetchSuaraMuhammadiyahNews(),
     checkYouTubeLiveStatus("KVGneiEldgo"),
   ]);
+
+  // Berita Manual Warta Masjid (dikelola melalui panel admin)
+  const manualArticles: ApiNewsItem[] = (db.manualNews || [])
+    .filter((n) => n.isPublished !== false)
+    .map((item) => ({
+      id: item.id,
+      source: "MASJIDMU",
+      badge: item.badge || "WARTA MASJID",
+      badgeClass: item.badgeClass || "bg-[#003B73] text-white",
+      timeAgo: calculateTimeAgo(item.publishedAt),
+      publishedAt: item.publishedAt,
+      sourceDomain: item.sourceDomain || "masjid.ums.ac.id",
+      sourceUrl: item.sourceUrl || "#",
+      title: item.title,
+      excerpt: item.excerpt,
+      content: item.content,
+      imageUrl: item.imageUrl,
+    }));
 
   const liveArticleItem: ApiNewsItem = {
     ...tablighAkbarLiveArticle,
@@ -669,10 +689,13 @@ export async function GET(request: Request) {
     timeAgo: isLive ? "Sedang Berlangsung" : "Siaran Ulang",
   };
 
-  // Prioritas utama: Siaran / Rekaman Tabligh Akbar
-  // Diikuti Berita Kampus UMS & Liputan Persyarikatan Solo (muhammadiyahsolo.com)
-  // Kemudian Suara Muhammadiyah & Lensamu
+  // Urutan prioritas:
+  // 1. Warta / Berita Manual Masjid (dibuat nomor pertama sebelum news ums)
+  // 2. Siaran / Rekaman Tabligh Akbar
+  // 3. Berita Kampus UMS & Liputan Persyarikatan Solo (muhammadiyahsolo.com)
+  // 4. Suara Muhammadiyah & Lensamu
   const officialArticles = [
+    ...manualArticles,
     liveArticleItem,
     ...umsArticles.filter((a) => a.id !== tablighAkbarLiveArticle.id),
     ...soloArticles,

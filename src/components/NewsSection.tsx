@@ -80,6 +80,25 @@ export function formatClientTimeAgo(
   }
 }
 
+export const initialSilaturahmiBphArticle: NewsItem = {
+  id: "news-manual-silaturahmi-bph-2026",
+  source: "MASJIDMU",
+  badge: "WARTA MASJID",
+  badgeClass: "bg-[#003B73] text-white",
+  timeAgo: "13 Oktober 2026",
+  publishedAt: "2026-10-13T10:00:00+07:00",
+  sourceDomain: "masjid.ums.ac.id",
+  sourceUrl: "#",
+  title: "Silaturrahmi Badan Pembina dan Pelaksana Masjid Hj. Sudalmiyah Rais dengan BPH UMS",
+  excerpt: "SURAKARTA — Badan Pembina dan Pelaksana Masjid Hj. Sudalmiyah Rais menggelar silaturrahmi koordinasi bersama Badan Pembina Harian (BPH) Universitas Muhammadiyah Surakarta di Ruang Sidang BPH UMS pada Selasa, 13 Oktober 2026.",
+  content: [
+    "SURAKARTA — Dalam rangka mempererat ukhuwah serta menyelaraskan arah pembinaan kemakmuran masjid kampus, jajaran Badan Pembina dan Pelaksana Masjid Hj. Sudalmiyah Rais menggelar pertemuan silaturrahmi bersama jajaran Badan Pembina Harian (BPH) Universitas Muhammadiyah Surakarta pada Selasa, 13 Oktober 2026.",
+    "Pertemuan yang bertempat di Ruang Sidang BPH UMS ini dihadiri oleh pimpinan BPH UMS, jajaran pembina, serta takmir pelaksana Masjid Hj. Sudalmiyah Rais. Agenda pertemuan membahas koordinasi kelembagaan, penguatan program ibadah, pembinaan dakwah kemahasiswaan, serta peningkatan sarana prasarana penunjang kegiatan jamaah.",
+    "Melalui silaturrahmi ini, sinergi antara BPH UMS dan pengelola Masjid Hj. Sudalmiyah Rais diharapkan semakin kokoh dalam mewujudkan masjid kampus sebagai pusat peradaban, pembinaan karakter Islami, dan pusat syiar persyarikatan di lingkungan civitas akademika."
+  ],
+  imageUrl: "/images/news/silaturahmi-bph-1.jpg",
+};
+
 export const tablighAkbarLiveItem: NewsItem = {
   id: "ums-live-tabligh-akbar-68",
   source: "UMS",
@@ -102,6 +121,7 @@ export const tablighAkbarLiveItem: NewsItem = {
 };
 
 const initialNewsData: NewsItem[] = [
+  initialSilaturahmiBphArticle,
   tablighAkbarLiveItem,
   {
     id: "ums-43448",
@@ -259,14 +279,13 @@ export default function NewsSection() {
     let isMounted = true;
 
     const fetchLiveNews = async () => {
-      // 1. Ambil dari API route internal yang mengagregasi 3 portal
+      // 1. Ambil dari API route internal yang mengagregasi warta manual + 3 portal
       try {
         const res = await fetch("/api/news", { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
           if (isMounted && data.articles && Array.isArray(data.articles) && data.articles.length > 0) {
-            const hasLive = data.articles.some((a: NewsItem) => a.id === tablighAkbarLiveItem.id);
-            setNewsList(hasLive ? data.articles : [tablighAkbarLiveItem, ...data.articles]);
+            setNewsList(data.articles);
           }
         }
       } catch (err) {
@@ -326,10 +345,13 @@ export default function NewsSection() {
             });
 
             setNewsList((prev) => {
+              const manualItems = prev.filter((item) => item.source === "MASJIDMU");
               const currentLive = prev.find((item) => item.id === tablighAkbarLiveItem.id) || tablighAkbarLiveItem;
-              const nonUms = prev.filter((item) => item.source !== "UMS" && item.id !== tablighAkbarLiveItem.id);
+              const nonUms = prev.filter(
+                (item) => item.source !== "UMS" && item.source !== "MASJIDMU" && item.id !== tablighAkbarLiveItem.id
+              );
               const filteredClient = clientUmsArticles.filter((item) => item.id !== tablighAkbarLiveItem.id);
-              return [currentLive, ...filteredClient, ...nonUms];
+              return [...manualItems, currentLive, ...filteredClient, ...nonUms];
             });
           }
         }
@@ -389,11 +411,14 @@ export default function NewsSection() {
             });
 
             setNewsList((prev) => {
+              const manualItems = prev.filter((item) => item.source === "MASJIDMU");
               const currentLive = prev.find((item) => item.id === tablighAkbarLiveItem.id) || tablighAkbarLiveItem;
-              const nonSolo = prev.filter((item) => item.source !== "MUHAMMADIYAH_SOLO" && item.id !== tablighAkbarLiveItem.id);
+              const nonSolo = prev.filter(
+                (item) => item.source !== "MUHAMMADIYAH_SOLO" && item.source !== "MASJIDMU" && item.id !== tablighAkbarLiveItem.id
+              );
               const umsItems = nonSolo.filter((item) => item.source === "UMS");
               const otherItems = nonSolo.filter((item) => item.source !== "UMS");
-              return [currentLive, ...umsItems, ...clientSoloArticles, ...otherItems];
+              return [...manualItems, currentLive, ...umsItems, ...clientSoloArticles, ...otherItems];
             });
           }
         }
@@ -425,7 +450,7 @@ export default function NewsSection() {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const displayNews = newsList.filter((item) => (item.source as string) !== "MASJIDMU");
+  const displayNews = newsList;
 
   const checkScrollPosition = useCallback(() => {
     if (!sliderRef.current) return;
@@ -595,20 +620,22 @@ export default function NewsSection() {
                         } group-hover/btn:translate-x-1 transition-all`}
                       />
                     </button>
-                    <a
-                      href={item.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      title={item.isLive ? "Buka YouTube di tab baru" : "Buka sumber resmi di tab baru"}
-                      className={`p-1.5 rounded-full hover:bg-stone-100 ${
-                        item.isLive
-                          ? "text-red-500 hover:text-red-700"
-                          : "text-stone-400 hover:text-[#003B73]"
-                      } transition-colors`}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
+                    {item.sourceUrl && item.sourceUrl !== "#" ? (
+                      <a
+                        href={item.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        title={item.isLive ? "Buka YouTube di tab baru" : "Buka sumber resmi di tab baru"}
+                        className={`p-1.5 rounded-full hover:bg-stone-100 ${
+                          item.isLive
+                            ? "text-red-500 hover:text-red-700"
+                            : "text-stone-400 hover:text-[#003B73]"
+                        } transition-colors`}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    ) : null}
                   </div>
                 </article>
               ))}
@@ -717,34 +744,42 @@ export default function NewsSection() {
                 <div className="text-xs text-stone-600">
                   {selectedArticle.isLive ? (
                     <span>Siaran Resmi: <strong className="text-stone-900">YouTube Official UMS</strong></span>
+                  ) : selectedArticle.source === "MASJIDMU" ? (
+                    <span>Diterbitkan oleh: <strong className="text-stone-900">Takmir Masjid Hj. Sudalmiyah Rais</strong></span>
                   ) : (
                     <span>Portal Resmi: <strong className="text-stone-900">{selectedArticle.sourceDomain}</strong></span>
                   )}
                 </div>
-                <a
-                  href={selectedArticle.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`px-5 py-2.5 rounded-full ${
-                    selectedArticle.isLive
-                      ? "bg-red-600 hover:bg-red-700 text-white"
-                      : "bg-[#003B73] hover:bg-[#002855] text-white"
-                  } text-xs font-bold text-center inline-flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs`}
-                >
-                  {selectedArticle.isLive ? (
-                    <>
-                      <Play className="w-3.5 h-3.5 fill-current" />
-                      <span>Buka Siaran di YouTube</span>
-                    </>
-                  ) : selectedArticle.youtubeId ? (
-                    <>
-                      <Play className="w-3.5 h-3.5 fill-current" />
-                      <span>Tonton di YouTube</span>
-                    </>
-                  ) : (
-                    <span>Kunjungi Sumber Resmi</span>
-                  )}
-                </a>
+                {selectedArticle.sourceUrl && selectedArticle.sourceUrl !== "#" ? (
+                  <a
+                    href={selectedArticle.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`px-5 py-2.5 rounded-full ${
+                      selectedArticle.isLive
+                        ? "bg-red-600 hover:bg-red-700 text-white"
+                        : "bg-[#003B73] hover:bg-[#002855] text-white"
+                    } text-xs font-bold text-center inline-flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs`}
+                  >
+                    {selectedArticle.isLive ? (
+                      <>
+                        <Play className="w-3.5 h-3.5 fill-current" />
+                        <span>Buka Siaran di YouTube</span>
+                      </>
+                    ) : selectedArticle.youtubeId ? (
+                      <>
+                        <Play className="w-3.5 h-3.5 fill-current" />
+                        <span>Tonton di YouTube</span>
+                      </>
+                    ) : (
+                      <span>Kunjungi Sumber Resmi</span>
+                    )}
+                  </a>
+                ) : (
+                  <span className="text-xs font-semibold text-[#003B73]">
+                    Dokumentasi &amp; Warta Resmi Masjid
+                  </span>
+                )}
               </div>
             </div>
           </div>

@@ -311,3 +311,20 @@ export interface DownloadDocument {
   createdAt: string;
   updatedAt?: string;
 }
+
+export interface ManualNewsItem {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string[];
+  imageUrl: string;
+  publishedAt: string;
+  badge: string;
+  badgeClass?: string;
+  sourceDomain?: string;
+  sourceUrl?: string;
+  author?: string;
+  createdAt: string;
+  updatedAt?: string;
+  isPublished?: boolean;
+}

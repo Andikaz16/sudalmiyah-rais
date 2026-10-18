@@ -15,9 +15,11 @@ import {
   MosqueFeedback,
   PopupBanner,
   DownloadDocument,
+  ManualNewsItem,
 } from "./types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getFirestoreDb, isFirebaseConfigured } from "./firebase";
+import { isBlobConfigured, saveManualNewsToBlob, readManualNewsFromBlob } from "./blobStorage";
 
 export interface DatabaseSchema {
   users: User[];
@@ -34,6 +36,7 @@ export interface DatabaseSchema {
   popupBanner?: PopupBanner | null;
   popupBanners?: PopupBanner[];
   documents?: DownloadDocument[];
+  manualNews?: ManualNewsItem[];
 }
 
 function getDbFilePath(): string {
@@ -279,6 +282,30 @@ export function getDefaultDocuments(): DownloadDocument[] {
       downloadCount: 420,
       publishedYear: "Edisi LPCR-PM PP Muhammadiyah",
       createdAt: "2026-10-15T10:00:00.000Z",
+    },
+  ];
+}
+
+export function getDefaultManualNews(): ManualNewsItem[] {
+  return [
+    {
+      id: "news-manual-silaturahmi-bph-2026",
+      title: "Silaturrahmi Badan Pembina dan Pelaksana Masjid Hj. Sudalmiyah Rais dengan BPH UMS",
+      excerpt: "SURAKARTA — Badan Pembina dan Pelaksana Masjid Hj. Sudalmiyah Rais menggelar silaturrahmi koordinasi bersama Badan Pembina Harian (BPH) Universitas Muhammadiyah Surakarta di Ruang Sidang BPH UMS pada Selasa, 13 Oktober 2026.",
+      content: [
+        "SURAKARTA — Dalam rangka mempererat ukhuwah serta menyelaraskan arah pembinaan kemakmuran masjid kampus, jajaran Badan Pembina dan Pelaksana Masjid Hj. Sudalmiyah Rais menggelar pertemuan silaturrahmi bersama jajaran Badan Pembina Harian (BPH) Universitas Muhammadiyah Surakarta pada Selasa, 13 Oktober 2026.",
+        "Pertemuan yang bertempat di Ruang Sidang BPH UMS ini dihadiri oleh pimpinan BPH UMS, jajaran pembina, serta takmir pelaksana Masjid Hj. Sudalmiyah Rais. Agenda pertemuan membahas koordinasi kelembagaan, penguatan program ibadah, pembinaan dakwah kemahasiswaan, serta peningkatan sarana prasarana penunjang kegiatan jamaah.",
+        "Melalui silaturrahmi ini, sinergi antara BPH UMS dan pengelola Masjid Hj. Sudalmiyah Rais diharapkan semakin kokoh dalam mewujudkan masjid kampus sebagai pusat peradaban, pembinaan karakter Islami, dan pusat syiar persyarikatan di lingkungan civitas akademika."
+      ],
+      imageUrl: "/images/news/silaturahmi-bph-1.jpg",
+      publishedAt: "2026-10-13T10:00:00+07:00",
+      badge: "WARTA MASJID",
+      badgeClass: "bg-[#003B73] text-white",
+      sourceDomain: "masjid.ums.ac.id",
+      sourceUrl: "#",
+      author: "Badan Pembina & Pelaksana Masjid Hj. Sudalmiyah Rais",
+      createdAt: "2026-10-13T10:00:00+07:00",
+      isPublished: true,
     },
   ];
 }
@@ -559,11 +586,20 @@ function getInitialData(): DatabaseSchema {
       },
     ],
     documents: getDefaultDocuments(),
+    manualNews: getDefaultManualNews(),
   };
 }
 
 export function ensureDbDefaults(data: DatabaseSchema): DatabaseSchema {
   if (!data) return getInitialData();
+  if (!data.manualNews || data.manualNews.length === 0) {
+    data.manualNews = getDefaultManualNews();
+  } else {
+    const hasSilaturahmi = data.manualNews.some((n) => n.id === "news-manual-silaturahmi-bph-2026");
+    if (!hasSilaturahmi) {
+      data.manualNews.unshift(getDefaultManualNews()[0]);
+    }
+  }
   if (!data.fridaySchedules || data.fridaySchedules.length < 6) {
     const defaults = getDefaultFridaySchedules(data.fridaySchedule);
     if (!data.fridaySchedules || data.fridaySchedules.length === 0) {
@@ -689,7 +725,20 @@ export async function getDbAsync(): Promise<DatabaseSchema> {
       console.warn("Notice: Firestore read error, falling back to local file:", err);
     }
   }
-  return getDb();
+
+  const db = getDb();
+  if (isBlobConfigured()) {
+    try {
+      const blobNews = await readManualNewsFromBlob();
+      if (blobNews && blobNews.length > 0) {
+        db.manualNews = blobNews;
+        memoryDb = db;
+      }
+    } catch (blobErr) {
+      console.warn("Notice: Blob manual news sync notice:", blobErr);
+    }
+  }
+  return db;
 }
 
 export async function saveDb(data: DatabaseSchema): Promise<void> {
@@ -716,6 +765,11 @@ export async function saveDb(data: DatabaseSchema): Promise<void> {
     } catch (err) {
       console.error("Notice: Firestore write error:", err);
     }
+  }
+
+  // Persist manual news to Vercel Blob if configured
+  if (isBlobConfigured() && data.manualNews) {
+    saveManualNewsToBlob(data.manualNews).catch(() => {});
   }
 }
 

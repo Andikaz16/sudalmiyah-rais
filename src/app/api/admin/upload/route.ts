@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Sanitize folder
-    const allowedFolders = ["khatib", "agendas", "qris", "general", "documents", "popup"];
+    const allowedFolders = ["khatib", "agendas", "qris", "general", "documents", "popup", "news"];
     const folder = allowedFolders.includes(rawFolder) ? rawFolder : "general";
 
     // Validate MIME type

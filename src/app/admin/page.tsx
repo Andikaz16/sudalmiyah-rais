@@ -37,6 +37,7 @@ import {
   X,
   Database,
   Copy,
+  Newspaper,
 } from "lucide-react";
 import {
   Agenda,
@@ -51,6 +52,7 @@ import {
   DocumentCategory,
   isPopupExpired,
   getPopupRemainingTime,
+  ManualNewsItem,
 } from "@/lib/types";
 
 const ADMIN_MOSQUES = [
@@ -136,7 +138,7 @@ async function compressImageForUpload(
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS"
+    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID"
   >("AGENDAS");
   const [stats, setStats] = useState<{
     totalAgendas: number;
@@ -381,9 +383,29 @@ export default function AdminDashboardPage() {
     publishedYear: "",
   });
 
+  // Manual News Management State
+  const [manualNewsList, setManualNewsList] = useState<ManualNewsItem[]>([]);
+  const [loadingNews, setLoadingNews] = useState(false);
+  const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
+  const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
+  const [uploadingNewsImage, setUploadingNewsImage] = useState(false);
+  const [savingNews, setSavingNews] = useState(false);
+  const [newsForm, setNewsForm] = useState({
+    title: "",
+    badge: "WARTA MASJID",
+    badgeClass: "bg-[#003B73] text-white",
+    publishedAt: "",
+    sourceDomain: "masjid.ums.ac.id",
+    sourceUrl: "",
+    imageUrl: "/images/news/silaturahmi-bph-1.jpg",
+    excerpt: "",
+    contentRaw: "",
+    isPublished: true,
+  });
+
   const loadData = async () => {
     try {
-      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes] = await Promise.all([
+      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes, newsRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch(`/api/agendas?t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/friday-schedule"),
@@ -391,6 +413,7 @@ export default function AdminDashboardPage() {
         fetch(`/api/popup?admin=1&t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/documents"),
         fetch("/api/admin/system-status"),
+        fetch(`/api/admin/news?t=${Date.now()}`, { cache: "no-store" }),
       ]);
 
       if (statusRes.ok) {
@@ -484,6 +507,10 @@ export default function AdminDashboardPage() {
       if (docRes.ok) {
         const docJson = await docRes.json();
         setDocuments(docJson.documents || []);
+      }
+      if (newsRes.ok) {
+        const newsJson = await newsRes.json();
+        setManualNewsList(newsJson.news || []);
       }
     } catch (e) {
       console.error(e);
@@ -1369,6 +1396,180 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Manual News Management Handlers
+  const loadManualNews = async () => {
+    setLoadingNews(true);
+    try {
+      const res = await fetch(`/api/admin/news?t=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setManualNewsList(data.news || []);
+      }
+    } catch (e) {
+      console.error("Error loading manual news:", e);
+    } finally {
+      setLoadingNews(false);
+    }
+  };
+
+  const handleOpenAddNews = () => {
+    setEditingNewsId(null);
+    setNewsForm({
+      title: "",
+      badge: "WARTA MASJID",
+      badgeClass: "bg-[#003B73] text-white",
+      publishedAt: new Date().toISOString().slice(0, 16),
+      sourceDomain: "masjid.ums.ac.id",
+      sourceUrl: "",
+      imageUrl: "/images/news/silaturahmi-bph-1.jpg",
+      excerpt: "",
+      contentRaw: "",
+      isPublished: true,
+    });
+    setIsNewsModalOpen(true);
+  };
+
+  const handleOpenEditNews = (item: ManualNewsItem) => {
+    setEditingNewsId(item.id);
+    let dateStr = "";
+    try {
+      dateStr = new Date(item.publishedAt).toISOString().slice(0, 16);
+    } catch {
+      dateStr = new Date().toISOString().slice(0, 16);
+    }
+    setNewsForm({
+      title: item.title,
+      badge: item.badge || "WARTA MASJID",
+      badgeClass: item.badgeClass || "bg-[#003B73] text-white",
+      publishedAt: dateStr,
+      sourceDomain: item.sourceDomain || "masjid.ums.ac.id",
+      sourceUrl: item.sourceUrl === "#" ? "" : (item.sourceUrl || ""),
+      imageUrl: item.imageUrl || "/images/news/silaturahmi-bph-1.jpg",
+      excerpt: item.excerpt,
+      contentRaw: Array.isArray(item.content) ? item.content.join("\n\n") : "",
+      isPublished: item.isPublished !== false,
+    });
+    setIsNewsModalOpen(true);
+  };
+
+  const handleNewsImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
+    setUploadingNewsImage(true);
+    try {
+      const file = await compressImageForUpload(rawFile);
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "news");
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal mengunggah foto warta.");
+      setNewsForm((prev) => ({ ...prev, imageUrl: data.url }));
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal mengunggah foto warta.");
+    } finally {
+      setUploadingNewsImage(false);
+    }
+  };
+
+  const handleSaveNews = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsForm.title.trim()) {
+      alert("Judul warta wajib diisi.");
+      return;
+    }
+    if (!newsForm.excerpt.trim()) {
+      alert("Ringkasan warta wajib diisi.");
+      return;
+    }
+
+    setSavingNews(true);
+    setIsPublishingProcessing("Menyimpan & Menerbitkan Warta Masjid");
+    try {
+      const contentArray = newsForm.contentRaw
+        .split("\n")
+        .map((p) => p.trim())
+        .filter((p) => p.length > 0);
+
+      const payload = {
+        title: newsForm.title.trim(),
+        badge: newsForm.badge.trim() || "WARTA MASJID",
+        badgeClass: newsForm.badgeClass.trim() || "bg-[#003B73] text-white",
+        publishedAt: newsForm.publishedAt
+          ? new Date(newsForm.publishedAt).toISOString()
+          : new Date().toISOString(),
+        sourceDomain: newsForm.sourceDomain.trim() || "masjid.ums.ac.id",
+        sourceUrl: newsForm.sourceUrl.trim() || "#",
+        imageUrl: newsForm.imageUrl.trim() || "/images/news/silaturahmi-bph-1.jpg",
+        excerpt: newsForm.excerpt.trim(),
+        content: contentArray.length > 0 ? contentArray : [newsForm.excerpt.trim()],
+        isPublished: newsForm.isPublished,
+      };
+
+      const res = await fetch("/api/admin/news", {
+        method: editingNewsId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingNewsId ? { id: editingNewsId, ...payload } : payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menyimpan warta.");
+
+      setIsNewsModalOpen(false);
+      triggerPublishNotification(
+        editingNewsId ? "Warta Berhasil Diperbarui" : "Warta Baru Diterbitkan",
+        `Warta "${newsForm.title.slice(0, 45)}..." telah disimpan dan langsung aktif di baris pertama beranda.`
+      );
+      await loadManualNews();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menyimpan warta.");
+    } finally {
+      setSavingNews(false);
+      setIsPublishingProcessing(null);
+    }
+  };
+
+  const handleDeleteNews = async (id: string, title: string) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus warta "${title}"? Tindakan ini tidak dapat dibatalkan.`)) return;
+    try {
+      const res = await fetch(`/api/admin/news?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus warta.");
+      triggerPublishNotification("Warta Dihapus", `Warta "${title.slice(0, 40)}..." telah dihapus.`);
+      await loadManualNews();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menghapus warta.");
+    }
+  };
+
+  const handleTogglePublishNews = async (item: ManualNewsItem) => {
+    const nextStatus = item.isPublished === false ? true : false;
+    try {
+      const res = await fetch("/api/admin/news", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: item.id, isPublished: nextStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gagal mengubah status publikasi.");
+      }
+      triggerPublishNotification(
+        nextStatus ? "Warta Ditayangkan" : "Warta Disembunyikan",
+        `Status warta "${item.title.slice(0, 40)}..." telah diperbarui.`
+      );
+      await loadManualNews();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal mengubah status publikasi.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans pb-16">
       {/* Floating Processing Indicator */}
@@ -1643,6 +1844,22 @@ export default function AdminDashboardPage() {
             {documents.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
                 {documents.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("BERITA_MASJID")}
+            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+              activeTab === "BERITA_MASJID"
+                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
+                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+            }`}
+          >
+            <Newspaper className="w-3.5 h-3.5 text-blue-500" />
+            <span>Warta &amp; Berita Masjid</span>
+            {manualNewsList.length > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
+                {manualNewsList.length}
               </span>
             )}
           </button>
@@ -3534,6 +3751,165 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Tab 8: BERITA_MASJID */}
+        {activeTab === "BERITA_MASJID" && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-stone-200 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#003B73] flex items-center justify-center">
+                  <Newspaper className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-stone-900 font-serif">
+                    Warta &amp; Berita Masjid
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Kelola warta internal, silaturahmi, dan liputan kegiatan resmi masjid. Berita ini otomatis tampil di urutan nomor pertama pada slider Beranda sebelum warta UMS.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/#berita"
+                  target="_blank"
+                  className="px-4 py-2.5 rounded-full border border-stone-200 hover:bg-stone-50 text-stone-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Lihat di Beranda</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleOpenAddNews}
+                  className="px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold flex items-center gap-2 shadow-md shadow-[#003B73]/20 transition-all cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah Warta Baru</span>
+                </button>
+              </div>
+            </div>
+
+            {/* News Cards / List */}
+            <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xs">
+              <div className="p-5 border-b border-stone-200 flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-stone-900 font-serif">
+                    Daftar Warta Masjid ({manualNewsList.length})
+                  </h4>
+                  <p className="text-xs text-stone-500">
+                    Warta yang aktif bertanda Tayang dan langsung dapat dibaca oleh jamaah.
+                  </p>
+                </div>
+                {loadingNews && (
+                  <span className="text-xs text-stone-400">Memuat warta...</span>
+                )}
+              </div>
+
+              {manualNewsList.length === 0 ? (
+                <div className="p-12 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
+                    <Newspaper className="w-6 h-6" />
+                  </div>
+                  <h5 className="text-sm font-bold text-stone-800 font-serif">
+                    Belum Ada Warta Masjid
+                  </h5>
+                  <p className="text-xs text-stone-500 max-w-sm mx-auto">
+                    Klik tombol &ldquo;Tambah Warta Baru&rdquo; di atas untuk mempublikasikan warta atau liputan kegiatan masjid pertama Anda.
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y divide-stone-100">
+                  {manualNewsList.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-5 sm:p-6 hover:bg-stone-50/70 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    >
+                      <div className="flex items-start gap-4 flex-1 min-w-0">
+                        {/* Thumbnail Image */}
+                        <div className="relative w-24 h-20 sm:w-32 sm:h-24 rounded-2xl overflow-hidden bg-stone-100 shrink-0 border border-stone-200">
+                          <Image
+                            src={item.imageUrl || "/images/news/silaturahmi-bph-1.jpg"}
+                            alt={item.title}
+                            fill
+                            unoptimized
+                            className="object-cover"
+                          />
+                        </div>
+
+                        {/* News Info */}
+                        <div className="space-y-1.5 flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${item.badgeClass || "bg-[#003B73] text-white"}`}>
+                              {item.badge || "WARTA MASJID"}
+                            </span>
+                            <span className="text-[11px] text-stone-500 flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {new Date(item.publishedAt).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })}
+                            </span>
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                item.isPublished !== false
+                                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                  : "bg-stone-100 text-stone-500 border border-stone-200"
+                              }`}
+                            >
+                              {item.isPublished !== false ? "Tayang di Beranda" : "Draf (Sembunyi)"}
+                            </span>
+                          </div>
+
+                          <h4 className="text-sm sm:text-base font-bold text-stone-900 leading-snug line-clamp-2 font-sans">
+                            {item.title}
+                          </h4>
+
+                          <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed">
+                            {item.excerpt}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2 shrink-0 self-end md:self-center pt-2 md:pt-0 border-t md:border-t-0 border-stone-100 w-full md:w-auto justify-end">
+                        <button
+                          type="button"
+                          onClick={() => handleTogglePublishNews(item)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
+                            item.isPublished !== false
+                              ? "bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100"
+                              : "bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100"
+                          }`}
+                          title={item.isPublished !== false ? "Sembunyikan dari beranda" : "Tayangkan ke beranda"}
+                        >
+                          {item.isPublished !== false ? "Sembunyikan" : "Tayangkan"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditNews(item)}
+                          className="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003B73] transition-colors cursor-pointer"
+                          title="Edit warta"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteNews(item.id, item.title)}
+                          className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer"
+                          title="Hapus warta"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Modal Responding to Feedback */}
@@ -4201,6 +4577,215 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Modal Add / Edit Manual News */}
+      {isNewsModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-2xl bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-y-auto max-h-[92vh]">
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-200">
+              <div>
+                <h3 className="text-lg font-bold text-stone-900 font-serif">
+                  {editingNewsId ? "Edit Warta Masjid" : "Tambah Warta Masjid Baru"}
+                </h3>
+                <p className="text-xs text-stone-500">
+                  Warta akan langsung tampil sebagai nomor pertama pada kartu berita beranda.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsNewsModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center cursor-pointer transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveNews} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Judul Warta / Kegiatan <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newsForm.title}
+                  onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })}
+                  placeholder="Contoh: Silaturrahmi Badan Pembina dan Pelaksana Masjid Hj. Sudalmiyah Rais dengan BPH UMS"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-medium focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Label Kategori / Badge
+                  </label>
+                  <select
+                    value={newsForm.badge}
+                    onChange={(e) => {
+                      const badge = e.target.value;
+                      let badgeClass = "bg-[#003B73] text-white";
+                      if (badge === "SILATURAHMI") badgeClass = "bg-[#1E5F3B] text-white";
+                      if (badge === "PENGUMUMAN") badgeClass = "bg-amber-600 text-white";
+                      if (badge === "DAKWAH") badgeClass = "bg-purple-700 text-white";
+                      setNewsForm({ ...newsForm, badge, badgeClass });
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  >
+                    <option value="WARTA MASJID">WARTA MASJID</option>
+                    <option value="SILATURAHMI">SILATURAHMI</option>
+                    <option value="PENGUMUMAN">PENGUMUMAN</option>
+                    <option value="DAKWAH">DAKWAH</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Tanggal Terbit
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={newsForm.publishedAt}
+                    onChange={(e) => setNewsForm({ ...newsForm, publishedAt: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+              </div>
+
+              {/* Foto Dokumentasi / Banner */}
+              <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 space-y-3">
+                <label className="block text-xs font-bold text-stone-700">
+                  Foto Dokumentasi Warta
+                </label>
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <div className="relative w-full sm:w-36 h-24 rounded-xl overflow-hidden bg-stone-200 border border-stone-300 shrink-0">
+                    <Image
+                      src={newsForm.imageUrl || "/images/news/silaturahmi-bph-1.jpg"}
+                      alt="Pratinjau Foto"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="space-y-2 flex-1 w-full">
+                    <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-stone-300 hover:bg-stone-50 text-stone-700 text-xs font-semibold cursor-pointer shadow-xs transition-colors">
+                      <Camera className="w-4 h-4 text-[#003B73]" />
+                      <span>{uploadingNewsImage ? "Mengunggah..." : "Pilih Berkas Foto Baru"}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={uploadingNewsImage}
+                        onChange={handleNewsImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    <p className="text-[11px] text-stone-500">
+                      Format JPG, PNG, atau WebP. Gambar dikompresi otomatis untuk efisiensi loading.
+                    </p>
+                    <input
+                      type="text"
+                      value={newsForm.imageUrl}
+                      onChange={(e) => setNewsForm({ ...newsForm, imageUrl: e.target.value })}
+                      placeholder="Atau tempel URL gambar (/images/news/...)"
+                      className="w-full px-3 py-1.5 rounded-lg bg-white border border-stone-300 text-stone-700 text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Excerpt */}
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Ringkasan Singkat (Muncul di Kartu Beranda) <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={2}
+                  required
+                  value={newsForm.excerpt}
+                  onChange={(e) => setNewsForm({ ...newsForm, excerpt: e.target.value })}
+                  placeholder="Ringkasan 1-2 kalimat untuk kartu berita di beranda..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs leading-relaxed focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              {/* Full Content */}
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Isi Lengkap Warta (Pisahkan paragraf dengan baris baru / Enter)
+                </label>
+                <textarea
+                  rows={5}
+                  value={newsForm.contentRaw}
+                  onChange={(e) => setNewsForm({ ...newsForm, contentRaw: e.target.value })}
+                  placeholder="Tuliskan isi berita lengkap di sini. Tiap paragraf dipisahkan dengan menekan Enter dua kali..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs leading-relaxed focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              {/* External Source Link (Optional) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Nama Penerbit / Domain
+                  </label>
+                  <input
+                    type="text"
+                    value={newsForm.sourceDomain}
+                    onChange={(e) => setNewsForm({ ...newsForm, sourceDomain: e.target.value })}
+                    placeholder="masjid.ums.ac.id"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Tautan Luar / Berita Asli (Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    value={newsForm.sourceUrl}
+                    onChange={(e) => setNewsForm({ ...newsForm, sourceUrl: e.target.value })}
+                    placeholder="Kosongkan jika warta internal masjid"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+              </div>
+
+              {/* Status Publish Checkbox */}
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="newsIsPublished"
+                  checked={newsForm.isPublished}
+                  onChange={(e) => setNewsForm({ ...newsForm, isPublished: e.target.checked })}
+                  className="w-4 h-4 rounded text-[#003B73] focus:ring-[#003B73] border-stone-300"
+                />
+                <label htmlFor="newsIsPublished" className="text-xs font-semibold text-stone-800 cursor-pointer">
+                  Langsung tayangkan warta ini di halaman beranda (urutan pertama sebelum warta UMS)
+                </label>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex justify-end gap-3 pt-3 border-t border-stone-200">
+                <button
+                  type="button"
+                  onClick={() => setIsNewsModalOpen(false)}
+                  className="px-5 py-2.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingNews || uploadingNewsImage}
+                  className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50 cursor-pointer"
+                >
+                  {savingNews ? "Menyimpan..." : editingNewsId ? "Perbarui Warta" : "Terbitkan Warta"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Modal Panduan Koneksi Firebase Cloud Firestore */}
       {showFirebaseModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
