@@ -133,6 +133,33 @@ export async function saveAgendasToBlob(agendas: Agenda[]): Promise<string | nul
 }
 
 /**
+ * Purges fabricated dummy documentation data if present in legacy storage.
+ */
+export function cleanDummyAgendaData(agendas: Agenda[]): Agenda[] {
+  return agendas.map((agenda) => {
+    if (
+      agenda.id === "agn-cinsub-02" &&
+      (agenda.actualAttendees === 1080 ||
+        agenda.summaryNote?.includes("dihadiri oleh 1080 mahasiswa") ||
+        (Array.isArray(agenda.documentationPhotos) &&
+          agenda.documentationPhotos.includes("/uploads/agendas/agenda-subuh.jpg") &&
+          agenda.documentationPhotos.includes("/uploads/agendas/agenda-tabligh.jpg")))
+    ) {
+      const {
+        isCompleted,
+        completedAt,
+        actualAttendees,
+        documentationPhotos,
+        summaryNote,
+        ...rest
+      } = agenda;
+      return rest;
+    }
+    return agenda;
+  });
+}
+
+/**
  * Reads agendas from Vercel Blob if available.
  */
 export async function readAgendasFromBlob(): Promise<Agenda[] | null> {
@@ -150,7 +177,16 @@ export async function readAgendasFromBlob(): Promise<Agenda[] | null> {
     if (!res.ok) return null;
     const data = await res.json();
     if (Array.isArray(data)) {
-      return data;
+      const cleaned = cleanDummyAgendaData(data);
+      const hadDummy = data.some(
+        (a) =>
+          a.id === "agn-cinsub-02" &&
+          (a.actualAttendees === 1080 || a.summaryNote?.includes("dihadiri oleh 1080 mahasiswa"))
+      );
+      if (hadDummy) {
+        saveAgendasToBlob(cleaned).catch(() => {});
+      }
+      return cleaned;
     }
     return null;
   } catch (err) {

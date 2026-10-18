@@ -19,7 +19,14 @@ import {
 } from "./types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getFirestoreDb, isFirebaseConfigured } from "./firebase";
-import { isBlobConfigured, saveManualNewsToBlob, readManualNewsFromBlob } from "./blobStorage";
+import {
+  isBlobConfigured,
+  saveManualNewsToBlob,
+  readManualNewsFromBlob,
+  readAgendasFromBlob,
+  saveAgendasToBlob,
+  cleanDummyAgendaData,
+} from "./blobStorage";
 
 export interface DatabaseSchema {
   users: User[];
@@ -353,6 +360,26 @@ function getInitialData(): DatabaseSchema {
       },
     ],
     agendas: [
+      {
+        id: "agn-mvdo9gbf",
+        title: "Kajian Tematik",
+        category: "KAJIAN_MAHASISWA",
+        speaker: "Nur Sillatorohmah H., Lc., M.H.",
+        speakerRole: "Dosen Ma'had Abu Bakar ash Shiddiq & Penulis buku",
+        date: "2026-10-23",
+        time: "15:45 - 17:30 WIB",
+        location: "Masjid Fadhlurrahman Kampus 1 UMS",
+        description:
+          "Di tengah pesatnya perkembangan zaman, menjadi muslimah di era modern tentu menghadirkan tantangan tersendiri. Mulai dari menjaga keistiqamahan dalam beribadah hingga menyikapi batasan dalam pergaulan harian.\n\nYuk, pahami tuntunan Islam selengkapnya dalam Kajian Tematik dengan Tema: Fikih Muslimah di Era Modern: Dari Persoalan Ibadah hingga Tantangan Pergaulan",
+        quota: 250,
+        registeredCount: 0,
+        isOpen: true,
+        requiresRegistration: false,
+        targetAudience: "Terbuka untuk Seluruh Mahasiswa UMS",
+        bannerUrl:
+          "https://zevj7pj8sew8cphf.public.blob.vercel-storage.com/agendas/1000775421_1792318474594_7obof-bKsOqH7UyLdiVvu788Ub1L5gdkPIRz.jpg",
+        createdAt: "2026-10-18T10:17:54.651Z",
+      },
       {
         id: "agn-cinsub-01",
         title: "Cinta Subuh Bersama Rektor UMS",
@@ -729,13 +756,19 @@ export async function getDbAsync(): Promise<DatabaseSchema> {
   const db = getDb();
   if (isBlobConfigured()) {
     try {
-      const blobNews = await readManualNewsFromBlob();
+      const [blobNews, blobAgendas] = await Promise.all([
+        readManualNewsFromBlob(),
+        readAgendasFromBlob(),
+      ]);
       if (blobNews && blobNews.length > 0) {
         db.manualNews = blobNews;
-        memoryDb = db;
       }
+      if (blobAgendas && Array.isArray(blobAgendas) && blobAgendas.length > 0) {
+        db.agendas = cleanDummyAgendaData(blobAgendas);
+      }
+      memoryDb = db;
     } catch (blobErr) {
-      console.warn("Notice: Blob manual news sync notice:", blobErr);
+      console.warn("Notice: Blob sync notice:", blobErr);
     }
   }
   return db;
@@ -767,9 +800,14 @@ export async function saveDb(data: DatabaseSchema): Promise<void> {
     }
   }
 
-  // Persist manual news to Vercel Blob if configured
-  if (isBlobConfigured() && data.manualNews) {
-    saveManualNewsToBlob(data.manualNews).catch(() => {});
+  // Persist manual news & agendas to Vercel Blob if configured
+  if (isBlobConfigured()) {
+    if (data.manualNews) {
+      saveManualNewsToBlob(data.manualNews).catch(() => {});
+    }
+    if (data.agendas) {
+      saveAgendasToBlob(data.agendas).catch(() => {});
+    }
   }
 }
 

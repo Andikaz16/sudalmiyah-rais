@@ -23,6 +23,24 @@
   ],
   "agendas": [
     {
+      "id": "agn-mvdo9gbf",
+      "title": "Kajian Tematik",
+      "category": "KAJIAN_MAHASISWA",
+      "speaker": "Nur Sillatorohmah H., Lc., M.H.",
+      "speakerRole": "Dosen Ma'had Abu Bakar ash Shiddiq & Penulis buku",
+      "date": "2026-10-23",
+      "time": "15:45 - 17:30 WIB",
+      "location": "Masjid Fadhlurrahman Kampus 1 UMS",
+      "description": "Di tengah pesatnya perkembangan zaman, menjadi muslimah di era modern tentu menghadirkan tantangan tersendiri. Mulai dari menjaga keistiqamahan dalam beribadah hingga menyikapi batasan dalam pergaulan harian.\n\nYuk, pahami tuntunan Islam selengkapnya dalam Kajian Tematik dengan Tema: Fikih Muslimah di Era Modern: Dari Persoalan Ibadah hingga Tantangan Pergaulan\n\n📅Hari / Tanggal: Jumat, 23 Oktober 2026\n⏰️Waktu: 15.45 WIB – selesai\n 🕌Tempat: Masjid Fadlurrahman Kampus 1 UMS\n 👤Nur Sillatorohmah H",
+      "quota": 250,
+      "registeredCount": 0,
+      "isOpen": true,
+      "requiresRegistration": false,
+      "targetAudience": "Terbuka untuk Seluruh Mahasiswa UMS",
+      "createdAt": "2026-10-18T10:17:54.651Z",
+      "bannerUrl": "https://zevj7pj8sew8cphf.public.blob.vercel-storage.com/agendas/1000775421_1792318474594_7obof-bKsOqH7UyLdiVvu788Ub1L5gdkPIRz.jpg"
+    },
+    {
       "id": "agn-cinsub-01",
       "title": "Cinta Subuh Bersama Rektor UMS",
       "category": "KAJIAN_MAHASISWA",
@@ -56,16 +74,7 @@
       "requiresRegistration": false,
       "targetAudience": "Fakultas Terjadwal: FHIP, FKI, FPSI",
       "createdAt": "2026-10-15T15:45:00.000Z",
-      "bannerUrl": "/uploads/agendas/cinta-subuh-mutohharun-jinan.png",
-      "isCompleted": true,
-      "completedAt": "2026-10-17T06:00:00.000Z",
-      "actualAttendees": 1080,
-      "documentationPhotos": [
-        "/uploads/agendas/agenda-subuh.jpg",
-        "/uploads/agendas/agenda-tabligh.jpg",
-        "/images/masjid-sudalmiyah.jpg"
-      ],
-      "summaryNote": "Alhamdulillah agenda Cinta Subuh hari ini bersama Dr. Mutohharun Jinan, M.Ag. telah sukses terlaksana, dihadiri oleh 1080 mahasiswa dari Fakultas FHIP, FKI, dan FPSI."
+      "bannerUrl": "/uploads/agendas/cinta-subuh-mutohharun-jinan.png"
     }
   ],
   "registrations": [],

@@ -165,7 +165,10 @@ export async function PATCH(request: NextRequest) {
     const current = db.agendas[targetIdx];
     const updatedAgenda: Agenda = {
       ...current,
-      ...(isCompleted !== undefined && { isCompleted: Boolean(isCompleted) }),
+      ...(isCompleted !== undefined && {
+        isCompleted: Boolean(isCompleted),
+        ...(!Boolean(isCompleted) && { completedAt: undefined }),
+      }),
       ...(actualAttendees !== undefined && {
         actualAttendees:
           actualAttendees === null || actualAttendees === "" ? null : Number(actualAttendees),
