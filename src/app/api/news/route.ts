@@ -1,7 +1,4 @@
-import { NextResponse } from "next/server";
-
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+import { NextResponse, connection } from "next/server";
 
 export interface ApiNewsItem {
   id: string;
@@ -654,6 +651,7 @@ async function checkYouTubeLiveStatus(videoId: string): Promise<boolean> {
 }
 
 export async function GET(request: Request) {
+  await connection();
   // Ambil semua sumber berita dan status live secara paralel
   const [umsArticles, soloArticles, lensamuArticles, smArticles, isLive] = await Promise.all([
     fetchUmsNews(),
