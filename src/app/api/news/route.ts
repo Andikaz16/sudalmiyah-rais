@@ -25,7 +25,7 @@ export const tablighAkbarLiveArticle: ApiNewsItem = {
   timeAgo: "Sedang Berlangsung",
   publishedAt: "2026-10-18T08:30:00+07:00",
   sourceDomain: "youtube.com",
-  sourceUrl: "https://www.youtube.com/live/KVGneiEIdgo?si=LLB6Q6zLVrdVyjbw",
+  sourceUrl: "https://www.youtube.com/live/KVGneiEldgo",
   title: "Tabligh Akbar Harijadi ke-68 UMS bersama Ustadz Dr. H. Das'ad Latif",
   excerpt: "ums.ac.id, SURAKARTA - Siaran langsung Tabligh Akbar dalam rangka peringatan Hari Jadi (Milad) ke-68 Universitas Muhammadiyah Surakarta menghadirkan mubaligh nasional Ustadz Dr. H. Das'ad Latif, S.Sos., S.Ag., M.Si., Ph.D. langsung dari Gedung Edutorium KH Ahmad Dahlan UMS.",
   content: [
@@ -35,7 +35,7 @@ export const tablighAkbarLiveArticle: ApiNewsItem = {
   ],
   imageUrl: "/images/news/tabligh-akbar-poster.jpg",
   isLive: true,
-  youtubeId: "KVGneiEIdgo",
+  youtubeId: "KVGneiEldgo",
 };
 
 function decodeHtmlEntities(str: string): string {
