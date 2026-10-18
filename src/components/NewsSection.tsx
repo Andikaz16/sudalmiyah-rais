@@ -83,21 +83,21 @@ export function formatClientTimeAgo(
 export const tablighAkbarLiveItem: NewsItem = {
   id: "ums-live-tabligh-akbar-68",
   source: "UMS",
-  badge: "SIARAN LANGSUNG",
-  badgeClass: "bg-red-600 text-white animate-pulse",
-  timeAgo: "Sedang Berlangsung",
+  badge: "REKAMAN KAJIAN",
+  badgeClass: "bg-[#003B73] text-white",
+  timeAgo: "Siaran Ulang",
   publishedAt: "2026-10-18T08:30:00+07:00",
   sourceDomain: "youtube.com",
   sourceUrl: "https://www.youtube.com/live/KVGneiEldgo",
   title: "Tabligh Akbar Harijadi ke-68 UMS bersama Ustadz Dr. H. Das'ad Latif",
-  excerpt: "ums.ac.id, SURAKARTA - Siaran langsung Tabligh Akbar Milad ke-68 Universitas Muhammadiyah Surakarta menghadirkan mubaligh kondang Ustadz Dr. H. Das'ad Latif, S.Sos., S.Ag., M.Si., Ph.D. langsung dari Edutorium KH Ahmad Dahlan UMS.",
+  excerpt: "ums.ac.id, SURAKARTA - Siaran dan rekaman Tabligh Akbar Milad ke-68 Universitas Muhammadiyah Surakarta menghadirkan mubaligh kondang Ustadz Dr. H. Das'ad Latif, S.Sos., S.Ag., M.Si., Ph.D. langsung dari Edutorium KH Ahmad Dahlan UMS.",
   content: [
     "SURAKARTA - Menyemarakkan peringatan Hari Jadi ke-68 Universitas Muhammadiyah Surakarta (UMS), Lembaga Pengembangan Pondok, Al-Islam dan Kemuhammadiyahan (LPPIK) UMS menggelar Tabligh Akbar bertempat di Gedung Edutorium KH Ahmad Dahlan UMS pada Ahad, 18 Oktober 2026.",
     "Tabligh Akbar ini menghadirkan dai kondang nasional Ustadz Dr. H. Das'ad Latif, S.Sos., S.Ag., M.Si., Ph.D. dengan mengusung tema 'Meneguhkan Sinergi, Menebar Kebermanfaatan dan Menguatkan Peradaban'. Majelis ilmu ini dihadiri ribuan jamaah sivitas akademika UMS, warga persyarikatan se-Solo Raya, serta masyarakat luas.",
     "Bagi segenap jamaah dan warga persyarikatan yang berhalangan hadir langsung di Edutorium, siaran langsung dan rekaman lengkap pengajian dapat disaksikan secara daring melalui pemutar video di bawah ini atau melalui kanal YouTube resmi."
   ],
   imageUrl: "/images/news/tabligh-akbar-poster.jpg",
-  isLive: true,
+  isLive: false,
   youtubeId: "KVGneiEldgo",
 };
 
