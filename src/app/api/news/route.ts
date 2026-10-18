@@ -485,17 +485,48 @@ async function fetchSuaraMuhammadiyahNews(): Promise<ApiNewsItem[]> {
   return fallbackArticles.filter((a) => a.source === "SUARA_MUHAMMADIYAH");
 }
 
+async function checkYouTubeLiveStatus(videoId: string): Promise<boolean> {
+  try {
+    const res = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+      },
+      signal: AbortSignal.timeout(4000),
+      cache: "no-store",
+    });
+    if (!res.ok) return false;
+    const text = await res.text();
+    return (
+      text.includes('"isLiveNow":true') ||
+      (text.includes('"isLive":true') &&
+        !text.includes('Streamed live') &&
+        !text.includes('Disiarkan langsung'))
+    );
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(request: Request) {
-  // Ambil ketiga sumber secara paralel untuk efisiensi
-  const [umsArticles, lensamuArticles, smArticles] = await Promise.all([
+  // Ambil sumber berita dan status live secara paralel
+  const [umsArticles, lensamuArticles, smArticles, isLive] = await Promise.all([
     fetchUmsNews(),
     fetchLensamuNews(),
     fetchSuaraMuhammadiyahNews(),
+    checkYouTubeLiveStatus("KVGneiEldgo"),
   ]);
 
-  // UTAMAKAN SIARAN LANGSUNG & BERITA KAMPUS UMS DI URUTAN TERDEPAN (Posisi 0, 1, 2, dst.)
+  const liveArticleItem: ApiNewsItem = {
+    ...tablighAkbarLiveArticle,
+    isLive,
+    badge: isLive ? "SIARAN LANGSUNG" : "REKAMAN KAJIAN",
+    badgeClass: isLive ? "bg-red-600 text-white animate-pulse" : "bg-[#003B73] text-white",
+    timeAgo: isLive ? "Sedang Berlangsung" : "Siaran Ulang",
+  };
+
+  // UTAMAKAN KAJIAN & BERITA KAMPUS UMS DI URUTAN TERDEPAN (Posisi 0, 1, 2, dst.)
   const officialArticles = [
-    tablighAkbarLiveArticle,
+    liveArticleItem,
     ...umsArticles.filter((a) => a.id !== tablighAkbarLiveArticle.id),
     ...smArticles,
     ...lensamuArticles,

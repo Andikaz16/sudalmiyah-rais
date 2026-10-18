@@ -309,9 +309,10 @@ export default function NewsSection() {
             });
 
             setNewsList((prev) => {
+              const currentLive = prev.find((item) => item.id === tablighAkbarLiveItem.id) || tablighAkbarLiveItem;
               const nonUms = prev.filter((item) => item.source !== "UMS" && item.id !== tablighAkbarLiveItem.id);
               const filteredClient = clientUmsArticles.filter((item) => item.id !== tablighAkbarLiveItem.id);
-              return [tablighAkbarLiveItem, ...filteredClient, ...nonUms];
+              return [currentLive, ...filteredClient, ...nonUms];
             });
           }
         }
@@ -426,7 +427,7 @@ export default function NewsSection() {
                         sizes="(max-width: 640px) 84vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      {item.isLive && (
+                      {item.isLive ? (
                         <>
                           <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600 text-white text-[10px] sm:text-[11px] font-bold shadow-lg tracking-wider uppercase">
                             <span className="relative flex h-2 w-2">
@@ -441,7 +442,13 @@ export default function NewsSection() {
                             </div>
                           </div>
                         </>
-                      )}
+                      ) : item.youtubeId ? (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="w-12 h-12 rounded-full bg-black/60 text-white flex items-center justify-center shadow-lg backdrop-blur-xs group-hover:scale-110 group-hover:bg-[#003B73] transition-all">
+                            <Play className="w-5 h-5 fill-current ml-0.5 text-white" />
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
 
                     {/* Card Body */}
@@ -488,7 +495,7 @@ export default function NewsSection() {
                           : "text-stone-600 group-hover:text-[#003B73]"
                       } transition-colors text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 focus:outline-none cursor-pointer group/btn`}
                     >
-                      <span>{item.isLive ? "TONTON SIARAN" : "BACA SELENGKAPNYA"}</span>
+                      <span>{item.isLive ? "TONTON SIARAN" : item.youtubeId ? "TONTON REKAMAN" : "BACA SELENGKAPNYA"}</span>
                       <ArrowRight
                         className={`w-3.5 h-3.5 ${
                           item.isLive
@@ -636,7 +643,12 @@ export default function NewsSection() {
                   {selectedArticle.isLive ? (
                     <>
                       <Play className="w-3.5 h-3.5 fill-current" />
-                      <span>Buka di YouTube</span>
+                      <span>Buka Siaran di YouTube</span>
+                    </>
+                  ) : selectedArticle.youtubeId ? (
+                    <>
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                      <span>Tonton di YouTube</span>
                     </>
                   ) : (
                     <span>Kunjungi Sumber Resmi</span>
