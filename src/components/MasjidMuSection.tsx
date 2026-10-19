@@ -49,16 +49,16 @@ export default function MasjidMuSection() {
       color: "text-[#003B73]",
       bgBadge: "bg-[#003B73]/10 text-[#003B73] border-[#003B73]/20",
       description: isEn
-        ? "LPCR-PM institutional mosque management standards with professional governance, audited digital transparency, structured organization, and active synergy with campus bodies, Ortom, Ormawa, and student units."
-        : "Standar manajemen kelembagaan masjid LPCR-PM dengan tata kelola profesional, transparansi digital terverifikasi audit, kepengurusan terstruktur, serta sinergi erat bersama institusi kampus, Ortom, Ormawa, dan UKM.",
+        ? "AUM institutional mosque management standards with professional governance, audited digital transparency, structured organization, and active synergy with campus bodies, Ortom, Ormawa, and student units."
+        : "Standar manajemen kelembagaan masjid Amal Usaha Muhammadiyah (AUM) dengan tata kelola profesional, transparansi digital terverifikasi audit, kepengurusan terstruktur, serta sinergi erat bersama institusi kampus, Ortom, Ormawa, dan UKM.",
       points: isEn
         ? [
-            "Managerial governance integration meeting LPCR-PM & PTMA standards",
+            "Managerial governance integration meeting AUM & PTMA standards",
             "Open, audited, and real-time infaq financial reports",
             "Active synergy with Ortom (IMM, Tapak Suci, HW, & 'Aisyiyah), Ormawa, & UKM",
           ]
         : [
-            "Integrasi tata kelola manajerial berstandar LPCR-PM & PTMA",
+            "Integrasi tata kelola manajerial berstandar AUM & PTMA",
             "Laporan keuangan infaq terbuka, teraudit & real-time",
             "Sinergi aktif bersama Ortom (IMM, Tapak Suci, HW, & 'Aisyiyah), Ormawa, dan UKM",
           ],
@@ -122,24 +122,50 @@ export default function MasjidMuSection() {
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
             {isEn ? (
               <>
-                LPCR-PM <span className="text-[#003B73]">Model Mosque</span>
+                Muhammadiyah Undertakings (AUM) <span className="text-[#003B73]">Model Mosque</span>
               </>
             ) : (
               <>
-                Masjid Percontohan <span className="text-[#003B73]">LPCR-PM</span>
+                Masjid Percontohan <span className="text-[#003B73]">Amal Usaha Muhammadiyah (AUM)</span>
               </>
             )}
           </h2>
           <p className="mt-2 text-xs sm:text-sm font-semibold tracking-wider text-[#003B73]/90 uppercase font-sans">
             {isEn
-              ? "Institute for Branch & Ranting Development and Mosque Guidance PP Muhammadiyah"
-              : "Lembaga Pengembangan Cabang Ranting & Pembinaan Masjid PP Muhammadiyah"}
+              ? "Muhammadiyah and 'Aisyiyah Higher Education (PTMA)"
+              : "Perguruan Tinggi Muhammadiyah dan 'Aisyiyah (PTMA)"}
           </p>
 
           <p className="mt-4 text-sm sm:text-base text-stone-600 leading-relaxed">
-            {isEn
-              ? "UMS Mosque serves as an exemplary benchmark of LPCR-PM PP Muhammadiyah Model Mosque for Muhammadiyah & 'Aisyiyah Higher Education (PTMA) and institutional organizations. Becoming the epicenter of spiritual development, integration of Islamic & Muhammadiyah education (AIK), leadership training, and modern governance based on 3J pillars (Jama'ah, Jam'iyah, and Jariyah)."
-              : "Masjid UMS hadir sebagai teladan dan standar Masjid Percontohan LPCR-PM (Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid) Pimpinan Pusat Muhammadiyah di lingkungan Perguruan Tinggi Muhammadiyah dan 'Aisyiyah (PTMA) serta institusi persyarikatan. Menjadi episentrum pembinaan spiritual, integrasi Al-Islam & Kemuhammadiyahan (AIK), pengkaderan persyarikatan, serta tata kelola modern berbasis pilar 3J (Jama'ah, Jam'iyah, dan Jariyah)."}
+            {isEn ? (
+              <>
+                UMS Mosque serves as an exemplary model mosque of{" "}
+                <strong className="font-bold text-stone-900">
+                  Muhammadiyah Institutional Undertakings (AUM)
+                </strong>{" "}
+                within Muhammadiyah and &apos;Aisyiyah Higher Education (PTMA). Becoming the
+                epicenter of da&apos;wah and Islamic &amp; Muhammadiyah education (AIK), cadre
+                development, and modern governance based on 3J ({" "}
+                <strong className="font-bold text-stone-900">
+                  Jama&apos;ah, Jam&apos;iyah, and Jariyah
+                </strong>{" "}
+                ).
+              </>
+            ) : (
+              <>
+                Masjid UMS hadir sebagai masjid percontohan{" "}
+                <strong className="font-bold text-stone-900">
+                  Amal Usaha Muhammadiyah (AUM)
+                </strong>{" "}
+                di lingkungan Perguruan Tinggi Muhammadiyah dan &apos;Aisyiyah (PTMA). Menjadi
+                episentrum dakwah dan pembinaan Al-Islam &amp; Kemuhammadiyahan (AIK), pengkaderan,
+                serta tata kelola modern berbasis 3J ({" "}
+                <strong className="font-bold text-stone-900">
+                  Jama&apos;ah, Jam&apos;iyah, dan Jariyah
+                </strong>{" "}
+                ).
+              </>
+            )}
           </p>
         </div>
 
@@ -217,7 +243,7 @@ export default function MasjidMuSection() {
                 {/* Bottom link to related service */}
                 <div className="pt-2">
                   <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider flex items-center gap-1 group-hover:text-[#003B73] transition-colors">
-                    <span>Pilar 3J Masjid LPCR-PM UMS</span>
+                    <span>{isEn ? "3J Pillars of UMS AUM Mosque" : "Pilar 3J Masjid AUM UMS"}</span>
                     <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -230,10 +256,14 @@ export default function MasjidMuSection() {
         <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#002855] via-[#003B73] to-[#001F3F] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-blue-400/20">
           <div className="space-y-2 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-bold font-serif">
-              Mewujudkan Standar Masjid Percontohan LPCR-PM Berkemajuan
+              {isEn
+                ? "Realizing Progressive AUM Model Mosque Standards"
+                : "Mewujudkan Standar Masjid Percontohan AUM Berkemajuan"}
             </h3>
             <p className="text-xs sm:text-sm text-stone-200 max-w-2xl leading-relaxed">
-              Dukung penguatan peran masjid di lingkungan LPCR-PM dan Amal Usaha Muhammadiyah melalui partisipasi aktif ibadah berjamaah, penguatan kajian AIK, pemanfaatan ruang ibadah digital, serta saluran infaq berkah.
+              {isEn
+                ? "Support strengthening the role of mosques in Amal Usaha Muhammadiyah (AUM) and higher education through active congregational worship, AIK study groups, digital prayer spaces, and noble infaq donations."
+                : "Dukung penguatan peran masjid di lingkungan Amal Usaha Muhammadiyah (AUM) dan perguruan tinggi melalui partisipasi aktif ibadah berjamaah, penguatan kajian AIK, pemanfaatan ruang ibadah digital, serta saluran infaq berkah."}
             </p>
           </div>
 

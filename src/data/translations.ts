@@ -197,7 +197,7 @@ export const translations: Record<Language, TranslationDictionary> = {
       digitalInfaq: "Infaq Digital",
       mosqueAgenda: "Agenda Masjid",
       tagline: "Pusat Ibadah, Peradaban & Dakwah Berkemajuan",
-      subTagline: "Model Masjid Percontohan LPCR-PM & PTMA",
+      subTagline: "Model Masjid Percontohan AUM & PTMA",
       takmirPanel: "Panel Takmir",
       language: "Bahasa",
       servicesGroup: "Layanan Masjid",
@@ -326,7 +326,7 @@ export const translations: Record<Language, TranslationDictionary> = {
     masjidmu: {
       badge: "Pilar Masjid Percontohan",
       title: "Pilar Keunggulan Masjid Sudalmiyah Rais",
-      desc: "Standarisasi model pembinaan LPCR-PM PP Muhammadiyah tingkat Perguruan Tinggi Muhammadiyah & 'Aisyiyah (PTMA).",
+      desc: "Standarisasi model pembinaan Amal Usaha Muhammadiyah (AUM) tingkat Perguruan Tinggi Muhammadiyah & 'Aisyiyah (PTMA).",
       pillars: [
         {
           id: "idarah",
@@ -438,7 +438,7 @@ export const translations: Record<Language, TranslationDictionary> = {
       digitalInfaq: "Digital Infaq",
       mosqueAgenda: "Mosque Agenda",
       tagline: "Center for Worship, Civilization & Progressive Da'wah",
-      subTagline: "LPCR-PM & PTMA Model Mosque",
+      subTagline: "AUM & PTMA Model Mosque",
       takmirPanel: "Takmir Panel",
       language: "Language",
       servicesGroup: "Mosque Services",
@@ -567,7 +567,7 @@ export const translations: Record<Language, TranslationDictionary> = {
     masjidmu: {
       badge: "Model Mosque Pillars",
       title: "Excellence Pillars of Sudalmiyah Rais Mosque",
-      desc: "Standardized guidance model of LPCR-PM PP Muhammadiyah for Muhammadiyah & 'Aisyiyah Higher Education (PTMA).",
+      desc: "Standardized guidance model of Amal Usaha Muhammadiyah (AUM) for Muhammadiyah & 'Aisyiyah Higher Education (PTMA).",
       pillars: [
         {
           id: "idarah",
