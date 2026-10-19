@@ -467,16 +467,16 @@ export default function SejarahPage() {
 
                     <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-stone-700">
                       <div className="flex items-center gap-1.5">
-                        <UserCheck className="w-4 h-4 text-[#003B73]" />
-                        <span>Direktur BPHM: <strong>Dodi Afianto, S.Ag., M.Pd.I</strong></span>
+                        <Award className="w-4 h-4 text-emerald-700" />
+                        <span>Ketua Penasihat: <strong>Drs. KH. Marpuji Ali, M.Si</strong></span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Users className="w-4 h-4 text-[#B58A1E]" />
                         <span>Ketua BPM: <strong>Dr. Muchamad Iksan, S.H., M.H</strong></span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Award className="w-4 h-4 text-emerald-700" />
-                        <span>Ketua Penasihat: <strong>Drs. KH. Marpuji Ali, M.Si</strong></span>
+                        <UserCheck className="w-4 h-4 text-[#003B73]" />
+                        <span>Direktur BPHM: <strong>Dodi Afianto, S.Ag., M.Pd.I</strong></span>
                       </div>
                     </div>
                   </div>
@@ -661,7 +661,7 @@ export default function SejarahPage() {
       {/* MODAL PRATINJAU DOKUMEN SK & STRUKTUR TAKMIR */}
       {selectedDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative border border-stone-200 my-8">
+          <div className="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl relative border border-stone-200 my-8 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setSelectedDoc(null)}
               className="absolute top-5 right-5 p-2 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-colors"
@@ -705,33 +705,39 @@ export default function SejarahPage() {
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-                  <div className="p-3 rounded-xl bg-blue-50/60 border border-blue-200">
-                    <strong className="text-[#003B73] block mb-1">Badan Pelaksana (BPHM)</strong>
-                    <div className="font-semibold text-stone-800">
-                      Direktur: {selectedDoc.structure.bphm.direktur}
-                    </div>
-                    <div className="text-[11px] text-stone-500 mt-1">
-                      Anggota: {selectedDoc.structure.bphm.anggota.join(", ")}
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200">
-                    <strong className="text-amber-900 block mb-1">Badan Pembina (BPM)</strong>
-                    <div className="font-semibold text-stone-800">
-                      Ketua: {selectedDoc.structure.bpm.ketua}
-                    </div>
-                    <div className="text-[11px] text-stone-500 mt-1">
-                      Anggota: {selectedDoc.structure.bpm.anggota.slice(0, 3).join(", ")} dkk.
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200">
+                  {/* Dewan Penasihat (Kotak Hijau - di Kiri / Pertama) */}
+                  <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col">
                     <strong className="text-emerald-900 block mb-1">Dewan Penasihat</strong>
                     <div className="font-semibold text-stone-800">
                       Ketua: {selectedDoc.structure.penasihat.ketua}
                     </div>
-                    <div className="text-[11px] text-stone-500 mt-1">
-                      Anggota: Drs. H. A. Dahlan Rais, M.Hum, Para Wakil Rektor dkk.
+                    <div className="text-[11px] text-stone-600 mt-1.5 leading-relaxed">
+                      <span className="font-semibold text-stone-700">Anggota:</span>{" "}
+                      {selectedDoc.structure.penasihat.anggota.join(", ")}
+                    </div>
+                  </div>
+
+                  {/* Badan Pembina (BPM) (Kotak Kuning/Amber - di Tengah) */}
+                  <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 flex flex-col">
+                    <strong className="text-amber-900 block mb-1">Badan Pembina (BPM)</strong>
+                    <div className="font-semibold text-stone-800">
+                      Ketua: {selectedDoc.structure.bpm.ketua}
+                    </div>
+                    <div className="text-[11px] text-stone-600 mt-1.5 leading-relaxed">
+                      <span className="font-semibold text-stone-700">Anggota:</span>{" "}
+                      {selectedDoc.structure.bpm.anggota.join(", ")}
+                    </div>
+                  </div>
+
+                  {/* Badan Pelaksana (BPHM) (Kotak Biru - di Kanan / Ketiga) */}
+                  <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200 flex flex-col">
+                    <strong className="text-[#003B73] block mb-1">Badan Pelaksana (BPHM)</strong>
+                    <div className="font-semibold text-stone-800">
+                      Direktur: {selectedDoc.structure.bphm.direktur}
+                    </div>
+                    <div className="text-[11px] text-stone-600 mt-1.5 leading-relaxed">
+                      <span className="font-semibold text-stone-700">Anggota:</span>{" "}
+                      {selectedDoc.structure.bphm.anggota.join(", ")}
                     </div>
                   </div>
                 </div>
