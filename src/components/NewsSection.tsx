@@ -26,58 +26,60 @@ interface NewsItem {
 export function formatClientTimeAgo(
   dateString?: string,
   fallback: string = "Baru saja",
-  now: number | null = null
+  now: number | null = null,
+  isEn: boolean = false
 ): string {
-  if (!dateString || !now) return fallback;
+  const defaultFallback = isEn ? "Just now" : fallback;
+  if (!dateString || !now) return defaultFallback;
   try {
     const pubDate = new Date(dateString);
-    if (isNaN(pubDate.getTime())) return fallback;
+    if (isNaN(pubDate.getTime())) return defaultFallback;
     const diffMs = now - pubDate.getTime();
 
     if (diffMs < 0 && diffMs > -60000) {
-      return "Baru saja";
+      return isEn ? "Just now" : "Baru saja";
     }
 
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
     if (diffMinutes < 1) {
-      return "Baru saja";
+      return isEn ? "Just now" : "Baru saja";
     }
     if (diffMinutes === 1) {
-      return "1 menit lalu";
+      return isEn ? "1 min ago" : "1 menit lalu";
     }
     if (diffMinutes < 60) {
-      return `${diffMinutes} menit lalu`;
+      return isEn ? `${diffMinutes} mins ago` : `${diffMinutes} menit lalu`;
     }
 
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     if (diffHours === 1) {
-      return "1 jam lalu";
+      return isEn ? "1 hour ago" : "1 jam lalu";
     }
     if (diffHours < 24) {
-      return `${diffHours} jam lalu`;
+      return isEn ? `${diffHours} hours ago` : `${diffHours} jam lalu`;
     }
 
     const diffDays = Math.floor(diffHours / 24);
     if (diffDays === 1) {
-      return "1 hari lalu";
+      return isEn ? "1 day ago" : "1 hari lalu";
     }
     if (diffDays < 7) {
-      return `${diffDays} hari lalu`;
+      return isEn ? `${diffDays} days ago` : `${diffDays} hari lalu`;
     }
 
     const diffWeeks = Math.floor(diffDays / 7);
     if (diffWeeks < 4) {
-      return `${diffWeeks} minggu lalu`;
+      return isEn ? `${diffWeeks} weeks ago` : `${diffWeeks} minggu lalu`;
     }
 
     const diffMonths = Math.floor(diffDays / 30);
     if (diffMonths < 12) {
-      return `${diffMonths} bulan lalu`;
+      return isEn ? `${diffMonths} months ago` : `${diffMonths} bulan lalu`;
     }
 
-    return `${Math.floor(diffDays / 365)} tahun lalu`;
+    return isEn ? `${Math.floor(diffDays / 365)} years ago` : `${Math.floor(diffDays / 365)} tahun lalu`;
   } catch {
-    return fallback;
+    return defaultFallback;
   }
 }
 
@@ -649,7 +651,7 @@ export default function NewsSection() {
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                               <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                             </span>
-                            <span>SIARAN LANGSUNG</span>
+                            <span>{isEn ? "LIVE STREAM" : "SIARAN LANGSUNG"}</span>
                           </div>
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                             <div className="w-12 h-12 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-xl backdrop-blur-xs group-hover:scale-110 group-hover:bg-red-600 transition-all">
@@ -680,7 +682,7 @@ export default function NewsSection() {
                             item.isLive ? "text-red-600 font-bold" : "text-stone-400 font-normal"
                           } text-xs`}
                         >
-                          {item.isLive ? item.timeAgo : formatClientTimeAgo(item.publishedAt, item.timeAgo, now)}
+                          {item.isLive ? item.timeAgo : formatClientTimeAgo(item.publishedAt, item.timeAgo, now, isEn)}
                         </span>
                       </div>
 
@@ -710,7 +712,13 @@ export default function NewsSection() {
                           : "text-stone-600 group-hover:text-[#003B73]"
                       } transition-colors text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 focus:outline-none cursor-pointer group/btn`}
                     >
-                      <span>{item.isLive ? "TONTON SIARAN" : item.youtubeId ? "TONTON REKAMAN" : "BACA SELENGKAPNYA"}</span>
+                      <span>
+                        {item.isLive
+                          ? (isEn ? "WATCH LIVE" : "TONTON SIARAN")
+                          : item.youtubeId
+                          ? (isEn ? "WATCH RECORDING" : "TONTON REKAMAN")
+                          : (isEn ? "READ MORE" : "BACA SELENGKAPNYA")}
+                      </span>
                       <ArrowRight
                         className={`w-3.5 h-3.5 ${
                           item.isLive
@@ -725,7 +733,7 @@ export default function NewsSection() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        title={item.isLive ? "Buka YouTube di tab baru" : "Buka sumber resmi di tab baru"}
+                        title={item.isLive ? (isEn ? "Open YouTube in new tab" : "Buka YouTube di tab baru") : (isEn ? "Open official source in new tab" : "Buka sumber resmi di tab baru")}
                         className={`p-1.5 rounded-full hover:bg-stone-100 ${
                           item.isLive
                             ? "text-red-500 hover:text-red-700"
@@ -790,14 +798,14 @@ export default function NewsSection() {
                 >
                   {selectedArticle.isLive
                     ? selectedArticle.timeAgo
-                    : formatClientTimeAgo(selectedArticle.publishedAt, selectedArticle.timeAgo, now)}
+                    : formatClientTimeAgo(selectedArticle.publishedAt, selectedArticle.timeAgo, now, isEn)}
                 </span>
               </div>
               <button
                 onClick={() => setSelectedArticle(null)}
                 className="px-4 py-1.5 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
               >
-                Tutup
+                {isEn ? "Close" : "Tutup"}
               </button>
             </div>
 
@@ -842,13 +850,13 @@ export default function NewsSection() {
               <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF8F5] p-4 rounded-xl">
                 <div className="text-xs text-stone-600">
                   {selectedArticle.isLive ? (
-                    <span>Siaran Resmi: <strong className="text-stone-900">YouTube Official UMS</strong></span>
+                    <span>{isEn ? "Official Broadcast:" : "Siaran Resmi:"} <strong className="text-stone-900">YouTube Official UMS</strong></span>
                   ) : selectedArticle.source === "MASJIDMU" ? (
-                    <span>Diterbitkan oleh: <strong className="text-stone-900">Takmir Masjid Hj. Sudalmiyah Rais</strong></span>
+                    <span>{isEn ? "Published by:" : "Diterbitkan oleh:"} <strong className="text-stone-900">{isEn ? "Takmir of Hj. Sudalmiyah Rais Mosque" : "Takmir Masjid Hj. Sudalmiyah Rais"}</strong></span>
                   ) : selectedArticle.source === "LPCR" ? (
-                    <span>Portal Resmi: <strong className="text-stone-900">LPCR-PM PP Muhammadiyah (lpcr.or.id)</strong></span>
+                    <span>{isEn ? "Official Portal:" : "Portal Resmi:"} <strong className="text-stone-900">LPCR-PM PP Muhammadiyah (lpcr.or.id)</strong></span>
                   ) : (
-                    <span>Portal Resmi: <strong className="text-stone-900">{selectedArticle.sourceDomain}</strong></span>
+                    <span>{isEn ? "Official Portal:" : "Portal Resmi:"} <strong className="text-stone-900">{selectedArticle.sourceDomain}</strong></span>
                   )}
                 </div>
                 {selectedArticle.sourceUrl && selectedArticle.sourceUrl !== "#" ? (
@@ -865,20 +873,20 @@ export default function NewsSection() {
                     {selectedArticle.isLive ? (
                       <>
                         <Play className="w-3.5 h-3.5 fill-current" />
-                        <span>Buka Siaran di YouTube</span>
+                        <span>{isEn ? "Open Broadcast on YouTube" : "Buka Siaran di YouTube"}</span>
                       </>
                     ) : selectedArticle.youtubeId ? (
                       <>
                         <Play className="w-3.5 h-3.5 fill-current" />
-                        <span>Tonton di YouTube</span>
+                        <span>{isEn ? "Watch on YouTube" : "Tonton di YouTube"}</span>
                       </>
                     ) : (
-                      <span>Kunjungi Sumber Resmi</span>
+                      <span>{isEn ? "Visit Official Source" : "Kunjungi Sumber Resmi"}</span>
                     )}
                   </a>
                 ) : (
                   <span className="text-xs font-semibold text-[#003B73]">
-                    Dokumentasi &amp; Warta Resmi Masjid
+                    {isEn ? "Official Mosque Documentation & News" : "Dokumentasi & Warta Resmi Masjid"}
                   </span>
                 )}
               </div>

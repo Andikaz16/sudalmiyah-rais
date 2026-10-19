@@ -212,7 +212,8 @@ const initialFridayHistory: FridayOfficerSchedule[] = [
 ];
 
 export default function FridayScheduleSection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isEn = language === "en";
   const [schedules, setSchedules] = useState<FridayOfficerSchedule[]>(fallbackSchedules);
   const [history, setHistory] = useState<FridayOfficerSchedule[]>(initialFridayHistory);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -346,7 +347,7 @@ export default function FridayScheduleSection() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-stone-50 active:scale-95 border border-stone-300 hover:border-[#003B73] text-stone-700 hover:text-[#003B73] text-xs font-bold shadow-xs transition-all cursor-pointer"
             >
               <History className="w-4 h-4 text-[#003B73]" />
-              <span>Lihat Petugas Imam &amp; Khatib Sebelumnya</span>
+              <span>{isEn ? "View Previous Khatib & Imam Officers" : "Lihat Petugas Imam & Khatib Sebelumnya"}</span>
             </button>
           </div>
         </div>
@@ -375,11 +376,11 @@ export default function FridayScheduleSection() {
               <button
                 onClick={prevSlide}
                 className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/20 text-white transition-all flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
-                title="Masjid Sebelumnya"
-                aria-label="Masjid Sebelumnya"
+                title={isEn ? "Previous Mosque" : "Masjid Sebelumnya"}
+                aria-label={isEn ? "Previous Mosque" : "Masjid Sebelumnya"}
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Sebelumnya</span>
+                <span className="hidden sm:inline">{isEn ? "Previous" : "Sebelumnya"}</span>
               </button>
 
               <span className="text-xs text-white/80 font-mono font-bold px-1.5">
@@ -389,10 +390,10 @@ export default function FridayScheduleSection() {
               <button
                 onClick={nextSlide}
                 className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/20 text-white transition-all flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
-                title="Masjid Berikutnya"
-                aria-label="Masjid Berikutnya"
+                title={isEn ? "Next Mosque" : "Masjid Berikutnya"}
+                aria-label={isEn ? "Next Mosque" : "Masjid Berikutnya"}
               >
-                <span className="hidden sm:inline">Berikutnya</span>
+                <span className="hidden sm:inline">{isEn ? "Next" : "Berikutnya"}</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -408,10 +409,10 @@ export default function FridayScheduleSection() {
                   {/* Top Badge & Date Row */}
                   <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-stone-200/80 mb-5">
                     <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#003B73] text-white shadow-sm">
-                      Khatib Shalat Jumat
+                      {isEn ? "Friday Prayer Khatib" : "Khatib Shalat Jumat"}
                     </span>
                     <span className="text-xs font-semibold text-[#B58A1E] font-mono">
-                      {activeSchedule.date} • {activeSchedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H"}
+                      {activeSchedule.date === "Jumat Pekan Ini" ? (isEn ? "This Friday" : "Jumat Pekan Ini") : activeSchedule.date} • {activeSchedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || (isEn ? "5 Jumada al-Awwal 1448 AH" : "5 Jumadilawal 1448 H")}
                     </span>
                   </div>
 
@@ -423,14 +424,16 @@ export default function FridayScheduleSection() {
                         <>
                           <Image
                             src={activeSchedule.khatibPhotoUrl}
-                            alt={activeSchedule.khatibName || "Khatib"}
+                            alt={activeSchedule.khatibName || (isEn ? "Khatib" : "Khatib")}
                             fill
                             unoptimized
                             sizes="160px"
                             className="object-cover"
                           />
                           <div className="absolute inset-x-0 bottom-0 py-1 bg-gradient-to-t from-black/80 to-transparent text-center">
-                            <span className="text-[10px] text-white font-semibold">Khatib Resmi</span>
+                            <span className="text-[10px] text-white font-semibold">
+                              {isEn ? "Official Khatib" : "Khatib Resmi"}
+                            </span>
                           </div>
                         </>
                       ) : (
@@ -438,8 +441,12 @@ export default function FridayScheduleSection() {
                           <div className="w-14 h-14 rounded-full bg-stone-200/80 flex items-center justify-center mb-2 text-stone-500">
                             <User className="w-7 h-7" />
                           </div>
-                          <span className="text-[11px] font-bold text-stone-600">Foto Khatib</span>
-                          <span className="text-[10px] text-stone-400 mt-0.5">Menunggu Takmir</span>
+                          <span className="text-[11px] font-bold text-stone-600">
+                            {isEn ? "Khatib Photo" : "Foto Khatib"}
+                          </span>
+                          <span className="text-[10px] text-stone-400 mt-0.5">
+                            {isEn ? "Awaiting Takmir" : "Menunggu Takmir"}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -448,27 +455,33 @@ export default function FridayScheduleSection() {
                     <div className="flex-1 text-center sm:text-left space-y-3">
                       <div>
                         <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
-                          Tema Khutbah Jumat
+                          {isEn ? "Friday Sermon Theme" : "Tema Khutbah Jumat"}
                         </span>
                         <h4 className="text-base sm:text-xl font-bold text-stone-900 font-serif leading-snug mt-1">
-                          &ldquo;{activeSchedule.khutbahTheme}&rdquo;
+                          &ldquo;{activeSchedule.khutbahTheme === "Tema Khutbah Dalam Konfirmasi"
+                            ? (isEn ? "Sermon Theme Under Confirmation" : activeSchedule.khutbahTheme)
+                            : activeSchedule.khutbahTheme}&rdquo;
                         </h4>
                       </div>
 
                       <div className="pt-2 border-t border-stone-200/70">
                         <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
-                          Khatib
+                          {isEn ? "Khatib" : "Khatib"}
                         </span>
                         <h5 className="text-base sm:text-lg font-bold text-[#003B73]">
-                          {activeSchedule.khatibName}
+                          {activeSchedule.khatibName === "Dalam Konfirmasi"
+                            ? (isEn ? "Under Confirmation" : activeSchedule.khatibName)
+                            : activeSchedule.khatibName}
                         </h5>
                         <p className="text-xs text-stone-500 mt-0.5">
-                          {activeSchedule.khatibTitle}
+                          {activeSchedule.khatibTitle === "Akan Diumumkan Takmir"
+                            ? (isEn ? "To Be Announced by Takmir" : activeSchedule.khatibTitle)
+                            : activeSchedule.khatibTitle}
                         </p>
                       </div>
 
                       <div className="inline-block px-3.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs text-stone-700 font-medium shadow-sm">
-                        Waktu Mulai: <strong className="text-stone-900">{activeSchedule.time}</strong>
+                        {isEn ? "Start Time:" : "Waktu Mulai:"} <strong className="text-stone-900">{activeSchedule.time}</strong>
                       </div>
                     </div>
                   </div>
@@ -476,8 +489,10 @@ export default function FridayScheduleSection() {
 
                 {/* Bottom Reminder */}
                 <div className="pt-3 border-t border-stone-200/80 bg-white p-3.5 rounded-2xl text-xs text-stone-600 leading-relaxed border border-stone-200/60">
-                  <strong className="text-stone-900">Himbauan Jamaah:</strong>{" "}
-                  {activeSchedule.notes || "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid."}
+                  <strong className="text-stone-900">{isEn ? "Congregation Notice:" : "Himbauan Jamaah:"}</strong>{" "}
+                  {activeSchedule.notes === "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid."
+                    ? (isEn ? "Congregants are encouraged to arrive early before the adhan is called, maintain reverence and mosque cleanliness." : activeSchedule.notes)
+                    : (activeSchedule.notes || (isEn ? "Congregants are encouraged to arrive early before the adhan is called, maintain reverence and mosque cleanliness." : "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid."))}
                 </div>
               </div>
 
@@ -487,17 +502,23 @@ export default function FridayScheduleSection() {
                 <div className="bg-[#FAF8F5]/80 rounded-3xl border border-stone-200 p-5 flex flex-col justify-between">
                   <div className="flex items-center justify-start mb-2.5">
                     <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#003B73] text-white">
-                      Imam Shalat Jumat
+                      {isEn ? "Friday Prayer Imam" : "Imam Shalat Jumat"}
                     </span>
                   </div>
                   <h4 className="text-base sm:text-lg font-bold text-stone-900 font-serif">
-                    {activeSchedule.imamName}
+                    {activeSchedule.imamName === "Dalam Konfirmasi"
+                      ? (isEn ? "Under Confirmation" : activeSchedule.imamName)
+                      : activeSchedule.imamName}
                   </h4>
                   <p className="text-xs text-stone-500 mt-0.5 mb-2.5">
-                    {activeSchedule.imamRole}
+                    {activeSchedule.imamRole === "Imam Shalat Jumat"
+                      ? (isEn ? "Friday Prayer Imam" : activeSchedule.imamRole)
+                      : activeSchedule.imamRole}
                   </p>
                   <div className="pt-2 border-t border-stone-200/70 text-[11px] text-stone-500">
-                    Memimpin shalat fardhu Jumat berjamaah setelah khutbah kedua selesai.
+                    {isEn
+                      ? "Leading the congregational Friday fard prayer after the second sermon concludes."
+                      : "Memimpin shalat fardhu Jumat berjamaah setelah khutbah kedua selesai."}
                   </div>
                 </div>
 
@@ -505,27 +526,35 @@ export default function FridayScheduleSection() {
                 <div className="bg-[#FAF8F5]/80 rounded-3xl border border-stone-200 p-5 flex flex-col justify-between">
                   <div className="flex items-center justify-start mb-2.5">
                     <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-stone-800 text-white">
-                      Muadzin Jumat
+                      {isEn ? "Friday Muadzin" : "Muadzin Jumat"}
                     </span>
                   </div>
                   <h4 className="text-base sm:text-lg font-bold text-stone-900 font-serif">
-                    {activeSchedule.muadzinName}
+                    {activeSchedule.muadzinName === "Dalam Konfirmasi"
+                      ? (isEn ? "Under Confirmation" : activeSchedule.muadzinName)
+                      : activeSchedule.muadzinName}
                   </h4>
                   <p className="text-xs text-stone-500 mt-0.5 mb-2.5">
-                    {activeSchedule.muadzinRole}
+                    {activeSchedule.muadzinRole === "Muadzin Shalat Jumat"
+                      ? (isEn ? "Friday Prayer Muadzin" : activeSchedule.muadzinRole)
+                      : activeSchedule.muadzinRole}
                   </p>
                   <div className="pt-2 border-t border-stone-200/70 text-[11px] text-stone-500">
-                    Mengumandangkan adzan Shalat Jumat saat khatib menaiki mimbar serta memandu iqomah.
+                    {isEn
+                      ? "Calling the Friday prayer adhan as the khatib ascends the pulpit and leading the iqamah."
+                      : "Mengumandangkan adzan Shalat Jumat saat khatib menaiki mimbar serta memandu iqomah."}
                   </div>
                 </div>
 
                 {/* Quick Etiquette Card */}
                 <div className="bg-white rounded-3xl border border-stone-200 p-4 text-xs text-stone-700 space-y-1 shadow-sm">
                   <span className="font-bold text-[#003B73] uppercase text-[10px] tracking-wider block">
-                    Adab Berjamaah Shalat Jumat
+                    {isEn ? "Friday Congregational Etiquette" : "Adab Berjamaah Shalat Jumat"}
                   </span>
                   <p className="leading-relaxed">
-                    Diimbau menonaktifkan nada dering gawai, mengisi saf terdepan yang masih kosong, dan menyimak khutbah dengan khidmat.
+                    {isEn
+                      ? "Please silent mobile ringtones, fill the frontmost vacant rows, and listen to the sermon with reverence."
+                      : "Diimbau menonaktifkan nada dering gawai, mengisi saf terdepan yang masih kosong, dan menyimak khutbah dengan khidmat."}
                   </p>
                 </div>
               </div>
@@ -551,7 +580,7 @@ export default function FridayScheduleSection() {
                           </span>
                         ) : (
                           <span className="text-xs font-semibold text-stone-500">
-                            • {activeSchedule.date}
+                            • {activeSchedule.date === "Jumat Pekan Ini" ? (isEn ? "This Friday" : "Jumat Pekan Ini") : activeSchedule.date}
                           </span>
                         )}
                       </div>
@@ -561,13 +590,13 @@ export default function FridayScheduleSection() {
                           activeSchedule.infaqAmount !== null &&
                           Number(activeSchedule.infaqAmount) > 0
                             ? `Rp ${Number(activeSchedule.infaqAmount).toLocaleString("id-ID")}`
-                            : "Dalam Penghitungan Takmir"}
+                            : (isEn ? "Being Calculated by Takmir" : "Dalam Penghitungan Takmir")}
                         </span>
                         {activeSchedule.infaqAmount !== undefined &&
                           activeSchedule.infaqAmount !== null &&
                           Number(activeSchedule.infaqAmount) > 0 && (
                             <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 border border-emerald-300 px-2 py-0.5 rounded-full">
-                              Terverifikasi Takmir
+                              {isEn ? "Verified by Takmir" : "Terverifikasi Takmir"}
                             </span>
                           )}
                       </div>
@@ -584,7 +613,7 @@ export default function FridayScheduleSection() {
                       href="#donasi"
                       className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
                     >
-                      <span>Infaq Digital QRIS</span>
+                      <span>{isEn ? "Digital QRIS Infaq" : "Infaq Digital QRIS"}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </a>
                   </div>
@@ -614,10 +643,12 @@ export default function FridayScheduleSection() {
                 </div>
                 <div>
                   <h3 className="text-lg sm:text-xl font-bold text-stone-900 font-serif">
-                    Arsip Petugas Imam &amp; Khatib Jumat
+                    {isEn ? "Friday Imam & Khatib Officers Archive" : "Arsip Petugas Imam & Khatib Jumat"}
                   </h3>
                   <p className="text-xs text-stone-500 mt-0.5">
-                    Catatan susunan petugas Shalat Jumat sebelumnya yang otomatis terarsip
+                    {isEn
+                      ? "Historical Friday prayer officer line-ups automatically archived"
+                      : "Catatan susunan petugas Shalat Jumat sebelumnya yang otomatis terarsip"}
                   </p>
                 </div>
               </div>
@@ -625,7 +656,7 @@ export default function FridayScheduleSection() {
                 type="button"
                 onClick={() => setIsHistoryModalOpen(false)}
                 className="p-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 transition-colors cursor-pointer"
-                aria-label="Tutup"
+                aria-label={isEn ? "Close" : "Tutup"}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -642,7 +673,7 @@ export default function FridayScheduleSection() {
                     : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                 }`}
               >
-                Semua Masjid ({history.length})
+                {isEn ? `All Mosques (${history.length})` : `Semua Masjid (${history.length})`}
               </button>
               {MOSQUE_LIST.map((m) => {
                 const count = history.filter((h) => h.mosqueId === m.id).length;
@@ -667,7 +698,7 @@ export default function FridayScheduleSection() {
             <div className="py-4 overflow-y-auto space-y-4 pr-1">
               {filteredHistory.length === 0 ? (
                 <div className="text-center py-12 text-stone-500 text-xs">
-                  Belum ada arsip jadwal untuk masjid yang dipilih.
+                  {isEn ? "No schedule archive yet for the selected mosque." : "Belum ada arsip jadwal untuk masjid yang dipilih."}
                 </div>
               ) : (
                 filteredHistory.map((item) => (
@@ -705,7 +736,7 @@ export default function FridayScheduleSection() {
                       {/* Khatib */}
                       <div className="bg-white p-3.5 rounded-xl border border-stone-200 shadow-2xs">
                         <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
-                          Khatib Shalat Jumat
+                          {isEn ? "Friday Prayer Khatib" : "Khatib Shalat Jumat"}
                         </span>
                         <div className="text-sm font-bold text-[#003B73] mt-0.5">
                           {item.khatibName}
@@ -726,10 +757,10 @@ export default function FridayScheduleSection() {
                       <div className="bg-white p-3.5 rounded-xl border border-stone-200 shadow-2xs flex flex-col justify-between">
                         <div>
                           <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
-                            Imam Shalat Jumat
+                            {isEn ? "Friday Prayer Imam" : "Imam Shalat Jumat"}
                           </span>
                           <div className="text-sm font-bold text-stone-900 mt-0.5">
-                            {item.imamName || "Imam Shalat Jumat"}
+                            {item.imamName || (isEn ? "Friday Prayer Imam" : "Imam Shalat Jumat")}
                           </div>
                           {item.imamRole && (
                             <div className="text-[11px] text-stone-500 mt-0.5">
@@ -740,7 +771,9 @@ export default function FridayScheduleSection() {
 
                         {item.muadzinName && (
                           <div className="pt-2 mt-2 border-t border-stone-100 flex items-center justify-between text-xs">
-                            <span className="text-stone-400 text-[10px] uppercase font-bold">Muadzin:</span>
+                            <span className="text-stone-400 text-[10px] uppercase font-bold">
+                              {isEn ? "Muadzin:" : "Muadzin:"}
+                            </span>
                             <span className="font-semibold text-stone-700">{item.muadzinName}</span>
                           </div>
                         )}

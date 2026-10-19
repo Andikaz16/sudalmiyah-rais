@@ -332,6 +332,21 @@ export function calculateDeterministicHijri(date: Date = new Date()): {
   };
 }
 
+export const HIJRI_MONTH_NAMES_EN = [
+  "Muharram",
+  "Safar",
+  "Rabi' al-Awwal",
+  "Rabi' al-Thani",
+  "Jumada al-Awwal",
+  "Jumada al-Thani",
+  "Rajab",
+  "Sha'ban",
+  "Ramadan",
+  "Shawwal",
+  "Dhu al-Qi'dah",
+  "Dhu al-Hijjah",
+];
+
 // Daftar nama hari penanggalan Islam resmi (standar bahasa Indonesia & Majelis Tarjih)
 export const ISLAMIC_DAY_NAMES = [
   "Ahad",
@@ -343,14 +358,31 @@ export const ISLAMIC_DAY_NAMES = [
   "Sabtu",
 ] as const;
 
-export function getIslamicDayName(date: Date = new Date()): string {
+export const ISLAMIC_DAY_NAMES_EN = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
+
+export function getIslamicDayName(date: Date = new Date(), lang: "id" | "en" = "id"): string {
   const day = date.getDay();
-  return ISLAMIC_DAY_NAMES[day] || "Ahad";
+  return lang === "en" ? ISLAMIC_DAY_NAMES_EN[day] || "Sunday" : ISLAMIC_DAY_NAMES[day] || "Ahad";
 }
 
 // Konversi tanggal Masehi ke Penanggalan Hijriyah (KHGT & Standar Majelis Tarjih)
-export function getHijriDate(date: Date = new Date(), includeDayName: boolean = true): string {
-  const dayName = getIslamicDayName(date);
+export function getHijriDate(
+  date: Date = new Date(),
+  includeDayName: boolean = true,
+  lang: "id" | "en" = "id"
+): string {
+  const dayName = getIslamicDayName(date, lang);
+  const isEn = lang === "en";
+  const monthNames = isEn ? HIJRI_MONTH_NAMES_EN : HIJRI_MONTH_NAMES;
+  const suffix = isEn ? "AH" : "H";
   let hijriBase = "";
 
   try {
@@ -367,8 +399,8 @@ export function getHijriDate(date: Date = new Date(), includeDayName: boolean = 
     if (dayPart && monthPart && yearPart) {
       const mIdx = parseInt(monthPart, 10);
       if (mIdx >= 1 && mIdx <= 12) {
-        const mName = HIJRI_MONTH_NAMES[mIdx - 1];
-        hijriBase = `${dayPart} ${mName} ${yearPart} H`;
+        const mName = monthNames[mIdx - 1];
+        hijriBase = `${dayPart} ${mName} ${yearPart} ${suffix}`;
       }
     }
   } catch {
@@ -378,17 +410,19 @@ export function getHijriDate(date: Date = new Date(), includeDayName: boolean = 
   if (!hijriBase) {
     // Fallback deterministik independen
     const calc = calculateDeterministicHijri(date);
-    hijriBase = `${calc.day} ${calc.monthName} ${calc.year} H`;
+    const mName = monthNames[calc.month - 1] || (isEn ? "Hijri" : "Hijriyah");
+    hijriBase = `${calc.day} ${mName} ${calc.year} ${suffix}`;
   }
 
   return includeDayName ? `${dayName}, ${hijriBase}` : hijriBase;
 }
 
 // Rincian Kalender Hijriyah Resmi Muhammadiyah (KHGT)
-export function getMuhammadiyahCalendarDetails(date: Date = new Date()) {
-  const dayName = getIslamicDayName(date);
-  const hijri = getHijriDate(date, true);
-  const hijriWithoutDay = getHijriDate(date, false);
+export function getMuhammadiyahCalendarDetails(date: Date = new Date(), lang: "id" | "en" = "id") {
+  const isEn = lang === "en";
+  const dayName = getIslamicDayName(date, lang);
+  const hijri = getHijriDate(date, true, lang);
+  const hijriWithoutDay = getHijriDate(date, false, lang);
   const pasaran = getPasaranJawa(date);
   return {
     dayName,
@@ -396,8 +430,12 @@ export function getMuhammadiyahCalendarDetails(date: Date = new Date()) {
     hijriWithoutDay,
     pasaran,
     combined: `${hijri} (${pasaran})`,
-    standard: "Kalender Hijriyah Global Tunggal (KHGT)",
-    authority: "Majelis Tarjih & Tajdid PP Muhammadiyah",
+    standard: isEn
+      ? "Single Unified Global Hijri Calendar (KHGT)"
+      : "Kalender Hijriyah Global Tunggal (KHGT)",
+    authority: isEn
+      ? "Tarjih & Tajdid Council PP Muhammadiyah"
+      : "Majelis Tarjih & Tajdid PP Muhammadiyah",
   };
 }
 

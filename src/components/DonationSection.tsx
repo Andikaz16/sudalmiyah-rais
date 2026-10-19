@@ -109,7 +109,9 @@ export default function DonationSection() {
                   </button>
 
                   <div className="text-[10px] text-stone-500 leading-tight">
-                    Mendukung BCA, Mandiri, BSI, BRI, BNI, GoPay, OVO, ShopeePay, DANA, LinkAja, &amp; seluruh aplikasi QRIS.
+                    {isEn
+                      ? "Supports BCA, Mandiri, BSI, BRI, BNI, GoPay, OVO, ShopeePay, DANA, LinkAja, & all QRIS apps."
+                      : "Mendukung BCA, Mandiri, BSI, BRI, BNI, GoPay, OVO, ShopeePay, DANA, LinkAja, & seluruh aplikasi QRIS."}
                   </div>
                 </div>
               </div>
@@ -120,13 +122,15 @@ export default function DonationSection() {
               <div className="space-y-4">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-[#003B73]">
-                    Kemudahan Berinfaq Digital
+                    {isEn ? "Convenience of Digital Infaq" : "Kemudahan Berinfaq Digital"}
                   </span>
                   <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-stone-900 mt-1 font-serif">
-                    Panduan Pembayaran QRIS
+                    {isEn ? "QRIS Payment Guide" : "Panduan Pembayaran QRIS"}
                   </h3>
                   <p className="text-xs sm:text-sm text-stone-600 mt-2 leading-relaxed">
-                    Infaq dapat ditunaikan secara langsung tanpa perlu repot mencatat nomor rekening. Cukup scan salah satu kode QRIS di samping atau unduh barcode melalui ponsel pintar Anda kapan pun dan di mana pun.
+                    {isEn
+                      ? "Infaq can be contributed directly without the need to note account numbers. Simply scan one of the QRIS codes beside or download the barcode to your smartphone anytime, anywhere."
+                      : "Infaq dapat ditunaikan secara langsung tanpa perlu repot mencatat nomor rekening. Cukup scan salah satu kode QRIS di samping atau unduh barcode melalui ponsel pintar Anda kapan pun dan di mana pun."}
                   </p>
                 </div>
 
@@ -138,10 +142,12 @@ export default function DonationSection() {
                     </div>
                     <div>
                       <h4 className="text-xs sm:text-sm font-bold text-stone-900">
-                        Buka Aplikasi Mobile Banking atau E-Wallet
+                        {isEn ? "Open Mobile Banking or E-Wallet App" : "Buka Aplikasi Mobile Banking atau E-Wallet"}
                       </h4>
                       <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                        Gunakan aplikasi perbankan (BSI Mobile, Livin Mandiri, BCA Mobile, BRImo, Bank Jateng) atau dompet digital (GoPay, OVO, DANA, ShopeePay, LinkAja).
+                        {isEn
+                          ? "Use banking apps (BSI Mobile, Livin Mandiri, BCA Mobile, BRImo, Bank Jateng) or digital wallets (GoPay, OVO, DANA, ShopeePay, LinkAja)."
+                          : "Gunakan aplikasi perbankan (BSI Mobile, Livin Mandiri, BCA Mobile, BRImo, Bank Jateng) atau dompet digital (GoPay, OVO, DANA, ShopeePay, LinkAja)."}
                       </p>
                     </div>
                   </div>
@@ -152,10 +158,12 @@ export default function DonationSection() {
                     </div>
                     <div>
                       <h4 className="text-xs sm:text-sm font-bold text-stone-900">
-                        Pilih Menu Pindai (Scan) QRIS
+                        {isEn ? "Select Scan QRIS Menu" : "Pilih Menu Pindai (Scan) QRIS"}
                       </h4>
                       <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                        Arahkan kamera ponsel Anda ke salah satu kode QRIS di samping, atau pilih gambar QRIS yang telah diunduh dari galeri ponsel.
+                        {isEn
+                          ? "Point your phone camera to one of the QRIS codes, or select the downloaded QRIS image from your photo gallery."
+                          : "Arahkan kamera ponsel Anda ke salah satu kode QRIS di samping, atau pilih gambar QRIS yang telah diunduh dari galeri ponsel."}
                       </p>
                     </div>
                   </div>
@@ -166,10 +174,18 @@ export default function DonationSection() {
                     </div>
                     <div>
                       <h4 className="text-xs sm:text-sm font-bold text-stone-900">
-                        Pastikan Nama Penerima &amp; Masukkan Nominal
+                        {isEn ? "Verify Beneficiary Name & Enter Amount" : "Pastikan Nama Penerima & Masukkan Nominal"}
                       </h4>
                       <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                        Periksa nama merchant: <strong className="text-stone-900">{qris.merchantName || "LAZ UMS-MSJD SUDALMIYAH"}</strong> atau <strong className="text-stone-900">{qris.secondaryMerchantName || "MASJID UMS"}</strong>, kemudian ketik nominal infaq sesuai keikhlasan hati Anda.
+                        {isEn ? (
+                          <>
+                            Check merchant name: <strong className="text-stone-900">{qris.merchantName || "LAZ UMS-MSJD SUDALMIYAH"}</strong> or <strong className="text-stone-900">{qris.secondaryMerchantName || "MASJID UMS"}</strong>, then enter infaq amount according to your sincere intent.
+                          </>
+                        ) : (
+                          <>
+                            Periksa nama merchant: <strong className="text-stone-900">{qris.merchantName || "LAZ UMS-MSJD SUDALMIYAH"}</strong> atau <strong className="text-stone-900">{qris.secondaryMerchantName || "MASJID UMS"}</strong>, kemudian ketik nominal infaq sesuai keikhlasan hati Anda.
+                          </>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -180,10 +196,12 @@ export default function DonationSection() {
                     </div>
                     <div>
                       <h4 className="text-xs sm:text-sm font-bold text-stone-900">
-                        Konfirmasi Pembayaran
+                        {isEn ? "Confirm Payment" : "Konfirmasi Pembayaran"}
                       </h4>
                       <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                        Masukkan PIN transaksi Anda. Bukti pembayaran akan langsung tampil di layar ponsel dan dana masuk ke rekening operasional masjid.
+                        {isEn
+                          ? "Enter your transaction PIN. Payment confirmation will appear instantly on screen, and funds are deposited to the mosque operational account."
+                          : "Masukkan PIN transaksi Anda. Bukti pembayaran akan langsung tampil di layar ponsel dan dana masuk ke rekening operasional masjid."}
                       </p>
                     </div>
                   </div>
@@ -198,10 +216,12 @@ export default function DonationSection() {
                   </div>
                   <div>
                     <div className="text-xs font-bold text-stone-900">
-                      Amanah &amp; Standar Nasional Bank Indonesia
+                      {isEn ? "Trustworthy & Bank Indonesia National Standard" : "Amanah & Standar Nasional Bank Indonesia"}
                     </div>
                     <div className="text-[11px] text-stone-500">
-                      Terdaftar resmi di bawah pengawasan Bank Indonesia dan ASPI.
+                      {isEn
+                        ? "Officially registered under the supervision of Bank Indonesia and ASPI."
+                        : "Terdaftar resmi di bawah pengawasan Bank Indonesia dan ASPI."}
                     </div>
                   </div>
                 </div>
@@ -239,11 +259,13 @@ export default function DonationSection() {
                     onClick={handleDownloadSecondaryQRIS}
                     className="w-full text-center px-4 py-2.5 rounded-full bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition-all shadow-md shadow-stone-900/15 active:scale-[0.99] cursor-pointer"
                   >
-                    Unduh Gambar QRIS
+                    {isEn ? "Download QRIS Poster" : "Unduh Gambar QRIS"}
                   </button>
 
                   <div className="text-[10px] text-stone-500 leading-tight">
-                    Mendukung Bank Jateng BIMA, Mobile Banking, E-Wallet, &amp; seluruh aplikasi QRIS.
+                    {isEn
+                      ? "Supports Bank Jateng BIMA, Mobile Banking, E-Wallet, & all QRIS apps."
+                      : "Mendukung Bank Jateng BIMA, Mobile Banking, E-Wallet, & seluruh aplikasi QRIS."}
                   </div>
                 </div>
               </div>

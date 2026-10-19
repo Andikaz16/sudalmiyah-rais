@@ -72,13 +72,25 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
   }, [activeCategory]);
 
   const categories: Array<{ id: string; label: string }> = [
-    { id: "ALL", label: "Semua Kegiatan" },
-    { id: "SHALAT_JUMAT", label: "Shalat Jumat" },
-    { id: "KAJIAN_MAHASISWA", label: "Kajian Mahasiswa" },
-    { id: "TABLIGH_AKBAR", label: "Tabligh Akbar" },
-    { id: "TAHSIN", label: "Tahsin Al-Qur'an" },
-    { id: "SOSIAL", label: "Sosial" },
+    { id: "ALL", label: isEn ? "All Activities" : "Semua Kegiatan" },
+    { id: "SHALAT_JUMAT", label: isEn ? "Friday Prayer" : "Shalat Jumat" },
+    { id: "KAJIAN_MAHASISWA", label: isEn ? "Student Lectures" : "Kajian Mahasiswa" },
+    { id: "TABLIGH_AKBAR", label: isEn ? "Grand Gathering" : "Tabligh Akbar" },
+    { id: "TAHSIN", label: isEn ? "Quran Tahsin" : "Tahsin Al-Qur'an" },
+    { id: "SOSIAL", label: isEn ? "Social & Charity" : "Sosial" },
   ];
+
+  const getCategoryLabel = (cat: string) => {
+    if (!isEn) return cat.replace(/_/g, " ");
+    switch (cat) {
+      case "SHALAT_JUMAT": return "Friday Prayer";
+      case "KAJIAN_MAHASISWA": return "Student Lecture";
+      case "TABLIGH_AKBAR": return "Grand Gathering";
+      case "TAHSIN": return "Quran Tahsin";
+      case "SOSIAL": return "Social & Charity";
+      default: return cat.replace(/_/g, " ");
+    }
+  };
 
   return (
     <section id="agenda" className="py-10 sm:py-16 bg-[#FAF8F5] text-stone-900">
@@ -134,7 +146,7 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
           </div>
         ) : agendas.length === 0 ? (
           <div className="p-12 text-center rounded-3xl bg-stone-50 border border-stone-200 text-stone-500">
-            Tidak ada agenda untuk kategori ini saat ini.
+            {isEn ? "No agendas found for this category at the moment." : "Tidak ada agenda untuk kategori ini saat ini."}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -155,7 +167,7 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                     <div
                       onClick={() => setViewingDetailAgenda(item)}
                       className="relative h-44 sm:h-48 w-full overflow-hidden bg-stone-100 cursor-pointer group/thumb"
-                      title="Klik untuk melihat detail kegiatan"
+                      title={isEn ? "Click to view event details" : "Klik untuk melihat detail kegiatan"}
                     >
                       <Image
                         src={item.bannerUrl || "/uploads/agendas/agenda-jumat.jpg"}
@@ -168,22 +180,22 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                       {/* Top Badges Overlay */}
                       <div className="absolute top-3 left-3">
                         <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-stone-200 text-[#003B73] shadow-sm">
-                          {item.category.replace(/_/g, " ")}
+                          {getCategoryLabel(item.category)}
                         </span>
                       </div>
                       <div className="absolute top-3 right-3">
                         {item.isCompleted ? (
                           <span className="text-[10px] text-white bg-emerald-700 font-bold px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1 border border-emerald-500/40">
                             <CheckCircle2 className="w-3 h-3 text-emerald-200" />
-                            <span>Selesai / Terlaksana</span>
+                            <span>{isEn ? "Completed" : "Selesai / Terlaksana"}</span>
                           </span>
                         ) : item.requiresRegistration ? (
                           <span className="text-[10px] text-white bg-[#B58A1E] font-semibold px-2.5 py-1 rounded-full shadow-sm">
-                            Wajib Registrasi
+                            {isEn ? "Registration Required" : "Wajib Registrasi"}
                           </span>
                         ) : (
                           <span className="text-[10px] text-white bg-emerald-700 font-semibold px-2.5 py-1 rounded-full shadow-sm">
-                            Hadir Langsung di Masjid
+                            {isEn ? "Attend In Person" : "Hadir Langsung di Masjid"}
                           </span>
                         )}
                       </div>
@@ -194,12 +206,12 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                           {item.isCompleted ? (
                             <>
                               <Camera className="w-3.5 h-3.5 text-emerald-700" />
-                              <span>Lihat Hasil &amp; Foto</span>
+                              <span>{isEn ? "View Results & Photos" : "Lihat Hasil & Foto"}</span>
                             </>
                           ) : (
                             <>
                               <Eye className="w-3.5 h-3.5 text-[#003B73]" />
-                              <span>Buka Detail</span>
+                              <span>{isEn ? "View Details" : "Buka Detail"}</span>
                             </>
                           )}
                         </span>
@@ -223,7 +235,7 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                           <GraduationCap className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
                           <div className="min-w-0">
                             <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wider block">
-                              Fakultas Terjadwal (Wajib):
+                              {isEn ? "Scheduled Faculty (Mandatory):" : "Fakultas Terjadwal (Wajib):"}
                             </span>
                             <span className="text-xs font-bold text-stone-900 leading-snug line-clamp-2 block">
                               {item.targetAudience}
@@ -241,18 +253,18 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                             </div>
                             <div>
                               <span className="text-[10px] font-bold text-emerald-950 uppercase tracking-wider block">
-                                Hasil Kegiatan:
+                                {isEn ? "Event Results:" : "Hasil Kegiatan:"}
                               </span>
                               <span className="text-xs font-extrabold text-emerald-900 block">
                                 {item.actualAttendees
-                                  ? `${item.actualAttendees.toLocaleString("id-ID")} Peserta Hadir`
-                                  : "Kegiatan Selesai"}
+                                  ? `${item.actualAttendees.toLocaleString(isEn ? "en-US" : "id-ID")} ${isEn ? "Attendees" : "Peserta Hadir"}`
+                                  : (isEn ? "Event Completed" : "Kegiatan Selesai")}
                               </span>
                             </div>
                           </div>
                           {item.documentationPhotos && item.documentationPhotos.length > 0 && (
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
-                              {item.documentationPhotos.length} Foto
+                              {item.documentationPhotos.length} {isEn ? "Photos" : "Foto"}
                             </span>
                           )}
                         </div>
@@ -295,10 +307,10 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                         <div className="flex justify-between text-[11px] text-stone-500 mb-1.5 font-medium">
                           <span className="flex items-center gap-1.5">
                             <Users className="w-3.5 h-3.5 text-stone-400" />
-                            <span>Kapasitas Terisi</span>
+                            <span>{isEn ? "Capacity Filled" : "Kapasitas Terisi"}</span>
                           </span>
                           <span className="text-stone-700 font-semibold">
-                            {item.registeredCount} / {item.quota} Jamaah
+                            {item.registeredCount} / {item.quota} {isEn ? "Attendees" : "Jamaah"}
                           </span>
                         </div>
                         <div className="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
@@ -323,7 +335,7 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                       className="w-full text-center px-4 py-3 rounded-full text-xs sm:text-sm font-bold bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white shadow-md shadow-emerald-700/15 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] group/btn"
                     >
                       <Camera className="w-4 h-4 text-emerald-200" />
-                      <span>Lihat Hasil &amp; Foto Kegiatan</span>
+                      <span>{isEn ? "View Results & Event Photos" : "Lihat Hasil & Foto Kegiatan"}</span>
                       <ArrowRight className="w-4 h-4 text-emerald-200 group-hover/btn:translate-x-1 transition-transform" />
                     </button>
                   ) : item.requiresRegistration ? (
@@ -334,7 +346,7 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                         className="w-full text-center py-2.5 px-3 rounded-full text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-800 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <Eye className="w-3.5 h-3.5 text-stone-600" />
-                        <span>Rincian</span>
+                        <span>{isEn ? "Details" : "Rincian"}</span>
                       </button>
                       <button
                         type="button"
@@ -346,7 +358,7 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                             : "bg-[#003B73] hover:bg-[#002855] text-white shadow-xs"
                         }`}
                       >
-                        {isFull ? "Penuh" : "Daftar Tiket"}
+                        {isFull ? (isEn ? "Full" : "Penuh") : (isEn ? "Book Ticket" : "Daftar Tiket")}
                       </button>
                     </div>
                   ) : (
@@ -356,16 +368,16 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
                       className="w-full text-center px-4 py-3 rounded-full text-xs sm:text-sm font-bold bg-[#003B73] hover:bg-[#002855] text-white shadow-md shadow-[#003B73]/15 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] group/btn"
                     >
                       <Eye className="w-4 h-4 text-amber-300" />
-                      <span>Lihat Detail Kegiatan</span>
+                      <span>{isEn ? "View Event Details" : "Lihat Detail Kegiatan"}</span>
                       <ArrowRight className="w-4 h-4 text-amber-300 group-hover/btn:translate-x-1 transition-transform" />
                     </button>
                   )}
                   <div className="text-center text-[11px] text-stone-500 font-medium">
                     {item.isCompleted
-                      ? "Dokumentasi & Laporan Kehadiran Tersedia"
+                      ? (isEn ? "Documentation & Attendance Report Available" : "Dokumentasi & Laporan Kehadiran Tersedia")
                       : !item.requiresRegistration
-                      ? "Hadir Langsung di Lokasi • Presensi QR di Masjid"
-                      : "Pendaftaran Online Mahasiswa Mandiri"}
+                      ? (isEn ? "Attend In Person • QR Attendance at Mosque" : "Hadir Langsung di Lokasi • Presensi QR di Masjid")
+                      : (isEn ? "Independent Online Student Registration" : "Pendaftaran Online Mahasiswa Mandiri")}
                   </div>
                 </div>
               </div>

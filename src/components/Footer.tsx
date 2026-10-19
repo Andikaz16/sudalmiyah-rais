@@ -13,11 +13,16 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isEn = language === "en";
   const [comingSoonMessage, setComingSoonMessage] = useState<string | null>(null);
 
   const handleComingSoon = (platform: string) => {
-    setComingSoonMessage(`Kanal ${platform} Resmi Masjid Sudalmiyah UMS segera hadir (Coming Soon)!`);
+    setComingSoonMessage(
+      isEn
+        ? `Official ${platform} Channel of UMS Sudalmiyah Mosque is Coming Soon!`
+        : `Kanal ${platform} Resmi Masjid Sudalmiyah UMS segera hadir (Coming Soon)!`
+    );
     setTimeout(() => {
       setComingSoonMessage(null);
     }, 3500);
@@ -148,7 +153,7 @@ export default function Footer() {
             {/* Social Media in Sekretariat Column */}
             <div className="pt-2">
               <span className="block text-[11px] font-bold text-white uppercase tracking-wider mb-2.5">
-                Kanal Media Sosial
+                {isEn ? "Social Media Channels" : "Kanal Media Sosial"}
               </span>
               <div className="flex items-center gap-2.5">
                 {/* WhatsApp Pak Dodi */}

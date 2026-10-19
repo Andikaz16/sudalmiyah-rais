@@ -29,10 +29,12 @@ export default function MuhammadiyahCalendarWidget() {
   const [pasaranText, setPasaranText] = useState<string>("");
   const [masehiText, setMasehiText] = useState<string>("");
 
+  const isEn = language === "en";
+
   useEffect(() => {
     const now = new Date();
     setCurrentDate(now);
-    setHijriText(getHijriDate(now));
+    setHijriText(getHijriDate(now, true, language));
     setPasaranText(getPasaranJawa(now));
     setMasehiText(
       new Intl.DateTimeFormat(language === "en" ? "en-US" : "id-ID", {
@@ -48,18 +50,22 @@ export default function MuhammadiyahCalendarWidget() {
 
   const upcomingIbadah = [
     {
-      label: "Puasa Sunnah",
-      name: "Senin & Kamis",
-      schedule: "Rutin Mingguan",
-      note: "Amalan saat catatan amalan dihadapkan kepada Allah SWT.",
-      badge: "Sunnah Maqbulah",
+      label: isEn ? "Voluntary Fasting" : "Puasa Sunnah",
+      name: isEn ? "Monday & Thursday" : "Senin & Kamis",
+      schedule: isEn ? "Weekly Routine" : "Rutin Mingguan",
+      note: isEn
+        ? "Righteous deeds presented before Allah SWT every Monday and Thursday."
+        : "Amalan saat catatan amalan dihadapkan kepada Allah SWT.",
+      badge: isEn ? "Sunnah Maqbulah" : "Sunnah Maqbulah",
     },
     {
-      label: "Puasa Pertengahan Bulan",
-      name: "Ayyamul Bidh",
-      schedule: "13, 14, 15 Hijriyah",
-      note: "Pahala puasa berlipat ganda laksana berpuasa sepanjang tahun.",
-      badge: "Tiap Bulan",
+      label: isEn ? "Mid-Month Fasting" : "Puasa Pertengahan Bulan",
+      name: isEn ? "Ayyamul Bidh" : "Ayyamul Bidh",
+      schedule: isEn ? "13, 14, 15 Hijri" : "13, 14, 15 Hijriyah",
+      note: isEn
+        ? "Multiplied fasting rewards equivalent to fasting throughout the whole year."
+        : "Pahala puasa berlipat ganda laksana berpuasa sepanjang tahun.",
+      badge: isEn ? "Every Month" : "Tiap Bulan",
     },
   ];
 
@@ -121,15 +127,17 @@ export default function MuhammadiyahCalendarWidget() {
 
               {/* Tanggal Hijriyah */}
               <div className="font-serif font-black text-3xl sm:text-4xl text-white tracking-tight leading-snug">
-                {hijriText || "Memuat Kalender..."}
+                {hijriText || (isEn ? "Loading Calendar..." : "Memuat Kalender...")}
               </div>
 
               {/* Pasaran Jawa & Masehi */}
               <div className="mt-3.5 pt-3.5 border-t border-white/15 space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-stone-300 font-medium">Pasaran Jawa:</span>
+                  <span className="text-stone-300 font-medium">
+                    {isEn ? "Javanese Pasaran:" : "Pasaran Jawa:"}
+                  </span>
                   <span className="font-bold text-[#FCD34D] bg-[#001f3f]/60 px-2.5 py-0.5 rounded-md border border-amber-400/20 font-mono">
-                    {pasaranText ? `${getIslamicDayName(currentDate || new Date())} ${pasaranText}` : "..."}
+                    {pasaranText ? `${getIslamicDayName(currentDate || new Date(), language)} ${pasaranText}` : "..."}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">

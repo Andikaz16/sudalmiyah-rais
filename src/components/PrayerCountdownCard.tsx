@@ -39,8 +39,8 @@ export default function PrayerCountdownCard() {
       setCurrentTime(now);
       const times = calculatePrayerTimes(now);
       const nextInfo = getNextPrayer(times, now);
-      const hijri = getHijriDate(now);
-      const muhammadiyahCalendar = getMuhammadiyahCalendarDetails(now);
+      const hijri = getHijriDate(now, true, language);
+      const muhammadiyahCalendar = getMuhammadiyahCalendarDetails(now, language);
       const formattedDate = new Intl.DateTimeFormat(language === "en" ? "en-US" : "id-ID", {
         weekday: "long",
         day: "numeric",
@@ -241,11 +241,11 @@ export default function PrayerCountdownCard() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-[11px] text-[#003B73] font-semibold bg-[#003B73]/10 px-2.5 py-0.5 rounded-full border border-[#003B73]/20">
-            Hisab Tarjih Munas XXXI (Subuh -18°)
+            {language === "en" ? "Tarjih Munas XXXI Calculation (Fajr -18°)" : "Hisab Tarjih Munas XXXI (Subuh -18°)"}
           </span>
           <div className="flex items-center gap-1.5 text-stone-500">
             <Compass className="w-3.5 h-3.5 text-[#B58A1E]" />
-            <span>Kiblat: 294.5°</span>
+            <span>{language === "en" ? "Qibla: 294.5°" : "Kiblat: 294.5°"}</span>
           </div>
         </div>
       </div>

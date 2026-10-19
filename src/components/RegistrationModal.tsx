@@ -16,6 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Agenda, Registration } from "@/lib/types";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface RegistrationModalProps {
   agenda: Agenda | null;
@@ -28,6 +29,8 @@ export default function RegistrationModal({
   onClose,
   onSuccess,
 }: RegistrationModalProps) {
+  const { language } = useLanguage();
+  const isEn = language === "en";
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -114,7 +117,9 @@ export default function RegistrationModal({
         <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FAF8F5]">
           <div>
             <span className="text-[11px] font-semibold text-[#003B73] uppercase tracking-wider">
-              {ticketResult ? "Bukti Pendaftaran Resmi" : "Formulir Pendaftaran Kegiatan"}
+              {isEn
+                ? (ticketResult ? "Official Registration Ticket" : "Event Registration Form")
+                : (ticketResult ? "Bukti Pendaftaran Resmi" : "Formulir Pendaftaran Kegiatan")}
             </span>
             <h3 className="text-base sm:text-lg font-bold text-stone-900 line-clamp-1 font-serif">
               {agenda.title}
@@ -136,7 +141,9 @@ export default function RegistrationModal({
               <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
                 <div className="text-xs sm:text-sm text-emerald-800 font-medium">
-                  Pendaftaran terkonfirmasi. Data kehadiran Anda telah tercatat dalam sistem presensi kegiatan.
+                  {isEn
+                    ? "Registration confirmed. Your attendance data has been recorded in the event system."
+                    : "Pendaftaran terkonfirmasi. Data kehadiran Anda telah tercatat dalam sistem presensi kegiatan."}
                 </div>
               </div>
 
@@ -158,21 +165,31 @@ export default function RegistrationModal({
 
                 <div className="grid grid-cols-2 gap-3 py-4 border-b border-dashed border-stone-300 text-xs">
                   <div>
-                    <span className="text-stone-500 block text-[10px] uppercase font-semibold">Nama Peserta</span>
+                    <span className="text-stone-500 block text-[10px] uppercase font-semibold">
+                      {isEn ? "Participant Name" : "Nama Peserta"}
+                    </span>
                     <strong className="text-stone-900 text-xs">{ticketResult.fullName}</strong>
                   </div>
                   <div>
-                    <span className="text-stone-500 block text-[10px] uppercase font-semibold">Status Jamaah</span>
+                    <span className="text-stone-500 block text-[10px] uppercase font-semibold">
+                      {isEn ? "Participant Status" : "Status Jamaah"}
+                    </span>
                     <strong className="text-stone-900 text-xs">
-                      {ticketResult.isUmsStudent ? `Mahasiswa UMS (${ticketResult.nim})` : "Jamaah Umum"}
+                      {ticketResult.isUmsStudent
+                        ? (isEn ? `UMS Student (${ticketResult.nim})` : `Mahasiswa UMS (${ticketResult.nim})`)
+                        : (isEn ? "General Public" : "Jamaah Umum")}
                     </strong>
                   </div>
                   <div>
-                    <span className="text-stone-500 block text-[10px] uppercase font-semibold">Waktu Kegiatan</span>
+                    <span className="text-stone-500 block text-[10px] uppercase font-semibold">
+                      {isEn ? "Event Time" : "Waktu Kegiatan"}
+                    </span>
                     <span className="text-stone-700 text-xs">{agenda.date} ({agenda.time})</span>
                   </div>
                   <div>
-                    <span className="text-stone-500 block text-[10px] uppercase font-semibold">Lokasi Acara</span>
+                    <span className="text-stone-500 block text-[10px] uppercase font-semibold">
+                      {isEn ? "Event Location" : "Lokasi Acara"}
+                    </span>
                     <span className="text-stone-700 text-xs">{agenda.location}</span>
                   </div>
                 </div>
@@ -180,11 +197,11 @@ export default function RegistrationModal({
                 {/* Status Terdaftar */}
                 <div className="pt-4 flex flex-col items-center text-center">
                   <span className="text-[10px] text-stone-500 uppercase tracking-wider mb-1 font-semibold">
-                    Status Presensi Terkonfirmasi
+                    {isEn ? "Confirmed Attendance Status" : "Status Presensi Terkonfirmasi"}
                   </span>
                   <div className="inline-flex items-center gap-2 text-emerald-700 bg-emerald-50 border border-emerald-200 font-bold px-4 py-2 rounded-xl text-xs sm:text-sm">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Terdaftar Resmi di Sistem Masjid</span>
+                    <span>{isEn ? "Officially Registered in Mosque System" : "Terdaftar Resmi di Sistem Masjid"}</span>
                   </div>
                 </div>
               </div>
@@ -195,14 +212,14 @@ export default function RegistrationModal({
                   onClick={() => window.print()}
                   className="flex-1 text-center px-5 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white font-bold text-sm shadow-md transition-colors"
                 >
-                  Cetak / Unduh Bukti
+                  {isEn ? "Print / Download Ticket" : "Cetak / Unduh Bukti"}
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
                   className="px-6 py-3 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-semibold transition-colors"
                 >
-                  Selesai
+                  {isEn ? "Done" : "Selesai"}
                 </button>
               </div>
             </div>
@@ -221,7 +238,7 @@ export default function RegistrationModal({
                 <div className="flex items-center gap-2">
                   <User className="w-3.5 h-3.5 text-[#003B73]" />
                   <span>
-                    Pemateri: <strong>{agenda.speaker}</strong>
+                    {isEn ? "Speaker:" : "Pemateri:"} <strong>{agenda.speaker}</strong>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -238,12 +255,12 @@ export default function RegistrationModal({
 
               <div>
                 <label className="block text-xs font-semibold text-stone-700 mb-1">
-                  Nama Lengkap Sesuai KTP / KTM
+                  {isEn ? "Full Name (as on ID / Student Card)" : "Nama Lengkap Sesuai KTP / KTM"}
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Contoh: Muhammad Rafli Pratama"
+                  placeholder={isEn ? "e.g. John Doe" : "Contoh: Muhammad Rafli Pratama"}
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 placeholder-stone-400 text-sm focus:outline-none focus:border-[#003B73]"
@@ -253,7 +270,7 @@ export default function RegistrationModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Alamat Email Aktif
+                    {isEn ? "Active Email Address" : "Alamat Email Aktif"}
                   </label>
                   <input
                     type="email"
@@ -266,7 +283,7 @@ export default function RegistrationModal({
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Nomor WhatsApp / HP
+                    {isEn ? "WhatsApp / Phone Number" : "Nomor WhatsApp / HP"}
                   </label>
                   <input
                     type="tel"
@@ -290,7 +307,7 @@ export default function RegistrationModal({
                   />
                   <div className="flex items-center gap-2 text-xs font-semibold text-stone-800">
                     <GraduationCap className="w-4 h-4 text-[#B58A1E]" />
-                    <span>Saya Mahasiswa Universitas Muhammadiyah Surakarta</span>
+                    <span>{isEn ? "I am a student of Universitas Muhammadiyah Surakarta" : "Saya Mahasiswa Universitas Muhammadiyah Surakarta"}</span>
                   </div>
                 </label>
 
@@ -298,12 +315,12 @@ export default function RegistrationModal({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                     <div>
                       <label className="block text-[11px] text-stone-600 mb-1 font-semibold">
-                        Nomor Induk Mahasiswa (NIM)
+                        {isEn ? "Student ID Number (NIM)" : "Nomor Induk Mahasiswa (NIM)"}
                       </label>
                       <input
                         type="text"
                         required={formData.isUmsStudent}
-                        placeholder="Contoh: L200210001"
+                        placeholder={isEn ? "e.g. L200210001" : "Contoh: L200210001"}
                         value={formData.nim}
                         onChange={(e) => setFormData({ ...formData, nim: e.target.value })}
                         className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-900 placeholder-stone-400 text-xs uppercase focus:outline-none focus:border-[#003B73]"
@@ -311,7 +328,7 @@ export default function RegistrationModal({
                     </div>
                     <div>
                       <label className="block text-[11px] text-stone-600 mb-1 font-semibold">
-                        Fakultas
+                        {isEn ? "Faculty" : "Fakultas"}
                       </label>
                       <select
                         value={formData.faculty}
@@ -340,7 +357,9 @@ export default function RegistrationModal({
                   disabled={loading}
                   className="w-full text-center px-5 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] disabled:bg-stone-300 text-white font-bold text-sm shadow-md transition-colors"
                 >
-                  {loading ? "Memproses Pendaftaran..." : "Konfirmasi & Terbitkan Tiket Presensi"}
+                  {loading
+                    ? (isEn ? "Processing Registration..." : "Memproses Pendaftaran...")
+                    : (isEn ? "Confirm & Issue Attendance Ticket" : "Konfirmasi & Terbitkan Tiket Presensi")}
                 </button>
               </div>
             </form>

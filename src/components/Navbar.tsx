@@ -121,7 +121,7 @@ export default function Navbar() {
                           : "text-stone-600 hover:text-[#003B73] hover:bg-stone-100/60"
                       }`}
                     >
-                      <span>Layanan</span>
+                      <span>{link.label}</span>
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform duration-200 ${
                           layananDropdownOpen ? "rotate-180" : ""

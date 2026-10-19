@@ -21,14 +21,14 @@ const MOSQUE_OPTIONS = [
   "Semua Masjid Kampus",
 ];
 
-const CATEGORY_OPTIONS: { key: FeedbackCategory; label: string; desc: string }[] = [
-  { key: "RIAYAH", label: "Ri'ayah (Fasilitas & Kebersihan)", desc: "AC, wudhu, toilet, sound system, karpet, kerapian" },
-  { key: "IMARAH", label: "Imarah (Ibadah & Kajian)", desc: "Shalat berjamaah, materi kajian, khatib Jumat, tahsin" },
-  { key: "IDARAH", label: "Idarah (Pelayanan & Manajemen)", desc: "Layanan takmir, transparansi infaq, keterbukaan informasi" },
-  { key: "RAMAH_DIFABEL", label: "Ramah Difabel & Lansia", desc: "Akses kursi roda, handrail tangga, toilet ramah disabilitas" },
-  { key: "ECO_MOSQUE", label: "Eco-Mosque (Lingkungan)", desc: "Penghematan air wudhu, efisiensi listrik, penanganan sampah" },
-  { key: "KEAMANAN", label: "Keamanan & Parkir", desc: "Penataan motor/mobil, penitipan barang, penerangan area" },
-  { key: "LAINNYA", label: "Aspirasi Lainnya", desc: "Ide kreatif dan masukan kemajuan masjid kampus" },
+const CATEGORY_OPTIONS: { key: FeedbackCategory; label: string; labelEn: string; desc: string; descEn: string }[] = [
+  { key: "RIAYAH", label: "Ri'ayah (Fasilitas & Kebersihan)", labelEn: "Ri'ayah (Facilities & Cleanliness)", desc: "AC, wudhu, toilet, sound system, karpet, kerapian", descEn: "AC, ablution, restrooms, sound system, carpets, tidiness" },
+  { key: "IMARAH", label: "Imarah (Ibadah & Kajian)", labelEn: "Imarah (Worship & Study Circles)", desc: "Shalat berjamaah, materi kajian, khatib Jumat, tahsin", descEn: "Congregational prayers, lecture topics, Friday khatib, tahsin" },
+  { key: "IDARAH", label: "Idarah (Pelayanan & Manajemen)", labelEn: "Idarah (Service & Management)", desc: "Layanan takmir, transparansi infaq, keterbukaan informasi", descEn: "Takmir service, infaq transparency, public information" },
+  { key: "RAMAH_DIFABEL", label: "Ramah Difabel & Lansia", labelEn: "Accessible & Elderly Friendly", desc: "Akses kursi roda, handrail tangga, toilet ramah disabilitas", descEn: "Wheelchair access, handrails, accessible restrooms" },
+  { key: "ECO_MOSQUE", label: "Eco-Mosque (Lingkungan)", labelEn: "Eco-Mosque (Environment)", desc: "Penghematan air wudhu, efisiensi listrik, penanganan sampah", descEn: "Water conservation, electricity efficiency, waste management" },
+  { key: "KEAMANAN", label: "Keamanan & Parkir", labelEn: "Security & Parking", desc: "Penataan motor/mobil, penitipan barang, penerangan area", descEn: "Motorcycle/car parking, locker safekeeping, area lighting" },
+  { key: "LAINNYA", label: "Aspirasi Lainnya", labelEn: "Other Aspirations", desc: "Ide kreatif dan masukan kemajuan masjid kampus", descEn: "Creative ideas and input for campus mosque development" },
 ];
 
 export default function FeedbackSection() {
@@ -52,7 +52,7 @@ export default function FeedbackSection() {
     setErrorMessage("");
 
     if (message.trim().length < 5) {
-      setErrorMessage("Mohon sampaikan masukan minimal 5 karakter.");
+      setErrorMessage(isEn ? "Please provide feedback of at least 5 characters." : "Mohon sampaikan masukan minimal 5 karakter.");
       return;
     }
 
@@ -74,7 +74,7 @@ export default function FeedbackSection() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Gagal mengirim masukan.");
+        throw new Error(data.error || (isEn ? "Failed to send feedback." : "Gagal mengirim masukan."));
       }
 
       setSuccessData(data.feedback);
@@ -82,7 +82,9 @@ export default function FeedbackSection() {
       setContact("");
     } catch (err: unknown) {
       setErrorMessage(
-        err instanceof Error ? err.message : "Terjadi kendala saat mengirim data."
+        err instanceof Error
+          ? err.message
+          : (isEn ? "An issue occurred while sending data." : "Terjadi kendala saat mengirim data.")
       );
     } finally {
       setSubmitting(false);
@@ -90,6 +92,22 @@ export default function FeedbackSection() {
   };
 
   const getRatingLabel = (val: number) => {
+    if (isEn) {
+      switch (val) {
+        case 1:
+          return "Needs Much Improvement";
+        case 2:
+          return "Fair, Needs Work";
+        case 3:
+          return "Standard / Good";
+        case 4:
+          return "Very Good & Comfortable";
+        case 5:
+          return "Exceptional & Satisfying";
+        default:
+          return "";
+      }
+    }
     switch (val) {
       case 1:
         return "Perlu Banyak Perbaikan";
@@ -137,24 +155,34 @@ export default function FeedbackSection() {
                 <CheckCircle2 className="w-9 h-9" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-stone-900 font-serif">
-                Aspirasi Berhasil Terkirim ke Takmir!
+                {isEn ? "Aspiration Successfully Sent to Takmir!" : "Aspirasi Berhasil Terkirim ke Takmir!"}
               </h3>
               <p className="text-stone-600 text-sm mt-2 max-w-lg mx-auto leading-relaxed">
-                Jazakumullah khairan katsiran. Masukan Anda untuk <strong>{successData.targetMosque}</strong> telah tercatat di sistem admin takmir dan akan segera ditinjau oleh pengurus bidang terkait.
+                {isEn ? (
+                  <>
+                    Jazakumullah khairan katsiran. Your feedback for <strong>{successData.targetMosque}</strong> has been recorded in the Takmir admin system and will be reviewed by the respective division.
+                  </>
+                ) : (
+                  <>
+                    Jazakumullah khairan katsiran. Masukan Anda untuk <strong>{successData.targetMosque}</strong> telah tercatat di sistem admin takmir dan akan segera ditinjau oleh pengurus bidang terkait.
+                  </>
+                )}
               </p>
 
               <div className="mt-6 p-4 bg-stone-50 rounded-2xl border border-stone-200/80 text-left text-xs text-stone-600 space-y-1.5 max-w-md mx-auto">
                 <div className="flex justify-between">
-                  <span className="text-stone-500">ID Masukan:</span>
+                  <span className="text-stone-500">{isEn ? "Feedback ID:" : "ID Masukan:"}</span>
                   <span className="font-mono font-bold text-stone-800">{successData.id}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-500">Masjid Tujuan:</span>
+                  <span className="text-stone-500">{isEn ? "Target Mosque:" : "Masjid Tujuan:"}</span>
                   <span className="font-semibold text-stone-800">{successData.targetMosque}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-500">Status Awal:</span>
-                  <span className="font-semibold text-blue-700">Diterima Pengurus Takmir</span>
+                  <span className="text-stone-500">{isEn ? "Initial Status:" : "Status Awal:"}</span>
+                  <span className="font-semibold text-blue-700">
+                    {isEn ? "Received by Takmir Board" : "Diterima Pengurus Takmir"}
+                  </span>
                 </div>
               </div>
 
@@ -163,7 +191,7 @@ export default function FeedbackSection() {
                   onClick={() => setSuccessData(null)}
                   className="px-8 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-bold shadow-md transition-colors"
                 >
-                  Kirim Aspirasi Lainnya
+                  {isEn ? "Submit Another Aspiration" : "Kirim Aspirasi Lainnya"}
                 </button>
               </div>
             </div>
@@ -181,7 +209,8 @@ export default function FeedbackSection() {
               {/* 1. Pilih Masjid Tujuan */}
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-stone-900 mb-2">
-                  1. Pilih Masjid Kampus Tujuan <span className="text-rose-500">*</span>
+                  {isEn ? "1. Select Target Campus Mosque" : "1. Pilih Masjid Kampus Tujuan"}{" "}
+                  <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={targetMosque}
@@ -190,7 +219,7 @@ export default function FeedbackSection() {
                 >
                   {MOSQUE_OPTIONS.map((mosqueName) => (
                     <option key={mosqueName} value={mosqueName}>
-                      {mosqueName}
+                      {isEn && mosqueName === "Semua Masjid Kampus" ? "All Campus Mosques" : mosqueName}
                     </option>
                   ))}
                 </select>
@@ -199,7 +228,8 @@ export default function FeedbackSection() {
               {/* 2. Pilih Kategori Masukan */}
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-stone-900 mb-2">
-                  2. Kategori Aspirasi / Bidang <span className="text-rose-500">*</span>
+                  {isEn ? "2. Aspiration / Focus Category" : "2. Kategori Aspirasi / Bidang"}{" "}
+                  <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={category}
@@ -208,7 +238,7 @@ export default function FeedbackSection() {
                 >
                   {CATEGORY_OPTIONS.map((cat) => (
                     <option key={cat.key} value={cat.key}>
-                      {cat.label} - {cat.desc}
+                      {isEn ? `${cat.labelEn} - ${cat.descEn}` : `${cat.label} - ${cat.desc}`}
                     </option>
                   ))}
                 </select>
@@ -217,7 +247,7 @@ export default function FeedbackSection() {
               {/* 3. Rating Kepuasan / Apresiasi */}
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-stone-900 mb-1.5">
-                  3. Tingkat Kepuasan &amp; Apresiasi Pelayanan
+                  {isEn ? "3. Satisfaction Level & Service Appreciation" : "3. Tingkat Kepuasan & Apresiasi Pelayanan"}
                 </label>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5">
@@ -249,17 +279,24 @@ export default function FeedbackSection() {
               {/* 4. Pesan Saran & Aspirasi */}
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-stone-900 mb-1.5">
-                  4. Isi Saran, Masukan, atau Apresiasi Konstruktif <span className="text-rose-500">*</span>
+                  {isEn
+                    ? "4. Suggestions, Feedback, or Constructive Appreciation"
+                    : "4. Isi Saran, Masukan, atau Apresiasi Konstruktif"}{" "}
+                  <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows={4}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Tuliskan usulan konkret Anda (contoh: usulan penambahan dispenser air minum jamaah, perbaikan kran wudhu di sisi barat, rekomendasi tema kajian mahasiswa, dll)..."
+                  placeholder={
+                    isEn
+                      ? "Write your concrete suggestion (e.g. proposal for drinking water dispensers, repair of ablution taps on west side, lecture topic recommendations, etc)..."
+                      : "Tuliskan usulan konkret Anda (contoh: usulan penambahan dispenser air minum jamaah, perbaikan kran wudhu di sisi barat, rekomendasi tema kajian mahasiswa, dll)..."
+                  }
                   className="w-full px-4 py-3 rounded-2xl border border-stone-300 text-xs sm:text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#003B73] focus:border-transparent leading-relaxed"
                 />
                 <div className="flex justify-between items-center text-[11px] text-stone-400 mt-1">
-                  <span>Minimal 5 karakter, maksimal 2.000 karakter</span>
+                  <span>{isEn ? "Min 5 characters, max 2,000 characters" : "Minimal 5 karakter, maksimal 2.000 karakter"}</span>
                   <span>{message.length}/2000</span>
                 </div>
               </div>
@@ -268,7 +305,7 @@ export default function FeedbackSection() {
               <div className="pt-2 border-t border-stone-100">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-xs sm:text-sm font-bold text-stone-900">
-                    5. Identitas Jamaah (Opsional)
+                    {isEn ? "5. Congregant Identity (Optional)" : "5. Identitas Jamaah (Opsional)"}
                   </label>
                   <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-stone-600 hover:text-stone-900">
                     <input
@@ -277,7 +314,7 @@ export default function FeedbackSection() {
                       onChange={(e) => setIsAnonymous(e.target.checked)}
                       className="rounded border-stone-300 text-[#003B73] focus:ring-[#003B73] w-4 h-4"
                     />
-                    <span>Kirim sebagai Anonim / Hamba Allah</span>
+                    <span>{isEn ? "Submit Anonymously / Servant of Allah" : "Kirim sebagai Anonim / Hamba Allah"}</span>
                   </label>
                 </div>
 
@@ -290,7 +327,7 @@ export default function FeedbackSection() {
                           type="text"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="Nama Lengkap / Panggilan"
+                          placeholder={isEn ? "Full Name / Nickname" : "Nama Lengkap / Panggilan"}
                           className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 text-xs sm:text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#003B73]"
                         />
                       </div>
@@ -302,12 +339,14 @@ export default function FeedbackSection() {
                           type="text"
                           value={contact}
                           onChange={(e) => setContact(e.target.value)}
-                          placeholder="No. WhatsApp / Email (Opsional)"
+                          placeholder={isEn ? "WhatsApp No. / Email (Optional)" : "No. WhatsApp / Email (Opsional)"}
                           className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 text-xs sm:text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#003B73]"
                         />
                       </div>
                       <p className="text-[10px] text-stone-400 mt-1 pl-1">
-                        Diisi bila Anda bersedia dihubungi takmir terkait tindak lanjut.
+                        {isEn
+                          ? "Filled if you are willing to be contacted by Takmir regarding follow-up."
+                          : "Diisi bila Anda bersedia dihubungi takmir terkait tindak lanjut."}
                       </p>
                     </div>
                   </div>
@@ -324,17 +363,19 @@ export default function FeedbackSection() {
                   {submitting ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Mengirim Aspirasi ke Takmir...</span>
+                      <span>{isEn ? "Sending Aspiration to Takmir..." : "Mengirim Aspirasi ke Takmir..."}</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>Kirim Aspirasi Sekarang</span>
+                      <span>{isEn ? "Submit Aspiration Now" : "Kirim Aspirasi Sekarang"}</span>
                     </>
                   )}
                 </button>
                 <p className="text-[11px] text-stone-500 text-center mt-2.5">
-                  Data masukan tersimpan aman dan terhubung langsung ke Dashboard Pengurus Takmir Masjid UMS.
+                  {isEn
+                    ? "Feedback data is stored securely and directly connected to the UMS Mosque Takmir Board Dashboard."
+                    : "Data masukan tersimpan aman dan terhubung langsung ke Dashboard Pengurus Takmir Masjid UMS."}
                 </p>
               </div>
             </form>

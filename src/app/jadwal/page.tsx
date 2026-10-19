@@ -14,8 +14,12 @@ import {
   CALCULATION_STANDARDS,
   CalculationMethod,
 } from "@/lib/prayer-times";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function JadwalPage() {
+  const { language } = useLanguage();
+  const isEn = language === "en";
+
   const [selectedMonth, setSelectedMonth] = useState(9); // October
   const [currentDay, setCurrentDay] = useState(10);
   const [currentMonth, setCurrentMonth] = useState(9);
@@ -38,7 +42,7 @@ export default function JadwalPage() {
     const times = calculatePrayerTimes(d, method);
     return {
       day: i + 1,
-      dateFormatted: new Intl.DateTimeFormat("id-ID", {
+      dateFormatted: new Intl.DateTimeFormat(isEn ? "en-US" : "id-ID", {
         weekday: "short",
         day: "numeric",
         month: "short",
@@ -48,7 +52,7 @@ export default function JadwalPage() {
     };
   });
 
-  const monthNames = [
+  const monthNamesId = [
     "Januari",
     "Februari",
     "Maret",
@@ -63,6 +67,23 @@ export default function JadwalPage() {
     "Desember",
   ];
 
+  const monthNamesEn = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const monthNames = isEn ? monthNamesEn : monthNamesId;
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col font-sans">
       <Navbar />
@@ -71,10 +92,20 @@ export default function JadwalPage() {
         {/* Header Title */}
         <div className="mb-8 text-center max-w-3xl mx-auto space-y-3">
           <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 tracking-tight font-serif">
-            Jadwal Shalat & <span className="text-[#003B73]">Imsakiyah Surakarta</span>
+            {isEn ? (
+              <>
+                Prayer Times &amp; <span className="text-[#003B73]">Surakarta Imsakiyah</span>
+              </>
+            ) : (
+              <>
+                Jadwal Shalat &amp; <span className="text-[#003B73]">Imsakiyah Surakarta</span>
+              </>
+            )}
           </h1>
           <p className="text-xs sm:text-sm text-stone-600 leading-relaxed max-w-2xl mx-auto">
-            Dihitung berdasarkan hisab hakiki astronomis titik koordinat Masjid Sudalmiyah Rais Kampus 2 Universitas Muhammadiyah Surakarta (-7.5583° LS, 110.7719° BT) sesuai Putusan Munas Tarjih PP Muhammadiyah ke-31 (Subuh -18°, Isya -18°, Ihtiyat +2 menit).
+            {isEn
+              ? "Calculated based on genuine astronomical hisab for coordinates of Sudalmiyah Rais Mosque Campus 2 Universitas Muhammadiyah Surakarta (-7.5583° S, 110.7719° E) in accordance with the 31st Munas Tarjih PP Muhammadiyah decree (Subuh -18°, Isha -18°, Ihtiyat +2 minutes)."
+              : "Dihitung berdasarkan hisab hakiki astronomis titik koordinat Masjid Sudalmiyah Rais Kampus 2 Universitas Muhammadiyah Surakarta (-7.5583° LS, 110.7719° BT) sesuai Putusan Munas Tarjih PP Muhammadiyah ke-31 (Subuh -18°, Isya -18°, Ihtiyat +2 menit)."}
           </p>
         </div>
 
@@ -89,10 +120,12 @@ export default function JadwalPage() {
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serif">
                 <Calendar className="w-5 h-5 text-[#B58A1E]" />
-                <span>Kalender Bulanan: {monthNames[selectedMonth]} {year}</span>
+                <span>
+                  {isEn ? "Monthly Schedule:" : "Kalender Bulanan:"} {monthNames[selectedMonth]} {year}
+                </span>
               </h2>
               <span className="text-xs text-stone-500">
-                Waktu Indonesia Barat (WIB) • {CALCULATION_STANDARDS[method].shortName}
+                {isEn ? "Western Indonesia Time (WIB)" : "Waktu Indonesia Barat (WIB)"} • {CALCULATION_STANDARDS[method].shortName}
               </span>
             </div>
 
@@ -108,7 +141,7 @@ export default function JadwalPage() {
                       ? "bg-[#003B73] text-white shadow-xs font-bold"
                       : "text-stone-600 hover:text-stone-900"
                   }`}
-                  title="Standar resmi MASA (Muhammadiyah Super App) & Majelis Tarjih"
+                  title={isEn ? "Official MASA (Muhammadiyah Super App) & Majelis Tarjih standard" : "Standar resmi MASA (Muhammadiyah Super App) & Majelis Tarjih"}
                 >
                   MASA / Tarjih
                 </button>
@@ -120,7 +153,7 @@ export default function JadwalPage() {
                       ? "bg-[#003B73] text-white shadow-xs font-bold"
                       : "text-stone-600 hover:text-stone-900"
                   }`}
-                  title="Standar Kementerian Agama RI"
+                  title={isEn ? "Ministry of Religious Affairs standard" : "Standar Kementerian Agama RI"}
                 >
                   Kemenag RI
                 </button>
@@ -144,7 +177,7 @@ export default function JadwalPage() {
                 onClick={() => window.print()}
                 className="px-4 py-2 rounded-xl bg-[#003B73] hover:bg-[#002855] active:scale-95 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
               >
-                Cetak Jadwal
+                {isEn ? "Print Schedule" : "Cetak Jadwal"}
               </button>
             </div>
           </div>
@@ -153,10 +186,22 @@ export default function JadwalPage() {
           <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200/90 text-xs space-y-1.5">
             <div className="flex items-center gap-2 font-bold text-[#003B73]">
               <Info className="w-4 h-4 shrink-0" />
-              <span>Ketetapan Hisab Majelis Tarjih dan Tajdid PP Muhammadiyah (Aplikasi MASA):</span>
+              <span>
+                {isEn
+                  ? "Astronomical Hisab Decree of Majelis Tarjih & Tajdid PP Muhammadiyah (MASA App):"
+                  : "Ketetapan Hisab Majelis Tarjih dan Tajdid PP Muhammadiyah (Aplikasi MASA):"}
+              </span>
             </div>
             <p className="text-stone-600 leading-relaxed text-[11px] sm:text-xs">
-              Sesuai <strong>Keputusan Munas Tarjih Muhammadiyah ke-31</strong>, sudut ketinggian matahari untuk awal waktu Subuh ditetapkan pada <strong>-18°</strong> (mundur sekitar 8–10 menit dibandingkan patokan lama -20° Kemenag). Jadwal di atas secara baku telah diselaraskan dengan aplikasi resmi <strong>MASA (Muhammadiyah Super App)</strong> dan hisab falak Kampus UMS.
+              {isEn ? (
+                <>
+                  In accordance with the <strong>31st Muhammadiyah Munas Tarjih Decision</strong>, the sun altitude angle for the start of Fajr prayer is set at <strong>-18°</strong> (approximately 8–10 minutes later than the conventional -20° benchmark). The schedule above is standardized with the official <strong>MASA (Muhammadiyah Super App)</strong> and UMS Campus celestial calculation.
+                </>
+              ) : (
+                <>
+                  Sesuai <strong>Keputusan Munas Tarjih Muhammadiyah ke-31</strong>, sudut ketinggian matahari untuk awal waktu Subuh ditetapkan pada <strong>-18°</strong> (mundur sekitar 8–10 menit dibandingkan patokan lama -20° Kemenag). Jadwal di atas secara baku telah diselaraskan dengan aplikasi resmi <strong>MASA (Muhammadiyah Super App)</strong> dan hisab falak Kampus UMS.
+                </>
+              )}
             </p>
           </div>
 
@@ -165,15 +210,15 @@ export default function JadwalPage() {
             <table className="w-full text-left text-xs sm:text-sm">
               <thead>
                 <tr className="border-b border-stone-200 text-stone-500 uppercase text-[11px] tracking-wider bg-[#FAF8F5]">
-                  <th className="py-3 px-4 font-semibold">Tanggal</th>
+                  <th className="py-3 px-4 font-semibold">{isEn ? "Date" : "Tanggal"}</th>
                   <th className="py-3 px-3 font-semibold text-stone-400">Imsak</th>
-                  <th className="py-3 px-3 font-semibold text-[#003B73]">Subuh</th>
-                  <th className="py-3 px-3 font-semibold text-stone-400">Terbit</th>
+                  <th className="py-3 px-3 font-semibold text-[#003B73]">{isEn ? "Fajr" : "Subuh"}</th>
+                  <th className="py-3 px-3 font-semibold text-stone-400">{isEn ? "Sunrise" : "Terbit"}</th>
                   <th className="py-3 px-3 font-semibold text-stone-500">Dhuha</th>
                   <th className="py-3 px-3 font-semibold text-[#003B73]">Dzuhur</th>
                   <th className="py-3 px-3 font-semibold text-[#003B73]">Ashar</th>
                   <th className="py-3 px-3 font-semibold text-[#003B73]">Maghrib</th>
-                  <th className="py-3 px-3 font-semibold text-[#003B73]">Isya</th>
+                  <th className="py-3 px-3 font-semibold text-[#003B73]">{isEn ? "Isha" : "Isya"}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100 font-mono">
@@ -190,7 +235,7 @@ export default function JadwalPage() {
                       {item.dateFormatted}
                       {item.isToday && (
                         <span className="ml-2 px-2.5 py-0.5 rounded-full text-[10px] bg-[#003B73] text-white font-bold uppercase tracking-tight">
-                          Hari Ini
+                          {isEn ? "Today" : "Hari Ini"}
                         </span>
                       )}
                     </td>

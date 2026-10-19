@@ -17,6 +17,7 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { Agenda } from "@/lib/types";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface AgendaDetailModalProps {
   agenda: Agenda | null;
@@ -29,6 +30,8 @@ export default function AgendaDetailModal({
   onClose,
   onRegisterClick,
 }: AgendaDetailModalProps) {
+  const { language } = useLanguage();
+  const isEn = language === "en";
   const [mounted, setMounted] = useState<boolean>(false);
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
 
@@ -52,6 +55,18 @@ export default function AgendaDetailModal({
 
   if (!agenda || !mounted) return null;
 
+  const getCategoryLabel = (cat: string) => {
+    if (!isEn) return cat?.replace(/_/g, " ") || "";
+    switch (cat) {
+      case "SHALAT_JUMAT": return "Friday Prayer";
+      case "KAJIAN_MAHASISWA": return "Student Lecture";
+      case "TABLIGH_AKBAR": return "Grand Gathering";
+      case "TAHSIN": return "Quran Tahsin";
+      case "SOSIAL": return "Social & Charity";
+      default: return cat?.replace(/_/g, " ") || "";
+    }
+  };
+
   return createPortal(
     <div
       role="dialog"
@@ -67,28 +82,28 @@ export default function AgendaDetailModal({
         <div className="px-5 sm:px-6 py-4 border-b border-stone-200 bg-[#FAF8F5] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#003B73] text-white">
-              {agenda.category?.replace(/_/g, " ")}
+              {getCategoryLabel(agenda.category)}
             </span>
             {agenda.isCompleted ? (
               <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-700 text-white flex items-center gap-1 shadow-2xs">
                 <CheckCircle2 className="w-3 h-3 text-emerald-200" />
-                <span>Kegiatan Selesai Terlaksana</span>
+                <span>{isEn ? "Event Completed" : "Kegiatan Selesai Terlaksana"}</span>
               </span>
             ) : agenda.requiresRegistration ? (
               <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-white">
-                Pendaftaran Online Mandiri
+                {isEn ? "Online Registration Required" : "Pendaftaran Online Mandiri"}
               </span>
             ) : (
               <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-700 text-white flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>
-                <span>Hadir Langsung di Masjid</span>
+                <span>{isEn ? "Attend In Person" : "Hadir Langsung di Masjid"}</span>
               </span>
             )}
           </div>
 
           <button
             onClick={onClose}
-            aria-label="Tutup jendela rincian agenda"
+            aria-label={isEn ? "Close event details" : "Tutup jendela rincian agenda"}
             className="w-8 h-8 rounded-full bg-stone-200/70 hover:bg-stone-300 text-stone-600 hover:text-stone-900 flex items-center justify-center transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
@@ -112,7 +127,7 @@ export default function AgendaDetailModal({
                 rel="noopener noreferrer"
                 className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-black/75 hover:bg-black text-white text-[11px] font-semibold flex items-center gap-1.5 backdrop-blur-sm transition-all"
               >
-                <span>Lihat Poster Penuh</span>
+                <span>{isEn ? "View Full Poster" : "Lihat Poster Penuh"}</span>
                 <ExternalLink className="w-3 h-3 text-amber-300" />
               </a>
             </div>
@@ -133,10 +148,10 @@ export default function AgendaDetailModal({
                   <div className="p-1.5 rounded-xl bg-emerald-600 text-white shadow-2xs">
                     <CheckCircle2 className="w-4 h-4" />
                   </div>
-                  <span>Laporan Hasil &amp; Dokumentasi Kegiatan</span>
+                  <span>{isEn ? "Event Results & Documentation Report" : "Laporan Hasil & Dokumentasi Kegiatan"}</span>
                 </div>
                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  Status: Terlaksana
+                  {isEn ? "Status: Completed" : "Status: Terlaksana"}
                 </span>
               </div>
 
@@ -148,12 +163,12 @@ export default function AgendaDetailModal({
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
-                      Jumlah Peserta Hadir (Aktual)
+                      {isEn ? "Total Attendees (Actual)" : "Jumlah Peserta Hadir (Aktual)"}
                     </span>
                     <span className="text-base font-extrabold text-emerald-950">
                       {agenda.actualAttendees
-                        ? `${agenda.actualAttendees.toLocaleString("id-ID")} Jamaah`
-                        : "Selesai Terlaksana"}
+                        ? `${agenda.actualAttendees.toLocaleString(isEn ? "en-US" : "id-ID")} ${isEn ? "Attendees" : "Jamaah"}`
+                        : (isEn ? "Completed" : "Selesai Terlaksana")}
                     </span>
                   </div>
                 </div>
@@ -164,12 +179,12 @@ export default function AgendaDetailModal({
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
-                      Dokumentasi Foto
+                      {isEn ? "Photo Documentation" : "Dokumentasi Foto"}
                     </span>
                     <span className="text-sm font-extrabold text-stone-800">
                       {agenda.documentationPhotos?.length
-                        ? `${agenda.documentationPhotos.length} Foto Tersedia`
-                        : "Dokumentasi Tersimpan"}
+                        ? `${agenda.documentationPhotos.length} ${isEn ? "Photos Available" : "Foto Tersedia"}`
+                        : (isEn ? "Documentation Saved" : "Dokumentasi Tersimpan")}
                     </span>
                   </div>
                 </div>
@@ -179,7 +194,7 @@ export default function AgendaDetailModal({
               {agenda.summaryNote && (
                 <div className="p-3.5 rounded-2xl bg-white/90 border border-emerald-200/80 text-xs text-stone-700 leading-relaxed">
                   <span className="font-bold text-emerald-950 block mb-1">
-                    Ringkasan Pelaksanaan:
+                    {isEn ? "Execution Summary:" : "Ringkasan Pelaksanaan:"}
                   </span>
                   <p>{agenda.summaryNote}</p>
                 </div>
@@ -190,7 +205,7 @@ export default function AgendaDetailModal({
                 <div className="space-y-2 pt-1">
                   <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
                     <Camera className="w-3.5 h-3.5 text-emerald-700" />
-                    <span>Galeri Foto Hasil Kegiatan:</span>
+                    <span>{isEn ? "Event Photo Gallery:" : "Galeri Foto Hasil Kegiatan:"}</span>
                   </span>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                     {agenda.documentationPhotos.map((photoUrl, pIdx) => (
@@ -198,7 +213,7 @@ export default function AgendaDetailModal({
                         key={pIdx}
                         onClick={() => setPreviewPhoto(photoUrl)}
                         className="relative h-28 sm:h-32 rounded-2xl overflow-hidden bg-stone-900 border border-emerald-200 group/item cursor-pointer shadow-2xs hover:shadow-md transition-all"
-                        title="Klik untuk memperbesar foto dokumentasi"
+                        title={isEn ? "Click to enlarge photo" : "Klik untuk memperbesar foto dokumentasi"}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -227,17 +242,19 @@ export default function AgendaDetailModal({
                   <GraduationCap className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-amber-900">
-                  Fakultas &amp; Peserta Terjadwal
+                  {isEn ? "Scheduled Faculty & Students" : "Fakultas & Peserta Terjadwal"}
                 </span>
                 <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-900">
-                  Wajib Hadir
+                  {isEn ? "Mandatory Attendance" : "Wajib Hadir"}
                 </span>
               </div>
               <p className="text-sm font-bold text-stone-900 leading-snug">
                 {agenda.targetAudience}
               </p>
               <p className="text-xs text-amber-900/80 leading-relaxed">
-                Mahasiswa semester yang bersangkutan diwajibkan mengikuti agenda ini sebagai bagian dari program pembinaan keagamaan &amp; mentoring LPPIK UMS.
+                {isEn
+                  ? "Students from the respective faculties are required to attend this event as part of LPPIK UMS religious mentoring program."
+                  : "Mahasiswa semester yang bersangkutan diwajibkan mengikuti agenda ini sebagai bagian dari program pembinaan keagamaan & mentoring LPPIK UMS."}
               </p>
             </div>
           )}
@@ -249,7 +266,7 @@ export default function AgendaDetailModal({
             </div>
             <div>
               <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
-                Pemateri / Narasumber
+                {isEn ? "Speaker / Lecturer" : "Pemateri / Narasumber"}
               </span>
               <div className="text-sm font-bold text-stone-900">
                 {agenda.speaker}
@@ -265,7 +282,7 @@ export default function AgendaDetailModal({
             <div className="p-3.5 rounded-2xl bg-white border border-stone-200 space-y-1">
               <div className="flex items-center gap-1.5 text-stone-500 font-semibold text-[11px]">
                 <Calendar className="w-3.5 h-3.5 text-stone-400" />
-                <span>Hari &amp; Tanggal</span>
+                <span>{isEn ? "Day & Date" : "Hari & Tanggal"}</span>
               </div>
               <p className="font-bold text-stone-900 text-sm">
                 {agenda.date}
@@ -275,7 +292,7 @@ export default function AgendaDetailModal({
             <div className="p-3.5 rounded-2xl bg-white border border-stone-200 space-y-1">
               <div className="flex items-center gap-1.5 text-stone-500 font-semibold text-[11px]">
                 <Clock className="w-3.5 h-3.5 text-stone-400" />
-                <span>Waktu Kegiatan</span>
+                <span>{isEn ? "Time" : "Waktu Kegiatan"}</span>
               </div>
               <p className="font-bold text-stone-900 text-sm">
                 {agenda.time}
@@ -285,7 +302,7 @@ export default function AgendaDetailModal({
             <div className="sm:col-span-2 p-3.5 rounded-2xl bg-white border border-stone-200 space-y-1">
               <div className="flex items-center gap-1.5 text-stone-500 font-semibold text-[11px]">
                 <MapPin className="w-3.5 h-3.5 text-stone-400" />
-                <span>Lokasi Acara</span>
+                <span>{isEn ? "Event Location" : "Lokasi Acara"}</span>
               </div>
               <p className="font-bold text-stone-900 text-xs sm:text-sm">
                 {agenda.location}
@@ -297,7 +314,7 @@ export default function AgendaDetailModal({
           <div className="space-y-2">
             <div className="flex items-center gap-1.5 text-xs font-bold text-stone-800 uppercase tracking-wider">
               <Info className="w-3.5 h-3.5 text-[#003B73]" />
-              <span>Deskripsi &amp; Informasi Kegiatan</span>
+              <span>{isEn ? "Description & Event Information" : "Deskripsi & Informasi Kegiatan"}</span>
             </div>
             <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 text-xs sm:text-sm text-stone-700 leading-relaxed space-y-2">
               <p>{agenda.description}</p>
@@ -312,7 +329,7 @@ export default function AgendaDetailModal({
             onClick={onClose}
             className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
           >
-            Tutup
+            {isEn ? "Close" : "Tutup"}
           </button>
 
           {!agenda.isCompleted && agenda.requiresRegistration && onRegisterClick && (
@@ -321,14 +338,14 @@ export default function AgendaDetailModal({
                 onClick={() => onRegisterClick(agenda)}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md transition-all cursor-pointer"
               >
-                Daftar Presensi Tiket
+                {isEn ? "Book Ticket / Registration" : "Daftar Presensi Tiket"}
               </button>
             </div>
           )}
           {agenda.isCompleted && (
             <span className="text-xs font-semibold text-emerald-800 bg-emerald-100 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 border border-emerald-200">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Kegiatan Telah Terlaksana</span>
+              <span>{isEn ? "Event Completed" : "Kegiatan Telah Terlaksana"}</span>
             </span>
           )}
         </div>

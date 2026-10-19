@@ -209,7 +209,7 @@ export default function MasjidMuSection() {
                     <span
                       className={`text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border ${pillar.bgBadge}`}
                     >
-                      Pilar {pillar.code}
+                      {isEn ? "Pillar" : "Pilar"} {pillar.code}
                     </span>
                     <div className="w-10 h-10 rounded-2xl bg-white border border-stone-200 flex items-center justify-center text-stone-700 shadow-xs group-hover:scale-110 transition-transform">
                       <Icon className={`w-5 h-5 ${pillar.color}`} />
@@ -272,13 +272,13 @@ export default function MasjidMuSection() {
               href="/ibadah"
               className="px-6 py-3 rounded-full bg-white text-[#003B73] hover:bg-stone-100 text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105"
             >
-              Ruang Ibadah Digital
+              {isEn ? "Digital Worship Space" : "Ruang Ibadah Digital"}
             </Link>
             <Link
               href="/donasi"
               className="px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-semibold border border-white/20 transition-all hover:scale-105"
             >
-              Salurkan Infaq
+              {isEn ? "Donate Infaq" : "Salurkan Infaq"}
             </Link>
           </div>
         </div>

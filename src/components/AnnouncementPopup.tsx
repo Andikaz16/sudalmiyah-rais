@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { PopupBanner, isPopupExpired } from "@/lib/types";
+import { useLanguage } from "@/context/LanguageContext";
 
 export const POPUP_CACHE_KEY = "sudalmiyah_popup_cache";
 
@@ -14,6 +15,8 @@ let sessionDismissed = false;
 let sessionActivePopups: PopupBanner[] | null = null;
 
 export default function AnnouncementPopup() {
+  const { language } = useLanguage();
+  const isEn = language === "en";
   // Synchronous initialization from local cache for instant 0ms appearance
   const [popups, setPopups] = useState<PopupBanner[]>(() => {
     if (typeof window === "undefined") return [];
@@ -178,9 +181,9 @@ export default function AnnouncementPopup() {
           <button
             type="button"
             onClick={() => handleCloseOne(current.id)}
-            aria-label="Tutup Pop-up"
+            aria-label={isEn ? "Close Pop-up" : "Tutup Pop-up"}
             className="absolute top-3 right-3 z-30 w-8 h-8 rounded-lg bg-white/95 hover:bg-white text-stone-900 border-2 border-stone-800 shadow-xl flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
-            title="Tutup (Esc)"
+            title={isEn ? "Close (Esc)" : "Tutup (Esc)"}
           >
             <X className="w-5 h-5 stroke-[2.5]" />
           </button>

@@ -20,6 +20,7 @@ import ShalatIcon from "@/components/ShalatIcon";
 import KalenderIcon from "@/components/KalenderIcon";
 import HaditsIcon from "@/components/HaditsIcon";
 import { getMuhammadiyahCalendarDetails } from "@/lib/prayer-times";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   SURAH_LIST,
   JUZ_LIST,
@@ -50,8 +51,11 @@ type FeatureKey =
 interface FeatureCard {
   id: FeatureKey;
   title: string;
+  titleEn: string;
   shortDesc: string;
+  shortDescEn: string;
   badge: string;
+  badgeEn: string;
   iconSymbol: string;
 }
 
@@ -59,76 +63,108 @@ const FEATURE_LIST: FeatureCard[] = [
   {
     id: "quran",
     title: "Al-Qur'an Digital",
+    titleEn: "Digital Al-Qur'an",
     shortDesc: "Mushaf 114 surat & 30 juz, teks Arab, latin & terjemahan Kemenag",
+    shortDescEn: "Complete 114 surahs & 30 juz with Arabic script, transliteration & translation",
     badge: "114 Surat & 30 Juz",
+    badgeEn: "114 Surahs & 30 Juz",
     iconSymbol: "القرآن",
   },
   {
     id: "tasbih",
     title: "Tasbih Digital",
+    titleEn: "Digital Tasbih",
     shortDesc: "Penghitung dzikir sentuh interaktif dengan getar & target",
+    shortDescEn: "Interactive touch dhikr counter with vibration feedback & customizable targets",
     badge: "Counter Dzikir",
+    badgeEn: "Dhikr Counter",
     iconSymbol: "سبحة",
   },
   {
     id: "tilawah",
     title: "Audio Tilawah",
+    titleEn: "Audio Tilawah",
     shortDesc: "Murottal merdu 114 surat dengan qari terkemuka",
+    shortDescEn: "Melodious audio murottal of all 114 surahs by prominent reciters",
     badge: "Murottal Merdu",
+    badgeEn: "Audio Murottal",
     iconSymbol: "تلاوة",
   },
   {
     id: "doa",
     title: "Doa & Dzikir Harian",
+    titleEn: "Daily Supplications & Dhikr",
     shortDesc: "Kumpulan doa shahih Hisnul Muslim dan dzikir pagi petang standar MASA Tarjih",
+    shortDescEn: "Authentic supplications from Hisnul Muslim and morning & evening dhikr",
     badge: "Standar MASA",
+    badgeEn: "MASA Standard",
     iconSymbol: "دعاء",
   },
   {
     id: "kiblat",
     title: "Arah Kiblat",
+    titleEn: "Qibla Direction",
     shortDesc: "Kompas azimut 294.3° hisab astronomis resmi MASA Tarjih Kampus UMS",
+    shortDescEn: "Precise 294.3° azimuth compass with official Tarjih astronomical calculation",
     badge: "Hisab MASA Tarjih",
+    badgeEn: "Tarjih Calculation",
     iconSymbol: "القبلة",
   },
   {
     id: "asmaul-husna",
     title: "Asmaul Husna",
+    titleEn: "Asmaul Husna",
     shortDesc: "99 Nama Agung Allah, kaligrafi, makna & fadhilah",
+    shortDescEn: "99 Glorious Names of Allah with calligraphy, meaning & virtues",
     badge: "99 Nama Agung",
+    badgeEn: "99 Divine Names",
     iconSymbol: "الأسماء",
   },
   {
     id: "zakat",
     title: "Kalkulator Zakat",
+    titleEn: "Zakat Calculator",
     shortDesc: "Standar resmi BAZNAS RI 2026: penghasilan, maal, fitrah, fidyah & pertanian",
+    shortDescEn: "Official BAZNAS RI standard: income, wealth, fitrah, fidyah & agriculture",
     badge: "Standar BAZNAS RI",
+    badgeEn: "BAZNAS Standard",
     iconSymbol: "زكاة",
   },
   {
     id: "kalender",
     title: "Kalender Muhammadiyah (KHGT)",
+    titleEn: "Muhammadiyah Calendar (KHGT)",
     shortDesc: "Penanggalan Hijriyah Global Tunggal & hisab puasa Majelis Tarjih PP Muhammadiyah",
+    shortDescEn: "Global Unified Hijri Calendar & fasting dates by Majelis Tarjih Muhammadiyah",
     badge: "Standar KHGT Tarjih",
+    badgeEn: "KHGT Tarjih",
     iconSymbol: "تقويم",
   },
   {
     id: "panduan-shalat",
     title: "Panduan Shalat Tarjih",
+    titleEn: "Tarjih Prayer Guide",
     shortDesc: "Tuntunan wudhu & shalat berpedoman HPT sesuai database resmi MASA Muhammadiyah",
+    shortDescEn: "Ablution & prayer guidelines following HPT and official MASA database",
     badge: "HPT via MASA",
+    badgeEn: "HPT Standard",
     iconSymbol: "صلاة",
   },
   {
     id: "hadits",
     title: "Hadits Pilihan",
+    titleEn: "Selected Hadiths",
     shortDesc: "Koleksi Hadits Arba'in An-Nawawiyah & intisari fawaid",
+    shortDescEn: "Arba'in An-Nawawiyyah collection with essential lessons & insights",
     badge: "Arba'in Nawawiyah",
+    badgeEn: "Arba'in Nawawi",
     iconSymbol: "حديث",
   },
 ];
 
 export default function IbadahPage() {
+  const { language } = useLanguage();
+  const isEn = language === "en";
   const [activeFeature, setActiveFeature] = useState<FeatureKey | null>(null);
 
   const handleOpenFeature = (featId: FeatureKey) => {
@@ -206,10 +242,20 @@ export default function IbadahPage() {
             <section className="bg-gradient-to-b from-white via-white to-[#FAF8F5] border-b border-stone-200/80 pt-10 pb-12 sm:pt-14 sm:pb-14 text-center">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight animate-fade-up">
-                  Ruang Ibadah <span className="text-[#003B73]">Digital</span>
+                  {isEn ? (
+                    <>
+                      Digital <span className="text-[#003B73]">Worship Space</span>
+                    </>
+                  ) : (
+                    <>
+                      Ruang Ibadah <span className="text-[#003B73]">Digital</span>
+                    </>
+                  )}
                 </h1>
                 <p className="text-sm sm:text-base text-stone-600 mt-4 leading-relaxed max-w-2xl mx-auto font-sans animate-fade-up delay-150">
-                  Kumpulan piranti penunjang ibadah harian berpedoman resmi pada Himpunan Putusan Tarjih (HPT) untuk memperkaya kedekatan spiritual sivitas akademika UMS dan seluruh jamaah.
+                  {isEn
+                    ? "A suite of daily worship tools officially guided by the Himpunan Putusan Tarjih (HPT) to enrich the spiritual devotion of the UMS academic community and all congregants."
+                    : "Kumpulan piranti penunjang ibadah harian berpedoman resmi pada Himpunan Putusan Tarjih (HPT) untuk memperkaya kedekatan spiritual sivitas akademika UMS dan seluruh jamaah."}
                 </p>
               </div>
             </section>
@@ -219,10 +265,10 @@ export default function IbadahPage() {
             <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-8 sm:pt-10">
               <div className="mb-5 sm:mb-7 px-1 animate-fade-up delay-200">
                 <h2 className="text-lg sm:text-2xl font-bold text-stone-900 font-serif">
-                  Menu Layanan Ibadah
+                  {isEn ? "Worship Service Menu" : "Menu Layanan Ibadah"}
                 </h2>
                 <p className="text-xs sm:text-sm text-stone-500">
-                  Pilih salah satu kotak untuk membuka fitur ibadah digital.
+                  {isEn ? "Select any card to open the digital worship tool." : "Pilih salah satu kotak untuk membuka fitur ibadah digital."}
                 </p>
               </div>
 
@@ -241,7 +287,7 @@ export default function IbadahPage() {
                     {/* Top Badge (Hidden on mobile for clean app-icon look, visible on desktop) */}
                     <div className="hidden sm:flex w-full justify-end">
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 group-hover:bg-[#003B73] group-hover:text-white transition-colors">
-                        {feat.badge}
+                        {isEn ? feat.badgeEn : feat.badge}
                       </span>
                     </div>
 
@@ -277,10 +323,10 @@ export default function IbadahPage() {
                     {/* Title & Short Description */}
                     <div className="w-full">
                       <h3 className="font-bold text-xs sm:text-sm text-stone-900 group-hover:text-[#003B73] transition-colors line-clamp-2 leading-tight">
-                        {feat.title}
+                        {isEn ? feat.titleEn : feat.title}
                       </h3>
                       <p className="hidden sm:block text-[11px] text-stone-500 mt-1 line-clamp-2 leading-snug">
-                        {feat.shortDesc}
+                        {isEn ? feat.shortDescEn : feat.shortDesc}
                       </p>
                     </div>
                   </button>
@@ -299,8 +345,8 @@ export default function IbadahPage() {
                   <button
                     onClick={handleBackToMenu}
                     className="w-10 h-10 rounded-xl bg-stone-100 hover:bg-stone-200 active:scale-95 text-stone-700 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-stone-200 shrink-0"
-                    title="Kembali ke Menu Ruang Ibadah"
-                    aria-label="Kembali ke Menu Ruang Ibadah"
+                    title={isEn ? "Back to Worship Menu" : "Kembali ke Menu Ruang Ibadah"}
+                    aria-label={isEn ? "Back to Worship Menu" : "Kembali ke Menu Ruang Ibadah"}
                   >
                     <svg
                       className="w-5 h-5 text-stone-700"
@@ -320,10 +366,10 @@ export default function IbadahPage() {
                   {/* Title & Category Info - Clean & Roomy for Mobile */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 text-[11px] text-stone-500 font-medium leading-none mb-1">
-                      <span>Ruang Ibadah</span>
+                      <span>{isEn ? "Worship Space" : "Ruang Ibadah"}</span>
                       <span className="text-stone-300">•</span>
                       <span className="text-[#003B73] font-semibold truncate">
-                        {currentFeat?.badge}
+                        {isEn ? currentFeat?.badgeEn : currentFeat?.badge}
                       </span>
                     </div>
                     <h1 className="text-base sm:text-xl font-bold text-stone-900 font-serif leading-tight flex items-center gap-2 truncate">
