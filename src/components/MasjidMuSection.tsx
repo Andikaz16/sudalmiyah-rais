@@ -122,18 +122,18 @@ export default function MasjidMuSection() {
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
             {isEn ? (
               <>
-                Muhammadiyah Undertakings (AUM) <span className="text-[#003B73]">Model Mosque</span>
+                LPCR-PM <span className="text-[#003B73]">Model Mosque</span>
               </>
             ) : (
               <>
-                Masjid Percontohan <span className="text-[#003B73]">Amal Usaha Muhammadiyah (AUM)</span>
+                Masjid Percontohan <span className="text-[#003B73]">LPCR-PM</span>
               </>
             )}
           </h2>
           <p className="mt-2 text-xs sm:text-sm font-semibold tracking-wider text-[#003B73]/90 uppercase font-sans">
             {isEn
-              ? "Muhammadiyah and 'Aisyiyah Higher Education (PTMA)"
-              : "Perguruan Tinggi Muhammadiyah dan 'Aisyiyah (PTMA)"}
+              ? "Institute for Branch & Ranting Development and Mosque Guidance PP Muhammadiyah"
+              : "Lembaga Pengembangan Cabang Ranting & Pembinaan Masjid PP Muhammadiyah"}
           </p>
 
           <p className="mt-4 text-sm sm:text-base text-stone-600 leading-relaxed">
@@ -243,7 +243,7 @@ export default function MasjidMuSection() {
                 {/* Bottom link to related service */}
                 <div className="pt-2">
                   <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider flex items-center gap-1 group-hover:text-[#003B73] transition-colors">
-                    <span>{isEn ? "3J Pillars of UMS AUM Mosque" : "Pilar 3J Masjid AUM UMS"}</span>
+                    <span>{isEn ? "3J Pillars of UMS LPCR-PM Mosque" : "Pilar 3J Masjid LPCR-PM UMS"}</span>
                     <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -257,13 +257,13 @@ export default function MasjidMuSection() {
           <div className="space-y-2 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-bold font-serif">
               {isEn
-                ? "Realizing Progressive AUM Model Mosque Standards"
-                : "Mewujudkan Standar Masjid Percontohan AUM Berkemajuan"}
+                ? "Realizing Progressive LPCR-PM Model Mosque Standards"
+                : "Mewujudkan Standar Masjid Percontohan LPCR-PM Berkemajuan"}
             </h3>
             <p className="text-xs sm:text-sm text-stone-200 max-w-2xl leading-relaxed">
               {isEn
-                ? "Support strengthening the role of mosques in Amal Usaha Muhammadiyah (AUM) and higher education through active congregational worship, AIK study groups, digital prayer spaces, and noble infaq donations."
-                : "Dukung penguatan peran masjid di lingkungan Amal Usaha Muhammadiyah (AUM) dan perguruan tinggi melalui partisipasi aktif ibadah berjamaah, penguatan kajian AIK, pemanfaatan ruang ibadah digital, serta saluran infaq berkah."}
+                ? "Support strengthening the role of mosques in LPCR-PM and Amal Usaha Muhammadiyah (AUM) through active congregational worship, AIK study groups, digital prayer spaces, and noble infaq donations."
+                : "Dukung penguatan peran masjid di lingkungan LPCR-PM dan Amal Usaha Muhammadiyah (AUM) melalui partisipasi aktif ibadah berjamaah, penguatan kajian AIK, pemanfaatan ruang ibadah digital, serta saluran infaq berkah."}
             </p>
           </div>
 
