@@ -1,0 +1,487 @@
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Quote,
+  Share2,
+  Copy,
+  Check,
+  X,
+} from "lucide-react";
+import { getHijriDate } from "@/lib/prayer-times";
+
+export interface InfaqHadith {
+  id: number;
+  theme: string;
+  arabic: string;
+  translation: string;
+  source: string;
+  fadhilah: string;
+}
+
+export const INFAQ_HADITHS: InfaqHadith[] = [
+  {
+    id: 1,
+    theme: "Keberkahan & Harta yang Bertumbuh",
+    arabic: "مَا نَقَصَتْ صَدَقَةٌ مِنْ مَالٍ، وَمَا زَادَ اللَّهُ عَبْدًا بِعَفْوٍ إِلَّا عِزًّا",
+    translation:
+      "Sedekah itu tidak akan pernah mengurangi harta. Dan tidaklah Allah menambah bagi seorang hamba yang pemaaf melainkan kemuliaan, serta tidaklah seseorang merendahkan hati karena Allah melainkan Dia akan meninggikan derajatnya.",
+    source: "HR. Muslim No. 2588",
+    fadhilah: "Infaq mendatangkan keberkahan harta berlipat dan ketenangan batin.",
+  },
+  {
+    id: 2,
+    theme: "Doa Mustajab Malaikat Setiap Pagi",
+    arabic:
+      "مَا مِنْ يَوْمٍ يُصْبِحُ الْعِبَادُ فِيهِ إِلَّا مَلَكَانِ يَنْزِلَانِ، فَيَقُولُ أَحَدُهُمَا: اللَّهُمَّ أَعْطِ مُنْفِقًا خَلَفًا، وَيَقُولُ الْآخَرُ: اللَّهُمَّ أَعْطِ مُمْسِكًا تَلَفًا",
+    translation:
+      "Tiada suatu pagi pun saat seorang hamba bangun melainkan dua malaikat turun. Salah satunya berdoa: 'Ya Allah, berikanlah ganti keberkahan bagi orang yang berinfaq', sedangkan yang lain berkata: 'Ya Allah, berikanlah kebinasaan bagi orang yang menahan hartanya'.",
+    source: "HR. Bukhari No. 1442 & Muslim No. 1010",
+    fadhilah: "Setiap infaq yang dikeluarkan didoakan langsung oleh para malaikat Allah.",
+  },
+  {
+    id: 3,
+    theme: "Pahala Berlipat Ganda 700 Kali",
+    arabic:
+      "مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ فِي كُلِّ سُنبُلَةٍ مِّائَةُ حَبَّةٍ ۗ وَاللَّهُ يُضَاعِفُ لِمَن يَشَاءُ",
+    translation:
+      "Perumpamaan orang-orang yang menginfakkan hartanya di jalan Allah serupa dengan sebutir benih yang menumbuhkan tujuh butir, pada tiap-tiap butir ada seratus biji. Allah melipatgandakan pahala bagi siapa yang Dia kehendaki, dan Allah Maha Luas lagi Maha Mengetahui.",
+    source: "QS. Al-Baqarah: 261",
+    fadhilah: "Pahala infaq dilipatgandakan hingga ratusan kali lipat tanpa batas.",
+  },
+  {
+    id: 4,
+    theme: "Naungan Sejuk di Hari Kiamat",
+    arabic:
+      "إِنَّ الصَّدَقَةَ لَتُطْفِئُ عَنْ أَهْلِهَا حَرَّ الْقُبُورِ، وَإِنَّمَا يَسْتَظِلُّ الْمُؤْمِنُ يَوْمَ الْقِيَامَةِ فِي ظِلِّ صَدَقَتِهِ",
+    translation:
+      "Sesungguhnya sedekah itu benar-benar memadamkan panasnya alam kubur bagi pelakunya, dan sungguh seorang mukmin pada hari kiamat kelak akan bernaung di bawah keteduhan naungan sedekahnya.",
+    source: "HR. Ath-Thabrani & Al-Baihaqi (Shahih At-Targhib)",
+    fadhilah: "Sedekah menjadi perisai pelindung dari dahsyatnya panas terik hari kiamat.",
+  },
+  {
+    id: 5,
+    theme: "Amal Jariyah yang Abadi Melintasi Zaman",
+    arabic:
+      "إِذَا مَاتَ الْإِنْسَانُ انْقَطَعَ عَنْهُ عَمَلُهُ إِلَّا مِنْ ثَلَاثَةٍ: إِلَّا مِنْ صَدَقَةٍ جَارِيَةٍ، أَوْ عِلْمٍ يُنْتَفَعُ بِهِ، أَوْ وَلَدٍ صَالِحٍ يَدْعُو لَهُ",
+    translation:
+      "Apabila manusia meninggal dunia, maka terputuslah segala amal perbuatannya kecuali tiga perkara: sedekah jariyah, ilmu yang bermanfaat, dan anak shalih yang mendoakannya.",
+    source: "HR. Muslim No. 1631",
+    fadhilah: "Pahala infaq untuk kemakmuran masjid mengalir selamanya melintasi alam kubur.",
+  },
+  {
+    id: 6,
+    theme: "Pembersih Dosa & Penawar Kegelisahan",
+    arabic: "وَالصَّدَقَةُ تُطْفِئُ الْخَطِيئَةَ كَمَا يُطْفِئُ الْمَاءُ النَّارَ",
+    translation:
+      "Dan sedekah itu dapat memadamkan dosa-dosa dan kesalahan sebagaimana air memadamkan bara api yang menyala.",
+    source: "HR. At-Tirmidzi No. 614 & Ibnu Majah No. 3973",
+    fadhilah: "Menghapuskan dosa-dosa kecil dan membentengi diri dari marabahaya.",
+  },
+  {
+    id: 7,
+    theme: "Kemuliaan Tangan di Atas",
+    arabic:
+      "الْيَدُ الْعُلْيَا خَيْرٌ مِنَ الْيَدِ السُّفْلَى، فَالْيَدُ الْعُلْيَا هِيَ الْمُنْفِقَةُ، وَالسُّفْلَى هِيَ السَّائِلَةُ",
+    translation:
+      "Tangan yang di atas lebih baik daripada tangan yang di bawah. Tangan yang di atas adalah tangan yang memberi (berinfaq), sedangkan tangan yang di bawah adalah yang meminta.",
+    source: "HR. Bukhari No. 1429 & Muslim No. 1033",
+    fadhilah: "Menjadi pribadi dermawan yang mulia di hadapan Allah dan sesama manusia.",
+  },
+  {
+    id: 8,
+    theme: "Perlindungan Diri Walau Sebutir Kurma",
+    arabic:
+      "اتَّقُوا النَّارَ وَلَوْ بِشِقِّ تَمْرَةٍ، فَمَنْ لَمْ يَجِدْ فَبِكَلِمَةٍ طَيِّبَةٍ",
+    translation:
+      "Lindungilah diri kalian dari siksa api neraka walau hanya dengan menyedekahkan sebutir kurma. Jika tidak menemukannya, maka dengan bertutur kata yang baik.",
+    source: "HR. Bukhari No. 1417 & Muslim No. 1016",
+    fadhilah: "Sekecil apa pun nominal infaq yang disalurkan dengan ikhlas bernilai sangat agung di sisi-Nya.",
+  },
+];
+
+export const MARQUEE_QUOTES = [
+  "Investasi Akhirat yang Abadi",
+  "Harta yang Diinfaqkan Tidak Pernah Berkurang",
+  "Setiap Rupiah Menjadi Saksi Kebaikan di Hari Akhir",
+  "Sedekah Memadamkan Dosa & Menolak Bala",
+  "Doa Malaikat Menyertai Setiap Langkah Orang yang Berinfaq",
+  "Tangan di Atas Lebih Mulia daripada Tangan di Bawah",
+  "Memakmurkan Masjid, Meraih Naungan Naungan Arsy",
+];
+
+export default function MutiaraHaditsSection() {
+  const [currentHadithIndex, setCurrentHadithIndex] = useState(0);
+  const [isHadithPaused, setIsHadithPaused] = useState(false);
+
+  const nextHadith = useCallback(() => {
+    setCurrentHadithIndex((prev) => (prev + 1) % INFAQ_HADITHS.length);
+  }, []);
+
+  const prevHadith = useCallback(() => {
+    setCurrentHadithIndex((prev) => (prev - 1 + INFAQ_HADITHS.length) % INFAQ_HADITHS.length);
+  }, []);
+
+  useEffect(() => {
+    if (isHadithPaused) return;
+    const interval = setInterval(() => {
+      nextHadith();
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [isHadithPaused, nextHadith]);
+
+  const currentHadith = INFAQ_HADITHS[currentHadithIndex];
+
+  // Share Modal State
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [selectedHadithId, setSelectedHadithId] = useState<number>(1);
+  const [customShareText, setCustomShareText] = useState<string>("");
+  const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+
+  const formatHadithShareText = (hadith: InfaqHadith) => {
+    const today = new Date();
+    const hijriDate = getHijriDate(today);
+    const masehiDate = new Intl.DateTimeFormat("id-ID", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(today);
+
+    return `*MUTIARA HADITS & HIKMAH: ${hadith.theme}*
+${hijriDate} (KHGT) / ${masehiDate}
+
+${hadith.arabic}
+
+"${hadith.translation}"
+
+(${hadith.source} — ${hadith.fadhilah})
+
+Disiarkan oleh Masjid Hj. Sudalmiyah Rais - Universitas Muhammadiyah Surakarta
+Portal Resmi: https://sudalmiyah-rais.vercel.app`;
+  };
+
+  const handleOpenShare = (hadithIndex?: number) => {
+    const targetIdx = typeof hadithIndex === "number" ? hadithIndex : currentHadithIndex;
+    const targetHadith = INFAQ_HADITHS[targetIdx] || INFAQ_HADITHS[0];
+    setSelectedHadithId(targetHadith.id);
+    setCustomShareText(formatHadithShareText(targetHadith));
+    setIsShareModalOpen(true);
+    setIsHadithPaused(true);
+  };
+
+  const handleHadithSelectChange = (newId: number) => {
+    setSelectedHadithId(newId);
+    const targetHadith = INFAQ_HADITHS.find((h) => h.id === newId) || INFAQ_HADITHS[0];
+    setCustomShareText(formatHadithShareText(targetHadith));
+  };
+
+  const handleResetText = () => {
+    const targetHadith = INFAQ_HADITHS.find((h) => h.id === selectedHadithId) || INFAQ_HADITHS[0];
+    setCustomShareText(formatHadithShareText(targetHadith));
+  };
+
+  const handleCopyText = async (platformName?: string) => {
+    try {
+      await navigator.clipboard.writeText(customShareText);
+      const msg = platformName
+        ? `Teks hadits disalin! Silakan tempel pada ${platformName}.`
+        : "Teks hadits berhasil disalin ke clipboard!";
+      setCopyFeedback(msg);
+      setTimeout(() => setCopyFeedback(null), 3500);
+    } catch {
+      setCopyFeedback("Gagal menyalin teks.");
+      setTimeout(() => setCopyFeedback(null), 3000);
+    }
+  };
+
+  const handleShareWA = () => {
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(customShareText)}`;
+    window.open(url, "_blank");
+  };
+
+  const handleShareFB = () => {
+    const pageUrl = typeof window !== "undefined" ? window.location.href : "https://sudalmiyah-rais.vercel.app";
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}&quote=${encodeURIComponent(customShareText)}`;
+    window.open(url, "_blank");
+  };
+
+  const handleShareIG = async () => {
+    await handleCopyText("Instagram Story / Feed");
+    window.open("https://www.instagram.com/", "_blank");
+  };
+
+  const handleShareTikTok = async () => {
+    await handleCopyText("TikTok Caption / Video");
+    window.open("https://www.tiktok.com/", "_blank");
+  };
+
+  const handleNativeShare = async () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        const targetHadith = INFAQ_HADITHS.find((h) => h.id === selectedHadithId) || INFAQ_HADITHS[0];
+        await navigator.share({
+          title: `Mutiara Hadits: ${targetHadith.theme}`,
+          text: customShareText,
+          url: typeof window !== "undefined" ? window.location.href : undefined,
+        });
+      } catch {
+        // User cancelled or aborted
+      }
+    } else {
+      handleCopyText();
+    }
+  };
+
+  return (
+    <section id="mutiara-hadits" className="pt-10 sm:pt-14 pb-4 bg-[#FAF8F5] text-stone-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Continuous Ticker Ribbon of Wisdom Quotes */}
+        <div className="overflow-hidden whitespace-nowrap mb-6 py-2.5 px-4 rounded-2xl bg-white border border-stone-200/90 shadow-2xs flex items-center">
+          <div className="animate-marquee-infinite text-xs font-semibold text-[#003B73] gap-8 items-center">
+            {MARQUEE_QUOTES.concat(MARQUEE_QUOTES).map((quote, idx) => (
+              <span key={idx} className="inline-flex items-center gap-3">
+                <span>{quote}</span>
+                <span className="text-amber-500 font-bold">•</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Auto-sliding Hadith & Quotes Card */}
+        <div
+          onMouseEnter={() => setIsHadithPaused(true)}
+          onMouseLeave={() => setIsHadithPaused(false)}
+          className="relative rounded-3xl bg-gradient-to-br from-[#002147] via-[#003B73] to-[#001833] text-white p-6 sm:p-9 shadow-xl border border-amber-400/30 overflow-hidden"
+        >
+          {/* Decorative background glow */}
+          <div className="absolute -top-24 -right-24 w-72 h-72 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Header Row */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4 mb-5">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-amber-400/20 text-amber-200 border border-amber-300/40 uppercase tracking-wider flex items-center gap-1.5">
+                <Quote className="w-3.5 h-3.5 text-amber-300" />
+                Mutiara Hadits &amp; Keutamaan Infaq
+              </span>
+              <span className="hidden sm:inline-block text-xs text-blue-200/80">
+                • {currentHadith.theme}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs font-mono text-amber-300/90">
+              <button
+                onClick={() => handleOpenShare(currentHadithIndex)}
+                className="px-3 py-1 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 border border-amber-400/40 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Bagikan Mutiara Hadits Ini"
+              >
+                <Share2 className="w-3.5 h-3.5 text-amber-300" />
+                <span className="hidden sm:inline">Bagikan</span>
+              </button>
+              <span className="px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15">
+                {currentHadithIndex + 1} / {INFAQ_HADITHS.length}
+              </span>
+            </div>
+          </div>
+
+          {/* Hadith Content */}
+          <div className="min-h-[160px] sm:min-h-[140px] flex flex-col justify-center text-center space-y-4">
+            {/* Arabic Text */}
+            <p lang="ar" dir="rtl" className="font-quran text-xl sm:text-3xl text-amber-200 font-semibold leading-relaxed tracking-normal px-2 sm:px-6">
+              {currentHadith.arabic}
+            </p>
+
+            {/* Translation */}
+            <p className="text-xs sm:text-sm md:text-base text-stone-100 max-w-3xl mx-auto leading-relaxed italic px-2">
+              &ldquo;{currentHadith.translation}&rdquo;
+            </p>
+
+            {/* Riwayat & Fadhilah */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+              <span className="text-[11px] font-bold px-3 py-0.5 rounded-full bg-white/15 text-white border border-white/20">
+                {currentHadith.source}
+              </span>
+              <span className="text-[11px] text-amber-300 font-medium hidden sm:inline-block">
+                — {currentHadith.fadhilah}
+              </span>
+            </div>
+          </div>
+
+          {/* Navigation Controls: Arrows and Share Button */}
+          <div className="flex items-center justify-between pt-6 border-t border-white/10 mt-5">
+            <button
+              onClick={prevHadith}
+              aria-label="Hadits Sebelumnya"
+              className="p-2 sm:px-3.5 sm:py-2 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+            >
+              <ChevronLeft className="w-5 h-5" />
+              <span className="hidden sm:inline">Sebelumnya</span>
+            </button>
+
+            {/* Bagikan Mutiara Hadits Button */}
+            <button
+              onClick={() => handleOpenShare(currentHadithIndex)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 active:scale-95 text-stone-950 text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
+            >
+              <Share2 className="w-4 h-4 text-stone-950" />
+              <span>Bagikan Mutiara Hadits</span>
+            </button>
+
+            <button
+              onClick={nextHadith}
+              aria-label="Hadits Berikutnya"
+              className="p-2 sm:px-3.5 sm:py-2 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+            >
+              <span className="hidden sm:inline">Berikutnya</span>
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Share Mutiara Hadits Modal Dialog */}
+      {isShareModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-lg bg-white rounded-3xl border border-stone-200 shadow-2xl p-6 sm:p-7 overflow-hidden text-stone-900">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-4 border-b border-stone-100">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-stone-900 font-serif">
+                  Bagikan Mutiara Hadits
+                </h3>
+                <p className="text-xs text-stone-500 mt-0.5">
+                  Pilih kata-kata atau sesuaikan pesan sebelum dibagikan ke media sosial
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsShareModalOpen(false)}
+                className="p-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 transition-colors cursor-pointer"
+                aria-label="Tutup"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Hadith Selector */}
+            <div className="mt-4">
+              <label htmlFor="hadith-select" className="block text-xs font-semibold text-stone-700 mb-1.5">
+                Pilih Tema Hadits:
+              </label>
+              <select
+                id="hadith-select"
+                value={selectedHadithId}
+                onChange={(e) => handleHadithSelectChange(Number(e.target.value))}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#003B73]/30 focus:border-[#003B73]"
+              >
+                {INFAQ_HADITHS.map((h) => (
+                  <option key={h.id} value={h.id}>
+                    #{h.id} - {h.theme} ({h.source})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Editable Share Text Box */}
+            <div className="mt-4">
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="share-textarea" className="text-xs font-semibold text-stone-700">
+                  Pratinjau / Sesuaikan Kata-Kata:
+                </label>
+                <button
+                  type="button"
+                  onClick={handleResetText}
+                  className="text-[11px] text-[#003B73] hover:underline font-medium cursor-pointer"
+                >
+                  Reset ke Teks Asli
+                </button>
+              </div>
+              <textarea
+                id="share-textarea"
+                rows={7}
+                value={customShareText}
+                onChange={(e) => setCustomShareText(e.target.value)}
+                className="w-full p-3.5 rounded-xl border border-stone-300 text-xs text-stone-800 font-mono leading-relaxed bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#003B73]/30 focus:border-[#003B73] resize-none"
+              />
+            </div>
+
+            {/* Copy Feedback Toast */}
+            {copyFeedback && (
+              <div className="mt-3 py-2 px-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-600" />
+                <span>{copyFeedback}</span>
+              </div>
+            )}
+
+            {/* Action Buttons: Social Media & Copy */}
+            <div className="mt-5 pt-4 border-t border-stone-100 space-y-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {/* WhatsApp */}
+                <button
+                  type="button"
+                  onClick={handleShareWA}
+                  className="px-3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <span>WhatsApp</span>
+                </button>
+
+                {/* Facebook */}
+                <button
+                  type="button"
+                  onClick={handleShareFB}
+                  className="px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <span>Facebook</span>
+                </button>
+
+                {/* Instagram */}
+                <button
+                  type="button"
+                  onClick={handleShareIG}
+                  className="px-3 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-600 hover:opacity-90 active:scale-95 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <span>Instagram</span>
+                </button>
+
+                {/* TikTok */}
+                <button
+                  type="button"
+                  onClick={handleShareTikTok}
+                  className="px-3 py-2.5 rounded-xl bg-stone-900 hover:bg-black active:scale-95 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <span>TikTok</span>
+                </button>
+              </div>
+
+              {/* Copy & Native Share Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => handleCopyText()}
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-300 hover:border-stone-400 bg-white hover:bg-stone-50 active:scale-95 text-stone-800 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Copy className="w-4 h-4 text-stone-600" />
+                  <span>Salin Seluruh Teks</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleNativeShare}
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#003B73] hover:bg-[#002855] active:scale-95 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                >
+                  <Share2 className="w-4 h-4 text-amber-300" />
+                  <span>Bagikan Langsung</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}

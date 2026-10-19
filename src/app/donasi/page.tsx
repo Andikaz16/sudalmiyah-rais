@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import MutiaraHaditsSection from "@/components/MutiaraHaditsSection";
 import DonationSection from "@/components/DonationSection";
 
 export default function DonasiPage() {
@@ -10,6 +11,7 @@ export default function DonasiPage() {
       <Navbar />
 
       <main className="flex-1 w-full">
+        <MutiaraHaditsSection />
         <DonationSection />
       </main>
 

@@ -3,7 +3,7 @@ import { getDbAsync } from "@/lib/db";
 
 export interface ApiNewsItem {
   id: string;
-  source: "MASJIDMU" | "UMS" | "MUHAMMADIYAH_SOLO" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
+  source: "MASJIDMU" | "UMS" | "LPCR" | "MUHAMMADIYAH_SOLO" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
   badge: string;
   badgeClass: string;
   timeAgo: string;
@@ -190,6 +190,40 @@ const fallbackArticles: ApiNewsItem[] = [
     imageUrl: "https://news.ums.ac.id/id/wp-content/uploads/sites/2/2026/10/Wakili-Jawa-Tengah-Dua-Mahasiswa-UMS-Borong-Medali-Kejurnas-Panahan-Senior.jpeg",
   },
   {
+    id: "lpcr-13692",
+    source: "LPCR",
+    badge: "LPCR-PM",
+    badgeClass: "bg-[#D97706] text-white",
+    timeAgo: "Baru saja",
+    publishedAt: "2026-10-18T10:00:00+07:00",
+    sourceDomain: "lpcr.or.id",
+    sourceUrl: "https://lpcr.or.id/prm-jepara-gelar-pengajian-lesehan-rutin-dakwah-inklusif-ukhuwah-dan-kepedulian-sosial/",
+    title: "PRM Jepara Gelar Pengajian Lesehan Rutin: Dakwah Inklusif, Ukhuwah, dan Kepedulian Sosial",
+    excerpt: "lpcr.or.id, JEPARA — PRM Jepara menggelar pengajian lesehan rutin sebagai wujud dakwah inklusif dan penguatan ukhuwah serta kepedulian sosial di akar rumput persyarikatan.",
+    content: [
+      "lpcr.or.id, JEPARA — PRM Jepara menggelar pengajian lesehan rutin sebagai wujud dakwah inklusif dan penguatan ukhuwah serta kepedulian sosial di akar rumput persyarikatan.",
+      "Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid (LPCR-PM) PP Muhammadiyah terus mendorong akselerasi cabang, ranting, dan masjid unggulan di seluruh Indonesia sebagai pilar kemajuan dakwah umat.",
+    ],
+    imageUrl: "https://lpcr.or.id/wp-content/uploads/2026/10/prm-jepara-unggulan-Pengajian-Lesehan.webp",
+  },
+  {
+    id: "lpcr-13688",
+    source: "LPCR",
+    badge: "LPCR-PM",
+    badgeClass: "bg-[#D97706] text-white",
+    timeAgo: "2 jam lalu",
+    publishedAt: "2026-10-18T08:30:00+07:00",
+    sourceDomain: "lpcr.or.id",
+    sourceUrl: "https://lpcr.or.id/prm-jepara-kembangkan-dakwah-amal-usaha-dan-pemberdayaan-ekonomi-umat/",
+    title: "PRM Jepara Kembangkan Dakwah, Amal Usaha, dan Pemberdayaan Ekonomi Umat",
+    excerpt: "lpcr.or.id, JEPARA — Pimpinan Ranting Muhammadiyah (PRM) Jepara menggerakkan kemandirian persyarikatan melalui integrasi dakwah jamaah, optimalisasi AUM, dan pemberdayaan ekonomi umat.",
+    content: [
+      "lpcr.or.id, JEPARA — Pimpinan Ranting Muhammadiyah (PRM) Jepara menggerakkan kemandirian persyarikatan melalui integrasi dakwah jamaah, optimalisasi AUM, dan pemberdayaan ekonomi umat.",
+      "Melalui pendampingan LPCR-PM PP Muhammadiyah, pengelolaan masjid dan ranting diarahkan menjadi sentra pembinaan spiritual dan kemandirian finansial berbasis jamaah.",
+    ],
+    imageUrl: "https://lpcr.or.id/wp-content/uploads/2026/10/PRM-Jepara-Unggulan-Ekonomi-Umat.webp",
+  },
+  {
     id: "sm-fallback-1",
     source: "SUARA_MUHAMMADIYAH",
     badge: "SUARA MUHAMMADIYAH",
@@ -261,7 +295,7 @@ const fallbackArticles: ApiNewsItem[] = [
 
 function parseRssFeed(
   xml: string,
-  source: "UMS" | "MUHAMMADIYAH_SOLO" | "SUARA_MUHAMMADIYAH" | "LENSAMU"
+  source: "UMS" | "LPCR" | "MUHAMMADIYAH_SOLO" | "SUARA_MUHAMMADIYAH" | "LENSAMU"
 ): ApiNewsItem[] {
   const items: ApiNewsItem[] = [];
   const itemRegex = /<item>([\s\S]*?)<\/item>/g;
@@ -294,6 +328,7 @@ function parseRssFeed(
 
     if (rawTitle && rawLink) {
       const isUms = source === "UMS";
+      const isLpcr = source === "LPCR";
       const isSolo = source === "MUHAMMADIYAH_SOLO";
       const isSm = source === "SUARA_MUHAMMADIYAH";
 
@@ -302,6 +337,8 @@ function parseRssFeed(
         source,
         badge: isUms
           ? "UMS NEWS"
+          : isLpcr
+          ? "LPCR-PM"
           : isSolo
           ? "MUHAMMADIYAH SOLO"
           : isSm
@@ -309,6 +346,8 @@ function parseRssFeed(
           : "LENSAMU",
         badgeClass: isUms
           ? "bg-[#003B73] text-white"
+          : isLpcr
+          ? "bg-[#D97706] text-white"
           : isSolo
           ? "bg-[#1E5F3B] text-white"
           : isSm
@@ -318,6 +357,8 @@ function parseRssFeed(
         publishedAt: pubDateIso,
         sourceDomain: isUms
           ? "news.ums.ac.id"
+          : isLpcr
+          ? "lpcr.or.id"
           : isSolo
           ? "muhammadiyahsolo.com"
           : isSm
@@ -334,6 +375,8 @@ function parseRssFeed(
           ? imgMatch[1]
           : isUms
           ? "/images/news/ums-pemilu.jpg"
+          : isLpcr
+          ? "/images/logo/logo-lpcr.png"
           : isSolo
           ? "/images/news/news-lensamu-1.jpg"
           : isSm
@@ -425,7 +468,86 @@ async function fetchUmsNews(): Promise<ApiNewsItem[]> {
   return fallbackArticles.filter((a) => a.source === "UMS");
 }
 
-// 2. Fetcher Khusus Berita Muhammadiyah Solo (muhammadiyahsolo.com)
+// 2. Fetcher Khusus Berita LPCR-PM PP Muhammadiyah (lpcr.or.id)
+async function fetchLpcrNews(): Promise<ApiNewsItem[]> {
+  const items: ApiNewsItem[] = [];
+
+  // Strategi A: WordPress REST API resmi lpcr.or.id
+  try {
+    const res = await fetch("https://lpcr.or.id/wp-json/wp/v2/posts?_embed&per_page=6", {
+      cache: "no-store",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach((p) => {
+          const rawExcerpt = p.excerpt?.rendered || "";
+          const imgUrl =
+            p._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+            "/images/logo/logo-lpcr.png";
+          const pubDateIso = p.date_gmt
+            ? `${p.date_gmt}Z`
+            : p.date
+            ? `${p.date}+07:00`
+            : new Date().toISOString();
+
+          items.push({
+            id: `lpcr-${p.id}`,
+            source: "LPCR",
+            badge: "LPCR-PM",
+            badgeClass: "bg-[#D97706] text-white",
+            timeAgo: calculateTimeAgo(pubDateIso),
+            publishedAt: pubDateIso,
+            sourceDomain: "lpcr.or.id",
+            sourceUrl: p.link,
+            title: decodeHtmlEntities(p.title?.rendered || ""),
+            excerpt: decodeHtmlEntities(rawExcerpt),
+            content: [
+              decodeHtmlEntities(rawExcerpt),
+              "Informasi dan liputan program pembinaan masjid serta cabang-ranting ini disiarkan langsung oleh Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid (LPCR-PM) PP Muhammadiyah.",
+            ],
+            imageUrl: imgUrl,
+          });
+        });
+
+        if (items.length > 0) return items;
+      }
+    }
+  } catch (err) {
+    console.warn("Notice: LPCR REST API failed, trying RSS:", err);
+  }
+
+  // Strategi B: RSS Feed lpcr.or.id/feed
+  try {
+    const resRss = await fetch("https://lpcr.or.id/feed", {
+      cache: "no-store",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        Accept: "text/xml, application/rss+xml, */*",
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (resRss.ok) {
+      const xml = await resRss.text();
+      const parsed = parseRssFeed(xml, "LPCR");
+      if (parsed.length > 0) return parsed;
+    }
+  } catch (err) {
+    console.warn("Notice: LPCR RSS failed:", err);
+  }
+
+  // Strategi C: Fallback Lokal LPCR
+  return fallbackArticles.filter((a) => a.source === "LPCR");
+}
+
+// 3. Fetcher Khusus Berita Muhammadiyah Solo (muhammadiyahsolo.com)
 async function fetchMuhammadiyahSoloNews(): Promise<ApiNewsItem[]> {
   const items: ApiNewsItem[] = [];
 
@@ -654,9 +776,10 @@ async function checkYouTubeLiveStatus(videoId: string): Promise<boolean> {
 export async function GET(request: Request) {
   await connection();
   // Ambil berita manual dari basis data dan semua sumber berita eksternal secara paralel
-  const [db, umsArticles, soloArticles, lensamuArticles, smArticles, isLive] = await Promise.all([
+  const [db, umsArticles, lpcrArticles, soloArticles, lensamuArticles, smArticles, isLive] = await Promise.all([
     getDbAsync(),
     fetchUmsNews(),
+    fetchLpcrNews(),
     fetchMuhammadiyahSoloNews(),
     fetchLensamuNews(),
     fetchSuaraMuhammadiyahNews(),
@@ -692,12 +815,14 @@ export async function GET(request: Request) {
   // Urutan prioritas:
   // 1. Warta / Berita Manual Masjid (dibuat nomor pertama sebelum news ums)
   // 2. Siaran / Rekaman Tabligh Akbar
-  // 3. Berita Kampus UMS & Liputan Persyarikatan Solo (muhammadiyahsolo.com)
-  // 4. Suara Muhammadiyah & Lensamu
+  // 3. Berita Kampus UMS & Berita LPCR-PM PP Muhammadiyah
+  // 4. Liputan Persyarikatan Solo (muhammadiyahsolo.com)
+  // 5. Suara Muhammadiyah & Lensamu
   const officialArticles = [
     ...manualArticles,
     liveArticleItem,
     ...umsArticles.filter((a) => a.id !== tablighAkbarLiveArticle.id),
+    ...lpcrArticles,
     ...soloArticles,
     ...smArticles,
     ...lensamuArticles,

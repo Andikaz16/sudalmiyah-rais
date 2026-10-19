@@ -6,9 +6,10 @@ import MuhammadiyahCalendarWidget from "@/components/MuhammadiyahCalendarWidget"
 import AgendaSection from "@/components/AgendaSection";
 import MasjidMuSection from "@/components/MasjidMuSection";
 import FridayScheduleSection from "@/components/FridayScheduleSection";
+import MutiaraHaditsSection from "@/components/MutiaraHaditsSection";
+import NewsSection from "@/components/NewsSection";
 import DonationSection from "@/components/DonationSection";
 import FeedbackSection from "@/components/FeedbackSection";
-import NewsSection from "@/components/NewsSection";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import AnimatedSection from "@/components/AnimatedSection";
@@ -53,19 +54,24 @@ export default function Home() {
           <FridayScheduleSection />
         </AnimatedSection>
 
-        {/* Infaq Digital & QRIS Section */}
+        {/* 1. Mutiara Hadits & Kata-Kata Hikmah */}
+        <AnimatedSection animation="fade-up" duration={700}>
+          <MutiaraHaditsSection />
+        </AnimatedSection>
+
+        {/* 2. Kabar Persyarikatan, Warta LPCR-PM & Kampus UMS */}
+        <AnimatedSection animation="fade-up" duration={700}>
+          <NewsSection />
+        </AnimatedSection>
+
+        {/* 3. Infaq Digital & QRIS Section */}
         <AnimatedSection animation="fade-up" duration={700}>
           <DonationSection />
         </AnimatedSection>
 
-        {/* Kotak Saran & Aspirasi Jamaah Masjid Kampus UMS */}
+        {/* 4. Kotak Saran & Aspirasi Jamaah Masjid Kampus UMS */}
         <AnimatedSection animation="fade-up" duration={700}>
           <FeedbackSection />
-        </AnimatedSection>
-
-        {/* Kabar Persyarikatan & Warta Kampus (UMS, Suara Muhammadiyah, Lensamu) */}
-        <AnimatedSection animation="fade-up" duration={700}>
-          <NewsSection />
         </AnimatedSection>
       </main>
 

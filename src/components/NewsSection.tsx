@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, ArrowRight, ExternalLink, Play } from "lucid
 
 interface NewsItem {
   id: string;
-  source: "MASJIDMU" | "UMS" | "MUHAMMADIYAH_SOLO" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
+  source: "MASJIDMU" | "UMS" | "LPCR" | "MUHAMMADIYAH_SOLO" | "SUARA_MUHAMMADIYAH" | "LENSAMU";
   badge: string;
   badgeClass: string;
   timeAgo: string;
@@ -120,9 +120,28 @@ export const tablighAkbarLiveItem: NewsItem = {
   youtubeId: "KVGneiEldgo",
 };
 
+export const initialLpcrArticle: NewsItem = {
+  id: "lpcr-13692",
+  source: "LPCR",
+  badge: "LPCR-PM",
+  badgeClass: "bg-[#D97706] text-white",
+  timeAgo: "Baru saja",
+  publishedAt: "2026-10-18T10:00:00+07:00",
+  sourceDomain: "lpcr.or.id",
+  sourceUrl: "https://lpcr.or.id/prm-jepara-gelar-pengajian-lesehan-rutin-dakwah-inklusif-ukhuwah-dan-kepedulian-sosial/",
+  title: "PRM Jepara Gelar Pengajian Lesehan Rutin: Dakwah Inklusif, Ukhuwah, dan Kepedulian Sosial",
+  excerpt: "lpcr.or.id — Pengajian lesehan rutin yang digagas PRM Jepara menjadi inspirasi dakwah inklusif akar rumput dalam mempererat ukhuwah serta kepedulian sosial warga persyarikatan.",
+  content: [
+    "lpcr.or.id — Pengajian lesehan rutin yang digagas PRM Jepara menjadi inspirasi dakwah inklusif akar rumput dalam mempererat ukhuwah serta kepedulian sosial warga persyarikatan.",
+    "Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid (LPCR-PM) PP Muhammadiyah terus mendorong akselerasi cabang, ranting, dan masjid unggulan di seluruh Indonesia sebagai pilar kemajuan dakwah umat.",
+  ],
+  imageUrl: "https://lpcr.or.id/wp-content/uploads/2026/10/prm-jepara-unggulan-Pengajian-Lesehan.webp",
+};
+
 const initialNewsData: NewsItem[] = [
   initialSilaturahmiBphArticle,
   tablighAkbarLiveItem,
+  initialLpcrArticle,
   {
     id: "ums-43448",
     source: "UMS",
@@ -425,6 +444,73 @@ export default function NewsSection() {
       } catch (clientSoloErr) {
         console.warn("Direct browser Solo fetch notice:", clientSoloErr);
       }
+
+      // 4. Ambil langsung dari WordPress REST API LPCR-PM PP Muhammadiyah (lpcr.or.id)
+      try {
+        const lpcrRes = await fetch("https://lpcr.or.id/wp-json/wp/v2/posts?_embed&per_page=6");
+        if (lpcrRes.ok) {
+          const lpcrData = await lpcrRes.json();
+          if (Array.isArray(lpcrData) && lpcrData.length > 0 && isMounted) {
+            const clientLpcrArticles: NewsItem[] = lpcrData.map((p: any) => {
+              const rawExcerpt = (p.excerpt?.rendered || "")
+                .replace(/<[^>]+>/g, "")
+                .replace(/\[&hellip;\]/g, "...")
+                .replace(/&#8211;/g, "-")
+                .replace(/&#8217;/g, "'")
+                .trim();
+              const imgUrl =
+                p._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+                "/images/logo/logo-lpcr.png";
+              const pubDateIso = p.date_gmt
+                ? `${p.date_gmt}Z`
+                : p.date
+                ? `${p.date}+07:00`
+                : new Date().toISOString();
+
+              const cleanTitle = (p.title?.rendered || "")
+                .replace(/&amp;/g, "&")
+                .replace(/&#8211;/g, "-")
+                .replace(/&#8212;/g, "-")
+                .replace(/&#8217;/g, "'")
+                .replace(/&#8220;/g, '"')
+                .replace(/&#8221;/g, '"')
+                .replace(/<[^>]+>/g, "")
+                .trim();
+
+              return {
+                id: `lpcr-${p.id}`,
+                source: "LPCR",
+                badge: "LPCR-PM",
+                badgeClass: "bg-[#D97706] text-white",
+                timeAgo: formatClientTimeAgo(pubDateIso, "Baru saja", Date.now()),
+                publishedAt: pubDateIso,
+                sourceDomain: "lpcr.or.id",
+                sourceUrl: p.link,
+                title: cleanTitle,
+                excerpt: rawExcerpt.slice(0, 220) + (rawExcerpt.length > 220 ? "..." : ""),
+                content: [
+                  rawExcerpt,
+                  "Informasi dan liputan program pembinaan masjid serta cabang-ranting ini disiarkan langsung oleh Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid (LPCR-PM) PP Muhammadiyah.",
+                ],
+                imageUrl: imgUrl,
+              };
+            });
+
+            setNewsList((prev) => {
+              const manualItems = prev.filter((item) => item.source === "MASJIDMU");
+              const currentLive = prev.find((item) => item.id === tablighAkbarLiveItem.id) || tablighAkbarLiveItem;
+              const nonLpcr = prev.filter(
+                (item) => item.source !== "LPCR" && item.source !== "MASJIDMU" && item.id !== tablighAkbarLiveItem.id
+              );
+              const umsItems = nonLpcr.filter((item) => item.source === "UMS");
+              const otherItems = nonLpcr.filter((item) => item.source !== "UMS");
+              return [...manualItems, currentLive, ...umsItems, ...clientLpcrArticles, ...otherItems];
+            });
+          }
+        }
+      } catch (clientLpcrErr) {
+        console.warn("Direct browser LPCR fetch notice:", clientLpcrErr);
+      }
     };
 
     fetchLiveNews();
@@ -487,7 +573,7 @@ export default function NewsSection() {
             Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
-            Warta aktual civitas akademika UMS, liputan resmi persyarikatan Solo Raya (Muhammadiyah Solo), serta rilis berita Suara Muhammadiyah dan Lensamu yang terupdate otomatis dari sumber resminya.
+            Warta aktual civitas akademika UMS, kabar pembinaan masjid &amp; cabang-ranting LPCR-PM PP Muhammadiyah, liputan resmi persyarikatan Solo Raya, serta rilis berita Suara Muhammadiyah dan Lensamu.
           </p>
         </div>
 
@@ -746,6 +832,8 @@ export default function NewsSection() {
                     <span>Siaran Resmi: <strong className="text-stone-900">YouTube Official UMS</strong></span>
                   ) : selectedArticle.source === "MASJIDMU" ? (
                     <span>Diterbitkan oleh: <strong className="text-stone-900">Takmir Masjid Hj. Sudalmiyah Rais</strong></span>
+                  ) : selectedArticle.source === "LPCR" ? (
+                    <span>Portal Resmi: <strong className="text-stone-900">LPCR-PM PP Muhammadiyah (lpcr.or.id)</strong></span>
                   ) : (
                     <span>Portal Resmi: <strong className="text-stone-900">{selectedArticle.sourceDomain}</strong></span>
                   )}
