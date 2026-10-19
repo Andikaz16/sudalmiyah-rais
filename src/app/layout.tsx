@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://sudalmiyah-rais.vercel.app"),
   title: "Masjid UMS | Masjid Sudalmiyah Rais Kampus 2",
   description:
-    "Portal Resmi Masjid UMS - Model Masjid Percontohan LPCR-PM & PTMA. Jadwal shalat standar MASA Tarjih, ruang ibadah digital, warta persyarikatan, dan transparansi infaq.",
+    "Portal Resmi Masjid UMS - Model Masjid Percontohan LPCR-PM & PTMA. Jadwal shalat standar MASA, ruang ibadah digital, warta persyarikatan, dan transparansi infaq.",
   authors: [{ name: "Takmir Masjid UMS" }],
   keywords: [
     "Masjid UMS",

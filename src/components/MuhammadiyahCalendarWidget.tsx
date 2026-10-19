@@ -160,7 +160,7 @@ export default function MuhammadiyahCalendarWidget() {
             <div className="mt-6 pt-4 border-t border-white/15 flex items-center justify-between text-[11px] text-stone-300">
               <span className="flex items-center gap-1">
                 <Compass className="w-3.5 h-3.5 text-[#FCD34D]" />
-                Standar MASA Tarjih UMS
+                Standar MASA
               </span>
               <span className="text-[#FCD34D] font-mono font-bold">1448 H</span>
             </div>
@@ -277,7 +277,7 @@ export default function MuhammadiyahCalendarWidget() {
               href="/ibadah"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#003B73]/10 hover:bg-[#003B73]/15 text-[#003B73] font-bold text-xs transition-colors"
             >
-              <span>Eksplorasi Kalender & Shalat MASA</span>
+              <span>Eksplorasi Kalender & Aplikasi MASA</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>
           </div>
