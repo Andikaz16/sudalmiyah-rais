@@ -39,6 +39,7 @@ import {
   Copy,
   Newspaper,
   History,
+  Coins,
 } from "lucide-react";
 import {
   Agenda,
@@ -2386,6 +2387,94 @@ export default function AdminDashboardPage() {
                     className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
                     placeholder="Contoh: Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid."
                   />
+                </div>
+
+                {/* Transparansi Perolehan Infaq Shalat Jumat */}
+                <div className="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200/90 space-y-4">
+                  <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <Coins className="w-4 h-4 text-emerald-700" />
+                      <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
+                        Transparansi Hasil Perolehan Infaq Shalat Jumat
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-emerald-700 font-semibold">
+                      Tampil di Bawah Jadwal Jumat ({activeMosqueMeta.name})
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        Perolehan Infaq Shalat Jumat (Rp)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3.5 top-2.5 text-xs font-bold text-stone-500">
+                          Rp
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="1000"
+                          placeholder="Contoh: 8750000"
+                          value={
+                            fridaySchedule.infaqAmount !== undefined && fridaySchedule.infaqAmount !== null
+                              ? fridaySchedule.infaqAmount
+                              : ""
+                          }
+                          onChange={(e) =>
+                            setFridaySchedule({
+                              ...fridaySchedule,
+                              infaqAmount: e.target.value === "" ? null : Number(e.target.value),
+                            })
+                          }
+                          className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-mono font-bold"
+                        />
+                      </div>
+                      <p className="text-[10px] text-stone-400 mt-1">
+                        Kosongkan atau biarkan 0 jika belum selesai dihitung oleh takmir.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        Periode / Tanggal Pelaksanaan Infaq
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Contoh: Jumat, 17 Oktober 2026 (atau Pekan Ke-2)"
+                        value={fridaySchedule.infaqPeriod || ""}
+                        onChange={(e) =>
+                          setFridaySchedule({
+                            ...fridaySchedule,
+                            infaqPeriod: e.target.value,
+                          })
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
+                      />
+                      <p className="text-[10px] text-stone-400 mt-1">
+                        Keterangan waktu pelaksanaan perolehan infaq Jumat ini.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Catatan / Keterangan Penyaluran Infaq (Opsional)
+                    </label>
+                    <textarea
+                      rows={2}
+                      placeholder="Contoh: Infaq kotak keliling telah dihitung bersama panitia dan marbot masjid serta disalurkan untuk operasional ibadah & kebersihan."
+                      value={fridaySchedule.infaqNotes || ""}
+                      onChange={(e) =>
+                        setFridaySchedule({
+                          ...fridaySchedule,
+                          infaqNotes: e.target.value,
+                        })
+                      }
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
+                    />
+                  </div>
                 </div>
 
                 {/* Submit Action */}

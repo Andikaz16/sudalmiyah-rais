@@ -21,6 +21,9 @@ const updateFridaySchema = z.object({
   muadzinRole: z.string().max(150).optional().or(z.literal("")),
   time: z.string().min(1).max(50),
   notes: z.string().max(1000).optional().or(z.literal("")),
+  infaqAmount: z.number().nullable().optional(),
+  infaqPeriod: z.string().max(100).optional().or(z.literal("")),
+  infaqNotes: z.string().max(500).optional().or(z.literal("")),
 });
 
 export async function GET(request: NextRequest) {
@@ -125,6 +128,9 @@ export async function PUT(request: NextRequest) {
       muadzinRole: sanitizeString(data.muadzinRole),
       time: sanitizeString(data.time),
       notes: data.notes ? sanitizeString(data.notes) : undefined,
+      infaqAmount: data.infaqAmount !== undefined ? data.infaqAmount : (existing?.infaqAmount ?? null),
+      infaqPeriod: data.infaqPeriod !== undefined ? sanitizeString(data.infaqPeriod) : (existing?.infaqPeriod || ""),
+      infaqNotes: data.infaqNotes !== undefined ? sanitizeString(data.infaqNotes) : (existing?.infaqNotes || ""),
       updatedAt: new Date().toISOString(),
     };
 

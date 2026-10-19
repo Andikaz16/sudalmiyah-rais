@@ -77,6 +77,9 @@ export interface FridayOfficerSchedule {
   time: string;
   notes?: string;
   updatedAt: string;
+  infaqAmount?: number | null;
+  infaqPeriod?: string;
+  infaqNotes?: string;
 }
 
 
