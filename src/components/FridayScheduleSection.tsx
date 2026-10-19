@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { User, History, X, Clock, Calendar, ChevronLeft, ChevronRight, Coins, ArrowRight } from "lucide-react";
 import { FridayOfficerSchedule } from "@/lib/types";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface MosqueInfo {
   id: string;
@@ -211,6 +212,7 @@ const initialFridayHistory: FridayOfficerSchedule[] = [
 ];
 
 export default function FridayScheduleSection() {
+  const { t } = useLanguage();
   const [schedules, setSchedules] = useState<FridayOfficerSchedule[]>(fallbackSchedules);
   const [history, setHistory] = useState<FridayOfficerSchedule[]>(initialFridayHistory);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -330,10 +332,10 @@ export default function FridayScheduleSection() {
         {/* Section Heading & Subtitle */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
-            Petugas Imam &amp; Khatib <span className="text-[#003B73]">Pekan Ini</span>
+            {t.friday.title}
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-2.5 leading-relaxed">
-            Susunan khidmat khatib, imam, dan muadzin Shalat Jumat di 6 masjid lingkungan Universitas Muhammadiyah Surakarta. Gunakan tombol panah untuk melihat jadwal masjid lainnya.
+            {t.friday.desc}
           </p>
 
           {/* Button: Lihat Petugas Imam & Khatib Sebelumnya */}
@@ -541,7 +543,7 @@ export default function FridayScheduleSection() {
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-700 text-white shadow-2xs">
-                          Informasi Infaq Shalat Jumat
+                          {t.friday.infaqCardTitle}
                         </span>
                         {activeSchedule.infaqPeriod ? (
                           <span className="text-xs font-semibold text-stone-600">

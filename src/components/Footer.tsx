@@ -10,8 +10,10 @@ import {
   ShieldCheck,
   Info,
 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Footer() {
+  const { t } = useLanguage();
   const [comingSoonMessage, setComingSoonMessage] = useState<string | null>(null);
 
   const handleComingSoon = (platform: string) => {
@@ -38,74 +40,74 @@ export default function Footer() {
               </div>
               <div>
                 <h3 className="font-bold text-white text-base font-serif">
-                  Masjid Kampus
+                  {t.footer.campusMosque}
                 </h3>
                 <p className="text-xs text-stone-300">
-                  Universitas Muhammadiyah Surakarta
+                  {t.footer.university}
                 </p>
               </div>
             </div>
             <p className="text-stone-300 text-xs leading-relaxed max-w-md">
-              Masjid percontohan Amal Usaha Muhammadiyah (AUM) tingkat PTMA dan menjadi pusat pembinaan AIK bagi civitas akademika UMS. Mengimplementasikan gerakan Islam yang unggul dan berkemajuan berbasis jama&apos;ah, jam&apos;iyah dan jariyah.
+              {t.footer.desc}
             </p>
             <div className="flex items-center gap-2 pt-1 text-[#FCD34D] text-xs font-medium">
               <ShieldCheck className="w-4 h-4 shrink-0" />
-              <span>Sistem Terenkripsi &amp; Standar Keamanan OWASP Berlapis</span>
+              <span>{t.footer.security}</span>
             </div>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-3">
             <h4 className="font-bold text-white text-xs uppercase tracking-wider">
-              Navigasi Layanan
+              {t.footer.navTitle}
             </h4>
             <ul className="space-y-2.5 text-xs">
               <li>
                 <Link href="/sejarah" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
-                  <span>Sejarah Masjid Kampus</span>
+                  <span>{t.footer.history}</span>
                 </Link>
               </li>
               <li>
                 <Link href="/#masjidmu" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
-                  <span>Pilar Masjid Percontohan LPCR-PM</span>
+                  <span>{t.footer.lpcrPillars}</span>
                 </Link>
               </li>
               <li>
                 <Link href="/ibadah" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
-                  <span>Ruang Ibadah Digital</span>
+                  <span>{t.footer.worshipSpace}</span>
                 </Link>
               </li>
               <li>
                 <Link href="/jadwal" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
-                  <span>Jadwal Shalat Surakarta</span>
+                  <span>{t.footer.prayerSchedule}</span>
                 </Link>
               </li>
               <li>
                 <Link href="/agenda" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
-                  <span>Agenda &amp; Kajian Rutin</span>
+                  <span>{t.footer.agendaRoutine}</span>
                 </Link>
               </li>
               <li>
                 <Link href="/donasi" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
-                  <span>Infaq Digital QRIS</span>
+                  <span>{t.footer.digitalInfaqQris}</span>
                 </Link>
               </li>
               <li>
                 <Link href="/#kotak-saran" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
-                  <span>Kotak Saran &amp; Aspirasi</span>
+                  <span>{t.footer.feedbackBox}</span>
                 </Link>
               </li>
               <li>
                 <Link href="/#berita" className="flex items-center gap-2.5 hover:text-[#FCD34D] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform shrink-0" />
-                  <span>Warta Kampus &amp; Persyarikatan</span>
+                  <span>{t.footer.campusNews}</span>
                 </Link>
               </li>
             </ul>
@@ -114,12 +116,12 @@ export default function Footer() {
           {/* Contact & Location */}
           <div className="space-y-4">
             <h4 className="font-bold text-white text-xs uppercase tracking-wider">
-              Sekretariat Takmir
+              {t.footer.secretariatTitle}
             </h4>
             <div className="space-y-2 text-xs text-stone-300">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
-                <span>Kampus 2 (Masjid Hj. Sudalmiyah Rais), Jl. Ahmad Yani, Pabelan, Kecamatan Kartasura, Kabupaten Sukoharjo, Jawa Tengah 57162</span>
+                <span>{t.footer.campusAddress}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-[#D4AF37] shrink-0" />
@@ -201,7 +203,7 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-400">
           <div>
-            Hak Cipta © 2026 Masjid Kampus - Universitas Muhammadiyah Surakarta. Seluruh Hak Dilindungi.
+            {t.footer.copyright}
           </div>
           <div className="flex items-center gap-4 text-[11px] text-stone-300">
             <span>Jama&apos;ah</span>
@@ -209,7 +211,7 @@ export default function Footer() {
             <span>Jariyah</span>
             <span className="text-stone-500">•</span>
             <Link href="/auth/login" className="hover:text-amber-300 transition-colors">
-              Akses Takmir
+              {t.footer.takmirAccess}
             </Link>
           </div>
         </div>

@@ -18,6 +18,7 @@ import {
 import { Agenda, AgendaCategory } from "@/lib/types";
 import RegistrationModal from "./RegistrationModal";
 import AgendaDetailModal from "./AgendaDetailModal";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface AgendaSectionProps {
   isHomePage?: boolean;
@@ -25,6 +26,8 @@ interface AgendaSectionProps {
 }
 
 export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaSectionProps) {
+  const { language } = useLanguage();
+  const isEn = language === "en";
   const [agendas, setAgendas] = useState<Agenda[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>("ALL");
@@ -83,10 +86,20 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
         {/* Section Heading Centered */}
         <div className="text-center max-w-3xl mx-auto mb-10">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
-            Agenda &amp; Kajian <span className="text-[#003B73]">Masjid Sudalmiyah</span>
+            {isEn ? (
+              <>
+                Agendas &amp; Lectures <span className="text-[#003B73]">Sudalmiyah Mosque</span>
+              </>
+            ) : (
+              <>
+                Agenda &amp; Kajian <span className="text-[#003B73]">Masjid Sudalmiyah</span>
+              </>
+            )}
           </h1>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
-            Ikuti kegiatan ibadah berjamaah, kajian tematik mahasiswa berkemajuan, serta kelas bimbingan tahsin Al-Qur&apos;an di lingkungan Kampus 2 UMS.
+            {isEn
+              ? "Join congregational worship, progressive student study circles, and Al-Qur'an tahsin classes at Campus 2 UMS."
+              : "Ikuti kegiatan ibadah berjamaah, kajian tematik mahasiswa berkemajuan, serta kelas bimbingan tahsin Al-Qur'an di lingkungan Kampus 2 UMS."}
           </p>
         </div>
 
@@ -368,7 +381,7 @@ export default function AgendaSection({ isHomePage = false, limit = 3 }: AgendaS
               href="/agenda"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all"
             >
-              <span>Lihat Semua Agenda &amp; Kajian</span>
+              <span>{isEn ? "View All Agendas & Lectures" : "Lihat Semua Agenda & Kajian"}</span>
               <span className="text-amber-300">&rarr;</span>
             </Link>
           </div>

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, ArrowRight, ExternalLink, Play } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface NewsItem {
   id: string;
@@ -247,6 +248,8 @@ const initialNewsData: NewsItem[] = [
 ];
 
 export default function NewsSection() {
+  const { language } = useLanguage();
+  const isEn = language === "en";
   const [newsList, setNewsList] = useState<NewsItem[]>(initialNewsData);
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
   const [now, setNow] = useState<number | null>(null);
@@ -570,10 +573,20 @@ export default function NewsSection() {
         {/* Section Heading - Centered to match other sections */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-            Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
+            {isEn ? (
+              <>
+                UMS Campus News &amp; <span className="text-[#003B73]">Muhammadiyah Updates</span>
+              </>
+            ) : (
+              <>
+                Warta Kampus UMS &amp; <span className="text-[#003B73]">Kabar Persyarikatan</span>
+              </>
+            )}
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
-            Warta aktual civitas akademika UMS, kabar pembinaan masjid &amp; cabang-ranting LPCR-PM PP Muhammadiyah, liputan resmi persyarikatan Solo Raya, serta rilis berita Suara Muhammadiyah dan Lensamu.
+            {isEn
+              ? "Actual news of the UMS academic community, LPCR-PM mosque & branch guidance updates, official reports of Muhammadiyah Solo Raya, Suara Muhammadiyah, and Lensamu."
+              : "Warta aktual civitas akademika UMS, kabar pembinaan masjid & cabang-ranting LPCR-PM PP Muhammadiyah, liputan resmi persyarikatan Solo Raya, serta rilis berita Suara Muhammadiyah dan Lensamu."}
           </p>
         </div>
 

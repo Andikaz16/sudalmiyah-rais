@@ -10,9 +10,12 @@ import {
   ChevronDown,
   Building2,
   BookOpen,
+  Globe,
 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Navbar() {
+  const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [layananDropdownOpen, setLayananDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -73,12 +76,12 @@ export default function Navbar() {
   }, [pathname]);
 
   const navLinks: Array<{ href: string; label: string; isDropdown?: boolean }> = [
-    { href: "/", label: "Beranda" },
-    { href: "/sejarah", label: "Sejarah" },
-    { href: "/ibadah", label: "Ruang Ibadah" },
-    { href: "/jadwal", label: "Jadwal Shalat" },
-    { href: "/layanan", label: "Layanan", isDropdown: true },
-    { href: "/donasi", label: "Infaq Digital" },
+    { href: "/", label: t.navbar.home },
+    { href: "/sejarah", label: t.navbar.history },
+    { href: "/ibadah", label: t.navbar.worship },
+    { href: "/jadwal", label: t.navbar.prayerTimes },
+    { href: "/layanan", label: t.navbar.services, isDropdown: true },
+    { href: "/donasi", label: t.navbar.digitalInfaq },
   ];
 
   return (
@@ -165,10 +168,10 @@ export default function Navbar() {
                             </div>
                             <div>
                               <div className="text-xs font-bold leading-tight">
-                                Formulir Peminjaman
+                                {t.navbar.bookingForm}
                               </div>
                               <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
-                                Peminjaman ruang aula &amp; inventaris proyektor masjid
+                                {t.navbar.bookingFormDesc}
                               </div>
                             </div>
                           </Link>
@@ -187,10 +190,10 @@ export default function Navbar() {
                             </div>
                             <div>
                               <div className="text-xs font-bold leading-tight">
-                                Pusat Unduhan Dokumen
+                                {t.navbar.downloadCenter}
                               </div>
                               <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
-                                E-Book HPT, PHIWM, Risalah Islam Berkemajuan, &amp; panduan
+                                {t.navbar.downloadCenterDesc}
                               </div>
                             </div>
                           </Link>
@@ -218,27 +221,80 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Right Action Button - Text Only without icons */}
+          {/* Right Action: Language Switcher Button (ID | EN) */}
           <div className="hidden md:flex items-center gap-3">
-            {user ? (
+            <div className="inline-flex items-center p-1 rounded-full bg-stone-100 border border-stone-200/90 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setLanguage("id")}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 flex items-center gap-1 cursor-pointer ${
+                  language === "id"
+                    ? "bg-[#003B73] text-white shadow-xs"
+                    : "text-stone-600 hover:text-stone-900"
+                }`}
+                title="Bahasa Indonesia"
+                aria-label="Ganti ke Bahasa Indonesia"
+              >
+                <span>ID</span>
+                <span className="hidden lg:inline text-[10px] font-normal opacity-90">INA</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 flex items-center gap-1 cursor-pointer ${
+                  language === "en"
+                    ? "bg-[#003B73] text-white shadow-xs"
+                    : "text-stone-600 hover:text-stone-900"
+                }`}
+                title="English"
+                aria-label="Switch to English"
+              >
+                <span>EN</span>
+                <span className="hidden lg:inline text-[10px] font-normal opacity-90">ENG</span>
+              </button>
+            </div>
+
+            {/* Akses Takmir jika terotentikasi tanpa menutupi tombol bahasa */}
+            {user && (
               <Link
                 href="/admin"
-                className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-semibold shadow-sm transition-all hover:scale-[1.02]"
+                className="px-3 py-1.5 rounded-full bg-[#003B73]/10 hover:bg-[#003B73]/20 text-[#003B73] text-xs font-bold transition-all"
+                title={t.navbar.takmirPanel}
               >
-                Panel Takmir
-              </Link>
-            ) : (
-              <Link
-                href="/agenda"
-                className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-semibold shadow-sm shadow-[#003B73]/15 transition-all hover:scale-[1.02] border border-amber-400/30"
-              >
-                Agenda Masjid
+                {t.navbar.takmirPanel}
               </Link>
             )}
           </div>
 
-          {/* Mobile menu trigger */}
+          {/* Mobile menu trigger + compact language toggle */}
           <div className="flex md:hidden items-center gap-2">
+            <div className="inline-flex items-center p-0.5 rounded-full bg-stone-100 border border-stone-200/90">
+              <button
+                type="button"
+                onClick={() => setLanguage("id")}
+                className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                  language === "id"
+                    ? "bg-[#003B73] text-white shadow-xs"
+                    : "text-stone-600"
+                }`}
+                aria-label="Bahasa Indonesia"
+              >
+                ID
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                  language === "en"
+                    ? "bg-[#003B73] text-white shadow-xs"
+                    : "text-stone-600"
+                }`}
+                aria-label="English"
+              >
+                EN
+              </button>
+            </div>
+
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-xl text-stone-700 hover:text-stone-900 hover:bg-stone-200/50 focus:outline-none cursor-pointer"
@@ -260,7 +316,7 @@ export default function Navbar() {
               pathname === "/" ? "bg-[#003B73]/10 text-[#003B73] font-bold" : "text-stone-700 hover:bg-stone-100"
             }`}
           >
-            Beranda
+            {t.navbar.home}
           </Link>
           <Link
             href="/sejarah"
@@ -269,7 +325,7 @@ export default function Navbar() {
               pathname === "/sejarah" ? "bg-[#003B73]/10 text-[#003B73] font-bold" : "text-stone-700 hover:bg-stone-100"
             }`}
           >
-            Sejarah
+            {t.navbar.history}
           </Link>
           <Link
             href="/ibadah"
@@ -278,7 +334,7 @@ export default function Navbar() {
               pathname === "/ibadah" ? "bg-[#003B73]/10 text-[#003B73] font-bold" : "text-stone-700 hover:bg-stone-100"
             }`}
           >
-            Ruang Ibadah
+            {t.navbar.worship}
           </Link>
           <Link
             href="/jadwal"
@@ -287,13 +343,13 @@ export default function Navbar() {
               pathname === "/jadwal" ? "bg-[#003B73]/10 text-[#003B73] font-bold" : "text-stone-700 hover:bg-stone-100"
             }`}
           >
-            Jadwal Shalat
+            {t.navbar.prayerTimes}
           </Link>
 
           {/* Layanan Group in Mobile */}
           <div className="p-2.5 rounded-2xl bg-stone-100 border border-stone-200 space-y-1">
             <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block px-2 py-0.5">
-              Layanan Masjid
+              {t.navbar.servicesGroup}
             </span>
             <Link
               href="/layanan"
@@ -303,7 +359,7 @@ export default function Navbar() {
               }`}
             >
               <Building2 className="w-3.5 h-3.5" />
-              <span>Formulir Peminjaman Fasilitas</span>
+              <span>{t.navbar.bookingForm}</span>
             </Link>
             <Link
               href="/layanan/unduhan"
@@ -313,7 +369,7 @@ export default function Navbar() {
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Pusat Unduhan Dokumen &amp; E-Book</span>
+              <span>{t.navbar.downloadCenter}</span>
             </Link>
           </div>
 
@@ -324,25 +380,52 @@ export default function Navbar() {
               pathname === "/donasi" ? "bg-[#003B73]/10 text-[#003B73] font-bold" : "text-stone-700 hover:bg-stone-100"
             }`}
           >
-            Infaq Digital
+            {t.navbar.digitalInfaq}
           </Link>
 
-          <div className="pt-3 border-t border-stone-200">
+          <div className="pt-3 border-t border-stone-200 space-y-2">
+            <div className="flex items-center justify-between px-3 py-2 bg-stone-100 rounded-xl">
+              <span className="text-xs font-semibold text-stone-600 flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5 text-[#003B73]" />
+                {t.navbar.language}
+              </span>
+              <div className="inline-flex items-center p-0.5 rounded-full bg-white border border-stone-200 shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setLanguage("id")}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                    language === "id" ? "bg-[#003B73] text-white shadow-xs" : "text-stone-700"
+                  }`}
+                >
+                  ID (Indonesia)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage("en")}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                    language === "en" ? "bg-[#003B73] text-white shadow-xs" : "text-stone-700"
+                  }`}
+                >
+                  EN (English)
+                </button>
+              </div>
+            </div>
+
             {user ? (
               <Link
                 href="/admin"
                 onClick={() => setIsOpen(false)}
-                className="block text-center w-full px-4 py-3 rounded-full bg-[#003B73] text-white font-semibold text-sm"
+                className="block text-center w-full px-4 py-2.5 rounded-xl bg-[#003B73] text-white font-semibold text-xs shadow-sm"
               >
-                Panel Takmir Masjid
+                {t.navbar.takmirPanel}
               </Link>
             ) : (
               <Link
                 href="/agenda"
                 onClick={() => setIsOpen(false)}
-                className="block text-center w-full px-4 py-3 rounded-full bg-[#003B73] text-white font-semibold text-sm shadow-md"
+                className="block text-center w-full px-4 py-2.5 rounded-xl bg-[#003B73] text-white font-semibold text-xs shadow-sm"
               >
-                Agenda Masjid
+                {t.navbar.mosqueAgenda}
               </Link>
             )}
           </div>

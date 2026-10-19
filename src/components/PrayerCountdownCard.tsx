@@ -18,8 +18,10 @@ import {
   getNextPrayer,
   getMuhammadiyahCalendarDetails,
 } from "@/lib/prayer-times";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function PrayerCountdownCard() {
+  const { language, t } = useLanguage();
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [data, setData] = useState<{
     times: ReturnType<typeof calculatePrayerTimes>;
@@ -39,7 +41,7 @@ export default function PrayerCountdownCard() {
       const nextInfo = getNextPrayer(times, now);
       const hijri = getHijriDate(now);
       const muhammadiyahCalendar = getMuhammadiyahCalendarDetails(now);
-      const formattedDate = new Intl.DateTimeFormat("id-ID", {
+      const formattedDate = new Intl.DateTimeFormat(language === "en" ? "en-US" : "id-ID", {
         weekday: "long",
         day: "numeric",
         month: "long",
@@ -60,7 +62,7 @@ export default function PrayerCountdownCard() {
     update();
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [language]);
 
   if (!data || !currentTime) {
     return (
@@ -99,6 +101,29 @@ export default function PrayerCountdownCard() {
     }
   };
 
+  const getTranslatedName = (name: string) => {
+    switch (name) {
+      case "Subuh":
+        return t.prayer.subuh;
+      case "Terbit":
+        return t.prayer.terbit;
+      case "Dzuhur":
+        return t.prayer.dzuhur;
+      case "Ashar":
+        return t.prayer.ashar;
+      case "Maghrib":
+        return t.prayer.maghrib;
+      case "Isya":
+        return t.prayer.isya;
+      case "Imsak":
+        return t.prayer.imsak;
+      case "Dhuha":
+        return t.prayer.dhuha;
+      default:
+        return name;
+    }
+  };
+
   return (
     <div className="w-full bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
       {/* Background Soft Accent Glows with breathing glow */}
@@ -111,11 +136,11 @@ export default function PrayerCountdownCard() {
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#B58A1E]">
               <MapPin className="w-3.5 h-3.5 text-[#B58A1E]" />
-              <span>Kampus 2 UMS Surakarta</span>
+              <span>{t.prayer.location}</span>
             </div>
             <span className="text-stone-300">•</span>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#003B73]/10 text-[#003B73] border border-[#003B73]/20">
-              Standar MASA (Muhammadiyah)
+              {t.prayer.standard}
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight font-serif">
@@ -127,7 +152,7 @@ export default function PrayerCountdownCard() {
               <span className="font-serif font-bold">{data.muhammadiyahCalendar.hijri}</span>
               <span className="text-[11px] font-sans text-stone-600 font-semibold">({data.muhammadiyahCalendar.pasaran})</span>
             </div>
-            <span className="text-[10px] text-stone-400 font-mono hidden sm:inline">• KHGT Majelis Tarjih</span>
+            <span className="text-[10px] text-stone-400 font-mono hidden sm:inline">• {t.prayer.khgtStandard}</span>
           </div>
         </div>
 
@@ -139,7 +164,7 @@ export default function PrayerCountdownCard() {
             </div>
             <div>
               <div className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">
-                Menuju Waktu {data.nextPrayer.name} ({data.nextPrayer.time} WIB)
+                {t.prayer.countdownTo} {getTranslatedName(data.nextPrayer.name)} ({data.nextPrayer.time} {t.prayer.wib})
               </div>
               <div className="font-mono text-2xl sm:text-3xl font-extrabold text-[#003B73] tracking-tight">
                 {String(hours).padStart(2, "0")}:{String(minutes).padStart(2, "0")}:
@@ -167,7 +192,7 @@ export default function PrayerCountdownCard() {
             >
               {isNext && (
                 <span className="absolute -top-2.5 right-3 bg-[#D4AF37] text-stone-900 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
-                  Berikutnya
+                  {t.prayer.next}
                 </span>
               )}
 
@@ -177,7 +202,7 @@ export default function PrayerCountdownCard() {
                     isNext ? "text-[#FCD34D]" : "text-stone-500"
                   }`}
                 >
-                  {prayer.name}
+                  {getTranslatedName(prayer.name)}
                 </span>
                 <Icon
                   className={`w-4 h-4 ${isNext ? "text-[#FCD34D]" : "text-stone-400"}`}
@@ -197,7 +222,7 @@ export default function PrayerCountdownCard() {
                   isNext ? "text-stone-200" : "text-stone-400"
                 }`}
               >
-                WIB
+                {t.prayer.wib}
               </div>
             </div>
           );
@@ -208,10 +233,10 @@ export default function PrayerCountdownCard() {
       <div className="mt-5 pt-4 border-t border-stone-200/80 flex flex-wrap items-center justify-between gap-3 text-xs text-stone-500">
         <div className="flex items-center gap-4">
           <span>
-            <strong className="text-stone-800">Imsak:</strong> {data.times.Imsak} WIB
+            <strong className="text-stone-800">{t.prayer.imsak}:</strong> {data.times.Imsak} {t.prayer.wib}
           </span>
           <span>
-            <strong className="text-stone-800">Dhuha:</strong> {data.times.Dhuha} WIB
+            <strong className="text-stone-800">{t.prayer.dhuha}:</strong> {data.times.Dhuha} {t.prayer.wib}
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-3">

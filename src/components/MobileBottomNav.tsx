@@ -10,8 +10,10 @@ import {
   Home,
 } from "lucide-react";
 import QuranIcon from "@/components/QuranIcon";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function MobileBottomNav() {
+  const { t } = useLanguage();
   const pathname = usePathname();
 
   if (pathname.startsWith("/admin")) {
@@ -19,11 +21,11 @@ export default function MobileBottomNav() {
   }
 
   const items = [
-    { href: "/", label: "Beranda", icon: Home },
-    { href: "/ibadah", label: "Ibadah", icon: QuranIcon },
-    { href: "/jadwal", label: "Jadwal", icon: Compass },
-    { href: "/agenda", label: "Agenda", icon: Calendar },
-    { href: "/donasi", label: "Infaq", icon: HeartHandshake },
+    { href: "/", label: t.mobileNav.home, icon: Home },
+    { href: "/ibadah", label: t.mobileNav.worship, icon: QuranIcon },
+    { href: "/jadwal", label: t.mobileNav.schedule, icon: Compass },
+    { href: "/agenda", label: t.mobileNav.agenda, icon: Calendar },
+    { href: "/donasi", label: t.mobileNav.infaq, icon: HeartHandshake },
   ];
 
   return (

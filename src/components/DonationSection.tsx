@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { ShieldCheck } from "lucide-react";
 import { QrisSettings } from "@/lib/types";
+import { useLanguage } from "@/context/LanguageContext";
 
 const fallbackQris: QrisSettings = {
   id: "qris-01",
@@ -18,6 +19,8 @@ const fallbackQris: QrisSettings = {
 };
 
 export default function DonationSection() {
+  const { language } = useLanguage();
+  const isEn = language === "en";
   const [qris, setQris] = useState<QrisSettings>(fallbackQris);
 
   useEffect(() => {
@@ -53,10 +56,20 @@ export default function DonationSection() {
         {/* Section Title */}
         <div className="text-center max-w-3xl mx-auto mb-10">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif">
-            Infaq Digital <span className="text-[#003B73]">QRIS</span>
+            {isEn ? (
+              <>
+                Digital Infaq <span className="text-[#003B73]">QRIS</span>
+              </>
+            ) : (
+              <>
+                Infaq Digital <span className="text-[#003B73]">QRIS</span>
+              </>
+            )}
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
-            Salurkan infaq dan sedekah jariyah secara mudah, amanah, dan berkah melalui pemindaian kode QRIS resmi Masjid Sudalmiyah Rais Kampus 2 UMS.
+            {isEn
+              ? "Channel infaq and continuous charity easily, safely, and blessedly by scanning the official QRIS codes of Sudalmiyah Rais Mosque Campus 2 UMS."
+              : "Salurkan infaq dan sedekah jariyah secara mudah, amanah, dan berkah melalui pemindaian kode QRIS resmi Masjid Sudalmiyah Rais Kampus 2 UMS."}
           </p>
         </div>
 
@@ -92,7 +105,7 @@ export default function DonationSection() {
                     onClick={handleDownloadQRIS}
                     className="w-full text-center px-4 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/15 active:scale-[0.99] cursor-pointer"
                   >
-                    Unduh Gambar QRIS
+                    {isEn ? "Download QRIS Poster" : "Unduh Gambar QRIS"}
                   </button>
 
                   <div className="text-[10px] text-stone-500 leading-tight">

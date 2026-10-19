@@ -9,6 +9,7 @@ import {
   Phone,
 } from "lucide-react";
 import { FeedbackCategory, MosqueFeedback } from "@/lib/types";
+import { useLanguage } from "@/context/LanguageContext";
 
 const MOSQUE_OPTIONS = [
   "Masjid Hj. Sudalmiyah Rais",
@@ -31,6 +32,8 @@ const CATEGORY_OPTIONS: { key: FeedbackCategory; label: string; desc: string }[]
 ];
 
 export default function FeedbackSection() {
+  const { language } = useLanguage();
+  const isEn = language === "en";
   const [targetMosque, setTargetMosque] = useState(MOSQUE_OPTIONS[0]);
   const [category, setCategory] = useState<FeedbackCategory>("RIAYAH");
   const [rating, setRating] = useState<number>(5);
@@ -109,10 +112,20 @@ export default function FeedbackSection() {
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-            Kotak Saran &amp; <span className="text-[#003B73]">Aspirasi Jamaah</span>
+            {isEn ? (
+              <>
+                Feedback &amp; <span className="text-[#003B73]">Congregational Aspirations</span>
+              </>
+            ) : (
+              <>
+                Kotak Saran &amp; <span className="text-[#003B73]">Aspirasi Jamaah</span>
+              </>
+            )}
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
-            Sinergi kebaikan untuk kemajuan 6 masjid kampus percontohan UMS. Setiap masukan, kritik fasilitas, dan usulan dakwah terkumpul langsung di dashboard Pengurus Takmir untuk ditindaklanjuti.
+            {isEn
+              ? "Synergy of goodness for the progress of 6 UMS campus model mosques. Every suggestion, facility critique, and da'wah proposal is delivered directly to the Takmir board dashboard for follow-up."
+              : "Sinergi kebaikan untuk kemajuan 6 masjid kampus percontohan UMS. Setiap masukan, kritik fasilitas, dan usulan dakwah terkumpul langsung di dashboard Pengurus Takmir untuk ditindaklanjuti."}
           </p>
         </div>
 

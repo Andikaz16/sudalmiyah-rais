@@ -12,75 +12,100 @@ import {
   Leaf,
   ChevronRight,
 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function MasjidMuSection() {
+  const { language } = useLanguage();
+  const isEn = language === "en";
+
   const pillars = [
     {
       code: "JAMA'AH",
-      title: "Pembinaan Jama'ah & Kemakmuran Ibadah",
-      subtitle: "Dakwah Mencerahkan & Penguatan AIK",
+      title: isEn ? "Congregational Guidance & Worship Prosperity" : "Pembinaan Jama'ah & Kemakmuran Ibadah",
+      subtitle: isEn ? "Enlightening Da'wah & AIK Strengthening" : "Dakwah Mencerahkan & Penguatan AIK",
       icon: Users,
       color: "text-[#B58A1E]",
       bgBadge: "bg-[#B58A1E]/10 text-[#B58A1E] border-[#B58A1E]/20",
-      description:
-        "Menggerakkan peribadatan berpedoman resmi HPT PP Muhammadiyah dan hisab MASA SatuMu, penguatan ideologi AIK, serta kajian tematik ilmiah yang menyejukkan bagi civitas akademika dan masyarakat.",
-      points: [
-        "Pusat pembinaan ideologi AIK civitas akademika & mahasiswa",
-        "Jadwal shalat hisab astronomis standar Munas Tarjih & MASA SatuMu",
-        "Kajian tematik ilmiah, fatwa tarjih, dan ruang ibadah digital",
-      ],
+      description: isEn
+        ? "Advancing worship guided by official HPT PP Muhammadiyah and MASA SatuMu calculations, strengthening AIK ideology, and hosting inspiring scholarly thematic lectures for campus civitas and society."
+        : "Menggerakkan peribadatan berpedoman resmi HPT PP Muhammadiyah dan hisab MASA SatuMu, penguatan ideologi AIK, serta kajian tematik ilmiah yang menyejukkan bagi civitas akademika dan masyarakat.",
+      points: isEn
+        ? [
+            "Center for AIK ideology guidance for UMS academics & students",
+            "Astronomical hisab prayer times based on Munas Tarjih & MASA SatuMu",
+            "Thematic scientific lectures, tarjih fatwas, and digital prayer space",
+          ]
+        : [
+            "Pusat pembinaan ideologi AIK civitas akademika & mahasiswa",
+            "Jadwal shalat hisab astronomis standar Munas Tarjih & MASA SatuMu",
+            "Kajian tematik ilmiah, fatwa tarjih, dan ruang ibadah digital",
+          ],
     },
     {
       code: "JAM'IYAH",
-      title: "Tata Kelola Organisasi & Manajemen Modern",
-      subtitle: "Good Governance & Sinergi Persyarikatan",
+      title: isEn ? "Modern Organizational Governance & Management" : "Tata Kelola Organisasi & Manajemen Modern",
+      subtitle: isEn ? "Good Governance & Institutional Synergy" : "Good Governance & Sinergi Persyarikatan",
       icon: ShieldCheck,
       color: "text-[#003B73]",
       bgBadge: "bg-[#003B73]/10 text-[#003B73] border-[#003B73]/20",
-      description:
-        "Standar manajemen kelembagaan masjid LPCR-PM dengan tata kelola profesional, transparansi digital terverifikasi audit, kepengurusan terstruktur, serta sinergi erat bersama institusi kampus, Ortom, Ormawa, dan UKM.",
-      points: [
-        "Integrasi tata kelola manajerial berstandar LPCR-PM & PTMA",
-        "Laporan keuangan infaq terbuka, teraudit & real-time",
-        "Sinergi aktif bersama Ortom (IMM, Tapak Suci, HW, & 'Aisyiyah), Ormawa, dan UKM",
-      ],
+      description: isEn
+        ? "LPCR-PM institutional mosque management standards with professional governance, audited digital transparency, structured organization, and active synergy with campus bodies, Ortom, Ormawa, and student units."
+        : "Standar manajemen kelembagaan masjid LPCR-PM dengan tata kelola profesional, transparansi digital terverifikasi audit, kepengurusan terstruktur, serta sinergi erat bersama institusi kampus, Ortom, Ormawa, dan UKM.",
+      points: isEn
+        ? [
+            "Managerial governance integration meeting LPCR-PM & PTMA standards",
+            "Open, audited, and real-time infaq financial reports",
+            "Active synergy with Ortom (IMM, Tapak Suci, HW, & 'Aisyiyah), Ormawa, & UKM",
+          ]
+        : [
+            "Integrasi tata kelola manajerial berstandar LPCR-PM & PTMA",
+            "Laporan keuangan infaq terbuka, teraudit & real-time",
+            "Sinergi aktif bersama Ortom (IMM, Tapak Suci, HW, & 'Aisyiyah), Ormawa, dan UKM",
+          ],
     },
     {
       code: "JARIYAH",
-      title: "Pemberdayaan Umat & Sarana Lestari",
-      subtitle: "Filantropi Digital, Beasiswa & Eco-Mosque",
+      title: isEn ? "Community Empowerment & Sustainable Facilities" : "Pemberdayaan Umat & Sarana Lestari",
+      subtitle: isEn ? "Digital Philanthropy, Scholarships & Eco-Mosque" : "Filantropi Digital, Beasiswa & Eco-Mosque",
       icon: HeartHandshake,
       color: "text-emerald-700",
       bgBadge: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      description:
-        "Optimalisasi infaq dan wakaf digital untuk beasiswa mahasiswa serta kemaslahatan sosial, didukung sarana prasarana fisik representatif standar kampus unggul yang ramah lingkungan dan difabel.",
-      points: [
-        "Penyaluran infaq berkah untuk beasiswa dan santunan sosial",
-        "Aksesibilitas inklusif ramah disabilitas, lansia, & sarana unggul",
-        "Penerapan prinsip Eco-Mosque ramah lingkungan & efisiensi energi",
-      ],
+      description: isEn
+        ? "Optimizing digital infaq and waqf for student scholarships and community welfare, supported by representative campus-standard physical facilities that are eco-friendly and disability-inclusive."
+        : "Optimalisasi infaq dan wakaf digital untuk beasiswa mahasiswa serta kemaslahatan sosial, didukung sarana prasarana fisik representatif standar kampus unggul yang ramah lingkungan dan difabel.",
+      points: isEn
+        ? [
+            "Distribution of infaq blessings for scholarships and social assistance",
+            "Inclusive accessibility for disabilities, seniors, & premier amenities",
+            "Implementation of Eco-Mosque principles and energy efficiency",
+          ]
+        : [
+            "Penyaluran infaq berkah untuk beasiswa dan santunan sosial",
+            "Aksesibilitas inklusif ramah disabilitas, lansia, & sarana unggul",
+            "Penerapan prinsip Eco-Mosque ramah lingkungan & efisiensi energi",
+          ],
     },
   ];
 
   const highlights = [
     {
-      label: "Penguatan AIK",
-      desc: "Pembinaan Ideologi Civitas Akademika UMS",
+      label: isEn ? "AIK Strengthening" : "Penguatan AIK",
+      desc: isEn ? "Ideological Guidance for UMS Academics" : "Pembinaan Ideologi Civitas Akademika UMS",
       icon: BookOpen,
     },
     {
-      label: "Standar MASA SatuMu",
-      desc: "Akurasi Waktu Ibadah & Pedoman HPT Resmi",
+      label: isEn ? "MASA SatuMu Standard" : "Standar MASA SatuMu",
+      desc: isEn ? "Prayer Time Accuracy & Official HPT Guidance" : "Akurasi Waktu Ibadah & Pedoman HPT Resmi",
       icon: Compass,
     },
     {
-      label: "Tata Kelola & Audit Terbuka",
-      desc: "Transparansi Finansial Infaq & Good Governance",
+      label: isEn ? "Open Governance & Audit" : "Tata Kelola & Audit Terbuka",
+      desc: isEn ? "Infaq Financial Transparency & Good Governance" : "Transparansi Finansial Infaq & Good Governance",
       icon: ShieldCheck,
     },
     {
-      label: "Fasilitas Unggul & Inklusif",
-      desc: "Aksesibilitas Difabel & Prinsip Eco-Campus",
+      label: isEn ? "Exemplary & Inclusive Facilities" : "Fasilitas Unggul & Inklusif",
+      desc: isEn ? "Disability Accessibility & Eco-Campus Principles" : "Aksesibilitas Difabel & Prinsip Eco-Campus",
       icon: Users,
     },
   ];
@@ -95,14 +120,26 @@ export default function MasjidMuSection() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-            Masjid Percontohan <span className="text-[#003B73]">LPCR-PM</span>
+            {isEn ? (
+              <>
+                LPCR-PM <span className="text-[#003B73]">Model Mosque</span>
+              </>
+            ) : (
+              <>
+                Masjid Percontohan <span className="text-[#003B73]">LPCR-PM</span>
+              </>
+            )}
           </h2>
           <p className="mt-2 text-xs sm:text-sm font-semibold tracking-wider text-[#003B73]/90 uppercase font-sans">
-            Lembaga Pengembangan Cabang Ranting &amp; Pembinaan Masjid PP Muhammadiyah
+            {isEn
+              ? "Institute for Branch & Ranting Development and Mosque Guidance PP Muhammadiyah"
+              : "Lembaga Pengembangan Cabang Ranting & Pembinaan Masjid PP Muhammadiyah"}
           </p>
 
           <p className="mt-4 text-sm sm:text-base text-stone-600 leading-relaxed">
-            Masjid UMS hadir sebagai teladan dan standar <strong>Masjid Percontohan LPCR-PM (Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid) Pimpinan Pusat Muhammadiyah</strong> di lingkungan Perguruan Tinggi Muhammadiyah dan &apos;Aisyiyah (PTMA) serta institusi persyarikatan. Menjadi episentrum pembinaan spiritual, integrasi Al-Islam &amp; Kemuhammadiyahan (AIK), pengkaderan persyarikatan, serta tata kelola modern berbasis pilar <strong>3J (Jama&apos;ah, Jam&apos;iyah, dan Jariyah)</strong>.
+            {isEn
+              ? "UMS Mosque serves as an exemplary benchmark of LPCR-PM PP Muhammadiyah Model Mosque for Muhammadiyah & 'Aisyiyah Higher Education (PTMA) and institutional organizations. Becoming the epicenter of spiritual development, integration of Islamic & Muhammadiyah education (AIK), leadership training, and modern governance based on 3J pillars (Jama'ah, Jam'iyah, and Jariyah)."
+              : "Masjid UMS hadir sebagai teladan dan standar Masjid Percontohan LPCR-PM (Lembaga Pengembangan Cabang Ranting dan Pembinaan Masjid) Pimpinan Pusat Muhammadiyah di lingkungan Perguruan Tinggi Muhammadiyah dan 'Aisyiyah (PTMA) serta institusi persyarikatan. Menjadi episentrum pembinaan spiritual, integrasi Al-Islam & Kemuhammadiyahan (AIK), pengkaderan persyarikatan, serta tata kelola modern berbasis pilar 3J (Jama'ah, Jam'iyah, dan Jariyah)."}
           </p>
         </div>
 

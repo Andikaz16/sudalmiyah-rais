@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface HeroSlide {
   id: string;
@@ -72,6 +73,7 @@ const HERO_SLIDES: HeroSlide[] = [
 ];
 
 export default function HeroSection() {
+  const { t } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -91,7 +93,14 @@ export default function HeroSection() {
     return () => clearInterval(timer);
   }, [isPaused, nextSlide]);
 
-  const active = HERO_SLIDES[currentSlide];
+  const baseSlide = HERO_SLIDES[currentSlide];
+  const translatedSlide = t.hero.slides.find((s) => s.id === baseSlide.id) || baseSlide;
+  const active = {
+    ...baseSlide,
+    leadWord: translatedSlide.leadWord,
+    mosqueName: translatedSlide.mosqueName,
+    description: translatedSlide.description,
+  };
 
   return (
     <section
@@ -158,7 +167,7 @@ export default function HeroSection() {
 
             {/* Lencana AUM Minimalis & Pas */}
             <div className="inline-flex items-center justify-center px-4 sm:px-5 py-1 sm:py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-semibold tracking-wide mb-6 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all duration-300">
-              <span>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</span>
+              <span>{t.hero.modelBadge}</span>
             </div>
           </div>
         ) : (
@@ -186,14 +195,14 @@ export default function HeroSection() {
             href="/agenda"
             className="px-8 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-sm sm:text-base font-bold shadow-2xl border border-amber-400/40 hover:scale-105 active:scale-95 transition-all duration-300"
           >
-            Daftar Kajian &amp; Kegiatan
+            {t.hero.ctaAgenda}
           </Link>
 
           <Link
             href="/donasi"
             className="px-7 py-3.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-stone-200 hover:text-white text-sm sm:text-base font-semibold backdrop-blur-md border border-stone-600/70 hover:border-amber-400/60 transition-all duration-300 hover:scale-105"
           >
-            Donasi Kebaikan
+            {t.hero.ctaDonation}
           </Link>
         </div>
       </div>
