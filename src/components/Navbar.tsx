@@ -20,7 +20,6 @@ export default function Navbar() {
   const [layananDropdownOpen, setLayananDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const pathname = usePathname();
 
   const handleDropdownEnter = () => {
@@ -60,19 +59,6 @@ export default function Navbar() {
   useEffect(() => {
     setLayananDropdownOpen(false);
     setIsOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.authenticated && data.user) {
-          setUser(data.user);
-        } else {
-          setUser(null);
-        }
-      })
-      .catch(() => setUser(null));
   }, [pathname]);
 
   const navLinks: Array<{ href: string; label: string; isDropdown?: boolean }> = [
@@ -253,17 +239,6 @@ export default function Navbar() {
                 <span className="hidden lg:inline text-[10px] font-normal opacity-90">ENG</span>
               </button>
             </div>
-
-            {/* Akses Takmir jika terotentikasi tanpa menutupi tombol bahasa */}
-            {user && (
-              <Link
-                href="/admin"
-                className="px-3 py-1.5 rounded-full bg-[#003B73]/10 hover:bg-[#003B73]/20 text-[#003B73] text-xs font-bold transition-all"
-                title={t.navbar.takmirPanel}
-              >
-                {t.navbar.takmirPanel}
-              </Link>
-            )}
           </div>
 
           {/* Mobile menu trigger + compact language toggle */}
@@ -411,23 +386,13 @@ export default function Navbar() {
               </div>
             </div>
 
-            {user ? (
-              <Link
-                href="/admin"
-                onClick={() => setIsOpen(false)}
-                className="block text-center w-full px-4 py-2.5 rounded-xl bg-[#003B73] text-white font-semibold text-xs shadow-sm"
-              >
-                {t.navbar.takmirPanel}
-              </Link>
-            ) : (
-              <Link
-                href="/agenda"
-                onClick={() => setIsOpen(false)}
-                className="block text-center w-full px-4 py-2.5 rounded-xl bg-[#003B73] text-white font-semibold text-xs shadow-sm"
-              >
-                {t.navbar.mosqueAgenda}
-              </Link>
-            )}
+            <Link
+              href="/agenda"
+              onClick={() => setIsOpen(false)}
+              className="block text-center w-full px-4 py-2.5 rounded-xl bg-[#003B73] text-white font-semibold text-xs shadow-sm"
+            >
+              {t.navbar.mosqueAgenda}
+            </Link>
           </div>
         </div>
       )}
