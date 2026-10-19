@@ -821,6 +821,7 @@ export async function saveDb(data: DatabaseSchema): Promise<void> {
       }
     } catch (err) {
       console.error("Notice: Firestore write error:", err);
+      throw err;
     }
   }
 }

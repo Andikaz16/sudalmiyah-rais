@@ -1,21 +1,54 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyC9fp4Mjpd6rHOQmOEPT-hLrKvPttjms7I",
+  authDomain: "masjid-ums.firebaseapp.com",
+  projectId: "masjid-ums",
+  storageBucket: "masjid-ums.firebasestorage.app",
+  messagingSenderId: "938250854409",
+  appId: "1:938250854409:web:e6973e16da81ef7bf5d8d8",
+};
+
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY || "",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || process.env.FIREBASE_AUTH_DOMAIN || "",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || "",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || process.env.FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || process.env.FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || process.env.FIREBASE_APP_ID || "",
+  apiKey: (
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
+    process.env.FIREBASE_API_KEY ||
+    DEFAULT_FIREBASE_CONFIG.apiKey
+  ).trim(),
+  authDomain: (
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+    process.env.FIREBASE_AUTH_DOMAIN ||
+    DEFAULT_FIREBASE_CONFIG.authDomain
+  ).trim(),
+  projectId: (
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+    process.env.FIREBASE_PROJECT_ID ||
+    DEFAULT_FIREBASE_CONFIG.projectId
+  ).trim(),
+  storageBucket: (
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+    process.env.FIREBASE_STORAGE_BUCKET ||
+    DEFAULT_FIREBASE_CONFIG.storageBucket
+  ).trim(),
+  messagingSenderId: (
+    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ||
+    process.env.FIREBASE_MESSAGING_SENDER_ID ||
+    DEFAULT_FIREBASE_CONFIG.messagingSenderId
+  ).trim(),
+  appId: (
+    process.env.NEXT_PUBLIC_FIREBASE_APP_ID ||
+    process.env.FIREBASE_APP_ID ||
+    DEFAULT_FIREBASE_CONFIG.appId
+  ).trim(),
 };
 
 export function isFirebaseConfigured(): boolean {
   return Boolean(
     firebaseConfig.projectId &&
-    firebaseConfig.projectId.trim().length > 0 &&
+    firebaseConfig.projectId.length > 0 &&
     firebaseConfig.apiKey &&
-    firebaseConfig.apiKey.trim().length > 0
+    firebaseConfig.apiKey.length > 0
   );
 }
 
