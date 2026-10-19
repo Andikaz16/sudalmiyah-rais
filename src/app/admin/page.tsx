@@ -38,6 +38,7 @@ import {
   Database,
   Copy,
   Newspaper,
+  History,
 } from "lucide-react";
 import {
   Agenda,
@@ -205,6 +206,7 @@ export default function AdminDashboardPage() {
   // Friday officer schedule state (6 Mosques)
   const [fridaySchedule, setFridaySchedule] = useState<FridayOfficerSchedule | null>(null);
   const [fridaySchedules, setFridaySchedules] = useState<FridayOfficerSchedule[]>([]);
+  const [fridayHistory, setFridayHistory] = useState<FridayOfficerSchedule[]>([]);
   const [selectedMosqueId, setSelectedMosqueId] = useState<string>("sudalmiyah");
   const [savingFriday, setSavingFriday] = useState(false);
   const [uploadingKhatibPhoto, setUploadingKhatibPhoto] = useState(false);
@@ -453,6 +455,9 @@ export default function AdminDashboardPage() {
           };
           setFridaySchedule(sanitizedCurrent);
           setFridaySchedules([sanitizedCurrent]);
+        }
+        if (fridayJson.history && Array.isArray(fridayJson.history)) {
+          setFridayHistory(fridayJson.history);
         }
       }
       if (qrisJson.success && qrisJson.qris) {
@@ -726,6 +731,10 @@ export default function AdminDashboardPage() {
         setFridaySchedules((prev) =>
           prev.map((s) => ((s.mosqueId || s.id) === selectedMosqueId ? data.schedule || payload : s))
         );
+      }
+
+      if (Array.isArray(data.history)) {
+        setFridayHistory(data.history);
       }
 
       setFridaySaveSuccess(true);
@@ -1824,7 +1833,7 @@ export default function AdminDashboardPage() {
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
-            Petugas Shalat & Khatib Pekan Ini
+            Petugas Imam & Khatib Pekan Ini
           </button>
           <button
             onClick={() => setActiveTab("QRIS_INFAQ")}
@@ -2095,10 +2104,10 @@ export default function AdminDashboardPage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-lg font-bold text-stone-900 font-serif">
-                Pengaturan Petugas Shalat & Khatib 6 Masjid Kampus UMS
+                Pengaturan Petugas Imam &amp; Khatib 6 Masjid Kampus UMS
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
-                Pilih salah satu dari 6 masjid kampus di bawah ini untuk melihat dan menyesuaikan jadwal petugas jumat, nama khatib, foto, tema khutbah, imam, dan muadzin.
+                Pilih salah satu dari 6 masjid kampus di bawah ini untuk melihat dan menyesuaikan jadwal petugas jumat, nama khatib, foto, tema khutbah, imam, dan muadzin. Jadwal sebelumnya otomatis tersimpan di arsip riwayat.
               </p>
             </div>
 
@@ -2398,6 +2407,63 @@ export default function AdminDashboardPage() {
                 Memuat data jadwal jumat...
               </div>
             )}
+
+            {/* Arsip Riwayat Petugas Jumat Sebelumnya (Tersimpan Otomatis) */}
+            <div className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-stone-900 font-serif flex items-center gap-2">
+                    <History className="w-4 h-4 text-[#003B73]" />
+                    <span>Arsip Riwayat Petugas Sebelumnya (Tersimpan Otomatis)</span>
+                  </h3>
+                  <p className="text-[11px] text-stone-500 mt-0.5">
+                    Setiap kali jadwal Jumat diperbarui dengan nama petugas baru, jadwal sebelumnya otomatis diarsipkan ke sistem ini.
+                  </p>
+                </div>
+                <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-stone-100 text-stone-700">
+                  {fridayHistory.length} Arsip
+                </span>
+              </div>
+
+              {fridayHistory.length === 0 ? (
+                <div className="p-6 rounded-2xl bg-stone-50 text-center text-xs text-stone-400">
+                  Belum ada riwayat petugas tersimpan.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  {fridayHistory.map((h) => (
+                    <div
+                      key={h.id}
+                      className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 text-xs space-y-2 hover:border-[#003B73]/30 transition-all"
+                    >
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="font-bold text-[#003B73]">{h.mosqueName}</span>
+                        <span className="font-mono text-stone-500 font-semibold">{h.date}</span>
+                      </div>
+                      <div>
+                        <div className="font-bold text-stone-900 text-sm">
+                          Khatib: {h.khatibName}
+                        </div>
+                        {h.khatibTitle && (
+                          <div className="text-[11px] text-stone-500 mt-0.5">
+                            {h.khatibTitle}
+                          </div>
+                        )}
+                      </div>
+                      {h.khutbahTheme && (
+                        <div className="text-stone-600 italic text-[11px] pt-1 border-t border-stone-200/60">
+                          &ldquo;{h.khutbahTheme}&rdquo;
+                        </div>
+                      )}
+                      <div className="text-stone-500 text-[11px] pt-1.5 border-t border-stone-200/70 flex items-center justify-between">
+                        <span>Imam: <strong>{h.imamName || "-"}</strong></span>
+                        <span>{h.time}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 

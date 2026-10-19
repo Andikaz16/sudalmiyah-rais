@@ -57,11 +57,12 @@ export async function GET(request: NextRequest) {
     ? schedules.find((s) => (s.mosqueId || s.id) === mosqueId) || db.fridaySchedule
     : db.fridaySchedule || schedules[0];
 
-  return NextResponse.json(
+    return NextResponse.json(
     {
       success: true,
       schedule: activeSchedule,
       schedules: schedules,
+      history: db.fridayScheduleHistory || [],
     },
     {
       headers: {
@@ -127,6 +128,40 @@ export async function PUT(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     };
 
+    // Arsipkan jadwal sebelumnya ke riwayat jika sebelumnya sudah terisi nama petugas dan ada pembaruan
+    if (
+      existing &&
+      existing.khatibName &&
+      existing.khatibName.trim() !== "" &&
+      !existing.khatibName.toLowerCase().includes("konfirmasi") &&
+      !existing.khatibName.toLowerCase().includes("menunggu") &&
+      (existing.khatibName !== updatedSchedule.khatibName || existing.date !== updatedSchedule.date)
+    ) {
+      if (!Array.isArray(db.fridayScheduleHistory)) {
+        db.fridayScheduleHistory = [];
+      }
+
+      const isDuplicate = db.fridayScheduleHistory.some(
+        (h) =>
+          (h.mosqueId === existing.mosqueId || h.id === existing.id) &&
+          h.date === existing.date &&
+          h.khatibName === existing.khatibName
+      );
+
+      if (!isDuplicate) {
+        db.fridayScheduleHistory.unshift({
+          ...existing,
+          id: `hist-${Date.now()}-${existing.mosqueId || "mosque"}`,
+          updatedAt: new Date().toISOString(),
+        });
+
+        // Batasi arsip riwayat hingga 30 jadwal terakhir
+        if (db.fridayScheduleHistory.length > 30) {
+          db.fridayScheduleHistory = db.fridayScheduleHistory.slice(0, 30);
+        }
+      }
+    }
+
     if (existingIndex >= 0) {
       db.fridaySchedules[existingIndex] = updatedSchedule;
     } else {
@@ -152,6 +187,7 @@ export async function PUT(request: NextRequest) {
       success: true,
       schedule: updatedSchedule,
       schedules: db.fridaySchedules,
+      history: db.fridayScheduleHistory || [],
     });
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : "Gagal memperbarui jadwal jumat.";

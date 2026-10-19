@@ -592,5 +592,45 @@
       "createdAt": "2026-10-13T10:00:00+07:00",
       "isPublished": true
     }
+  ],
+  "fridayScheduleHistory": [
+    {
+      "id": "hist-20261016-sudalmiyah",
+      "mosqueId": "sudalmiyah",
+      "mosqueName": "Masjid Hj. Sudalmiyah Rais",
+      "mosqueLocation": "Kampus 2 UMS",
+      "date": "Jumat, 16 Oktober 2026",
+      "hijriDate": "4 Jumadilawal 1448 H",
+      "khatibName": "Prof. Muhammad Da'i",
+      "khatibTitle": "Guru Besar Farmasi UMS / Wakil Rektor",
+      "khatibPhotoUrl": "",
+      "khutbahTheme": "Meneguhkan Integritas Moral & Keteladanan Intelektual Muslim",
+      "imamName": "Ustadz Mahfuzh, S.Pd.I",
+      "imamRole": "Imam Rawatib Masjid Sudalmiyah",
+      "muadzinName": "Muadzin Masjid Sudalmiyah",
+      "muadzinRole": "Muadzin Shalat Jumat",
+      "time": "11:40 WIB",
+      "notes": "Khutbah Jumat di Ruang Utama Shalat Lantai 2 Masjid Hj. Sudalmiyah Rais Kampus 2 UMS.",
+      "updatedAt": "2026-10-16T13:00:00Z"
+    },
+    {
+      "id": "hist-20261016-fadhlurrahman",
+      "mosqueId": "fadhlurrahman",
+      "mosqueName": "Masjid Fadhlurrahman",
+      "mosqueLocation": "Kampus 1 UMS",
+      "date": "Jumat, 16 Oktober 2026",
+      "hijriDate": "4 Jumadilawal 1448 H",
+      "khatibName": "Dr. Muh. Nur Rochim Maksum",
+      "khatibTitle": "Dosen & Dai Majelis Tabligh Muhammadiyah",
+      "khatibPhotoUrl": "",
+      "khutbahTheme": "Karakter Generasi Berkemajuan Pembawa Risalah Pencerahan",
+      "imamName": "Imam Shalat Jumat",
+      "imamRole": "Imam Shalat Jumat",
+      "muadzinName": "Muadzin Masjid Fadhlurrahman",
+      "muadzinRole": "Muadzin Shalat Jumat",
+      "time": "11:40 WIB",
+      "notes": "Khutbah Jumat di Masjid Fadhlurrahman Kampus 1 UMS.",
+      "updatedAt": "2026-10-16T13:00:00Z"
+    }
   ]
 }

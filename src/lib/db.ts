@@ -25,6 +25,7 @@ export interface DatabaseSchema {
   agendas: Agenda[];
   fridaySchedule: FridayOfficerSchedule;
   fridaySchedules?: FridayOfficerSchedule[];
+  fridayScheduleHistory?: FridayOfficerSchedule[];
   qrisSettings: QrisSettings;
   registrations: Registration[];
   finances: FinancialRecord[];
@@ -188,6 +189,49 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
   };
 
   return [sudalmiyah, fadhlurrahman, masMansur, mahadAbuBakar, arRazi, munajatShabran];
+}
+
+export function getDefaultFridayScheduleHistory(): FridayOfficerSchedule[] {
+  return [
+    {
+      id: "hist-20261016-sudalmiyah",
+      mosqueId: "sudalmiyah",
+      mosqueName: "Masjid Hj. Sudalmiyah Rais",
+      mosqueLocation: "Kampus 2 UMS",
+      date: "Jumat, 16 Oktober 2026",
+      hijriDate: "4 Jumadilawal 1448 H",
+      khatibName: "Prof. Muhammad Da'i",
+      khatibTitle: "Guru Besar Farmasi UMS / Wakil Rektor",
+      khatibPhotoUrl: "",
+      khutbahTheme: "Meneguhkan Integritas Moral & Keteladanan Intelektual Muslim",
+      imamName: "Ustadz Mahfuzh, S.Pd.I",
+      imamRole: "Imam Rawatib Masjid Sudalmiyah",
+      muadzinName: "Muadzin Masjid Sudalmiyah",
+      muadzinRole: "Muadzin Shalat Jumat",
+      time: "11:40 WIB",
+      notes: "Khutbah Jumat di Ruang Utama Shalat Lantai 2 Masjid Hj. Sudalmiyah Rais Kampus 2 UMS.",
+      updatedAt: "2026-10-16T13:00:00Z",
+    },
+    {
+      id: "hist-20261016-fadhlurrahman",
+      mosqueId: "fadhlurrahman",
+      mosqueName: "Masjid Fadhlurrahman",
+      mosqueLocation: "Kampus 1 UMS",
+      date: "Jumat, 16 Oktober 2026",
+      hijriDate: "4 Jumadilawal 1448 H",
+      khatibName: "Dr. Muh. Nur Rochim Maksum",
+      khatibTitle: "Dosen & Dai Majelis Tabligh Muhammadiyah",
+      khatibPhotoUrl: "",
+      khutbahTheme: "Karakter Generasi Berkemajuan Pembawa Risalah Pencerahan",
+      imamName: "Imam Shalat Jumat",
+      imamRole: "Imam Shalat Jumat",
+      muadzinName: "Muadzin Masjid Fadhlurrahman",
+      muadzinRole: "Muadzin Shalat Jumat",
+      time: "11:40 WIB",
+      notes: "Khutbah Jumat di Masjid Fadhlurrahman Kampus 1 UMS.",
+      updatedAt: "2026-10-16T13:00:00Z",
+    },
+  ];
 }
 
 export function getDefaultDocuments(): DownloadDocument[] {
@@ -411,6 +455,7 @@ function getInitialData(): DatabaseSchema {
     ],
     fridaySchedule: defaultSchedules[0],
     fridaySchedules: defaultSchedules,
+    fridayScheduleHistory: getDefaultFridayScheduleHistory(),
     qrisSettings: {
       id: "qris-01",
       imageUrl: "/images/qris-sudalmiyah.png",
@@ -671,6 +716,9 @@ export function ensureDbDefaults(data: DatabaseSchema): DatabaseSchema {
   if (!Array.isArray(data.campaigns)) data.campaigns = [];
   if (!Array.isArray(data.facilityBookings)) data.facilityBookings = [];
   if (!Array.isArray(data.auditLogs)) data.auditLogs = [];
+  if (!Array.isArray(data.fridayScheduleHistory) || data.fridayScheduleHistory.length === 0) {
+    data.fridayScheduleHistory = getDefaultFridayScheduleHistory();
+  }
   return data;
 }
 
