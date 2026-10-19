@@ -463,14 +463,30 @@
     }
   ],
   "popupBanner": {
-    "id": "popup-patungan-air-01",
-    "title": "Patungan Air Minum Sehat & Gratis Masjid Hj. Sudalmiyah Rais",
-    "imageUrl": "/images/popup/patungan-air-minum.jpg",
+    "id": "popup-senam-donor-01",
+    "title": "Senam Sehat & Donor Darah - GEMILAR Milad ke-25 Ma'had Abu Bakar Ash-Shiddiq UMS",
+    "imageUrl": "/images/popup/senam-sehat-donor-darah.jpg",
     "targetUrl": "",
     "isActive": true,
-    "updatedAt": "2026-10-15T13:08:05.000Z"
+    "updatedAt": "2026-10-19T11:44:50.000Z",
+    "startDate": "2026-10-19T11:44:50.000Z",
+    "expiresAt": "2026-10-23T11:44:50.000Z",
+    "durationDays": 3,
+    "linkedAgendaTitle": "GEMILAR: Senam Sehat & Donor Darah"
   },
   "popupBanners": [
+    {
+      "id": "popup-senam-donor-01",
+      "title": "Senam Sehat & Donor Darah - GEMILAR Milad ke-25 Ma'had Abu Bakar Ash-Shiddiq UMS",
+      "imageUrl": "/images/popup/senam-sehat-donor-darah.jpg",
+      "targetUrl": "",
+      "isActive": true,
+      "updatedAt": "2026-10-19T11:44:50.000Z",
+      "startDate": "2026-10-19T11:44:50.000Z",
+      "expiresAt": "2026-10-23T11:44:50.000Z",
+      "durationDays": 3,
+      "linkedAgendaTitle": "GEMILAR: Senam Sehat & Donor Darah"
+    },
     {
       "id": "popup-patungan-air-01",
       "title": "Patungan Air Minum Sehat & Gratis Masjid Hj. Sudalmiyah Rais",

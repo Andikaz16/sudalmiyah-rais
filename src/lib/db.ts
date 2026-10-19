@@ -17,7 +17,7 @@ import {
   DownloadDocument,
   ManualNewsItem,
 } from "./types";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { getFirestoreDb, isFirebaseConfigured } from "./firebase";
 
 export interface DatabaseSchema {
@@ -355,6 +355,18 @@ export function getDefaultManualNews(): ManualNewsItem[] {
 
 export function getDefaultPopupBanners(): PopupBanner[] {
   return [
+    {
+      id: "popup-senam-donor-01",
+      title: "Senam Sehat & Donor Darah - GEMILAR Milad ke-25 Ma'had Abu Bakar Ash-Shiddiq UMS",
+      imageUrl: "/images/popup/senam-sehat-donor-darah.jpg",
+      targetUrl: "",
+      isActive: true,
+      updatedAt: "2026-10-19T11:44:50.000Z",
+      startDate: "2026-10-19T11:44:50.000Z",
+      expiresAt: "2026-10-23T11:44:50.000Z",
+      durationDays: 3,
+      linkedAgendaTitle: "GEMILAR: Senam Sehat & Donor Darah",
+    },
     {
       id: "popup-patungan-air-01",
       title: "Patungan Air Minum Sehat & Gratis Masjid Hj. Sudalmiyah Rais",
@@ -834,8 +846,6 @@ export function logSecurityEvent(
   details: string
 ): void {
   try {
-    const db = getDb();
-    if (!db.auditLogs) db.auditLogs = [];
     const log: SecurityAuditLog = {
       id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       timestamp: new Date().toISOString(),
@@ -845,12 +855,50 @@ export function logSecurityEvent(
       status,
       details,
     };
-    db.auditLogs.unshift(log);
-    if (db.auditLogs.length > 200) {
-      db.auditLogs = db.auditLogs.slice(0, 200);
+
+    if (memoryDb) {
+      if (!memoryDb.auditLogs) memoryDb.auditLogs = [];
+      memoryDb.auditLogs.unshift(log);
+      if (memoryDb.auditLogs.length > 200) {
+        memoryDb.auditLogs = memoryDb.auditLogs.slice(0, 200);
+      }
     }
-    saveDb(db).catch(() => {});
+
+    try {
+      const targetFile = getDbFilePath();
+      if (fs.existsSync(targetFile)) {
+        const raw = fs.readFileSync(targetFile, "utf-8");
+        const parsed = JSON.parse(raw);
+        if (!parsed.auditLogs) parsed.auditLogs = [];
+        parsed.auditLogs.unshift(log);
+        if (parsed.auditLogs.length > 200) parsed.auditLogs = parsed.auditLogs.slice(0, 200);
+        fs.writeFileSync(targetFile, JSON.stringify(parsed, null, 2), "utf-8");
+      }
+    } catch {
+      // ignore local write errors
+    }
+
+    if (isFirebaseConfigured()) {
+      const firestore = getFirestoreDb();
+      if (firestore) {
+        const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
+        getDoc(docRef)
+          .then((snap) => {
+            if (snap.exists()) {
+              const currentData = snap.data();
+              const existingLogs: SecurityAuditLog[] = Array.isArray(currentData.auditLogs)
+                ? currentData.auditLogs
+                : [];
+              existingLogs.unshift(log);
+              const trimmed = existingLogs.slice(0, 200);
+              updateDoc(docRef, { auditLogs: trimmed }).catch(() => {});
+            }
+          })
+          .catch(() => {});
+      }
+    }
   } catch (err) {
     console.warn("Security event logging error ignored:", err);
   }
 }
+
