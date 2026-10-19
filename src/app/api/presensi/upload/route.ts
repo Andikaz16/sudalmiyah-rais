@@ -4,6 +4,7 @@ import fs from "fs";
 import { checkRateLimit } from "@/lib/security";
 
 import { isFirebaseConfigured, uploadMediaToFirebase } from "@/lib/firebase";
+import { isImgbbConfigured, uploadImageToImgBB } from "@/lib/imgbb";
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
@@ -52,7 +53,22 @@ export async function POST(request: NextRequest) {
     const ext = path.extname(file.name).toLowerCase() || ".jpg";
     const safeFilename = `presensi_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext}`;
 
-    // 1. Priority 1: Firebase Cloud Firestore media store
+    // 1. Priority 1: ImgBB Cloud Hosting
+    if (isImgbbConfigured()) {
+      try {
+        const publicUrl = await uploadImageToImgBB(buffer, safeFilename, file.type);
+        return NextResponse.json({
+          success: true,
+          url: publicUrl,
+          filename: safeFilename,
+          size: file.size,
+        });
+      } catch (imgbbErr) {
+        console.warn("Notice: Presensi ImgBB upload fallback:", imgbbErr);
+      }
+    }
+
+    // 2. Priority 2: Firebase Cloud Firestore media store
     if (isFirebaseConfigured()) {
       try {
         const publicUrl = await uploadMediaToFirebase(safeFilename, buffer, file.type, "presensi");

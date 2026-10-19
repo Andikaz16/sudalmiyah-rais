@@ -153,7 +153,7 @@ export default function AdminDashboardPage() {
 
   const [agendas, setAgendas] = useState<Agenda[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [systemStatus, setSystemStatus] = useState<{ firebaseConfigured: boolean; blobConfigured: boolean } | null>(null);
+  const [systemStatus, setSystemStatus] = useState<{ firebaseConfigured: boolean; imgbbConfigured?: boolean; blobConfigured?: boolean } | null>(null);
   const [showFirebaseModal, setShowFirebaseModal] = useState(false);
   const [copiedEnv, setCopiedEnv] = useState(false);
   const [publishToast, setPublishToast] = useState<{
@@ -1699,6 +1699,17 @@ export default function AdminDashboardPage() {
                 <span className="hidden md:inline">Database:</span>
                 <span className="font-semibold text-amber-200 underline decoration-dotted">Setup Firebase (Gratis)</span>
               </button>
+            )}
+
+            {systemStatus?.imgbbConfigured && (
+              <div
+                className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/40 text-sky-300"
+                title="Hosting gambar aktif via ImgBB API CDN"
+              >
+                <span className="w-2 h-2 rounded-full bg-sky-400"></span>
+                <span className="hidden lg:inline">Media:</span>
+                <span className="font-semibold text-sky-200">ImgBB Cloud</span>
+              </div>
             )}
 
             <Link

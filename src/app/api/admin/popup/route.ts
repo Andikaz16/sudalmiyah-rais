@@ -5,6 +5,7 @@ import { getDbAsync, saveDb, logSecurityEvent, DatabaseSchema } from "@/lib/db";
 import { verifySessionToken } from "@/lib/security";
 import { PopupBanner } from "@/lib/types";
 import { uploadMediaToFirebase, deleteMediaFromFirebase, isFirebaseConfigured } from "@/lib/firebase";
+import { isImgbbConfigured, uploadImageToImgBB } from "@/lib/imgbb";
 
 function getPopupsList(db: DatabaseSchema): PopupBanner[] {
   if (Array.isArray(db.popupBanners) && db.popupBanners.length > 0) {
@@ -148,11 +149,19 @@ export async function POST(request: NextRequest) {
     }
 
     let finalImageUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+    const ext = path.extname(file.name).toLowerCase() || ".jpg";
+    const safeFilename = `popup_${Date.now()}${ext}`;
 
-    if (isFirebaseConfigured()) {
+    if (isImgbbConfigured()) {
       try {
-        const ext = path.extname(file.name).toLowerCase() || ".jpg";
-        const safeFilename = `popup_${Date.now()}${ext}`;
+        finalImageUrl = await uploadImageToImgBB(buffer, safeFilename, file.type);
+      } catch (imgbbErr) {
+        console.warn("Notice: ImgBB popup upload failed, falling back to Firebase:", imgbbErr);
+      }
+    }
+
+    if (finalImageUrl.startsWith("data:") && isFirebaseConfigured()) {
+      try {
         finalImageUrl = await uploadMediaToFirebase(safeFilename, buffer, file.type, "popup");
       } catch (fbErr) {
         console.warn("Notice: Firebase media upload fallback to Data URI:", fbErr);

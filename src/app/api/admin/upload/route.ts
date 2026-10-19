@@ -4,6 +4,7 @@ import fs from "fs";
 import { verifySessionToken } from "@/lib/security";
 import { logSecurityEvent } from "@/lib/db";
 import { isFirebaseConfigured, uploadMediaToFirebase } from "@/lib/firebase";
+import { isImgbbConfigured, uploadImageToImgBB } from "@/lib/imgbb";
 
 export async function POST(request: NextRequest) {
   // Verify session
@@ -69,8 +70,17 @@ export async function POST(request: NextRequest) {
 
     let publicUrl = "";
 
-    // 1. Priority 1: Firebase Cloud Firestore media store
-    if (isFirebaseConfigured()) {
+    // 1. Priority 1: ImgBB Cloud Hosting (returns permanent CDN URL, keeps Firestore 100% lightweight)
+    if (file.type.startsWith("image/") && isImgbbConfigured()) {
+      try {
+        publicUrl = await uploadImageToImgBB(buffer, safeFilename, file.type);
+      } catch (imgbbErr) {
+        console.warn("Notice: ImgBB upload failed, falling back to Firebase:", imgbbErr);
+      }
+    }
+
+    // 2. Priority 2: Firebase Cloud Firestore media store
+    if (!publicUrl && isFirebaseConfigured()) {
       try {
         publicUrl = await uploadMediaToFirebase(safeFilename, buffer, file.type, folder);
       } catch (fbErr) {
