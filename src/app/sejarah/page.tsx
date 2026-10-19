@@ -163,9 +163,9 @@ export default function SejarahPage() {
       facilities: [
         "Ruang Shalat 2 Lantai",
         "Lapangan Luas",
-        "Pesmart",
+        "Pesma Mart",
         "Guesthouse",
-        "Asrama",
+        "Asrama Putra & Putri",
         "Parkir Luas",
       ],
       philosophicalMeaning:
@@ -199,7 +199,13 @@ export default function SejarahPage() {
       historicalContext:
         "Hadir di lingkungan Fakultas Kedokteran Gigi dan Rumah Sakit Gigi dan Mulut (RSGM) UMS. Masjid ini dibangun sebagai sarana pembentukan etika dan spiritualitas dokter gigi muslim yang berjiwa pengabdi. Suasana hening dan bersih mendukung para calon dokter untuk merefleksikan sumpah profesi dan nilai-nilai kemanusiaan dalam bingkai ibadah lillahi ta'ala.",
       keyFigures: "Abu Bakar Muhammad bin Zakariya al-Razi (865–925 M)",
-      facilities: ["Ruang Ibadah Bersih", "Parkir", "Satpam"],
+      facilities: [
+        "Gedung",
+        "Ruang Seminar",
+        "Kelas",
+        "Tempat Ibadah Bersih",
+        "Parkiran",
+      ],
       philosophicalMeaning:
         "Terinspirasi dari Al-Razi, ilmuwan polimatik dan pelopor kedokteran klinis Islam yang meletakkan dasar farmakologi, etika medis, dan penanganan pasien tanpa diskriminasi.",
     },
@@ -215,7 +221,10 @@ export default function SejarahPage() {
       historicalContext:
         "Pondok Shabran didirikan atas wasiat dan wakaf keluarga H. Ahmad Dahlan dan H. Nuriyah Shabran untuk mencetak kader ulama tarjih Muhammadiyah. Masjid Al-Munajat Pondok Shabran menjadi pusat peribadatan malam, qiyamul lail berjamaah, munajat, serta gemblengan ideologis kader-kader utusan Pimpinan Wilayah Muhammadiyah (PWM) dari 38 provinsi di Indonesia yang kelak diterjunkan berdakwah ke pelosok nusantara.",
       keyFigures: "Keluarga Pewakaf Hj. Nuriyah Shabran & Pimpinan PP Muhammadiyah",
-      facilities: ["Gedung Lantai 4", "Asrama Kader Putra & Putri"],
+      facilities: [
+        "Dukuh: Asrama Putra & Putri",
+        "Saripan: Gedung 4 Lantai, Halaman/Tempat Parkir Luas, Shobron Bakery",
+      ],
       philosophicalMeaning:
         "Kata 'Munajat' menyimbolkan doa tulus dan permohonan tiada putus kepada Allah SWT agar setiap kader senantiasa diberi keistiqamahan dalam memikul risalah dakwah Islam berkemajuan.",
     },
