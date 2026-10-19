@@ -5,17 +5,17 @@ import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { Agenda, AgendaCategory } from "@/lib/types";
 
 const createAgendaSchema = z.object({
-  title: z.string().min(5).max(150),
+  title: z.string().min(3, "Judul agenda minimal 3 karakter").max(250, "Judul agenda maksimal 250 karakter"),
   category: z.enum(["SHALAT_JUMAT", "KAJIAN_MAHASISWA", "TABLIGH_AKBAR", "TAHSIN", "SOSIAL"]),
-  speaker: z.string().min(3).max(100),
-  speakerRole: z.string().min(3).max(100),
-  date: z.string().min(10).max(10),
-  time: z.string().min(5).max(50),
-  location: z.string().min(5).max(100),
-  description: z.string().min(10).max(1000),
-  quota: z.number().int().positive().max(5000),
+  speaker: z.string().min(2, "Nama pemateri / penyelenggara minimal 2 karakter").max(200),
+  speakerRole: z.string().min(2, "Jabatan / lembaga minimal 2 karakter").max(200),
+  date: z.string().min(8, "Format tanggal tidak valid").max(20),
+  time: z.string().min(2, "Format waktu minimal 2 karakter").max(100),
+  location: z.string().min(3, "Lokasi ruang minimal 3 karakter").max(300, "Lokasi ruang maksimal 300 karakter"),
+  description: z.string().min(3, "Deskripsi kegiatan minimal 3 karakter").max(5000, "Deskripsi kegiatan maksimal 5.000 karakter"),
+  quota: z.number().int().positive().max(50000),
   requiresRegistration: z.boolean(),
-  targetAudience: z.string().max(250).optional(),
+  targetAudience: z.string().max(300).optional(),
   bannerUrl: z.string().optional(),
 });
 
@@ -71,8 +71,11 @@ export async function POST(request: NextRequest) {
     const parseResult = createAgendaSchema.safeParse(body);
 
     if (!parseResult.success) {
+      const fieldErrors = parseResult.error.flatten().fieldErrors;
+      const firstEntry = Object.entries(fieldErrors)[0];
+      const detailMsg = firstEntry ? `${firstEntry[0]}: ${firstEntry[1]?.join(", ")}` : "Format data tidak sesuai";
       return NextResponse.json(
-        { error: "Data masukan tidak valid", details: parseResult.error.flatten().fieldErrors },
+        { error: `Data masukan tidak valid (${detailMsg})`, details: fieldErrors },
         { status: 400 }
       );
     }

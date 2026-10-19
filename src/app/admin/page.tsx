@@ -879,7 +879,18 @@ export default function AdminDashboardPage() {
         body: JSON.stringify(newAgenda),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Gagal membuat agenda.");
+      if (!res.ok) {
+        let errorMsg = data.error || "Gagal membuat agenda.";
+        if (data.details && typeof data.details === "object") {
+          const detailLines = Object.entries(data.details)
+            .map(([field, msgs]) => `${field}: ${(msgs as string[]).join(", ")}`)
+            .join("\n");
+          if (detailLines) {
+            errorMsg = `${errorMsg}\n\nDetail:\n${detailLines}`;
+          }
+        }
+        throw new Error(errorMsg);
+      }
       setIsNewAgendaOpen(false);
       await loadData();
       triggerPublishNotification(
