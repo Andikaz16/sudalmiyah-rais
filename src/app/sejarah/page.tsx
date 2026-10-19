@@ -71,7 +71,7 @@ export default function SejarahPage() {
       fileName: "198-Masjid Hj. Sudalmiyah Rais UMS-SK Takmir Masjid Percontohan.pdf",
       category: "Surat Keputusan Resmi LPCR-PM PP Muhammadiyah",
       description:
-        "Surat Keputusan penetapan resmi susunan Dewan Penasihat, Badan Pembina Masjid (BPM), dan Badan Pelaksana Harian Masjid (BPHM) Masjid Hj. Sudalmiyah Rais UMS sebagai Masjid Percontohan Nasional Muhammadiyah tingkat PTMA.",
+        "Surat Keputusan penetapan resmi susunan Dewan Penasihat, Badan Pembina Masjid (BPM), dan Badan Pelaksana Harian (Eksekutif) Masjid Hj. Sudalmiyah Rais UMS sebagai Masjid Percontohan Amal Usaha Muhammadiyah (AUM) tingkat PTMA.",
       structure: {
         penasihat: {
           ketua: "Drs. KH. Marpuji Ali, M.Si",
@@ -109,14 +109,14 @@ export default function SejarahPage() {
     },
     {
       id: "sk-penetapan-aum",
-      title: "Penetapan Masjid Percontohan Nasional Muhammadiyah Tingkat PTMA",
+      title: "Penetapan Masjid Percontohan Amal Usaha Muhammadiyah (AUM) Tingkat PTMA",
       docNumber: "SK LPCR-PM PP Muhammadiyah No. 022/I.15/B/2026",
       issuer: "LPCR-PM Pimpinan Pusat Muhammadiyah",
       date: "1448 H / 2026 M",
       fileName: "sk-takmir-masjid-percontohan.pdf",
-      category: "Standarisasi & Rekomendasi Nasional",
+      category: "Standarisasi & Rekomendasi AUM",
       description:
-        "Landasan pengukuhan Masjid Hj. Sudalmiyah Rais UMS sebagai model percontohan nasional dalam tata kelola Idarah (manajerial modern), Imarah (kemakmuran ibadah & dakwah AIK), dan Ri'ayah (Eco-Mosque inklusif ramah difabel).",
+        "Landasan pengukuhan Masjid Hj. Sudalmiyah Rais UMS sebagai model percontohan Amal Usaha Muhammadiyah (AUM) dalam tata kelola Idarah (manajerial modern), Imarah (kemakmuran ibadah & dakwah AIK), dan Ri'ayah (Eco-Mosque inklusif ramah difabel).",
     },
     {
       id: "pedoman-sop",
@@ -380,14 +380,14 @@ export default function SejarahPage() {
 
                   <div className="pt-2">
                     <h3 className="font-serif font-bold text-stone-900 text-lg sm:text-xl text-[#003B73]">
-                      Mandat Resmi Masjid Percontohan Nasional LPCR-PM
+                      Mandat Resmi Masjid Percontohan Amal Usaha Muhammadiyah (AUM)
                     </h3>
                     <p className="mt-2">
                       Melalui <strong>Surat Keputusan LPCR-PM Pimpinan Pusat Muhammadiyah No. 198/KEP/I.15/A/2026</strong>, 
-                      Masjid Hj. Sudalmiyah Rais ditetapkan secara resmi sebagai <strong>Masjid Percontohan Nasional Muhammadiyah</strong>. 
+                      Masjid Hj. Sudalmiyah Rais ditetapkan secara resmi sebagai <strong>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</strong>. 
                       Tata kelola masjid dijalankan secara profesional dengan pembagian kepengurusan yang mencakup Dewan Penasihat, 
-                      Badan Pembina Masjid (BPM) yang dipimpin oleh Dr. Muchamad Iksan, S.H., M.H, serta Badan Pelaksana Harian 
-                      Masjid (BPHM) yang dipimpin oleh <strong>Dodi Afianto, S.Ag., M.Pd.I</strong> selaku Direktur.
+                      Badan Pembina Masjid (BPM) yang dipimpin oleh <strong>Dr. Muchamad Iksan, S.H., M.H</strong>, serta Badan Pelaksana 
+                      Harian (Eksekutif) Masjid yang dipimpin oleh <strong>Dodi Afianto, S.Ag., M.Pd.I</strong> selaku Direktur.
                     </p>
                   </div>
 
@@ -469,23 +469,23 @@ export default function SejarahPage() {
 
                     <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
                       Dokumen hukum formal dari Pimpinan Pusat Muhammadiyah yang menetapkan struktur kepengurusan Takmir 
-                      Masjid Hj. Sudalmiyah Rais Universitas Muhammadiyah Surakarta sebagai <strong>Masjid Percontohan Nasional</strong>. 
+                      Masjid Hj. Sudalmiyah Rais Universitas Muhammadiyah Surakarta sebagai <strong>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</strong>. 
                       Ditandatangani oleh Ketua LPCR-PM H. M. Jamaludin Ahmad, S.Psi dan Sekretaris Isngadi Marwah Atmadja, M.H., 
                       serta diketahui oleh Ketua PP Muhammadiyah Drs. H. A. Dahlan Rais, M.Hum.
                     </p>
 
                     <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-stone-700">
                       <div className="flex items-center gap-1.5">
-                        <Award className="w-4 h-4 text-emerald-700" />
+                        <Award className="w-4 h-4 text-emerald-700 shrink-0" />
                         <span>Ketua Penasihat: <strong>Drs. KH. Marpuji Ali, M.Si</strong></span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Users className="w-4 h-4 text-[#B58A1E]" />
-                        <span>Ketua BPM: <strong>Dr. Muchamad Iksan, S.H., M.H</strong></span>
+                        <Users className="w-4 h-4 text-[#B58A1E] shrink-0" />
+                        <span>Ketua Badan Pembina Masjid (BPM): <strong>Dr. Muchamad Iksan, S.H., M.H</strong></span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <UserCheck className="w-4 h-4 text-[#003B73]" />
-                        <span>Direktur BPHM: <strong>Dodi Afianto, S.Ag., M.Pd.I</strong></span>
+                        <UserCheck className="w-4 h-4 text-[#003B73] shrink-0" />
+                        <span>Direktur Badan Pelaksana Harian (Eksekutif) Masjid: <strong>Dodi Afianto, S.Ag., M.Pd.I</strong></span>
                       </div>
                     </div>
                   </div>
@@ -726,9 +726,9 @@ export default function SejarahPage() {
                     </div>
                   </div>
 
-                  {/* Badan Pembina (BPM) (Kotak Kuning/Amber - di Tengah) */}
+                  {/* Badan Pembina Masjid (BPM) (Kotak Kuning/Amber - di Tengah) */}
                   <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 flex flex-col">
-                    <strong className="text-amber-900 block mb-1">Badan Pembina (BPM)</strong>
+                    <strong className="text-amber-900 block mb-1">Badan Pembina Masjid (BPM)</strong>
                     <div className="font-semibold text-stone-800">
                       Ketua: {selectedDoc.structure.bpm.ketua}
                     </div>
@@ -738,9 +738,9 @@ export default function SejarahPage() {
                     </div>
                   </div>
 
-                  {/* Badan Pelaksana (BPHM) (Kotak Biru - di Kanan / Ketiga) */}
+                  {/* Badan Pelaksana Harian (Eksekutif) Masjid (Kotak Biru - di Kanan / Ketiga) */}
                   <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200 flex flex-col">
-                    <strong className="text-[#003B73] block mb-1">Badan Pelaksana (BPHM)</strong>
+                    <strong className="text-[#003B73] block mb-1">Badan Pelaksana Harian (Eksekutif) Masjid</strong>
                     <div className="font-semibold text-stone-800">
                       Direktur: {selectedDoc.structure.bphm.direktur}
                     </div>
