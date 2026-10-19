@@ -13,7 +13,10 @@ const createAgendaSchema = z.object({
   time: z.string().min(2, "Format waktu minimal 2 karakter").max(100),
   location: z.string().min(3, "Lokasi ruang minimal 3 karakter").max(300, "Lokasi ruang maksimal 300 karakter"),
   description: z.string().min(3, "Deskripsi kegiatan minimal 3 karakter").max(5000, "Deskripsi kegiatan maksimal 5.000 karakter"),
-  quota: z.number().int().positive().max(50000),
+  quota: z.preprocess((val) => {
+    const num = Number(val);
+    return isNaN(num) || num <= 0 ? 1000 : num;
+  }, z.number().int().positive().max(100000)),
   requiresRegistration: z.boolean(),
   targetAudience: z.string().max(300).optional(),
   bannerUrl: z.string().optional(),

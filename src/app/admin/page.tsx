@@ -873,10 +873,14 @@ export default function AdminDashboardPage() {
     setSavingAgenda(true);
     setIsPublishingProcessing("Menyimpan agenda baru & memublikasikan ke publik");
     try {
+      const payload = {
+        ...newAgenda,
+        quota: !newAgenda.quota || Number(newAgenda.quota) <= 0 ? 1000 : Number(newAgenda.quota),
+      };
       const res = await fetch("/api/agendas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newAgenda),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -4313,9 +4317,14 @@ export default function AdminDashboardPage() {
                   </label>
                   <input
                     type="number"
+                    min={1}
                     required
-                    value={newAgenda.quota}
-                    onChange={(e) => setNewAgenda({ ...newAgenda, quota: Number(e.target.value) })}
+                    placeholder="Contoh: 1000"
+                    value={newAgenda.quota === 0 ? "" : newAgenda.quota}
+                    onChange={(e) => {
+                      const val = e.target.value === "" ? 0 : Number(e.target.value);
+                      setNewAgenda({ ...newAgenda, quota: val });
+                    }}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
                   />
                   <p className="text-[10px] text-stone-400 mt-0.5">
