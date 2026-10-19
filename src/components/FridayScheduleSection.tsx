@@ -541,7 +541,7 @@ export default function FridayScheduleSection() {
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-700 text-white shadow-2xs">
-                          Info Infaq Shalat Jumat
+                          Informasi Infaq Shalat Jumat
                         </span>
                         {activeSchedule.infaqPeriod ? (
                           <span className="text-xs font-semibold text-stone-600">

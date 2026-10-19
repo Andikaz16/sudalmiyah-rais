@@ -2395,7 +2395,7 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center gap-2">
                       <Coins className="w-4 h-4 text-emerald-700" />
                       <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
-                        Info Hasil Perolehan Infaq Shalat Jumat
+                        Informasi Hasil Perolehan Infaq Shalat Jumat
                       </span>
                     </div>
                     <span className="text-[11px] text-emerald-700 font-semibold">
