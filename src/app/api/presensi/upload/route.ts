@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import { checkRateLimit } from "@/lib/security";
 
-import { isBlobConfigured, uploadFileToBlob } from "@/lib/blobStorage";
+import { isFirebaseConfigured, uploadMediaToFirebase } from "@/lib/firebase";
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
@@ -52,18 +52,18 @@ export async function POST(request: NextRequest) {
     const ext = path.extname(file.name).toLowerCase() || ".jpg";
     const safeFilename = `presensi_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext}`;
 
-    // 1. Priority 1: Vercel Blob CDN (if configured)
-    if (isBlobConfigured()) {
+    // 1. Priority 1: Firebase Cloud Firestore media store
+    if (isFirebaseConfigured()) {
       try {
-        const publicUrl = await uploadFileToBlob(safeFilename, buffer, file.type, "presensi");
+        const publicUrl = await uploadMediaToFirebase(safeFilename, buffer, file.type, "presensi");
         return NextResponse.json({
           success: true,
           url: publicUrl,
           filename: safeFilename,
           size: file.size,
         });
-      } catch (blobErr) {
-        console.warn("Notice: Presensi Blob upload fallback:", blobErr);
+      } catch (fbErr) {
+        console.warn("Notice: Presensi Firebase upload fallback:", fbErr);
       }
     }
 

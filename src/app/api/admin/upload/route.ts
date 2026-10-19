@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import { verifySessionToken } from "@/lib/security";
 import { logSecurityEvent } from "@/lib/db";
-import { isBlobConfigured, uploadFileToBlob } from "@/lib/blobStorage";
+import { isFirebaseConfigured, uploadMediaToFirebase } from "@/lib/firebase";
 
 export async function POST(request: NextRequest) {
   // Verify session
@@ -69,12 +69,12 @@ export async function POST(request: NextRequest) {
 
     let publicUrl = "";
 
-    // 1. Priority 1: Vercel Blob CDN (if configured via BLOB_READ_WRITE_TOKEN)
-    if (isBlobConfigured()) {
+    // 1. Priority 1: Firebase Cloud Firestore media store
+    if (isFirebaseConfigured()) {
       try {
-        publicUrl = await uploadFileToBlob(safeFilename, buffer, file.type, folder);
-      } catch (blobErr) {
-        console.warn("Notice: Vercel Blob upload failed, falling back:", blobErr);
+        publicUrl = await uploadMediaToFirebase(safeFilename, buffer, file.type, folder);
+      } catch (fbErr) {
+        console.warn("Notice: Firebase media upload failed, falling back:", fbErr);
       }
     }
 

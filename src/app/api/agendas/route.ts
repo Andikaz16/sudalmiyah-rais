@@ -3,7 +3,6 @@ import { z } from "zod";
 import { getDb, getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { Agenda, AgendaCategory } from "@/lib/types";
-import { isBlobConfigured, readAgendasFromBlob, saveAgendasToBlob } from "@/lib/blobStorage";
 
 const createAgendaSchema = z.object({
   title: z.string().min(5).max(150),

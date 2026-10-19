@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY || "",
@@ -34,5 +34,83 @@ export function getFirestoreDb() {
   } catch (err) {
     console.error("Firebase Firestore initialization error:", err);
     return null;
+  }
+}
+
+/**
+ * Uploads media file to Firebase Firestore media_store collection.
+ * Returns public URL /api/media/<id>.
+ */
+export async function uploadMediaToFirebase(
+  filename: string,
+  buffer: Buffer,
+  contentType: string,
+  folder: string = "general"
+): Promise<string> {
+  const db = getFirestoreDb();
+  if (!db) {
+    throw new Error("Firebase Firestore is not configured.");
+  }
+
+  const id = `med-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 7)}`;
+  const docRef = doc(db, "media_store", id);
+
+  await setDoc(docRef, {
+    id,
+    filename,
+    folder,
+    contentType,
+    base64: buffer.toString("base64"),
+    size: buffer.length,
+    createdAt: new Date().toISOString(),
+  });
+
+  return `/api/media/${id}`;
+}
+
+/**
+ * Retrieves media file from Firebase Firestore media_store collection.
+ */
+export async function getMediaFromFirebase(
+  id: string
+): Promise<{ data: Buffer; contentType: string; filename: string } | null> {
+  const db = getFirestoreDb();
+  if (!db) return null;
+
+  try {
+    const docRef = doc(db, "media_store", id);
+    const snap = await getDoc(docRef);
+    if (!snap.exists()) return null;
+
+    const data = snap.data();
+    if (!data || !data.base64) return null;
+
+    return {
+      data: Buffer.from(data.base64, "base64"),
+      contentType: data.contentType || "image/jpeg",
+      filename: data.filename || "file",
+    };
+  } catch (err) {
+    console.error("Error retrieving media from Firebase:", err);
+    return null;
+  }
+}
+
+/**
+ * Deletes media file from Firebase Firestore media_store collection.
+ */
+export async function deleteMediaFromFirebase(idOrUrl: string): Promise<void> {
+  const db = getFirestoreDb();
+  if (!db) return;
+
+  try {
+    const id = idOrUrl.startsWith("/api/media/")
+      ? idOrUrl.replace("/api/media/", "").trim()
+      : idOrUrl.trim();
+    if (!id) return;
+    const docRef = doc(db, "media_store", id);
+    await deleteDoc(docRef);
+  } catch (err) {
+    console.warn("Notice: Failed to delete media doc from Firebase:", err);
   }
 }

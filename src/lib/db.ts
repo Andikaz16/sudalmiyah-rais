@@ -19,14 +19,6 @@ import {
 } from "./types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getFirestoreDb, isFirebaseConfigured } from "./firebase";
-import {
-  isBlobConfigured,
-  saveManualNewsToBlob,
-  readManualNewsFromBlob,
-  readAgendasFromBlob,
-  saveAgendasToBlob,
-  cleanDummyAgendaData,
-} from "./blobStorage";
 
 export interface DatabaseSchema {
   users: User[];
@@ -730,8 +722,6 @@ export function getDb(): DatabaseSchema {
 }
 
 export async function getDbAsync(): Promise<DatabaseSchema> {
-  let db: DatabaseSchema | null = null;
-
   if (isFirebaseConfigured()) {
     try {
       const firestore = getFirestoreDb();
@@ -739,12 +729,15 @@ export async function getDbAsync(): Promise<DatabaseSchema> {
         const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
         const snap = await getDoc(docRef);
         if (snap.exists()) {
-          db = ensureDbDefaults(snap.data() as DatabaseSchema);
+          const cloudData = ensureDbDefaults(snap.data() as DatabaseSchema);
+          memoryDb = cloudData;
+          return cloudData;
         } else {
           // First time initialization: seed Firestore with current local data
           const local = getDb();
           await setDoc(docRef, JSON.parse(JSON.stringify(local)));
-          db = local;
+          memoryDb = local;
+          return local;
         }
       }
     } catch (err) {
@@ -752,27 +745,7 @@ export async function getDbAsync(): Promise<DatabaseSchema> {
     }
   }
 
-  if (!db) {
-    db = getDb();
-  }
-
-  if (isBlobConfigured()) {
-    try {
-      const [blobNews, blobAgendas] = await Promise.all([
-        readManualNewsFromBlob(),
-        readAgendasFromBlob(),
-      ]);
-      if (blobNews && Array.isArray(blobNews) && blobNews.length > 0) {
-        db.manualNews = blobNews;
-      }
-      if (blobAgendas && Array.isArray(blobAgendas) && blobAgendas.length > 0) {
-        db.agendas = blobAgendas;
-      }
-    } catch (blobErr) {
-      console.warn("Notice: Blob sync notice:", blobErr);
-    }
-  }
-
+  const db = getDb();
   memoryDb = db;
   return db;
 }
@@ -800,22 +773,6 @@ export async function saveDb(data: DatabaseSchema): Promise<void> {
       }
     } catch (err) {
       console.error("Notice: Firestore write error:", err);
-    }
-  }
-
-  // Persist manual news & agendas to Vercel Blob if configured
-  if (isBlobConfigured()) {
-    try {
-      const blobPromises: Promise<any>[] = [];
-      if (data.manualNews) {
-        blobPromises.push(saveManualNewsToBlob(data.manualNews));
-      }
-      if (data.agendas) {
-        blobPromises.push(saveAgendasToBlob(data.agendas));
-      }
-      await Promise.allSettled(blobPromises);
-    } catch (blobErr) {
-      console.warn("Notice: Blob sync error in saveDb:", blobErr);
     }
   }
 }

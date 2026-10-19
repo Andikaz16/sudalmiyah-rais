@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import path from "path";
 import fs from "fs";
-import { getDb, getDbAsync, saveDb, logSecurityEvent, DatabaseSchema } from "@/lib/db";
+import { getDbAsync, saveDb, logSecurityEvent, DatabaseSchema } from "@/lib/db";
 import { verifySessionToken } from "@/lib/security";
 import { PopupBanner } from "@/lib/types";
-import {
-  isBlobConfigured,
-  uploadImageToBlob,
-  savePopupsToBlob,
-  readPopupsFromBlob,
-  deleteBlobByUrl,
-} from "@/lib/blobStorage";
+import { uploadMediaToFirebase, deleteMediaFromFirebase, isFirebaseConfigured } from "@/lib/firebase";
 
 function getPopupsList(db: DatabaseSchema): PopupBanner[] {
   if (Array.isArray(db.popupBanners) && db.popupBanners.length > 0) {
@@ -35,22 +29,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
   }
 
-  let popups: PopupBanner[] = [];
-  if (isBlobConfigured()) {
-    try {
-      const blobList = await readPopupsFromBlob();
-      if (Array.isArray(blobList) && blobList.length > 0) {
-        popups = blobList;
-      }
-    } catch (err) {
-      console.warn("Notice: Vercel Blob read error in admin GET:", err);
-    }
-  }
-
-  if (popups.length === 0) {
-    const db = await getDbAsync();
-    popups = getPopupsList(db);
-  }
+  const db = await getDbAsync();
+  let popups = getPopupsList(db);
 
   // Ensure no legacy automatic /donasi persists unless explicitly re-entered
   let hasLegacyDonasi = false;
@@ -63,13 +43,9 @@ export async function GET(request: NextRequest) {
   });
 
   if (hasLegacyDonasi) {
-    const db = await getDbAsync();
     db.popupBanners = popups;
     db.popupBanner = popups[0] || null;
     await saveDb(db);
-    if (isBlobConfigured()) {
-      await savePopupsToBlob(popups);
-    }
   }
 
   return NextResponse.json(
@@ -105,9 +81,6 @@ export async function POST(request: NextRequest) {
         db.popupBanners = body.popups;
         db.popupBanner = body.popups[0] || null;
         await saveDb(db);
-        if (isBlobConfigured()) {
-          await savePopupsToBlob(body.popups);
-        }
         return NextResponse.json({
           success: true,
           message: "Pop-up banner berhasil disinkronkan.",
@@ -176,37 +149,18 @@ export async function POST(request: NextRequest) {
 
     let finalImageUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
 
-    if (isBlobConfigured()) {
+    if (isFirebaseConfigured()) {
       try {
         const ext = path.extname(file.name).toLowerCase() || ".jpg";
         const safeFilename = `popup_${Date.now()}${ext}`;
-        finalImageUrl = await uploadImageToBlob(safeFilename, buffer, file.type);
-      } catch (blobErr) {
-        console.warn("Notice: Vercel Blob upload failed, fallback to Data URI:", blobErr);
+        finalImageUrl = await uploadMediaToFirebase(safeFilename, buffer, file.type, "popup");
+      } catch (fbErr) {
+        console.warn("Notice: Firebase media upload fallback to Data URI:", fbErr);
       }
     }
 
     const db = await getDbAsync();
-    const localList = getPopupsList(db);
-    let existingList: PopupBanner[] = [];
-    if (isBlobConfigured()) {
-      try {
-        const blobList = await readPopupsFromBlob();
-        if (Array.isArray(blobList) && blobList.length > 0) {
-          existingList = blobList;
-        }
-      } catch {}
-    }
-    if (existingList.length === 0) {
-      existingList = localList;
-    } else if (localList.length > 0) {
-      const existingIds = new Set(existingList.map((p) => p.id));
-      for (const item of localList) {
-        if (!existingIds.has(item.id)) {
-          existingList.push(item);
-        }
-      }
-    }
+    const existingList = getPopupsList(db);
 
     const popupRecord: PopupBanner = {
       id: replaceId || `popup-${Date.now().toString(36)}`,
@@ -247,10 +201,6 @@ export async function POST(request: NextRequest) {
     db.popupBanner = updatedList[0] || null;
     await saveDb(db);
 
-    if (isBlobConfigured()) {
-      await savePopupsToBlob(updatedList);
-    }
-
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
       "POPUP_BANNER_UPDATE",
@@ -289,28 +239,7 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const db = await getDbAsync();
-    const localList = getPopupsList(db);
-    let list: PopupBanner[] = [];
-
-    if (isBlobConfigured()) {
-      try {
-        const blobList = await readPopupsFromBlob();
-        if (Array.isArray(blobList) && blobList.length > 0) {
-          list = blobList;
-        }
-      } catch {}
-    }
-
-    if (list.length === 0) {
-      list = localList;
-    } else if (localList.length > 0) {
-      const existingIds = new Set(list.map((p) => p.id));
-      for (const item of localList) {
-        if (!existingIds.has(item.id)) {
-          list.push(item);
-        }
-      }
-    }
+    let list = getPopupsList(db);
 
     if (list.length === 0 && !body.imageUrl) {
       return NextResponse.json({ error: "Belum ada pop-up banner yang tersimpan." }, { status: 404 });
@@ -367,10 +296,6 @@ export async function PATCH(request: NextRequest) {
     db.popupBanner = updatedList[0] || null;
     await saveDb(db);
 
-    if (isBlobConfigured()) {
-      await savePopupsToBlob(updatedList);
-    }
-
     const updatedItem = updatedList.find((p) => p.id === targetId) || updatedList[0];
 
     return NextResponse.json({
@@ -402,18 +327,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const db = await getDbAsync();
     const idParam = request.nextUrl.searchParams.get("id")?.trim();
-    let list: PopupBanner[] = [];
-    if (isBlobConfigured()) {
-      try {
-        const blobList = await readPopupsFromBlob();
-        if (Array.isArray(blobList) && blobList.length > 0) {
-          list = blobList;
-        }
-      } catch {}
-    }
-    if (list.length === 0) {
-      list = getPopupsList(db);
-    }
+    const list = getPopupsList(db);
 
     const removedItem = idParam ? list.find((p) => p.id === idParam) : null;
     const updatedList = idParam ? list.filter((p) => p.id !== idParam) : [];
@@ -422,11 +336,8 @@ export async function DELETE(request: NextRequest) {
     db.popupBanner = updatedList[0] || null;
     await saveDb(db);
 
-    if (isBlobConfigured()) {
-      await savePopupsToBlob(updatedList);
-      if (removedItem?.imageUrl && removedItem.imageUrl.includes("blob.vercel-storage.com")) {
-        deleteBlobByUrl(removedItem.imageUrl).catch(() => {});
-      }
+    if (removedItem?.imageUrl && removedItem.imageUrl.startsWith("/api/media/")) {
+      deleteMediaFromFirebase(removedItem.imageUrl).catch(() => {});
     }
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import { getDbAsync, saveDb } from "@/lib/db";
 import { PopupBanner, isPopupExpired } from "@/lib/types";
-import { isBlobConfigured, readPopupsFromBlob, savePopupsToBlob } from "@/lib/blobStorage";
 import { POST as adminPost, PATCH as adminPatch, DELETE as adminDelete } from "@/app/api/admin/popup/route";
 
 export async function GET(request: NextRequest) {
@@ -9,28 +8,13 @@ export async function GET(request: NextRequest) {
 
   try {
     const isAdminQuery = request.nextUrl.searchParams.get("admin") === "1";
+    const db = await getDbAsync();
 
     let allPopups: PopupBanner[] = [];
-
-    // Prioritize persistent Vercel Blob storage if configured
-    if (isBlobConfigured()) {
-      try {
-        const blobList = await readPopupsFromBlob();
-        if (Array.isArray(blobList) && blobList.length > 0) {
-          allPopups = blobList;
-        }
-      } catch (blobErr) {
-        console.warn("Notice: Vercel Blob read error, falling back to local db:", blobErr);
-      }
-    }
-
-    if (allPopups.length === 0) {
-      const db = await getDbAsync();
-      if (Array.isArray(db.popupBanners) && db.popupBanners.length > 0) {
-        allPopups = db.popupBanners;
-      } else if (db.popupBanner) {
-        allPopups = [db.popupBanner];
-      }
+    if (Array.isArray(db.popupBanners) && db.popupBanners.length > 0) {
+      allPopups = db.popupBanners;
+    } else if (db.popupBanner) {
+      allPopups = [db.popupBanner];
     }
 
     // Sanitize any legacy automatic /donasi
@@ -44,13 +28,9 @@ export async function GET(request: NextRequest) {
     });
 
     if (hasLegacyDonasi) {
-      const db = await getDbAsync();
       db.popupBanners = allPopups;
       db.popupBanner = allPopups[0] || null;
       await saveDb(db);
-      if (isBlobConfigured()) {
-        await savePopupsToBlob(allPopups);
-      }
     }
 
     const filteredPopups = isAdminQuery
