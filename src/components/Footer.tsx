@@ -119,15 +119,27 @@ export default function Footer() {
             <div className="space-y-2 text-xs text-stone-300">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
-                <span>Kampus 2, Jl. Ahmad Yani, Pabelan, Kecamatan Kartasura, Kabupaten Sukoharjo, Jawa Tengah 57162</span>
+                <span>Kampus 2 (Masjid Hj. Sudalmiyah Rais), Jl. Ahmad Yani, Pabelan, Kecamatan Kartasura, Kabupaten Sukoharjo, Jawa Tengah 57162</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                <span>3158</span>
+                <a
+                  href="tel:+62271717417,3158"
+                  className="hover:text-[#FCD34D] transition-colors"
+                  title="Telepon UMS ext. 3158"
+                >
+                  (0271) 717417 ext. 3158
+                </a>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                <span>lppik@ums.ac.id</span>
+                <a
+                  href="mailto:lppik@ums.ac.id"
+                  className="hover:text-[#FCD34D] transition-colors"
+                  title="Email LPPIK UMS"
+                >
+                  lppik@ums.ac.id
+                </a>
               </div>
             </div>
 
