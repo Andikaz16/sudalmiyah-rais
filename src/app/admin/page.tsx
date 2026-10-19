@@ -2389,17 +2389,19 @@ export default function AdminDashboardPage() {
                   />
                 </div>
 
-                {/* Transparansi Perolehan Infaq Shalat Jumat */}
+                {/* Info Perolehan Infaq Shalat Jumat */}
                 <div className="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200/90 space-y-4">
                   <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2.5">
                     <div className="flex items-center gap-2">
                       <Coins className="w-4 h-4 text-emerald-700" />
                       <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
-                        Transparansi Hasil Perolehan Infaq Shalat Jumat
+                        Info Hasil Perolehan Infaq Shalat Jumat
                       </span>
                     </div>
                     <span className="text-[11px] text-emerald-700 font-semibold">
-                      Tampil di Bawah Jadwal Jumat ({activeMosqueMeta.name})
+                      {selectedMosqueId === "sudalmiyah" || selectedMosqueId === "fadhlurrahman"
+                        ? `Tampil Aktif di Bawah Jadwal Jumat (${activeMosqueMeta.name})`
+                        : `Fokus Utama: MSR & MFR (${activeMosqueMeta.name})`}
                     </span>
                   </div>
 
