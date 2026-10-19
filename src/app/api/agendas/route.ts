@@ -25,25 +25,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
 
-  let agendas: Agenda[] = [];
-
-  // Priority 1: Persistent Vercel Blob if active
-  if (isBlobConfigured()) {
-    try {
-      const blobAgendas = await readAgendasFromBlob();
-      if (Array.isArray(blobAgendas) && blobAgendas.length > 0) {
-        agendas = blobAgendas;
-      }
-    } catch (e) {
-      console.warn("Notice: Blob agendas read error:", e);
-    }
-  }
-
-  // Priority 2: Database fallback
-  if (agendas.length === 0) {
-    const db = await getDbAsync();
-    agendas = db.agendas;
-  }
+  const db = await getDbAsync();
+  let agendas: Agenda[] = Array.isArray(db.agendas) ? [...db.agendas] : [];
 
   if (category && category !== "ALL") {
     agendas = agendas.filter((a) => a.category === category);
@@ -120,14 +103,6 @@ export async function POST(request: NextRequest) {
     db.agendas.unshift(newAgenda);
     await saveDb(db);
 
-    if (isBlobConfigured()) {
-      try {
-        await saveAgendasToBlob(db.agendas);
-      } catch (blobErr) {
-        console.warn("Notice: Failed to sync new agenda to Blob:", blobErr);
-      }
-    }
-
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent("CREATE_AGENDA", session.email, ip, "SUCCESS", `Agenda dibuat: ${newAgenda.title}`);
 
@@ -188,14 +163,6 @@ export async function PATCH(request: NextRequest) {
 
     db.agendas[targetIdx] = updatedAgenda;
     await saveDb(db);
-
-    if (isBlobConfigured()) {
-      try {
-        await saveAgendasToBlob(db.agendas);
-      } catch (blobErr) {
-        console.warn("Notice: Failed to sync updated agenda to Blob:", blobErr);
-      }
-    }
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(

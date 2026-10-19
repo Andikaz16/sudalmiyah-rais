@@ -902,6 +902,20 @@ export default function AdminDashboardPage() {
   const handleToggleQuickComplete = async (agenda: Agenda) => {
     const nextStatus = !agenda.isCompleted;
     setIsPublishingProcessing(nextStatus ? "Menandai agenda selesai & memublikasikan" : "Mengubah status agenda & memublikasikan");
+
+    // Optimistic local state update
+    setAgendas((prev) =>
+      prev.map((a) =>
+        a.id === agenda.id
+          ? {
+              ...a,
+              isCompleted: nextStatus,
+              completedAt: nextStatus ? (a.completedAt || new Date().toISOString()) : undefined,
+            }
+          : a
+      )
+    );
+
     try {
       const res = await fetch("/api/agendas", {
         method: "PATCH",
@@ -913,12 +927,23 @@ export default function AdminDashboardPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal memperbarui status agenda.");
+
+      if (data.agenda) {
+        setAgendas((prev) =>
+          prev.map((a) => (a.id === data.agenda.id ? data.agenda : a))
+        );
+      }
+
       await loadData();
       triggerPublishNotification(
         nextStatus ? "Agenda Ditandai Selesai & Dipublikasikan!" : "Status Agenda Diperbarui!",
         `Agenda "${agenda.title}" telah ${nextStatus ? "ditandai terlaksana" : "diubah kembali menjadi jadwal aktif"} dan langsung terupdate di portal publik.`
       );
     } catch (err: any) {
+      // Rollback on error
+      setAgendas((prev) =>
+        prev.map((a) => (a.id === agenda.id ? agenda : a))
+      );
       alert(err.message || "Gagal memperbarui status agenda.");
     } finally {
       setIsPublishingProcessing(null);
@@ -976,11 +1001,19 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan hasil dokumentasi agenda.");
       const savedTitle = editingAgendaDoc.title;
+      const updatedAgenda = data.agenda;
+
+      if (updatedAgenda) {
+        setAgendas((prev) =>
+          prev.map((a) => (a.id === updatedAgenda.id ? updatedAgenda : a))
+        );
+      }
+
       setEditingAgendaDoc(null);
       await loadData();
       triggerPublishNotification(
         "Hasil Dokumentasi Berhasil Dipublikasikan!",
-        `Dokumentasi ${docPhotos.length} foto dan ${docAttendees ? `${Number(docAttendees).toLocaleString("id-ID")} peserta` : "kegiatan"} untuk "${savedTitle}" telah tersimpan ke Firebase dan langsung tampil di beranda publik.`
+        `Dokumentasi ${docPhotos.length} foto dan ${docAttendees ? `${Number(docAttendees).toLocaleString("id-ID")} peserta` : "kegiatan"} untuk "${savedTitle}" telah tersimpan dan langsung tampil di beranda publik.`
       );
     } catch (err: any) {
       alert(err.message || "Gagal menyimpan hasil agenda.");

@@ -133,30 +133,10 @@ export async function saveAgendasToBlob(agendas: Agenda[]): Promise<string | nul
 }
 
 /**
- * Purges fabricated dummy documentation data if present in legacy storage.
+ * Pass-through function to preserve all user-entered agenda documentation.
  */
 export function cleanDummyAgendaData(agendas: Agenda[]): Agenda[] {
-  return agendas.map((agenda) => {
-    if (
-      agenda.id === "agn-cinsub-02" &&
-      (agenda.actualAttendees === 1080 ||
-        agenda.summaryNote?.includes("dihadiri oleh 1080 mahasiswa") ||
-        (Array.isArray(agenda.documentationPhotos) &&
-          agenda.documentationPhotos.includes("/uploads/agendas/agenda-subuh.jpg") &&
-          agenda.documentationPhotos.includes("/uploads/agendas/agenda-tabligh.jpg")))
-    ) {
-      const {
-        isCompleted,
-        completedAt,
-        actualAttendees,
-        documentationPhotos,
-        summaryNote,
-        ...rest
-      } = agenda;
-      return rest;
-    }
-    return agenda;
-  });
+  return agendas;
 }
 
 /**
@@ -172,21 +152,15 @@ export async function readAgendasFromBlob(): Promise<Agenda[] | null> {
 
     const res = await fetch(`${targetBlob.url}?t=${Date.now()}`, {
       cache: "no-store",
-      headers: { "Cache-Control": "no-cache" },
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+      },
     });
     if (!res.ok) return null;
     const data = await res.json();
     if (Array.isArray(data)) {
-      const cleaned = cleanDummyAgendaData(data);
-      const hadDummy = data.some(
-        (a) =>
-          a.id === "agn-cinsub-02" &&
-          (a.actualAttendees === 1080 || a.summaryNote?.includes("dihadiri oleh 1080 mahasiswa"))
-      );
-      if (hadDummy) {
-        saveAgendasToBlob(cleaned).catch(() => {});
-      }
-      return cleaned;
+      return data;
     }
     return null;
   } catch (err) {

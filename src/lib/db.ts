@@ -730,6 +730,8 @@ export function getDb(): DatabaseSchema {
 }
 
 export async function getDbAsync(): Promise<DatabaseSchema> {
+  let db: DatabaseSchema | null = null;
+
   if (isFirebaseConfigured()) {
     try {
       const firestore = getFirestoreDb();
@@ -737,15 +739,12 @@ export async function getDbAsync(): Promise<DatabaseSchema> {
         const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
         const snap = await getDoc(docRef);
         if (snap.exists()) {
-          const cloudData = ensureDbDefaults(snap.data() as DatabaseSchema);
-          memoryDb = cloudData;
-          return cloudData;
+          db = ensureDbDefaults(snap.data() as DatabaseSchema);
         } else {
           // First time initialization: seed Firestore with current local data
           const local = getDb();
           await setDoc(docRef, JSON.parse(JSON.stringify(local)));
-          memoryDb = local;
-          return local;
+          db = local;
         }
       }
     } catch (err) {
@@ -753,24 +752,28 @@ export async function getDbAsync(): Promise<DatabaseSchema> {
     }
   }
 
-  const db = getDb();
+  if (!db) {
+    db = getDb();
+  }
+
   if (isBlobConfigured()) {
     try {
       const [blobNews, blobAgendas] = await Promise.all([
         readManualNewsFromBlob(),
         readAgendasFromBlob(),
       ]);
-      if (blobNews && blobNews.length > 0) {
+      if (blobNews && Array.isArray(blobNews) && blobNews.length > 0) {
         db.manualNews = blobNews;
       }
       if (blobAgendas && Array.isArray(blobAgendas) && blobAgendas.length > 0) {
-        db.agendas = cleanDummyAgendaData(blobAgendas);
+        db.agendas = blobAgendas;
       }
-      memoryDb = db;
     } catch (blobErr) {
       console.warn("Notice: Blob sync notice:", blobErr);
     }
   }
+
+  memoryDb = db;
   return db;
 }
 
@@ -802,11 +805,17 @@ export async function saveDb(data: DatabaseSchema): Promise<void> {
 
   // Persist manual news & agendas to Vercel Blob if configured
   if (isBlobConfigured()) {
-    if (data.manualNews) {
-      saveManualNewsToBlob(data.manualNews).catch(() => {});
-    }
-    if (data.agendas) {
-      saveAgendasToBlob(data.agendas).catch(() => {});
+    try {
+      const blobPromises: Promise<any>[] = [];
+      if (data.manualNews) {
+        blobPromises.push(saveManualNewsToBlob(data.manualNews));
+      }
+      if (data.agendas) {
+        blobPromises.push(saveAgendasToBlob(data.agendas));
+      }
+      await Promise.allSettled(blobPromises);
+    } catch (blobErr) {
+      console.warn("Notice: Blob sync error in saveDb:", blobErr);
     }
   }
 }
