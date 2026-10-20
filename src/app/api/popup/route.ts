@@ -17,21 +17,13 @@ export async function GET(request: NextRequest) {
       allPopups = [db.popupBanner];
     }
 
-    // Sanitize any legacy automatic /donasi
-    let hasLegacyDonasi = false;
+    // Sanitize any legacy automatic /donasi in response
     allPopups = allPopups.map((p) => {
       if (p.targetUrl === "/donasi") {
-        hasLegacyDonasi = true;
         return { ...p, targetUrl: "" };
       }
       return p;
     });
-
-    if (hasLegacyDonasi) {
-      db.popupBanners = allPopups;
-      db.popupBanner = allPopups[0] || null;
-      await saveDb(db);
-    }
 
     const filteredPopups = isAdminQuery
       ? allPopups

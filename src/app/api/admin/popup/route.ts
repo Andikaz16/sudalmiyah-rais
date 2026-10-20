@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import path from "path";
 import fs from "fs";
-import { getDbAsync, saveDb, logSecurityEvent, DatabaseSchema } from "@/lib/db";
+import { getDbAsync, saveDb, saveDbFields, logSecurityEvent, DatabaseSchema } from "@/lib/db";
 import { verifySessionToken } from "@/lib/security";
 import { PopupBanner } from "@/lib/types";
 import { uploadMediaToFirebase, deleteMediaFromFirebase, isFirebaseConfigured } from "@/lib/firebase";
@@ -33,21 +33,13 @@ export async function GET(request: NextRequest) {
   const db = await getDbAsync();
   let popups = getPopupsList(db);
 
-  // Ensure no legacy automatic /donasi persists unless explicitly re-entered
-  let hasLegacyDonasi = false;
+  // Ensure no legacy automatic /donasi persists in response
   popups = popups.map((p) => {
     if (p.targetUrl === "/donasi") {
-      hasLegacyDonasi = true;
       return { ...p, targetUrl: "" };
     }
     return p;
   });
-
-  if (hasLegacyDonasi) {
-    db.popupBanners = popups;
-    db.popupBanner = popups[0] || null;
-    await saveDb(db);
-  }
 
   return NextResponse.json(
     {
@@ -81,7 +73,10 @@ export async function POST(request: NextRequest) {
         const db = await getDbAsync();
         db.popupBanners = body.popups;
         db.popupBanner = body.popups[0] || null;
-        await saveDb(db);
+        await saveDbFields(["popupBanners", "popupBanner"], {
+          popupBanners: body.popups,
+          popupBanner: body.popups[0] || null,
+        });
         return NextResponse.json({
           success: true,
           message: "Pop-up banner berhasil disinkronkan.",
@@ -208,7 +203,10 @@ export async function POST(request: NextRequest) {
 
     db.popupBanners = updatedList;
     db.popupBanner = updatedList[0] || null;
-    await saveDb(db);
+    await saveDbFields(["popupBanners", "popupBanner"], {
+      popupBanners: updatedList,
+      popupBanner: updatedList[0] || null,
+    });
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -303,7 +301,10 @@ export async function PATCH(request: NextRequest) {
 
     db.popupBanners = updatedList;
     db.popupBanner = updatedList[0] || null;
-    await saveDb(db);
+    await saveDbFields(["popupBanners", "popupBanner"], {
+      popupBanners: updatedList,
+      popupBanner: updatedList[0] || null,
+    });
 
     const updatedItem = updatedList.find((p) => p.id === targetId) || updatedList[0];
 
@@ -343,7 +344,10 @@ export async function DELETE(request: NextRequest) {
 
     db.popupBanners = updatedList;
     db.popupBanner = updatedList[0] || null;
-    await saveDb(db);
+    await saveDbFields(["popupBanners", "popupBanner"], {
+      popupBanners: updatedList,
+      popupBanner: updatedList[0] || null,
+    });
 
     if (removedItem?.imageUrl && removedItem.imageUrl.startsWith("/api/media/")) {
       deleteMediaFromFirebase(removedItem.imageUrl).catch(() => {});

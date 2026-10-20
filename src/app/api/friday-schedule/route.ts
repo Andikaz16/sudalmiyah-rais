@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import { z } from "zod";
-import { getDb, getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDb, getDbAsync, logSecurityEvent, saveDb, saveDbFields } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { FridayOfficerSchedule } from "@/lib/types";
 
@@ -37,12 +37,10 @@ export async function GET(request: NextRequest) {
 
   if (db.fridaySchedule && db.fridaySchedule.hijriDate?.includes("Rabiul Akhir")) {
     db.fridaySchedule.hijriDate = db.fridaySchedule.hijriDate.replace(/Rabiul Akhir/gi, "Jumadilawal");
-    changed = true;
   }
 
   schedules = schedules.map((s) => {
     if (s.hijriDate?.includes("Rabiul Akhir")) {
-      changed = true;
       return {
         ...s,
         hijriDate: s.hijriDate.replace(/Rabiul Akhir/gi, "Jumadilawal"),
@@ -50,11 +48,6 @@ export async function GET(request: NextRequest) {
     }
     return s;
   });
-
-  if (changed) {
-    db.fridaySchedules = schedules;
-    saveDb(db);
-  }
 
   const activeSchedule = mosqueId
     ? schedules.find((s) => (s.mosqueId || s.id) === mosqueId) || db.fridaySchedule
@@ -178,7 +171,10 @@ export async function PUT(request: NextRequest) {
       db.fridaySchedule = updatedSchedule;
     }
 
-    await saveDb(db);
+    await saveDbFields(["fridaySchedule", "fridaySchedules"], {
+      fridaySchedule: db.fridaySchedule,
+      fridaySchedules: db.fridaySchedules,
+    });
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(

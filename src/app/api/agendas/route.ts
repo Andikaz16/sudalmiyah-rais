@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import { z } from "zod";
-import { getDb, getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDb, getDbAsync, logSecurityEvent, saveDb, saveDbField } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { Agenda, AgendaCategory } from "@/lib/types";
 
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.agendas.unshift(newAgenda);
-    await saveDb(db);
+    await saveDbField("agendas", db.agendas);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent("CREATE_AGENDA", session.email, ip, "SUCCESS", `Agenda dibuat: ${newAgenda.title}`);
@@ -167,7 +167,7 @@ export async function PATCH(request: NextRequest) {
     };
 
     db.agendas[targetIdx] = updatedAgenda;
-    await saveDb(db);
+    await saveDbField("agendas", db.agendas);
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(

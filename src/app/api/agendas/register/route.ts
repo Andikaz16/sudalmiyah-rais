@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDbAsync, logSecurityEvent, saveDb, saveDbFields } from "@/lib/db";
 import { checkRateLimit, generateTicketCode, sanitizeString } from "@/lib/security";
 import { Registration } from "@/lib/types";
 
@@ -91,7 +91,10 @@ export async function POST(request: NextRequest) {
 
     db.registrations.unshift(newRegistration);
     agenda.registeredCount += 1;
-    await saveDb(db);
+    await saveDbFields(["registrations", "agendas"], {
+      registrations: db.registrations,
+      agendas: db.agendas,
+    });
 
     logSecurityEvent(
       "EVENT_REGISTRATION",

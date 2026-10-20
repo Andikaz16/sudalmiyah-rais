@@ -445,6 +445,10 @@ function getInitialData(): DatabaseSchema {
         requiresRegistration: false,
         bannerUrl: "/uploads/agendas/cinta-subuh-harun-joko.png",
         createdAt: "2026-10-15T15:45:00.000Z",
+        isCompleted: true,
+        completedAt: "2026-10-10T06:30:00.000Z",
+        actualAttendees: 580,
+        summaryNote: "Alhamdulillah kegiatan Cinta Subuh bersama Rektor UMS Prof. Dr. Harun Joko Prayitno, M.Hum. telah terlaksana dengan sukses dan penuh berkah.",
       },
       {
         id: "agn-cinsub-02",
@@ -463,6 +467,14 @@ function getInitialData(): DatabaseSchema {
         requiresRegistration: false,
         bannerUrl: "/uploads/agendas/cinta-subuh-mutohharun-jinan.png",
         createdAt: "2026-10-15T15:45:00.000Z",
+        isCompleted: true,
+        completedAt: "2026-10-17T06:30:00.000Z",
+        actualAttendees: 420,
+        documentationPhotos: [
+          "/api/media/med-mvei19eq-42940",
+          "/api/media/med-mvei1ibk-ne1lj",
+        ],
+        summaryNote: "Alhamdulillah kegiatan Cinta Subuh bersama Dr. Mutohharun Jinan, M.Ag. telah terlaksana dengan khidmat dan lancar. Dihadiri ratusan jamaah dan mahasiswa fakultas terjadwal (FHIP, FKI, FPSI).",
       },
     ],
     fridaySchedule: defaultSchedules[0],
@@ -707,6 +719,13 @@ export function ensureDbDefaults(data: DatabaseSchema): DatabaseSchema {
       if (match && !a.bannerUrl) {
         a.bannerUrl = match.bannerUrl || "/uploads/agendas/agenda-jumat.jpg";
       }
+      if (match && match.isCompleted && a.isCompleted === undefined) {
+        a.isCompleted = match.isCompleted;
+        a.completedAt = match.completedAt;
+        a.actualAttendees = a.actualAttendees || match.actualAttendees;
+        a.documentationPhotos = a.documentationPhotos || match.documentationPhotos;
+        a.summaryNote = a.summaryNote || match.summaryNote;
+      }
     });
   } else {
     data.agendas = getInitialData().agendas;
@@ -829,13 +848,65 @@ export async function saveDb(data: DatabaseSchema): Promise<void> {
       const firestore = getFirestoreDb();
       if (firestore) {
         const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
-        await setDoc(docRef, JSON.parse(JSON.stringify(data)));
+        await setDoc(docRef, JSON.parse(JSON.stringify(data)), { merge: true });
       }
     } catch (err) {
       console.error("Notice: Firestore write error:", err);
       throw err;
     }
   }
+}
+
+/**
+ * Granular update for specific fields in Firestore to prevent race-condition data wipes.
+ */
+export async function saveDbFields(
+  fields: Array<keyof DatabaseSchema>,
+  payload: Partial<DatabaseSchema>
+): Promise<void> {
+  const db = await getDbAsync();
+  for (const f of fields) {
+    if (payload[f] !== undefined) {
+      (db as any)[f] = payload[f];
+    }
+  }
+  memoryDb = db;
+
+  try {
+    const targetFile = getDbFilePath();
+    ensureDbDirectory(targetFile);
+    fs.writeFileSync(targetFile, JSON.stringify(db, null, 2), "utf-8");
+    const stat = fs.statSync(targetFile);
+    lastDbMtimeMs = stat.mtimeMs;
+  } catch (err) {
+    // Graceful fallback for read-only serverless filesystems
+  }
+
+  if (isFirebaseConfigured()) {
+    try {
+      const firestore = getFirestoreDb();
+      if (firestore) {
+        const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
+        const updatePayload: Record<string, any> = {};
+        for (const f of fields) {
+          if (payload[f] !== undefined) {
+            updatePayload[f] = JSON.parse(JSON.stringify(payload[f]));
+          }
+        }
+        await updateDoc(docRef, updatePayload);
+      }
+    } catch (err) {
+      console.error("Notice: Firestore fields update error:", err);
+      throw err;
+    }
+  }
+}
+
+export async function saveDbField<K extends keyof DatabaseSchema>(
+  field: K,
+  value: DatabaseSchema[K]
+): Promise<void> {
+  return saveDbFields([field], { [field]: value });
 }
 
 export function logSecurityEvent(

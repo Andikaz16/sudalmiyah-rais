@@ -489,12 +489,6 @@ export default function AdminDashboardPage() {
               if (resolvedList.length === 0 && Array.isArray(parsedCache.popups) && parsedCache.popups.length > 0) {
                 resolvedList = parsedCache.popups;
                 resolvedPopup = resolvedList[0] || null;
-                // Silently re-seed cold serverless container with active popups
-                fetch("/api/popup", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ popups: resolvedList }),
-                }).catch(() => {});
               } else if (Array.isArray(parsedCache.popups) && parsedCache.popups.length > resolvedList.length) {
                 // If local cache has more banners than server (e.g. cold container had older seed)
                 resolvedList = parsedCache.popups;
