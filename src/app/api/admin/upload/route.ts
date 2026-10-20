@@ -70,17 +70,8 @@ export async function POST(request: NextRequest) {
 
     let publicUrl = "";
 
-    // 1. Priority 1: ImgBB Cloud Hosting (returns permanent CDN URL, keeps Firestore 100% lightweight)
-    if (file.type.startsWith("image/") && isImgbbConfigured()) {
-      try {
-        publicUrl = await uploadImageToImgBB(buffer, safeFilename, file.type);
-      } catch (imgbbErr) {
-        console.warn("Notice: ImgBB upload failed, falling back to Firebase:", imgbbErr);
-      }
-    }
-
-    // 2. Priority 2: Firebase Cloud Firestore media store
-    if (!publicUrl && isFirebaseConfigured()) {
+    // 1. Priority 1: Firebase Cloud Firestore media store (100% accessible in Indonesia, first-party domain, never blocked by Internet Positif)
+    if (isFirebaseConfigured()) {
       try {
         publicUrl = await uploadMediaToFirebase(safeFilename, buffer, file.type, folder);
       } catch (fbErr) {
@@ -99,11 +90,23 @@ export async function POST(request: NextRequest) {
         fs.writeFileSync(destinationPath, buffer);
         publicUrl = `/uploads/${folder}/${safeFilename}`;
       } catch (fsErr) {
-        console.warn("Notice: Local filesystem write failed, fallback to Data URI:", fsErr);
+        console.warn("Notice: Local filesystem write failed, fallback to secondary storage:", fsErr);
       }
     }
 
-    // 3. Priority 3: Data URI (Instant, 100% online in Vercel serverless without storage dependencies)
+    // 3. Priority 3: ImgBB Cloud Hosting (proxied through first-party domain to bypass ISP blocks)
+    if (!publicUrl && file.type.startsWith("image/") && isImgbbConfigured()) {
+      try {
+        const rawImgbbUrl = await uploadImageToImgBB(buffer, safeFilename, file.type);
+        if (rawImgbbUrl) {
+          publicUrl = `/api/image-proxy?url=${encodeURIComponent(rawImgbbUrl)}`;
+        }
+      } catch (imgbbErr) {
+        console.warn("Notice: ImgBB upload failed, falling back:", imgbbErr);
+      }
+    }
+
+    // 4. Priority 4: Data URI (Instant fallback without external dependencies)
     if (!publicUrl) {
       const base64 = buffer.toString("base64");
       publicUrl = `data:${file.type};base64,${base64}`;

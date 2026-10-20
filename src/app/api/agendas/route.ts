@@ -155,7 +155,13 @@ export async function PATCH(request: NextRequest) {
       }),
       ...(documentationPhotos !== undefined && {
         documentationPhotos: Array.isArray(documentationPhotos)
-          ? documentationPhotos.map((url: string) => sanitizeString(String(url)))
+          ? documentationPhotos.map((url: string) => {
+              const clean = sanitizeString(String(url));
+              if (clean.includes("i.ibb.co") || clean.includes("ibb.co")) {
+                return `/api/image-proxy?url=${encodeURIComponent(clean)}`;
+              }
+              return clean;
+            })
           : [],
       }),
       ...(summaryNote !== undefined && {

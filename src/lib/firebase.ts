@@ -72,6 +72,7 @@ export function getFirestoreDb() {
 
 /**
  * Uploads media file to Firebase Firestore media_store collection.
+ * Automatically chunks large files to bypass Firestore 1MiB document limits.
  * Returns public URL /api/media/<id>.
  */
 export async function uploadMediaToFirebase(
@@ -87,22 +88,46 @@ export async function uploadMediaToFirebase(
 
   const id = `med-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 7)}`;
   const docRef = doc(db, "media_store", id);
+  const fullBase64 = buffer.toString("base64");
+  const CHUNK_SIZE = 600 * 1024; // 600KB chunks (safe under 1MiB Firestore limit)
 
-  await setDoc(docRef, {
-    id,
-    filename,
-    folder,
-    contentType,
-    base64: buffer.toString("base64"),
-    size: buffer.length,
-    createdAt: new Date().toISOString(),
-  });
+  if (fullBase64.length <= CHUNK_SIZE) {
+    await setDoc(docRef, {
+      id,
+      filename,
+      folder,
+      contentType,
+      base64: fullBase64,
+      isChunked: false,
+      size: buffer.length,
+      createdAt: new Date().toISOString(),
+    });
+  } else {
+    const totalChunks = Math.ceil(fullBase64.length / CHUNK_SIZE);
+    await setDoc(docRef, {
+      id,
+      filename,
+      folder,
+      contentType,
+      isChunked: true,
+      totalChunks,
+      size: buffer.length,
+      createdAt: new Date().toISOString(),
+    });
+
+    for (let i = 0; i < totalChunks; i++) {
+      const chunkStr = fullBase64.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+      const chunkDocRef = doc(db, "media_store", `${id}_c${i}`);
+      await setDoc(chunkDocRef, { chunk: chunkStr });
+    }
+  }
 
   return `/api/media/${id}`;
 }
 
 /**
  * Retrieves media file from Firebase Firestore media_store collection.
+ * Handles both single-doc and chunked media.
  */
 export async function getMediaFromFirebase(
   id: string
@@ -116,10 +141,25 @@ export async function getMediaFromFirebase(
     if (!snap.exists()) return null;
 
     const data = snap.data();
-    if (!data || !data.base64) return null;
+    if (!data) return null;
+
+    let base64 = data.base64;
+    if (data.isChunked && data.totalChunks) {
+      const chunks: string[] = [];
+      for (let i = 0; i < data.totalChunks; i++) {
+        const chunkDocRef = doc(db, "media_store", `${id}_c${i}`);
+        const chunkSnap = await getDoc(chunkDocRef);
+        if (chunkSnap.exists() && chunkSnap.data()?.chunk) {
+          chunks.push(chunkSnap.data().chunk);
+        }
+      }
+      base64 = chunks.join("");
+    }
+
+    if (!base64) return null;
 
     return {
-      data: Buffer.from(data.base64, "base64"),
+      data: Buffer.from(base64, "base64"),
       contentType: data.contentType || "image/jpeg",
       filename: data.filename || "file",
     };
@@ -131,6 +171,7 @@ export async function getMediaFromFirebase(
 
 /**
  * Deletes media file from Firebase Firestore media_store collection.
+ * Also cleans up chunked documents if present.
  */
 export async function deleteMediaFromFirebase(idOrUrl: string): Promise<void> {
   const db = getFirestoreDb();
@@ -142,6 +183,19 @@ export async function deleteMediaFromFirebase(idOrUrl: string): Promise<void> {
       : idOrUrl.trim();
     if (!id) return;
     const docRef = doc(db, "media_store", id);
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data?.isChunked && data?.totalChunks) {
+        for (let i = 0; i < data.totalChunks; i++) {
+          try {
+            await deleteDoc(doc(db, "media_store", `${id}_c${i}`));
+          } catch {
+            // Ignore individual chunk delete error
+          }
+        }
+      }
+    }
     await deleteDoc(docRef);
   } catch (err) {
     console.warn("Notice: Failed to delete media doc from Firebase:", err);

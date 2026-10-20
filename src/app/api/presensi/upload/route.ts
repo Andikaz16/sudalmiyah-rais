@@ -53,22 +53,7 @@ export async function POST(request: NextRequest) {
     const ext = path.extname(file.name).toLowerCase() || ".jpg";
     const safeFilename = `presensi_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext}`;
 
-    // 1. Priority 1: ImgBB Cloud Hosting
-    if (isImgbbConfigured()) {
-      try {
-        const publicUrl = await uploadImageToImgBB(buffer, safeFilename, file.type);
-        return NextResponse.json({
-          success: true,
-          url: publicUrl,
-          filename: safeFilename,
-          size: file.size,
-        });
-      } catch (imgbbErr) {
-        console.warn("Notice: Presensi ImgBB upload fallback:", imgbbErr);
-      }
-    }
-
-    // 2. Priority 2: Firebase Cloud Firestore media store
+    // 1. Priority 1: Firebase Cloud Firestore media store (100% accessible in Indonesia, first-party domain)
     if (isFirebaseConfigured()) {
       try {
         const publicUrl = await uploadMediaToFirebase(safeFilename, buffer, file.type, "presensi");
@@ -101,7 +86,25 @@ export async function POST(request: NextRequest) {
           size: file.size,
         });
       } catch (fsError) {
-        console.warn("Filesystem write fallback to data URI:", fsError);
+        console.warn("Filesystem write fallback to secondary:", fsError);
+      }
+    }
+
+    // 3. Priority 3: ImgBB Cloud Hosting (proxied through first-party domain to bypass ISP blocks)
+    if (isImgbbConfigured()) {
+      try {
+        const rawImgbbUrl = await uploadImageToImgBB(buffer, safeFilename, file.type);
+        if (rawImgbbUrl) {
+          const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(rawImgbbUrl)}`;
+          return NextResponse.json({
+            success: true,
+            url: proxiedUrl,
+            filename: safeFilename,
+            size: file.size,
+          });
+        }
+      } catch (imgbbErr) {
+        console.warn("Notice: Presensi ImgBB upload fallback:", imgbbErr);
       }
     }
 

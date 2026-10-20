@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Agenda } from "@/lib/types";
 import { useLanguage } from "@/context/LanguageContext";
+import { normalizeImageUrl } from "@/lib/utils";
 
 interface AgendaDetailModalProps {
   agenda: Agenda | null;
@@ -217,7 +218,7 @@ export default function AgendaDetailModal({
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={photoUrl}
+                          src={normalizeImageUrl(photoUrl)}
                           alt={`Dokumentasi kegiatan ${pIdx + 1}`}
                           className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300"
                         />
@@ -367,7 +368,7 @@ export default function AgendaDetailModal({
               </button>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={previewPhoto}
+                src={normalizeImageUrl(previewPhoto)}
                 alt="Dokumentasi foto pembesar"
                 className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/20 shadow-2xl"
                 onClick={(e) => e.stopPropagation()}

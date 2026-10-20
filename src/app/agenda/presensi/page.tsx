@@ -136,29 +136,82 @@ function PresensiContent() {
     return () => clearInterval(timer);
   }, [status]);
 
+  // Helper kompresi gambar presensi di browser
+  const compressPresensiPhoto = async (inputFile: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = document.createElement("img");
+        img.onload = () => {
+          const maxDim = 1200;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve(inputFile);
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                resolve(inputFile);
+              } else {
+                const compressedFile = new File([blob], inputFile.name.replace(/\.[^/.]+$/, ".jpg"), {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                });
+                resolve(compressedFile);
+              }
+            },
+            "image/jpeg",
+            0.8
+          );
+        };
+        img.onerror = () => resolve(inputFile);
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = () => resolve(inputFile);
+      reader.readAsDataURL(inputFile);
+    });
+  };
+
   // Handler Unggah Foto Presensi
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
 
     setPhotoError("");
     const validMimes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-    if (!validMimes.includes(file.type)) {
+    if (!validMimes.includes(rawFile.type)) {
       setPhotoError("Format berkas harus gambar JPG, PNG, atau WEBP.");
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setPhotoError("Ukuran foto maksimal 5MB.");
+    if (rawFile.size > 15 * 1024 * 1024) {
+      setPhotoError("Ukuran foto maksimal 15MB.");
       return;
     }
 
     // Buat pratinjau lokal
-    const previewUrl = URL.createObjectURL(file);
+    const previewUrl = URL.createObjectURL(rawFile);
     setPhotoPreview(previewUrl);
 
     setUploadingPhoto(true);
     try {
+      const file = await compressPresensiPhoto(rawFile);
       const formData = new FormData();
       formData.append("file", file);
 

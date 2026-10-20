@@ -60,7 +60,11 @@
       "isCompleted": true,
       "completedAt": "2026-10-10T06:30:00.000Z",
       "actualAttendees": 580,
-      "summaryNote": "Alhamdulillah kegiatan Cinta Subuh bersama Rektor UMS Prof. Dr. Harun Joko Prayitno, M.Hum. telah terlaksana dengan sukses dan penuh berkah."
+      "summaryNote": "Alhamdulillah kegiatan Cinta Subuh bersama Rektor UMS Prof. Dr. Harun Joko Prayitno, M.Hum. telah terlaksana dengan sukses dan penuh berkah.",
+      "documentationPhotos": [
+        "/api/media/med-mvei19eq-42940",
+        "/api/media/med-mvei1ibk-ne1lj"
+      ]
     },
     {
       "date": "2026-10-17",

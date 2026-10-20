@@ -143,24 +143,34 @@ export async function POST(request: NextRequest) {
       // Ignore archival write error on read-only environments
     }
 
-    let finalImageUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+    let finalImageUrl = "";
     const ext = path.extname(file.name).toLowerCase() || ".jpg";
     const safeFilename = `popup_${Date.now()}${ext}`;
 
-    if (isImgbbConfigured()) {
-      try {
-        finalImageUrl = await uploadImageToImgBB(buffer, safeFilename, file.type);
-      } catch (imgbbErr) {
-        console.warn("Notice: ImgBB popup upload failed, falling back to Firebase:", imgbbErr);
-      }
-    }
-
-    if (finalImageUrl.startsWith("data:") && isFirebaseConfigured()) {
+    // 1. Priority 1: Firebase Cloud Firestore media store (100% accessible in Indonesia, first-party domain)
+    if (isFirebaseConfigured()) {
       try {
         finalImageUrl = await uploadMediaToFirebase(safeFilename, buffer, file.type, "popup");
       } catch (fbErr) {
-        console.warn("Notice: Firebase media upload fallback to Data URI:", fbErr);
+        console.warn("Notice: Firebase media upload failed for popup, falling back:", fbErr);
       }
+    }
+
+    // 2. Priority 2: ImgBB Cloud Hosting (proxied through first-party domain to bypass ISP blocks)
+    if (!finalImageUrl && isImgbbConfigured()) {
+      try {
+        const rawImgbbUrl = await uploadImageToImgBB(buffer, safeFilename, file.type);
+        if (rawImgbbUrl) {
+          finalImageUrl = `/api/image-proxy?url=${encodeURIComponent(rawImgbbUrl)}`;
+        }
+      } catch (imgbbErr) {
+        console.warn("Notice: ImgBB popup upload failed, falling back:", imgbbErr);
+      }
+    }
+
+    // 3. Priority 3: Fallback to Data URI
+    if (!finalImageUrl) {
+      finalImageUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
     }
 
     const db = await getDbAsync();

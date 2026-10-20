@@ -59,6 +59,7 @@ import {
   getPopupRemainingTime,
   ManualNewsItem,
 } from "@/lib/types";
+import { normalizeImageUrl } from "@/lib/utils";
 
 const ADMIN_MOSQUES = [
   { id: "sudalmiyah", name: "Masjid Hj. Sudalmiyah Rais", location: "Kampus 2 UMS" },
@@ -4683,7 +4684,7 @@ export default function AdminDashboardPage() {
                     {docPhotos.map((photo, pIdx) => (
                       <div key={pIdx} className="relative h-20 rounded-xl overflow-hidden bg-stone-900 border border-stone-200 group">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={photo} alt={`Dokumentasi ${pIdx + 1}`} className="w-full h-full object-cover" />
+                        <img src={normalizeImageUrl(photo)} alt={`Dokumentasi ${pIdx + 1}`} className="w-full h-full object-cover" />
                         <button
                           type="button"
                           onClick={() => handleRemoveDocPhoto(pIdx)}
