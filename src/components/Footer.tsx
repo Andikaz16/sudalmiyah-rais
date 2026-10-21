@@ -141,11 +141,11 @@ export default function Footer() {
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#D4AF37] shrink-0" />
                 <a
-                  href="mailto:lppik@ums.ac.id"
+                  href="mailto:masjidums@ums.ac.id"
                   className="hover:text-[#FCD34D] transition-colors"
-                  title="Email LPPIK UMS"
+                  title="Email Masjid UMS"
                 >
-                  lppik@ums.ac.id
+                  masjidums@ums.ac.id
                 </a>
               </div>
             </div>
