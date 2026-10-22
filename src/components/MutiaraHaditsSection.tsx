@@ -208,6 +208,11 @@ export default function MutiaraHaditsSection() {
       : `*MUTIARA HADITS & HIKMAH: ${hadith.theme}*`;
     const translation = isEn ? (hadith.translationEn || hadith.translation) : hadith.translation;
     const fadhilah = isEn ? (hadith.fadhilahEn || hadith.fadhilah) : hadith.fadhilah;
+    const donation = isEn
+      ? `Donation for AUM Model Mosque Activities:
+Bank Jateng Syariah (BJS): 6012275865 (a.n. MASJID UMS)`
+      : `Donasi kegiatan masjid percontohan AUM:
+Bank Jateng Syariah (BJS): 6012275865 (a.n. MASJID UMS)`;
     const footer = isEn
       ? "Broadcasted by Hj. Sudalmiyah Rais Mosque - Universitas Muhammadiyah Surakarta\nOfficial Portal: https://sudalmiyah-rais.vercel.app"
       : "Disiarkan oleh Masjid Hj. Sudalmiyah Rais - Universitas Muhammadiyah Surakarta\nPortal Resmi: https://sudalmiyah-rais.vercel.app";
@@ -220,6 +225,8 @@ ${hadith.arabic}
 "${translation}"
 
 (${hadith.source} — ${fadhilah})
+
+${donation}
 
 ${footer}`;
   }, [isEn, language]);

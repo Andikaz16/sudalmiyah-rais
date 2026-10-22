@@ -146,16 +146,28 @@ export async function generateHadithPosterBlob(
   ctx.font = "bold 17px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.fillText(`(${hadith.source} — ${hadith.fadhilah})`, width / 2, fadhilahStartY);
 
-  // 10. Footer Section
-  ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
-  ctx.fillRect(46, height - 90, width - 92, 44);
+  // 10. Footer Section (Donation & Identity)
+  ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
+  ctx.fillRect(46, height - 105, width - 92, 58);
+
+  ctx.strokeStyle = "rgba(212, 175, 55, 0.35)";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(46, height - 105, width - 92, 58);
+
+  ctx.fillStyle = "#FDE68A"; // Amber 200
+  ctx.font = "bold 14.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.fillText(
+    "Donasi Kegiatan Masjid Percontohan AUM: Bank Jateng Syariah (BJS) 6012275865 a.n. MASJID UMS",
+    width / 2,
+    height - 76
+  );
 
   ctx.fillStyle = "#94A3B8"; // Slate 400
-  ctx.font = "500 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.font = "500 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.fillText(
     "Disiarkan oleh Masjid Hj. Sudalmiyah Rais Kampus 2 UMS | Portal: sudalmiyah-rais.vercel.app",
     width / 2,
-    height - 62
+    height - 54
   );
 
   return new Promise<Blob>((resolve, reject) => {

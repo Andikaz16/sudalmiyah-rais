@@ -235,8 +235,9 @@ export default function DonationSection() {
             <div className="md:col-span-1 order-2 lg:order-3 flex flex-col h-full">
               <div className="w-full h-full rounded-3xl bg-white border border-stone-200 p-4 sm:p-5 shadow-lg text-center flex flex-col justify-between">
                 <div className="flex-1 flex flex-col">
-                  <div className="mb-3 inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500/10 text-amber-900 text-[11px] font-bold shrink-0 self-center">
-                    <span>Bank Jateng (Masjid UMS)</span>
+                  <div className="mb-3 inline-flex flex-col items-center justify-center gap-0.5 px-3.5 py-1.5 rounded-2xl bg-amber-500/10 text-amber-900 shrink-0 self-center border border-amber-500/20">
+                    <span className="text-[11px] font-bold">Bank Jateng Syariah (Masjid UMS)</span>
+                    <span className="text-xs font-mono font-bold text-[#003B73]">No. Rekening: 6012275865</span>
                   </div>
 
                   {/* Official QRIS Poster Image - Fills height */}
