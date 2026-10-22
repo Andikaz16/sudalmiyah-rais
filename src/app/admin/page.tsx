@@ -2437,9 +2437,7 @@ export default function AdminDashboardPage() {
                       </span>
                     </div>
                     <span className="text-[11px] text-emerald-700 font-semibold">
-                      {selectedMosqueId === "sudalmiyah" || selectedMosqueId === "fadhlurrahman"
-                        ? `Tampil Aktif di Bawah Jadwal Jumat (${activeMosqueMeta.name})`
-                        : `Fokus Utama: MSR & MFR (${activeMosqueMeta.name})`}
+                      Tampil Aktif di Bawah Jadwal Jumat ({activeMosqueMeta.name})
                     </span>
                   </div>
 
