@@ -1957,113 +1957,82 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Tab Controls - Smooth Horizontal Scrollable Pills with Navigation Arrows */}
+        {/* Tab Controls - Smooth Horizontal Scrollable Pills with Floating Navigation Arrows */}
         <div className="relative mb-6">
-          {/* Helper hint & navigation arrows header */}
-          <div className="flex items-center justify-between mb-2 px-1">
-            <span className="text-[11px] font-semibold text-stone-500 flex items-center gap-1.5">
-              <span>Bilah Menu (Geser horizontal untuk melihat 8 menu lengkap)</span>
-            </span>
-            <div className="flex items-center gap-1.5 shrink-0">
+          {/* Left Floating Arrow Button with Gradient Fade */}
+          {canScrollLeft && (
+            <div className="absolute left-0 inset-y-0 z-20 flex items-center pb-4 pr-6 bg-gradient-to-r from-[#FAF8F5] via-[#FAF8F5]/90 to-transparent pointer-events-none">
               <button
                 type="button"
                 onClick={() => scrollTabs("left")}
-                disabled={!canScrollLeft}
-                className="w-7 h-7 rounded-full bg-white border border-stone-200 shadow-2xs flex items-center justify-center text-stone-700 hover:bg-[#003B73] hover:text-white hover:border-[#003B73] disabled:opacity-25 disabled:cursor-not-allowed transition-all cursor-pointer active:scale-90"
+                className="w-8 h-8 rounded-full bg-white border border-stone-300 shadow-md flex items-center justify-center text-stone-700 hover:bg-[#003B73] hover:text-white hover:border-[#003B73] transition-all cursor-pointer active:scale-90 pointer-events-auto"
                 title="Geser menu ke kiri"
                 aria-label="Geser menu ke kiri"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
+            </div>
+          )}
+
+          {/* Scrollable Pills Container */}
+          <div
+            ref={tabsContainerRef}
+            className="flex items-center gap-2 overflow-x-auto pb-4 border-b border-stone-200 no-scrollbar scroll-smooth px-0.5"
+          >
+            {ADMIN_TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  data-active={isActive ? "true" : "false"}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer active:scale-95 shrink-0 ${
+                    isActive
+                      ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/20 ring-2 ring-[#003B73]/20"
+                      : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${isActive ? "text-amber-300" : "text-stone-500"}`} />
+                  <span>{tab.label}</span>
+                  {tab.id === "FEEDBACK" && feedbackCounts.baru > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-none">
+                      {feedbackCounts.baru}
+                    </span>
+                  )}
+                  {tab.id === "POPUP_BANNER" && popupBanner && popupBanner.isActive && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  )}
+                  {tab.id === "DOCUMENTS" && documents.length > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
+                      {documents.length}
+                    </span>
+                  )}
+                  {tab.id === "BERITA_MASJID" && manualNewsList.length > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
+                      {manualNewsList.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right Floating Arrow Button with Gradient Fade */}
+          {canScrollRight && (
+            <div className="absolute right-0 inset-y-0 z-20 flex items-center pb-4 pl-6 bg-gradient-to-l from-[#FAF8F5] via-[#FAF8F5]/90 to-transparent pointer-events-none">
               <button
                 type="button"
                 onClick={() => scrollTabs("right")}
-                disabled={!canScrollRight}
-                className="w-7 h-7 rounded-full bg-white border border-stone-200 shadow-2xs flex items-center justify-center text-stone-700 hover:bg-[#003B73] hover:text-white hover:border-[#003B73] disabled:opacity-25 disabled:cursor-not-allowed transition-all cursor-pointer active:scale-90"
+                className="w-8 h-8 rounded-full bg-white border border-stone-300 shadow-md flex items-center justify-center text-stone-700 hover:bg-[#003B73] hover:text-white hover:border-[#003B73] transition-all cursor-pointer active:scale-90 pointer-events-auto"
                 title="Geser menu ke kanan"
                 aria-label="Geser menu ke kanan"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
-          </div>
-
-          <div className="relative">
-            {/* Left Floating Arrow Button with Gradient Fade */}
-            {canScrollLeft && (
-              <div className="absolute left-0 inset-y-0 z-20 flex items-center pb-4 pr-6 bg-gradient-to-r from-[#FAF8F5] via-[#FAF8F5]/90 to-transparent pointer-events-none">
-                <button
-                  type="button"
-                  onClick={() => scrollTabs("left")}
-                  className="w-8 h-8 rounded-full bg-white border border-stone-300 shadow-md flex items-center justify-center text-stone-700 hover:bg-[#003B73] hover:text-white hover:border-[#003B73] transition-all cursor-pointer active:scale-90 pointer-events-auto"
-                  title="Geser menu ke kiri"
-                  aria-label="Geser menu ke kiri"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-
-            {/* Scrollable Pills Container */}
-            <div
-              ref={tabsContainerRef}
-              className="flex items-center gap-2 overflow-x-auto pb-4 border-b border-stone-200 no-scrollbar scroll-smooth px-0.5"
-            >
-              {ADMIN_TABS.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    data-active={isActive ? "true" : "false"}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer active:scale-95 shrink-0 ${
-                      isActive
-                        ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/20 ring-2 ring-[#003B73]/20"
-                        : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 ${isActive ? "text-amber-300" : "text-stone-500"}`} />
-                    <span>{tab.label}</span>
-                    {tab.id === "FEEDBACK" && feedbackCounts.baru > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-none">
-                        {feedbackCounts.baru}
-                      </span>
-                    )}
-                    {tab.id === "POPUP_BANNER" && popupBanner && popupBanner.isActive && (
-                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    )}
-                    {tab.id === "DOCUMENTS" && documents.length > 0 && (
-                      <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
-                        {documents.length}
-                      </span>
-                    )}
-                    {tab.id === "BERITA_MASJID" && manualNewsList.length > 0 && (
-                      <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
-                        {manualNewsList.length}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Right Floating Arrow Button with Gradient Fade */}
-            {canScrollRight && (
-              <div className="absolute right-0 inset-y-0 z-20 flex items-center pb-4 pl-6 bg-gradient-to-l from-[#FAF8F5] via-[#FAF8F5]/90 to-transparent pointer-events-none">
-                <button
-                  type="button"
-                  onClick={() => scrollTabs("right")}
-                  className="w-8 h-8 rounded-full bg-white border border-stone-300 shadow-md flex items-center justify-center text-stone-700 hover:bg-[#003B73] hover:text-white hover:border-[#003B73] transition-all cursor-pointer active:scale-90 pointer-events-auto"
-                  title="Geser menu ke kanan"
-                  aria-label="Geser menu ke kanan"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Tab 1: AGENDAS */}
