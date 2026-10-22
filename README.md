@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portal Resmi Masjid Hj. Sudalmiyah Rais
+## Universitas Muhammadiyah Surakarta (UMS)
 
-## Getting Started
+Repositori resmi sistem informasi dan portal dakwah Masjid Hj. Sudalmiyah Rais UMS. Aplikasi ini mencakup layanan publik jamaah, jadwal shalat, petugas imam & khatib shalat Jumat untuk 6 masjid kampus UMS, presensi live e-ticket anti-joki (QR dinamis 10 detik), pusat unduhan pustaka dokumen digital, warta dakwah, serta dashboard pengelolaan konten takmir berbasis web.
 
-First, run the development server:
+---
 
+## 1. Arsitektur & Teknologi
+
+- **Framework**: Next.js 16 (App Router dengan mode *Standalone Output*)
+- **Bahasa & Tipe**: TypeScript 5
+- **Styling & UI**: Tailwind CSS, Lucide Icons
+- **Database & Sync**: Cloud Firestore (Google Firebase) dengan fallback JSON local data
+- **Containerization**: Docker (Multi-stage build berbasis `node:20-alpine`)
+- **CI/CD**: Siap pakai untuk GitLab UMS (`.gitlab-ci.yml`) dan GitHub Actions
+
+---
+
+## 2. Cara Menjalankan dengan Docker (Rekomendasi Server UMS)
+
+Aplikasi telah dikonfigurasi dengan mode **Next.js Standalone**, sehingga container Docker sangat ringan (ukuran memori RAM hanya sekitar 100MB - 150MB).
+
+### Langkah Menjalankan:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1. Salin berkas variabel lingkungan
+cp .env.example .env
+
+# 2. Bangun dan jalankan container di latar belakang
+docker compose up -d --build
+
+# 3. Periksa status container
+docker compose ps
+
+# 4. Lihat log container
+docker compose logs -f
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Aplikasi akan berjalan pada port **3000** (`http://localhost:3000` atau `http://IP_SERVER:3000`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 3. Cara Menjalankan secara Lokal / Bare-Metal (Node.js)
 
-## Learn More
+### Kebutuhan Sistem:
+- Node.js versi 20.x atau 22.x LTS
+- npm 10.x atau pnpm
 
-To learn more about Next.js, take a look at the following resources:
+### Langkah:
+```bash
+# 1. Pasang dependensi
+npm install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 2. Salin variabel lingkungan
+cp .env.example .env.local
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# 3. Mode pengembangan (development)
+npm run dev
 
-## Deploy on Vercel
+# 4. Mode produksi (build & start)
+npm run build
+npm run start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 4. Variabel Lingkungan (.env)
+
+Konfigurasi lingkungan dapat dilihat pada berkas [`.env.example`](.env.example):
+- `GEMINI_API_KEY`: Kunci API Google AI Studio untuk modul konsultasi tanya-jawab fatwa tarjih.
+- `JWT_SECRET`: Kunci enkripsi sesi otentikasi login admin takmir.
+- `NEXT_PUBLIC_FIREBASE_*`: Kredensial Firebase Cloud Firestore untuk sinkronisasi data real-time lintas perangkat.
+
+---
+
+## 5. Panduan Migrasi Server & GitLab UMS
+
+Petunjuk teknis lengkap mengenai migrasi repositori ke `gitlab.ums.ac.id`, konfigurasi reverse proxy Nginx/Apache, SSL Let's Encrypt, dan manajemen layanan Docker telah didokumentasikan di berkas:
+- [`PANDUAN_DOCKER_DAN_GITLAB_UMS.md`](PANDUAN_DOCKER_DAN_GITLAB_UMS.md)
+
+---
+
+## 6. Struktur Direktori Utama
+
+```
+├── public/                 # Berkas statis (gambar logo, banner, ikon)
+├── src/
+│   ├── app/                # Halaman App Router (Beranda, Admin, Agenda, Layanan)
+│   │   ├── admin/          # Dashboard manajemen takmir
+│   │   ├── agenda/         # E-Ticket dan layar presensi proyektor dinamis
+│   │   └── api/            # REST API endpoints (agendas, friday, feedback, docs)
+│   ├── components/         # Komponen UI modular
+│   └── lib/                # Definisi tipe TypeScript, utilitas, dan helper
+├── Dockerfile              # Konfigurasi container produksi multi-stage
+├── docker-compose.yml      # Orkestrasi Docker produksi
+├── .gitlab-ci.yml          # Pipeline CI/CD untuk GitLab UMS
+└── PANDUAN_DOCKER_DAN_GITLAB_UMS.md # Panduan deployment server UMS
+```
+
+---
+
+Dikelola oleh Tim Takmir Masjid Hj. Sudalmiyah Rais bersama Biro Teknologi Informasi (BTI / DSTI) Universitas Muhammadiyah Surakarta.

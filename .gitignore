@@ -43,3 +43,5 @@ next-env.d.ts
 
 # scratch files
 scratch_*
+*.docx
+scripts/create_surat_*.py
