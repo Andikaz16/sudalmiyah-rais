@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Node dependencies & caches
+node_modules
+npm-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Next.js build output
+.next
+out
+
+# Environment variables
+.env*.local
+.env
+!.env.example
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+*.swp
+*.swo
+
+# Docker / Documentation temp files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+*.md
+!README.md
+!AGENTS.md
+*.docx
