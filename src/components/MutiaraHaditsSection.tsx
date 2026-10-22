@@ -9,9 +9,13 @@ import {
   Copy,
   Check,
   X,
+  Download,
+  Image as ImageIcon,
+  Sparkles,
 } from "lucide-react";
 import { getHijriDate } from "@/lib/prayer-times";
 import { useLanguage } from "@/context/LanguageContext";
+import { generateHadithPosterBlob } from "@/lib/hadith-card-canvas";
 
 export interface InfaqHadith {
   id: number;
@@ -187,6 +191,7 @@ export default function MutiaraHaditsSection() {
   const [selectedHadithId, setSelectedHadithId] = useState<number>(1);
   const [customShareText, setCustomShareText] = useState<string>("");
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+  const [isGeneratingPoster, setIsGeneratingPoster] = useState(false);
 
   const formatHadithShareText = useCallback((hadith: InfaqHadith) => {
     const today = new Date();
@@ -272,6 +277,108 @@ ${footer}`;
   const handleShareTikTok = async () => {
     await handleCopyText("TikTok Caption / Video");
     window.open("https://www.tiktok.com/", "_blank");
+  };
+
+  const getTargetHadith = () => {
+    return INFAQ_HADITHS.find((h) => h.id === selectedHadithId) || INFAQ_HADITHS[0];
+  };
+
+  const handleDownloadPoster = async () => {
+    setIsGeneratingPoster(true);
+    try {
+      const targetHadith = getTargetHadith();
+      const today = new Date();
+      const hijriDate = getHijriDate(today, true, language);
+      const masehiDate = new Intl.DateTimeFormat(isEn ? "en-US" : "id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(today);
+
+      const blob = await generateHadithPosterBlob(targetHadith, hijriDate, masehiDate);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Poster_Hadits_${targetHadith.theme.replace(/[^a-zA-Z0-9]/g, "_")}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setCopyFeedback(isEn ? "Poster image downloaded successfully!" : "Gambar poster hadits berlogo UMS berhasil diunduh!");
+      setTimeout(() => setCopyFeedback(null), 3500);
+    } catch (err) {
+      console.error(err);
+      setCopyFeedback(isEn ? "Failed to generate poster." : "Gagal membuat gambar poster.");
+      setTimeout(() => setCopyFeedback(null), 3000);
+    } finally {
+      setIsGeneratingPoster(false);
+    }
+  };
+
+  const handleSharePosterWithCaption = async () => {
+    setIsGeneratingPoster(true);
+    try {
+      const targetHadith = getTargetHadith();
+      const today = new Date();
+      const hijriDate = getHijriDate(today, true, language);
+      const masehiDate = new Intl.DateTimeFormat(isEn ? "en-US" : "id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(today);
+
+      const blob = await generateHadithPosterBlob(targetHadith, hijriDate, masehiDate);
+      const file = new File(
+        [blob],
+        `Poster_Hadits_${targetHadith.theme.replace(/[^a-zA-Z0-9]/g, "_")}.jpg`,
+        { type: "image/jpeg" }
+      );
+
+      if (
+        typeof navigator !== "undefined" &&
+        navigator.canShare &&
+        navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({
+          files: [file],
+          title: `Mutiara Hadits: ${targetHadith.theme}`,
+          text: customShareText,
+        });
+      } else {
+        // Fallback for Desktop: trigger image download, copy text caption, and open WhatsApp Web
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Poster_Hadits_${targetHadith.theme.replace(/[^a-zA-Z0-9]/g, "_")}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        await navigator.clipboard.writeText(customShareText);
+        setCopyFeedback(
+          isEn
+            ? "Poster downloaded & caption copied! Please paste image on WhatsApp."
+            : "Gambar poster diunduh & teks disalin! Tempelkan gambar dan teks ke WhatsApp."
+        );
+        setTimeout(() => setCopyFeedback(null), 4500);
+
+        setTimeout(() => {
+          window.open(
+            `https://api.whatsapp.com/send?text=${encodeURIComponent(customShareText)}`,
+            "_blank"
+          );
+        }, 600);
+      }
+    } catch (err: unknown) {
+      if ((err as Error)?.name !== "AbortError") {
+        console.error(err);
+      }
+    } finally {
+      setIsGeneratingPoster(false);
+    }
   };
 
   const handleNativeShare = async () => {
@@ -465,11 +572,52 @@ ${footer}`;
               </div>
               <textarea
                 id="share-textarea"
-                rows={7}
+                rows={5}
                 value={customShareText}
                 onChange={(e) => setCustomShareText(e.target.value)}
                 className="w-full p-3.5 rounded-xl border border-stone-300 text-xs text-stone-800 font-mono leading-relaxed bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#003B73]/30 focus:border-[#003B73] resize-none"
               />
+            </div>
+
+            {/* Poster Generator Banner / Highlight Action */}
+            <div className="mt-3.5 p-3.5 rounded-2xl bg-gradient-to-r from-[#002855] to-[#003B73] text-white border border-[#D4AF37]/40 shadow-sm space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{isEn ? "Share as Picture / Poster" : "Bagikan Berupa Gambar Poster Berlogo UMS"}</span>
+                </span>
+                <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-stone-200">
+                  {isEn ? "WA & Instagram Ready" : "Sesuai Permintaan Pak Dodi"}
+                </span>
+              </div>
+              <p className="text-[11px] text-stone-200 leading-relaxed">
+                {isEn
+                  ? "Share an elegant Islamic poster featuring the official UMS & Sudalmiyah Mosque logo placed right above the text."
+                  : "Kirimkan kartu poster hadits berlogo resmi UMS & Masjid Sudalmiyah di atas tulisan (gambar poster + teks caption)."}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={handleSharePosterWithCaption}
+                  disabled={isGeneratingPoster}
+                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
+                  title="Kirim gambar poster hadits ke WhatsApp beserta caption teksnya"
+                >
+                  <ImageIcon className="w-4 h-4 text-emerald-100" />
+                  <span>{isGeneratingPoster ? (isEn ? "Creating..." : "Membuat...") : (isEn ? "Kirim Poster + Teks ke WA" : "Kirim Poster + Teks ke WA")}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownloadPoster}
+                  disabled={isGeneratingPoster}
+                  className="w-full py-2.5 px-3 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-bold transition-all border border-white/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  title="Unduh file gambar poster hadits untuk disimpan ke galeri"
+                >
+                  <Download className="w-4 h-4 text-amber-300" />
+                  <span>{isGeneratingPoster ? (isEn ? "Creating..." : "Membuat...") : (isEn ? "Unduh Gambar Poster (JPG)" : "Unduh Gambar Poster (JPG)")}</span>
+                </button>
+              </div>
             </div>
 
             {/* Copy Feedback Toast */}
