@@ -1730,36 +1730,6 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            {systemStatus?.firebaseConfigured ? (
-              <div className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-400/40 text-emerald-300">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span className="hidden md:inline">Database:</span>
-                <span className="font-semibold text-emerald-200">Firebase Real-time</span>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setShowFirebaseModal(true)}
-                className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/50 text-amber-300 transition-colors cursor-pointer"
-                title="Klik untuk panduan setup Firebase Firestore gratis"
-              >
-                <Database className="w-3.5 h-3.5 text-amber-400" />
-                <span className="hidden md:inline">Database:</span>
-                <span className="font-semibold text-amber-200 underline decoration-dotted">Setup Firebase (Gratis)</span>
-              </button>
-            )}
-
-            {systemStatus?.imgbbConfigured && (
-              <div
-                className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/40 text-sky-300"
-                title="Hosting gambar aktif via ImgBB API CDN"
-              >
-                <span className="w-2 h-2 rounded-full bg-sky-400"></span>
-                <span className="hidden lg:inline">Media:</span>
-                <span className="font-semibold text-sky-200">ImgBB Cloud</span>
-              </div>
-            )}
-
             <Link
               href="/agenda/presensi-live"
               target="_blank"
@@ -1852,57 +1822,89 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab Controls - Pure Text with Badges */}
+        {/* Beginner Admin Guide Card */}
+        <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#003B73]/5 via-[#FAF8F5] to-amber-500/5 border border-stone-200/90 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-[#003B73] text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Sparkles className="w-5 h-5 text-amber-300" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-bold text-stone-900 font-serif">
+                Pusat Pengelolaan Konten Masjid
+              </h2>
+              <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
+                Pilih menu tab di bawah untuk mengelola data masjid. Setiap perubahan yang disimpan akan langsung terbit secara otomatis di website publik jamaah.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 self-stretch sm:self-auto shrink-0">
+            <Link
+              href="/"
+              target="_blank"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#003B73] bg-[#003B73]/10 hover:bg-[#003B73]/20 border border-[#003B73]/20 transition-all cursor-pointer"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Cek Tampilan Web</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Tab Controls - Friendly Design with Icons */}
         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 border-b border-stone-200 no-scrollbar">
           <button
             onClick={() => setActiveTab("AGENDAS")}
-            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "AGENDAS"
                 ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
-            Kelola Agenda & Kajian
+            <Calendar className="w-4 h-4" />
+            <span>Kelola Agenda &amp; Kajian</span>
           </button>
           <button
             onClick={() => setActiveTab("PETUGAS_JUMAT")}
-            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "PETUGAS_JUMAT"
                 ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
-            Petugas Imam & Khatib Pekan Ini
+            <Clock className="w-4 h-4" />
+            <span>Petugas Shalat Jumat</span>
           </button>
           <button
             onClick={() => setActiveTab("QRIS_INFAQ")}
-            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "QRIS_INFAQ"
                 ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
-            Kelola QRIS Infaq
+            <QrCode className="w-4 h-4" />
+            <span>Kelola QRIS Infaq</span>
           </button>
           <button
             onClick={() => setActiveTab("REGISTRATIONS")}
-            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "REGISTRATIONS"
                 ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
-            Presensi Kehadiran Jamaah
+            <Users className="w-4 h-4" />
+            <span>Presensi Kehadiran</span>
           </button>
           <button
             onClick={() => setActiveTab("FEEDBACK")}
-            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "FEEDBACK"
                 ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
-            <span>Kotak Saran & Aspirasi</span>
+            <MessageSquare className="w-4 h-4" />
+            <span>Kotak Saran &amp; Aspirasi</span>
             {feedbackCounts.baru > 0 && (
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-none">
                 {feedbackCounts.baru}
@@ -1911,13 +1913,13 @@ export default function AdminDashboardPage() {
           </button>
           <button
             onClick={() => setActiveTab("POPUP_BANNER")}
-            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "POPUP_BANNER"
                 ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <Sparkles className="w-4 h-4 text-amber-500" />
             <span>Pop-up Banner Beranda</span>
             {popupBanner && popupBanner.isActive && (
               <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -1925,13 +1927,13 @@ export default function AdminDashboardPage() {
           </button>
           <button
             onClick={() => setActiveTab("DOCUMENTS")}
-            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "DOCUMENTS"
                 ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5 text-amber-500" />
+            <BookOpen className="w-4 h-4 text-amber-500" />
             <span>Pustaka &amp; Dokumen</span>
             {documents.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
@@ -1941,13 +1943,13 @@ export default function AdminDashboardPage() {
           </button>
           <button
             onClick={() => setActiveTab("BERITA_MASJID")}
-            className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "BERITA_MASJID"
                 ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
                 : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
             }`}
           >
-            <Newspaper className="w-3.5 h-3.5 text-blue-500" />
+            <Newspaper className="w-4 h-4 text-blue-500" />
             <span>Warta &amp; Berita Masjid</span>
             {manualNewsList.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
