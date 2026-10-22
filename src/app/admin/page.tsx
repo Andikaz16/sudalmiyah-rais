@@ -43,6 +43,7 @@ import {
   ChevronUp,
   ChevronDown,
   Upload,
+  LogOut,
 } from "lucide-react";
 import {
   Agenda,
@@ -78,6 +79,17 @@ const DOCUMENT_CATEGORIES: { value: DocumentCategory; label: string }[] = [
   { value: "PANDUAN_MASJID", label: "Panduan Takmir" },
   { value: "UMUM", label: "Lainnya / Umum" },
 ];
+
+const ADMIN_TABS = [
+  { id: "AGENDAS", label: "Kelola Agenda & Kajian", shortLabel: "Agenda & Kajian", icon: Calendar },
+  { id: "PETUGAS_JUMAT", label: "Petugas Shalat Jumat", shortLabel: "Petugas Jumat", icon: Clock },
+  { id: "QRIS_INFAQ", label: "Kelola QRIS Infaq", shortLabel: "QRIS Infaq", icon: QrCode },
+  { id: "REGISTRATIONS", label: "Presensi Kehadiran", shortLabel: "Presensi Jamaah", icon: Users },
+  { id: "FEEDBACK", label: "Kotak Saran & Aspirasi", shortLabel: "Kotak Saran", icon: MessageSquare },
+  { id: "POPUP_BANNER", label: "Pop-up Banner Beranda", shortLabel: "Pop-up Banner", icon: Sparkles },
+  { id: "DOCUMENTS", label: "Pustaka & Dokumen", shortLabel: "Pustaka Dokumen", icon: BookOpen },
+  { id: "BERITA_MASJID", label: "Warta & Berita Masjid", shortLabel: "Warta Berita", icon: Newspaper },
+] as const;
 
 // Client-side image compressor: optimizes uploads for fast transfer & avoids serverless payload limits
 async function compressImageForUpload(
@@ -1707,10 +1719,11 @@ export default function AdminDashboardPage() {
       )}
 
       {/* Top Admin Header */}
-      <header className="bg-[#001F3F] border-b border-stone-800 text-white sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="w-11 h-11 flex items-center justify-center shrink-0 hover:scale-105 transition-transform">
+      <header className="bg-[#001F3F] border-b border-stone-800/80 text-white sticky top-0 z-40 shadow-sm backdrop-blur-md bg-opacity-95">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+          {/* Logo & Mosque Identity */}
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <Link href="/" className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center shrink-0 hover:scale-105 transition-transform" title="Beranda Publik">
               <Image
                 src="/images/logo/logo-masjid-white.png"
                 alt="Logo Masjid UMS"
@@ -1719,36 +1732,51 @@ export default function AdminDashboardPage() {
                 className="w-full h-full object-contain"
               />
             </Link>
-            <div>
-              <h1 className="font-bold text-sm sm:text-base text-white font-serif">
-                Dashboard Manajemen Takmir
-              </h1>
-              <p className="text-[11px] text-stone-300">
-                Masjid Sudalmiyah Rais Universitas Muhammadiyah Surakarta
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h1 className="font-bold text-xs sm:text-base text-white font-serif truncate">
+                  <span className="sm:hidden">Admin Takmir UMS</span>
+                  <span className="hidden sm:inline">Dashboard Manajemen Takmir</span>
+                </h1>
+                <span className="hidden xs:inline-block px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                  Panel
+                </span>
+              </div>
+              <p className="text-[10px] sm:text-[11px] text-stone-300 truncate">
+                <span className="sm:hidden">Masjid Hj. Sudalmiyah Rais</span>
+                <span className="hidden sm:inline">Masjid Hj. Sudalmiyah Rais Universitas Muhammadiyah Surakarta</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          {/* Quick Action Navigation */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <Link
               href="/agenda/presensi-live"
               target="_blank"
-              className="text-xs font-semibold text-amber-300 hover:text-amber-200 px-3.5 py-1.5 rounded-full border border-amber-400/50 bg-amber-400/10 flex items-center gap-1.5 transition-colors"
+              className="text-[11px] sm:text-xs font-semibold text-amber-300 hover:text-amber-200 px-2.5 sm:px-3.5 py-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 flex items-center gap-1 sm:gap-1.5 transition-colors shadow-2xs cursor-pointer active:scale-95"
+              title="Buka Layar Proyektor Presensi QR Dinamis"
             >
-              <Tv className="w-3.5 h-3.5 text-amber-400" />
-              <span>Layar Proyektor (QR Dinamis)</span>
+              <Tv className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="hidden md:inline">Layar Proyektor (QR Dinamis)</span>
+              <span className="hidden sm:inline md:hidden">Proyektor QR</span>
+              <span className="sm:hidden text-[10px]">Proyektor</span>
             </Link>
             <Link
               href="/"
-              className="text-xs font-semibold text-stone-300 hover:text-white px-3.5 py-1.5 rounded-full border border-stone-600 hidden sm:block transition-colors"
+              target="_blank"
+              className="text-xs font-semibold text-stone-300 hover:text-white px-3 py-1.5 rounded-full border border-stone-700 hidden lg:flex items-center gap-1.5 transition-colors"
             >
-              Lihat Portal Publik
+              <ExternalLink className="w-3 h-3 text-stone-400" />
+              <span>Portal Publik</span>
             </Link>
             <button
               onClick={handleLogout}
-              className="px-4 py-1.5 rounded-full bg-rose-900/60 hover:bg-rose-800 text-rose-200 text-xs font-semibold transition-colors"
+              className="px-3 sm:px-4 py-1.5 rounded-full bg-rose-900/70 hover:bg-rose-800 text-rose-200 text-[11px] sm:text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer active:scale-95"
+              title="Keluar dari sesi admin"
             >
-              Keluar
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden xs:inline">Keluar</span>
             </button>
           </div>
         </div>
@@ -1849,114 +1877,83 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Tab Controls - Friendly Design with Icons */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 border-b border-stone-200 no-scrollbar">
-          <button
-            onClick={() => setActiveTab("AGENDAS")}
-            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === "AGENDAS"
-                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
-                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Kelola Agenda &amp; Kajian</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("PETUGAS_JUMAT")}
-            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === "PETUGAS_JUMAT"
-                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
-                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-            }`}
-          >
-            <Clock className="w-4 h-4" />
-            <span>Petugas Shalat Jumat</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("QRIS_INFAQ")}
-            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === "QRIS_INFAQ"
-                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
-                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-            }`}
-          >
-            <QrCode className="w-4 h-4" />
-            <span>Kelola QRIS Infaq</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("REGISTRATIONS")}
-            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === "REGISTRATIONS"
-                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
-                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>Presensi Kehadiran</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("FEEDBACK")}
-            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === "FEEDBACK"
-                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
-                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-            }`}
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>Kotak Saran &amp; Aspirasi</span>
-            {feedbackCounts.baru > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-none">
-                {feedbackCounts.baru}
+        {/* Mobile Tab Selector (Compact, touch-friendly dropdown for iOS & Android) */}
+        <div className="block md:hidden mb-4">
+          <div className="bg-white rounded-2xl border border-stone-200 p-3 shadow-xs">
+            <div className="flex items-center justify-between mb-1.5 px-0.5">
+              <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
+                Menu Admin (8 Menu):
               </span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("POPUP_BANNER")}
-            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === "POPUP_BANNER"
-                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
-                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-            }`}
-          >
-            <Sparkles className="w-4 h-4 text-amber-500" />
-            <span>Pop-up Banner Beranda</span>
-            {popupBanner && popupBanner.isActive && (
-              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("DOCUMENTS")}
-            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === "DOCUMENTS"
-                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
-                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-            }`}
-          >
-            <BookOpen className="w-4 h-4 text-amber-500" />
-            <span>Pustaka &amp; Dokumen</span>
-            {documents.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
-                {documents.length}
+              <span className="text-[10px] font-semibold text-[#003B73]">
+                {activeTab === "FEEDBACK" && feedbackCounts.baru > 0
+                  ? `${feedbackCounts.baru} Masukan Baru`
+                  : activeTab === "BERITA_MASJID"
+                  ? `${manualNewsList.length} Warta`
+                  : activeTab === "DOCUMENTS"
+                  ? `${documents.length} Dokumen`
+                  : activeTab === "REGISTRATIONS"
+                  ? `${registrations.length} Presensi`
+                  : "Aktif"}
               </span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("BERITA_MASJID")}
-            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === "BERITA_MASJID"
-                ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/15"
-                : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-            }`}
-          >
-            <Newspaper className="w-4 h-4 text-blue-500" />
-            <span>Warta &amp; Berita Masjid</span>
-            {manualNewsList.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
-                {manualNewsList.length}
-              </span>
-            )}
-          </button>
+            </div>
+            <div className="relative">
+              <select
+                value={activeTab}
+                onChange={(e) => setActiveTab(e.target.value as typeof activeTab)}
+                className="w-full pl-3 pr-10 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 font-bold text-xs focus:ring-2 focus:ring-[#003B73] focus:border-[#003B73] appearance-none cursor-pointer"
+              >
+                {ADMIN_TABS.map((tab) => (
+                  <option key={tab.id} value={tab.id}>
+                    {tab.label} {tab.id === "FEEDBACK" && feedbackCounts.baru > 0 ? `(${feedbackCounts.baru} Baru)` : ""}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-stone-500">
+                <ChevronDown className="w-4 h-4" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Controls - Smooth Horizontal Scrollable Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 border-b border-stone-200 no-scrollbar scroll-smooth">
+          {ADMIN_TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer active:scale-95 shrink-0 ${
+                  isActive
+                    ? "bg-[#003B73] text-white font-bold shadow-md shadow-[#003B73]/20 ring-2 ring-[#003B73]/20"
+                    : "bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${isActive ? "text-amber-300" : "text-stone-500"}`} />
+                <span>{tab.label}</span>
+                {tab.id === "FEEDBACK" && feedbackCounts.baru > 0 && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-none">
+                    {feedbackCounts.baru}
+                  </span>
+                )}
+                {tab.id === "POPUP_BANNER" && popupBanner && popupBanner.isActive && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                )}
+                {tab.id === "DOCUMENTS" && documents.length > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
+                    {documents.length}
+                  </span>
+                )}
+                {tab.id === "BERITA_MASJID" && manualNewsList.length > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
+                    {manualNewsList.length}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Tab 1: AGENDAS */}
@@ -1968,10 +1965,12 @@ export default function AdminDashboardPage() {
                 <p className="text-xs text-stone-500 mt-0.5">Kelola jadwal kajian, bimbingan tahsin, dan kegiatan kemahasiswaan dengan thumbnail media</p>
               </div>
               <button
+                type="button"
                 onClick={() => setIsNewAgendaOpen(true)}
-                className="px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md transition-colors whitespace-nowrap"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md transition-all whitespace-nowrap cursor-pointer active:scale-95 flex items-center justify-center gap-1.5"
               >
-                Tambah Agenda Baru
+                <Plus className="w-4 h-4" />
+                <span>Tambah Agenda Baru</span>
               </button>
             </div>
 
@@ -2102,24 +2101,24 @@ export default function AdminDashboardPage() {
                       <button
                         type="button"
                         onClick={() => handleToggleQuickComplete(item)}
-                        className={`w-full py-2 px-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 border shadow-2xs ${
+                        className={`w-full min-h-[42px] py-2 px-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 border shadow-2xs active:scale-95 ${
                           item.isCompleted
                             ? "bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-300"
                             : "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
                         }`}
                         title={item.isCompleted ? "Tandai Belum Selesai" : "Tandai Selesai"}
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                         <span>{item.isCompleted ? "Batal Selesai" : "Tandai Selesai"}</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => handleOpenAgendaDoc(item)}
-                        className="w-full py-2 px-2 rounded-xl text-[11px] font-bold bg-[#003B73] hover:bg-[#002855] text-white border border-[#003B73] transition-all cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
+                        className="w-full min-h-[42px] py-2 px-2 rounded-xl text-[11px] font-bold bg-[#003B73] hover:bg-[#002855] text-white border border-[#003B73] transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs active:scale-95"
                         title="Atur foto dokumentasi dan jumlah peserta"
                       >
-                        <Camera className="w-3.5 h-3.5" />
+                        <Camera className="w-3.5 h-3.5 shrink-0" />
                         <span>Dokumentasi</span>
                       </button>
                     </div>
@@ -2127,11 +2126,11 @@ export default function AdminDashboardPage() {
                     <Link
                       href={`/agenda/presensi-live?agendaId=${item.id}`}
                       target="_blank"
-                      className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-bold text-[#003B73] bg-[#003B73]/10 hover:bg-[#003B73]/15 border border-[#003B73]/20 transition-all active:scale-[0.98]"
+                      className="inline-flex items-center justify-center gap-1.5 w-full min-h-[42px] py-2 px-3 rounded-xl text-xs font-bold text-[#003B73] bg-[#003B73]/10 hover:bg-[#003B73]/15 border border-[#003B73]/20 transition-all active:scale-[0.98]"
                     >
-                      <Tv className="w-3.5 h-3.5 text-[#003B73]" />
+                      <Tv className="w-3.5 h-3.5 text-[#003B73] shrink-0" />
                       <span>Mode Proyektor QR Acara Ini</span>
-                      <ExternalLink className="w-3 h-3 text-[#003B73]/70" />
+                      <ExternalLink className="w-3 h-3 text-[#003B73]/70 shrink-0" />
                     </Link>
                   </div>
                 </div>
@@ -2170,19 +2169,19 @@ export default function AdminDashboardPage() {
                       key={m.id}
                       type="button"
                       onClick={() => handleSelectMosque(m.id)}
-                      className={`p-3 rounded-2xl text-left border transition-all duration-200 flex flex-col justify-between ${
+                      className={`p-2.5 sm:p-3 rounded-2xl text-left border transition-all duration-200 flex flex-col justify-between active:scale-95 cursor-pointer ${
                         isSelected
                           ? "bg-[#003B73] text-white border-[#003B73] shadow-md shadow-[#003B73]/20 ring-2 ring-[#003B73]/20"
                           : "bg-white text-stone-700 border-stone-200 hover:bg-stone-100 hover:border-stone-300"
                       }`}
                     >
-                      <div className="flex items-center gap-1.5 mb-1">
+                      <div className="flex items-start gap-1.5 mb-1">
                         <span
-                          className={`w-2 h-2 rounded-full shrink-0 ${
+                          className={`w-2 h-2 rounded-full shrink-0 mt-1 ${
                             isSelected ? "bg-[#D4AF37]" : "bg-stone-300"
                           }`}
                         />
-                        <span className="text-xs font-bold truncate leading-snug">
+                        <span className="text-[11px] sm:text-xs font-bold leading-snug line-clamp-2">
                           {m.name}
                         </span>
                       </div>
@@ -2518,14 +2517,14 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Submit Action */}
-                <div className="flex items-center justify-between pt-2">
-                  <span className="text-xs text-stone-500">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+                  <span className="text-xs text-stone-500 text-center sm:text-left">
                     Menyimpan perubahan untuk <strong>{activeMosqueMeta.name}</strong>
                   </span>
                   <button
                     type="submit"
                     disabled={savingFriday}
-                    className="px-8 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50"
+                    className="w-full sm:w-auto px-8 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50 cursor-pointer active:scale-95"
                   >
                     {savingFriday ? "Menyimpan Perubahan..." : `Simpan Jadwal (${activeMosqueMeta.name})`}
                   </button>
@@ -2823,7 +2822,7 @@ export default function AdminDashboardPage() {
                   <button
                     type="submit"
                     disabled={savingQris}
-                    className="px-8 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50"
+                    className="w-full sm:w-auto px-8 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50 cursor-pointer active:scale-95"
                   >
                     {savingQris ? "Menyimpan Pengaturan..." : "Simpan Pengaturan QRIS"}
                   </button>
@@ -2837,7 +2836,7 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 3: REGISTRATIONS */}
+        {/* Tab 4: REGISTRATIONS */}
         {activeTab === "REGISTRATIONS" && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -2848,7 +2847,7 @@ export default function AdminDashboardPage() {
               <Link
                 href="/agenda/presensi-live"
                 target="_blank"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-sm transition-colors whitespace-nowrap self-start sm:self-auto"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-sm transition-all whitespace-nowrap self-start sm:self-auto cursor-pointer active:scale-95"
               >
                 <Tv className="w-3.5 h-3.5 text-amber-400" />
                 <span>Buka Layar Proyektor Presensi</span>
@@ -2856,7 +2855,67 @@ export default function AdminDashboardPage() {
               </Link>
             </div>
             <div className="rounded-3xl bg-white border border-stone-200 overflow-hidden shadow-sm">
-              <div className="overflow-x-auto">
+              {/* Mobile Card View (Phone screens: Android & iOS) */}
+              <div className="block md:hidden divide-y divide-stone-100">
+                {registrations.length === 0 ? (
+                  <div className="p-8 text-center text-stone-400 text-xs">
+                    Belum ada data presensi jamaah yang tercatat.
+                  </div>
+                ) : (
+                  registrations.map((reg) => (
+                    <div key={reg.id} className="p-4 flex items-start gap-3 bg-white hover:bg-stone-50/60 transition-colors">
+                      {reg.photoUrl ? (
+                        <a
+                          href={reg.photoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-12 h-12 rounded-xl overflow-hidden border border-stone-200 shadow-2xs shrink-0 bg-stone-100"
+                          title="Lihat foto presensi ukuran penuh"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={reg.photoUrl} alt={reg.fullName} className="w-full h-full object-cover" />
+                        </a>
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center text-xs text-stone-400 font-medium shrink-0">
+                          -
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="font-bold text-stone-900 text-xs sm:text-sm truncate">{reg.fullName}</h4>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold shrink-0">
+                            Hadir
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-stone-600 mt-0.5">
+                          {reg.isUmsStudent ? (
+                            <span className="text-sky-700 font-semibold">Mahasiswa ({reg.nim})</span>
+                          ) : (
+                            <span className="text-stone-500">Jamaah Umum</span>
+                          )}
+                        </p>
+                        <p className="text-[11px] text-stone-500 truncate mt-0.5 font-sans">
+                          {reg.agendaTitle}
+                        </p>
+                        <p className="text-[10px] text-stone-400 font-mono mt-1">
+                          {reg.attendedAt
+                            ? new Date(reg.attendedAt).toLocaleTimeString("id-ID", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                timeZone: "Asia/Jakarta",
+                              }) + " WIB"
+                            : reg.registeredAt
+                            ? new Date(reg.registeredAt).toLocaleDateString("id-ID")
+                            : "-"}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
                     <tr className="border-b border-stone-200 text-stone-500 uppercase text-[10px] tracking-wider bg-[#FAF8F5]">
@@ -3905,32 +3964,33 @@ export default function AdminDashboardPage() {
         {/* Tab 7: DOCUMENTS */}
         {activeTab === "DOCUMENTS" && (
           <div className="space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-stone-200 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-3xl border border-stone-200 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6" />
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                  <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-stone-900 font-serif">
-                    Pusat Unduhan & Pustaka Dokumen
+                  <h3 className="text-base sm:text-lg font-bold text-stone-900 font-serif">
+                    Pusat Unduhan &amp; Pustaka Dokumen
                   </h3>
                   <p className="text-xs text-stone-500">
                     Kelola berkas PDF resmi, HPT, PHIWM, Fatwa Tarjih, Risalah Islam Berkemajuan, Panduan Masjid, dan literatur dakwah lainnya.
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto w-full sm:w-auto">
                 <Link
                   href="/layanan/unduhan"
                   target="_blank"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-colors"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-colors cursor-pointer"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>Lihat Halaman Publik</span>
                 </Link>
                 <button
+                  type="button"
                   onClick={handleOpenNewDocModal}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md cursor-pointer active:scale-95"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah Dokumen Baru</span>
@@ -3938,9 +3998,9 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Document list table */}
+            {/* Document list table & mobile cards */}
             <div className="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
-              <div className="p-5 border-b border-stone-200 flex items-center justify-between">
+              <div className="p-4 sm:p-5 border-b border-stone-200 flex items-center justify-between">
                 <div>
                   <h4 className="text-sm font-bold text-stone-900 font-serif">
                     Daftar Dokumen Digital ({documents.length})
@@ -3952,7 +4012,7 @@ export default function AdminDashboardPage() {
               </div>
 
               {documents.length === 0 ? (
-                <div className="p-12 text-center space-y-3">
+                <div className="p-10 sm:p-12 text-center space-y-3">
                   <div className="w-12 h-12 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
                     <FileText className="w-6 h-6" />
                   </div>
@@ -3962,89 +4022,157 @@ export default function AdminDashboardPage() {
                   </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-stone-600">
-                    <thead className="bg-stone-50 text-stone-500 font-semibold border-b border-stone-200 uppercase tracking-wider text-[11px]">
-                      <tr>
-                        <th className="py-3.5 px-4">Dokumen</th>
-                        <th className="py-3.5 px-4">Kategori</th>
-                        <th className="py-3.5 px-4">Penerbit / Penulis</th>
-                        <th className="py-3.5 px-4 text-center">Ukuran / Format</th>
-                        <th className="py-3.5 px-4 text-center">Total Unduhan</th>
-                        <th className="py-3.5 px-4 text-right">Aksi</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-100">
-                      {documents.map((doc) => (
-                        <tr key={doc.id} className="hover:bg-stone-50/70 transition-colors">
-                          <td className="py-3.5 px-4">
-                            <div className="flex items-start gap-3 max-w-md">
-                              <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
-                                <FileText className="w-5 h-5" />
-                              </div>
-                              <div>
-                                <p className="font-bold text-stone-900 text-sm leading-snug">
-                                  {doc.title}
-                                </p>
-                                <p className="text-[11px] text-stone-500 line-clamp-1 mt-0.5">
-                                  {doc.description}
-                                </p>
-                                <p className="text-[10px] text-stone-400 font-mono mt-0.5">
-                                  Berkas: {doc.fileName || doc.fileUrl}
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-3.5 px-4 whitespace-nowrap">
-                            <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <>
+                  {/* Mobile Card List for Smartphones */}
+                  <div className="block md:hidden divide-y divide-stone-100">
+                    {documents.map((doc) => (
+                      <div key={doc.id} className="p-4 space-y-3 bg-white hover:bg-stone-50/60 transition-colors">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
+                            <FileText className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 mb-1">
                               {doc.categoryLabel || doc.category}
                             </span>
-                          </td>
-                          <td className="py-3.5 px-4">
-                            <p className="font-medium text-stone-800">{doc.author}</p>
-                            {doc.publishedYear && (
-                              <p className="text-[11px] text-stone-400 font-sans">Tahun: {doc.publishedYear}</p>
-                            )}
-                          </td>
-                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                            <span className="font-bold text-stone-800">{doc.fileSize || "1.9 MB"}</span>
-                            <span className="text-stone-400 ml-1">({doc.fileFormat || "PDF"})</span>
-                          </td>
-                          <td className="py-3.5 px-4 text-center whitespace-nowrap font-bold text-emerald-700">
-                            {doc.downloadCount || 0}x
-                          </td>
-                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                            <div className="flex items-center justify-end gap-1.5">
-                              <a
-                                href={doc.fileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
-                                title="Buka Berkas PDF"
-                              >
-                                <ExternalLink className="w-3.5 h-3.5" />
-                              </a>
-                              <button
-                                onClick={() => handleOpenEditDocModal(doc)}
-                                className="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#003B73] transition-colors"
-                                title="Edit Data Dokumen"
-                              >
-                                <Edit2 className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteDoc(doc.id, doc.title)}
-                                className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
-                                title="Hapus Dokumen"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                            <h5 className="font-bold text-stone-900 text-xs sm:text-sm leading-snug">
+                              {doc.title}
+                            </h5>
+                            <p className="text-[11px] text-stone-500 line-clamp-2 mt-0.5 leading-relaxed">
+                              {doc.description}
+                            </p>
+                            <p className="text-[11px] text-stone-600 font-medium mt-1">
+                              Penulis: {doc.author} {doc.publishedYear ? `(${doc.publishedYear})` : ""}
+                            </p>
+                            <div className="flex items-center gap-3 text-[10px] text-stone-400 font-mono mt-1">
+                              <span>Ukuran: {doc.fileSize || "PDF"}</span>
+                              <span className="text-emerald-700 font-bold">{doc.downloadCount || 0}x diunduh</span>
                             </div>
-                          </td>
+                          </div>
+                        </div>
+
+                        {/* Action buttons on mobile */}
+                        <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+                          <a
+                            href={doc.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors"
+                            title="Buka Berkas PDF"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            <span>Buka</span>
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditDocModal(doc)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003B73] text-xs font-semibold transition-colors"
+                            title="Edit Data Dokumen"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteDoc(doc.id, doc.title)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold transition-colors"
+                            title="Hapus Dokumen"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Hapus</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop Table */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full text-left text-xs text-stone-600">
+                      <thead className="bg-stone-50 text-stone-500 font-semibold border-b border-stone-200 uppercase tracking-wider text-[11px]">
+                        <tr>
+                          <th className="py-3.5 px-4">Dokumen</th>
+                          <th className="py-3.5 px-4">Kategori</th>
+                          <th className="py-3.5 px-4">Penerbit / Penulis</th>
+                          <th className="py-3.5 px-4 text-center">Ukuran / Format</th>
+                          <th className="py-3.5 px-4 text-center">Total Unduhan</th>
+                          <th className="py-3.5 px-4 text-right">Aksi</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-stone-100">
+                        {documents.map((doc) => (
+                          <tr key={doc.id} className="hover:bg-stone-50/70 transition-colors">
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-start gap-3 max-w-md">
+                                <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
+                                  <FileText className="w-5 h-5" />
+                                </div>
+                                <div>
+                                  <p className="font-bold text-stone-900 text-sm leading-snug">
+                                    {doc.title}
+                                  </p>
+                                  <p className="text-[11px] text-stone-500 line-clamp-1 mt-0.5">
+                                    {doc.description}
+                                  </p>
+                                  <p className="text-[10px] text-stone-400 font-mono mt-0.5">
+                                    Berkas: {doc.fileName || doc.fileUrl}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-4 whitespace-nowrap">
+                              <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                {doc.categoryLabel || doc.category}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <p className="font-medium text-stone-800">{doc.author}</p>
+                              {doc.publishedYear && (
+                                <p className="text-[11px] text-stone-400 font-sans">Tahun: {doc.publishedYear}</p>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                              <span className="font-bold text-stone-800">{doc.fileSize || "1.9 MB"}</span>
+                              <span className="text-stone-400 ml-1">({doc.fileFormat || "PDF"})</span>
+                            </td>
+                            <td className="py-3.5 px-4 text-center whitespace-nowrap font-bold text-emerald-700">
+                              {doc.downloadCount || 0}x
+                            </td>
+                            <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <a
+                                  href={doc.fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
+                                  title="Buka Berkas PDF"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditDocModal(doc)}
+                                  className="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#003B73] transition-colors"
+                                  title="Edit Data Dokumen"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteDoc(doc.id, doc.title)}
+                                  className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
+                                  title="Hapus Dokumen"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -4068,11 +4196,11 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto w-full sm:w-auto">
                 <Link
                   href="/#berita"
                   target="_blank"
-                  className="px-4 py-2.5 rounded-full border border-stone-200 hover:bg-stone-50 text-stone-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full border border-stone-200 hover:bg-stone-50 text-stone-700 text-xs font-semibold transition-colors active:scale-95 cursor-pointer"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>Lihat di Beranda</span>
@@ -4080,7 +4208,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={handleOpenAddNews}
-                  className="px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold flex items-center gap-2 shadow-md shadow-[#003B73]/20 transition-all cursor-pointer"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md shadow-[#003B73]/20 transition-all cursor-pointer active:scale-95"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah Warta Baru</span>
@@ -4171,11 +4299,11 @@ export default function AdminDashboardPage() {
                       </div>
 
                       {/* Action buttons */}
-                      <div className="flex items-center gap-2 shrink-0 self-end md:self-center pt-2 md:pt-0 border-t md:border-t-0 border-stone-100 w-full md:w-auto justify-end">
+                      <div className="flex flex-wrap items-center gap-2 shrink-0 self-end md:self-center pt-2 md:pt-0 border-t md:border-t-0 border-stone-100 w-full md:w-auto justify-end">
                         <button
                           type="button"
                           onClick={() => handleTogglePublishNews(item)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
+                          className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-colors cursor-pointer active:scale-95 ${
                             item.isPublished !== false
                               ? "bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100"
                               : "bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100"
@@ -4187,7 +4315,7 @@ export default function AdminDashboardPage() {
                         <button
                           type="button"
                           onClick={() => handleOpenEditNews(item)}
-                          className="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003B73] transition-colors cursor-pointer"
+                          className="p-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003B73] transition-colors cursor-pointer active:scale-95"
                           title="Edit warta"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -4195,7 +4323,7 @@ export default function AdminDashboardPage() {
                         <button
                           type="button"
                           onClick={() => handleDeleteNews(item.id, item.title)}
-                          className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer"
+                          className="p-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer active:scale-95"
                           title="Hapus warta"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -4212,9 +4340,17 @@ export default function AdminDashboardPage() {
 
       {/* Modal Responding to Feedback */}
       {respondingFeedback && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-y-auto max-h-[90vh]">
-            <h3 className="text-lg font-bold text-stone-900 mb-2 font-serif">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl p-5 sm:p-8 my-auto overflow-y-auto max-h-[90vh]">
+            <button
+              type="button"
+              onClick={() => setRespondingFeedback(null)}
+              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center cursor-pointer transition-colors"
+              title="Tutup Modal"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <h3 className="text-lg font-bold text-stone-900 mb-2 font-serif pr-8">
               Tanggapan Resmi Takmir Masjid
             </h3>
             <p className="text-xs text-stone-500 mb-4">
@@ -4284,9 +4420,18 @@ export default function AdminDashboardPage() {
 
       {/* Modal Add New Agenda */}
       {isNewAgendaOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-y-auto max-h-[90vh]">
-            <h3 className="text-lg font-bold text-stone-900 mb-4 font-serif">Tambah Agenda Masjid Baru</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl p-5 sm:p-8 my-auto overflow-y-auto max-h-[90vh]">
+            <button
+              type="button"
+              onClick={() => setIsNewAgendaOpen(false)}
+              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center cursor-pointer transition-colors"
+              title="Tutup Modal"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <h3 className="text-lg font-bold text-stone-900 mb-1 font-serif pr-8">Tambah Agenda Masjid Baru</h3>
+            <p className="text-xs text-stone-500 mb-4">Lengkapi informasi kegiatan dan jadwal kajian masjid</p>
             <form onSubmit={handleCreateAgenda} className="space-y-4">
               
               {/* Media Upload for Agenda Thumbnail */}
@@ -4542,8 +4687,8 @@ export default function AdminDashboardPage() {
 
       {/* Modal Kelola Hasil & Dokumentasi Agenda */}
       {editingAgendaDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-xl bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 sm:p-7 overflow-y-auto max-h-[90vh] space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="relative w-full max-w-xl bg-white border border-stone-200 rounded-3xl shadow-2xl p-5 sm:p-7 my-auto overflow-y-auto max-h-[90vh] space-y-5">
             <div className="flex items-center justify-between border-b border-stone-100 pb-3">
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-stone-900 font-serif">
@@ -4723,9 +4868,17 @@ export default function AdminDashboardPage() {
 
       {/* Modal Dokumen (Tambah / Edit) */}
       {isDocModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-y-auto max-h-[90vh]">
-            <h3 className="text-lg font-bold text-stone-900 mb-1 font-serif">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl p-5 sm:p-8 my-auto overflow-y-auto max-h-[90vh]">
+            <button
+              type="button"
+              onClick={() => setIsDocModalOpen(false)}
+              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center cursor-pointer transition-colors"
+              title="Tutup Modal"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <h3 className="text-lg font-bold text-stone-900 mb-1 font-serif pr-8">
               {editingDocId ? "Edit Dokumen & Risalah" : "Tambah Dokumen / Risalah Baru"}
             </h3>
             <p className="text-xs text-stone-500 mb-5">
@@ -4883,8 +5036,8 @@ export default function AdminDashboardPage() {
 
       {/* Modal Add / Edit Manual News */}
       {isNewsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-2xl bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-y-auto max-h-[92vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-white border border-stone-200 rounded-3xl shadow-2xl p-5 sm:p-8 my-auto overflow-y-auto max-h-[92vh]">
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-200">
               <div>
                 <h3 className="text-lg font-bold text-stone-900 font-serif">
@@ -5091,8 +5244,8 @@ export default function AdminDashboardPage() {
 
       {/* Modal Panduan Koneksi Firebase Cloud Firestore */}
       {showFirebaseModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-stone-200 relative my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl border border-stone-200 relative my-auto">
             <button
               onClick={() => setShowFirebaseModal(false)}
               className="absolute top-5 right-5 p-2 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
