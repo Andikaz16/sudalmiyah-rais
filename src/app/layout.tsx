@@ -21,24 +21,120 @@ const amiri = Amiri({
   display: "swap",
 });
 
+const jsonLdPayload = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://sudalmiyah-rais.vercel.app/#website",
+      "url": "https://sudalmiyah-rais.vercel.app",
+      "name": "Masjid Kampus UMS",
+      "alternateName": [
+        "Kampus Masjid UMS",
+        "Masjid Kampus",
+        "Kampus Masjid",
+        "Portal Resmi Masjid Kampus UMS",
+        "Masjid Hj. Sudalmiyah Rais"
+      ],
+      "description":
+        "Portal Resmi Informasi & Peribadatan Masjid Kampus UMS (Universitas Muhammadiyah Surakarta) - Melayani 6 Masjid Kampus Percontohan.",
+      "inLanguage": "id-ID"
+    },
+    {
+      "@type": "Mosque",
+      "@id": "https://sudalmiyah-rais.vercel.app/#mosque",
+      "name": "Masjid Hj. Sudalmiyah Rais - Masjid Kampus UMS",
+      "alternateName": [
+        "Masjid Kampus UMS",
+        "Kampus Masjid UMS",
+        "Masjid Kampus 2 UMS",
+        "Masjid Sudalmiyah Rais"
+      ],
+      "url": "https://sudalmiyah-rais.vercel.app",
+      "logo": "https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png",
+      "image": "https://sudalmiyah-rais.vercel.app/images/hero/hero-sudalmiyah.jpg",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Jl. A. Yani, Pabelan, Kartasura",
+        "addressLocality": "Sukoharjo",
+        "addressRegion": "Jawa Tengah",
+        "postalCode": "57169",
+        "addressCountry": "ID"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -7.5583,
+        "longitude": 110.7719
+      },
+      "parentOrganization": {
+        "@type": "EducationalOrganization",
+        "name": "Universitas Muhammadiyah Surakarta",
+        "url": "https://www.ums.ac.id"
+      },
+      "department": [
+        {
+          "@type": "Mosque",
+          "name": "Masjid Fadhlurrahman",
+          "description": "Masjid Kampus 1 UMS"
+        },
+        {
+          "@type": "Mosque",
+          "name": "Masjid KH. Mas Mansur",
+          "description": "Masjid Kampus 4 UMS (Pesma)"
+        },
+        {
+          "@type": "Mosque",
+          "name": "Masjid Ma'had Abu Bakar",
+          "description": "Masjid Kampus 2 UMS"
+        },
+        {
+          "@type": "Mosque",
+          "name": "Masjid Al-Munajat",
+          "description": "Masjid Pondok Shabran UMS"
+        },
+        {
+          "@type": "Mosque",
+          "name": "Masjid Ar-Razi FKG",
+          "description": "Masjid Kampus 4 UMS (FKG)"
+        }
+      ]
+    }
+  ]
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://sudalmiyah-rais.vercel.app"),
-  title: "Masjid UMS | Masjid Sudalmiyah Rais Kampus 2",
+  title: {
+    default: "Masjid Kampus UMS | Portal Resmi Masjid Sudalmiyah Rais & 6 Masjid Kampus",
+    template: "%s | Masjid Kampus UMS",
+  },
   description:
-    "Portal Resmi Masjid UMS - Model Masjid Percontohan LPCR-PM & PTMA. Jadwal shalat standar MASA, ruang ibadah digital, warta persyarikatan, dan transparansi infaq.",
-  authors: [{ name: "Takmir Masjid UMS" }],
+    "Portal resmi informasi dan peribadatan Masjid Kampus UMS (Universitas Muhammadiyah Surakarta). Layanan 6 masjid kampus: Masjid Hj. Sudalmiyah Rais, Fadhlurrahman, KH. Mas Mansur, Ma'had Abu Bakar, Al-Munajat, dan Ar-Razi FKG. Jadwal Shalat Jumat, kajian, presensi jamaah, dan transparansi infaq.",
+  authors: [{ name: "Takmir Masjid Kampus UMS" }],
   keywords: [
-    "Masjid UMS",
-    "Masjid Percontohan LPCR-PM",
+    "Masjid Kampus",
+    "Kampus Masjid",
+    "Masjid Kampus UMS",
+    "Kampus Masjid UMS",
+    "Masjid Kampus Universitas Muhammadiyah Surakarta",
     "Masjid Sudalmiyah Rais",
-    "Amal Usaha Muhammadiyah",
-    "UMS",
+    "Masjid Hj. Sudalmiyah Rais",
+    "Masjid Fadhlurrahman",
+    "Masjid KH. Mas Mansur",
+    "Masjid Ma'had Abu Bakar",
+    "Masjid Al-Munajat",
+    "Masjid Ar-Razi FKG",
+    "Jadwal Shalat Masjid Kampus",
+    "Jadwal Jumat Masjid UMS",
+    "Presensi Shalat Masjid Kampus",
+    "Kajian Masjid Kampus UMS",
+    "Infaq Masjid Kampus",
+    "LPCR-PM",
     "Universitas Muhammadiyah Surakarta",
-    "Jadwal Shalat MASA",
-    "Jadwal Shalat Surakarta",
-    "Kajian Mahasiswa UMS",
-    "Infaq Digital Masjid",
   ],
+  alternates: {
+    canonical: "/",
+  },
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -49,17 +145,17 @@ export const metadata: Metadata = {
     apple: "/images/logo/logo-masjid.png",
   },
   openGraph: {
-    title: "Masjid UMS - Universitas Muhammadiyah Surakarta",
+    title: "Masjid Kampus UMS - Portal Resmi 6 Masjid Kampus",
     description:
-      "Portal Resmi Masjid Kampus UMS - Jadwal Shalat Jumat, Kajian & Ruang Ibadah Digital.",
+      "Portal resmi informasi dan peribadatan Masjid Kampus UMS. Jadwal Shalat Jumat, kajian, ruang ibadah digital & presensi berjamaah.",
     url: "https://sudalmiyah-rais.vercel.app",
-    siteName: "Masjid UMS",
+    siteName: "Masjid Kampus UMS",
     images: [
       {
         url: "https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png",
         width: 512,
         height: 512,
-        alt: "Logo Resmi Masjid UMS",
+        alt: "Logo Resmi Masjid Kampus UMS",
       },
     ],
     locale: "id_ID",
@@ -67,15 +163,29 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Masjid UMS - Universitas Muhammadiyah Surakarta",
+    title: "Masjid Kampus UMS - Portal Resmi 6 Masjid Kampus",
     description:
-      "Portal Resmi Masjid Kampus UMS - Jadwal Shalat Jumat, Kajian & Ruang Ibadah Digital.",
+      "Portal resmi informasi dan peribadatan Masjid Kampus UMS. Jadwal Shalat Jumat, kajian, dan presensi jamaah.",
     images: ["https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Masjid UMS",
+    title: "Masjid Kampus UMS",
   },
 };
 
@@ -108,7 +218,13 @@ export default function RootLayout({
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="512" />
         <meta property="og:image:height" content="512" />
-        <meta property="og:image:alt" content="Logo Resmi Masjid UMS" />
+        <meta property="og:image:alt" content="Logo Resmi Masjid Kampus UMS" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLdPayload),
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col bg-[#FAF8F5] text-slate-800 font-sans selection:bg-[#C59B27] selection:text-white">
         <LanguageProvider>
