@@ -23,6 +23,7 @@ import {
   Share2,
   Lock,
 } from "lucide-react";
+import { calculatePrayerTimes } from "@/lib/prayer-times";
 
 interface MosqueOption {
   id: string;
@@ -40,32 +41,27 @@ const MOSQUES: MosqueOption[] = [
 
 type PrayerKey = "SUBUH" | "DZUHUR" | "ASHAR" | "MAGHRIB" | "ISYA";
 
-interface PrayerOption {
-  key: PrayerKey;
-  label: string;
-  timeHint: string;
-  startMinutes: number; // minutes from midnight WIB (UTC+7)
-  startTimeFormatted: string;
-}
-
-const PRAYERS: PrayerOption[] = [
-  { key: "SUBUH", label: "Shalat Subuh", timeHint: "04:15 - 05:30 WIB", startMinutes: 4 * 60 + 10, startTimeFormatted: "04:15" },
-  { key: "DZUHUR", label: "Shalat Dzuhur", timeHint: "11:35 - 13:00 WIB", startMinutes: 11 * 60 + 30, startTimeFormatted: "11:35" },
-  { key: "ASHAR", label: "Shalat Ashar", timeHint: "14:50 - 16:30 WIB", startMinutes: 14 * 60 + 50, startTimeFormatted: "14:50" },
-  { key: "MAGHRIB", label: "Shalat Maghrib", timeHint: "17:40 - 18:30 WIB", startMinutes: 17 * 60 + 40, startTimeFormatted: "17:40" },
-  { key: "ISYA", label: "Shalat Isya", timeHint: "18:50 - 20:30 WIB", startMinutes: 18 * 60 + 50, startTimeFormatted: "18:50" },
-];
-
-function computeWibMinutes(): number {
-  const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  const wib = new Date(utc + 7 * 3600000);
-  return wib.getHours() * 60 + wib.getMinutes();
+function parseTimeToMinutes(tStr: string): number {
+  const [h, m] = tStr.split(":").map(Number);
+  return h * 60 + m;
 }
 
 export default function ShalatPresensiPage() {
   const [selectedPrayer, setSelectedPrayer] = useState<PrayerKey>("SUBUH");
   const [currentWibMinutes, setCurrentWibMinutes] = useState<number | null>(null);
+  const [prayerTimes, setPrayerTimes] = useState<{
+    Subuh: string;
+    Dzuhur: string;
+    Ashar: string;
+    Maghrib: string;
+    Isya: string;
+  }>({
+    Subuh: "04:03",
+    Dzuhur: "11:23",
+    Ashar: "14:33",
+    Maghrib: "17:33",
+    Isya: "18:44",
+  });
   const [selectedMosque, setSelectedMosque] = useState<string>("sudalmiyah");
   const [participantRole, setParticipantRole] = useState<"MAHASISWA" | "DOSEN_KARYAWAN" | "UMUM">("MAHASISWA");
   const [fullName, setFullName] = useState("");
@@ -75,13 +71,33 @@ export default function ShalatPresensiPage() {
 
   useEffect(() => {
     const updateTime = () => {
-      const minutes = computeWibMinutes();
+      const now = new Date();
+      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      const wib = new Date(utc + 7 * 3600000);
+      const minutes = wib.getHours() * 60 + wib.getMinutes();
       setCurrentWibMinutes(minutes);
 
-      if (minutes >= 18 * 60 + 50) setSelectedPrayer("ISYA");
-      else if (minutes >= 17 * 60 + 40) setSelectedPrayer("MAGHRIB");
-      else if (minutes >= 14 * 60 + 50) setSelectedPrayer("ASHAR");
-      else if (minutes >= 11 * 60 + 30) setSelectedPrayer("DZUHUR");
+      // Hitung jadwal hisab astronomis resmi standar MASA / Tarjih Muhammadiyah (KHGT)
+      const calculated = calculatePrayerTimes(wib, "tarjih");
+      setPrayerTimes({
+        Subuh: calculated.Subuh,
+        Dzuhur: calculated.Dzuhur,
+        Ashar: calculated.Ashar,
+        Maghrib: calculated.Maghrib,
+        Isya: calculated.Isya,
+      });
+
+      const isyaMin = parseTimeToMinutes(calculated.Isya);
+      const maghribMin = parseTimeToMinutes(calculated.Maghrib);
+      const asharMin = parseTimeToMinutes(calculated.Ashar);
+      const dzuhurMin = parseTimeToMinutes(calculated.Dzuhur);
+      const subuhMin = parseTimeToMinutes(calculated.Subuh);
+
+      if (minutes >= isyaMin) setSelectedPrayer("ISYA");
+      else if (minutes >= maghribMin) setSelectedPrayer("MAGHRIB");
+      else if (minutes >= asharMin) setSelectedPrayer("ASHAR");
+      else if (minutes >= dzuhurMin) setSelectedPrayer("DZUHUR");
+      else if (minutes >= subuhMin) setSelectedPrayer("SUBUH");
       else setSelectedPrayer("SUBUH");
     };
 
@@ -94,6 +110,19 @@ export default function ShalatPresensiPage() {
     if (currentWibMinutes === null) return true;
     return currentWibMinutes >= startMinutes;
   };
+
+  const prayersList: Array<{
+    key: PrayerKey;
+    label: string;
+    time: string;
+    startMinutes: number;
+  }> = [
+    { key: "SUBUH", label: "Shalat Subuh", time: prayerTimes.Subuh, startMinutes: parseTimeToMinutes(prayerTimes.Subuh) },
+    { key: "DZUHUR", label: "Shalat Dzuhur", time: prayerTimes.Dzuhur, startMinutes: parseTimeToMinutes(prayerTimes.Dzuhur) },
+    { key: "ASHAR", label: "Shalat Ashar", time: prayerTimes.Ashar, startMinutes: parseTimeToMinutes(prayerTimes.Ashar) },
+    { key: "MAGHRIB", label: "Shalat Maghrib", time: prayerTimes.Maghrib, startMinutes: parseTimeToMinutes(prayerTimes.Maghrib) },
+    { key: "ISYA", label: "Shalat Isya", time: prayerTimes.Isya, startMinutes: parseTimeToMinutes(prayerTimes.Isya) },
+  ];
 
   // Photo
   const [photoUrl, setPhotoUrl] = useState("");
@@ -244,11 +273,10 @@ export default function ShalatPresensiPage() {
     e.preventDefault();
     setSubmitError("");
 
-    const nowMinutes = computeWibMinutes();
-    const currentPrayerObj = PRAYERS.find((p) => p.key === selectedPrayer);
-    if (currentPrayerObj && nowMinutes < currentPrayerObj.startMinutes) {
+    const currentPrayerObj = prayersList.find((p) => p.key === selectedPrayer);
+    if (currentPrayerObj && !isPrayerUnlocked(currentPrayerObj.startMinutes)) {
       setSubmitError(
-        `Waktu ${currentPrayerObj.label} belum dimulai (jadwal mulai pukul ${currentPrayerObj.startTimeFormatted} WIB). Presensi hanya dapat diisi setelah waktu shalat tiba.`
+        `Waktu ${currentPrayerObj.label} belum dimulai (Jadwal MASA/Tarjih Muhammadiyah: ${currentPrayerObj.time} WIB). Presensi hanya dapat diisi setelah waktu shalat tiba.`
       );
       return;
     }
@@ -434,15 +462,21 @@ export default function ShalatPresensiPage() {
           /* Main Attendance Form */
           <div className="bg-white rounded-3xl border border-stone-200 shadow-xl p-5 sm:p-8 space-y-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] text-[11px] font-bold mb-2">
-                <Clock className="w-3.5 h-3.5" />
-                <span>Formulir Absensi Shalat Rawatib 5 Waktu</span>
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#003B73]/10 text-[#003B73] text-[11px] font-bold">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Formulir Absensi Shalat Rawatib 5 Waktu</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[10px] font-semibold">
+                  <ShieldCheck className="w-3 h-3 text-amber-600" />
+                  <span>Standar Hisab MASA &amp; Tarjih Muhammadiyah (KHGT)</span>
+                </div>
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-stone-900 font-serif">
                 Presensi Shalat Berjamaah
               </h2>
               <p className="text-xs text-stone-600 mt-1 leading-relaxed">
-                Silakan pilih waktu shalat dan masjid lokasi Anda berjamaah. Verifikasi GPS di kawasan masjid UMS wajib dilakukan sebelum mengirimkan data.
+                Jadwal shalat otomatis diselaraskan dengan hisab astronomis resmi Majelis Tarjih PP Muhammadiyah (MASA &amp; KHGT) di kawasan UMS. Verifikasi GPS di kawasan masjid UMS wajib dilakukan sebelum mengirimkan data.
               </p>
             </div>
 
@@ -460,7 +494,7 @@ export default function ShalatPresensiPage() {
                   1. Pilih Waktu Shalat <span className="text-rose-600">*</span>
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                  {PRAYERS.map((p) => {
+                  {prayersList.map((p) => {
                     const isSelected = selectedPrayer === p.key;
                     const isUnlocked = isPrayerUnlocked(p.startMinutes);
                     return (
@@ -473,8 +507,8 @@ export default function ShalatPresensiPage() {
                         }}
                         title={
                           !isUnlocked
-                            ? `Waktu ${p.label} belum dimulai (Mulai ${p.startTimeFormatted} WIB)`
-                            : p.label
+                            ? `Waktu ${p.label} belum dimulai (Jadwal Tarjih/KHGT: ${p.time} WIB)`
+                            : `${p.label} (Jadwal Tarjih/KHGT: ${p.time} WIB)`
                         }
                         className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 relative ${
                           !isUnlocked
@@ -495,11 +529,11 @@ export default function ShalatPresensiPage() {
                             !isUnlocked
                               ? "text-stone-400 font-mono"
                               : isSelected
-                              ? "text-amber-300"
-                              : "text-stone-400"
+                              ? "text-amber-300 font-mono font-semibold"
+                              : "text-stone-500 font-mono"
                           }`}
                         >
-                          {!isUnlocked ? `Kunci (${p.startTimeFormatted})` : p.timeHint.split(" - ")[0]}
+                          {!isUnlocked ? `Kunci (${p.time})` : p.time}
                         </span>
                       </button>
                     );

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDbAsync, saveDb, logSecurityEvent } from "@/lib/db";
 import { sanitizeString, checkRateLimit } from "@/lib/security";
 import { PrayerAttendance, PrayerName } from "@/lib/types";
+import { calculatePrayerTimes } from "@/lib/prayer-times";
 import { z } from "zod";
 
 const CAMPUS_MOSQUES: Record<string, { name: string; location: string; lat: number; lng: number }> = {
@@ -67,24 +68,30 @@ export async function POST(request: NextRequest) {
 
     const data = parseResult.data;
 
-    // Validasi waktu shalat: shalat yang belum tiba waktunya tidak dapat dipresensi
+    // Validasi waktu shalat: shalat yang belum tiba waktunya tidak dapat dipresensi (standar hisab MASA/Tarjih Muhammadiyah/KHGT)
     const nowUtc = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
     const nowWib = new Date(nowUtc + 7 * 3600000);
     const currentWibMinutes = nowWib.getHours() * 60 + nowWib.getMinutes();
 
+    const times = calculatePrayerTimes(nowWib, "tarjih");
+    const parseTimeToMinutes = (tStr: string) => {
+      const [h, m] = tStr.split(":").map(Number);
+      return h * 60 + m;
+    };
+
     const PRAYER_SCHEDULE: Record<PrayerName, { start: number; label: string; timeStr: string }> = {
-      SUBUH: { start: 4 * 60 + 10, label: "Subuh", timeStr: "04:15 WIB" },
-      DZUHUR: { start: 11 * 60 + 30, label: "Dzuhur", timeStr: "11:35 WIB" },
-      ASHAR: { start: 14 * 60 + 50, label: "Ashar", timeStr: "14:50 WIB" },
-      MAGHRIB: { start: 17 * 60 + 40, label: "Maghrib", timeStr: "17:40 WIB" },
-      ISYA: { start: 18 * 60 + 50, label: "Isya", timeStr: "18:50 WIB" },
+      SUBUH: { start: parseTimeToMinutes(times.Subuh), label: "Subuh", timeStr: `${times.Subuh} WIB` },
+      DZUHUR: { start: parseTimeToMinutes(times.Dzuhur), label: "Dzuhur", timeStr: `${times.Dzuhur} WIB` },
+      ASHAR: { start: parseTimeToMinutes(times.Ashar), label: "Ashar", timeStr: `${times.Ashar} WIB` },
+      MAGHRIB: { start: parseTimeToMinutes(times.Maghrib), label: "Maghrib", timeStr: `${times.Maghrib} WIB` },
+      ISYA: { start: parseTimeToMinutes(times.Isya), label: "Isya", timeStr: `${times.Isya} WIB` },
     };
 
     const targetPrayer = PRAYER_SCHEDULE[data.prayerName];
     if (targetPrayer && currentWibMinutes < targetPrayer.start) {
       return NextResponse.json(
         {
-          error: `Waktu Shalat ${targetPrayer.label} belum dimulai (jadwal mulai pukul ${targetPrayer.timeStr}). Presensi hanya dapat diisi setelah waktu shalat tiba.`,
+          error: `Waktu Shalat ${targetPrayer.label} belum dimulai (Jadwal MASA/Tarjih: ${targetPrayer.timeStr}). Presensi hanya dapat diisi setelah waktu shalat tiba.`,
         },
         { status: 400 }
       );
