@@ -66,6 +66,29 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parseResult.data;
+
+    // Validasi waktu shalat: shalat yang belum tiba waktunya tidak dapat dipresensi
+    const nowUtc = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
+    const nowWib = new Date(nowUtc + 7 * 3600000);
+    const currentWibMinutes = nowWib.getHours() * 60 + nowWib.getMinutes();
+
+    const PRAYER_SCHEDULE: Record<PrayerName, { start: number; label: string; timeStr: string }> = {
+      SUBUH: { start: 4 * 60 + 10, label: "Subuh", timeStr: "04:15 WIB" },
+      DZUHUR: { start: 11 * 60 + 30, label: "Dzuhur", timeStr: "11:35 WIB" },
+      ASHAR: { start: 14 * 60 + 50, label: "Ashar", timeStr: "14:50 WIB" },
+      MAGHRIB: { start: 17 * 60 + 40, label: "Maghrib", timeStr: "17:40 WIB" },
+      ISYA: { start: 18 * 60 + 50, label: "Isya", timeStr: "18:50 WIB" },
+    };
+
+    const targetPrayer = PRAYER_SCHEDULE[data.prayerName];
+    if (targetPrayer && currentWibMinutes < targetPrayer.start) {
+      return NextResponse.json(
+        {
+          error: `Waktu Shalat ${targetPrayer.label} belum dimulai (jadwal mulai pukul ${targetPrayer.timeStr}). Presensi hanya dapat diisi setelah waktu shalat tiba.`,
+        },
+        { status: 400 }
+      );
+    }
     const mosqueData = CAMPUS_MOSQUES[data.mosqueId] || {
       name: "Masjid Kampus UMS",
       location: "Kawasan UMS",

@@ -3405,17 +3405,17 @@ export default function AdminDashboardPage() {
               <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] font-bold text-stone-600 uppercase tracking-wider mb-1">
-                    Filter Masjid Kampus UMS
+                    Filter Masjid UMS
                   </label>
                   <select
                     value={prayerMosqueFilter}
                     onChange={(e) => setPrayerMosqueFilter(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs sm:text-sm font-semibold focus:outline-none focus:border-[#003B73]"
                   >
-                    <option value="ALL">Semua Masjid Kampus UMS (6 Masjid)</option>
+                    <option value="ALL">Semua Masjid (6 Masjid)</option>
                     {ADMIN_MOSQUES.map((m) => (
                       <option key={m.id} value={m.id}>
-                        {m.name} ({m.location})
+                        {m.name}
                       </option>
                     ))}
                   </select>

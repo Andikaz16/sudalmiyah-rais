@@ -21,21 +21,21 @@ import {
   ChevronRight,
   ShieldCheck,
   Share2,
+  Lock,
 } from "lucide-react";
 
 interface MosqueOption {
   id: string;
   name: string;
-  campus: string;
 }
 
 const MOSQUES: MosqueOption[] = [
-  { id: "sudalmiyah", name: "Masjid Hj. Sudalmiyah Rais", campus: "Kampus 2 UMS" },
-  { id: "fadhlurrahman", name: "Masjid Fadhlurrahman", campus: "Kampus 1 UMS" },
-  { id: "mas-mansur", name: "Masjid KH. Mas Mansur", campus: "Kampus 4 UMS (Pesma)" },
-  { id: "mahad-abu-bakar", name: "Masjid Ma'had Abu Bakar", campus: "Kampus 2 UMS" },
-  { id: "ar-razi", name: "Masjid Ar-Razi FKG", campus: "Kampus 4 UMS (FKG)" },
-  { id: "munajat-shabran", name: "Masjid Al-Munajat Pondok Shabran", campus: "Makamhaji (Pondok Shabran)" },
+  { id: "sudalmiyah", name: "Masjid Hj. Sudalmiyah Rais" },
+  { id: "fadhlurrahman", name: "Masjid Fadhlurrahman" },
+  { id: "mas-mansur", name: "Masjid KH. Mas Mansur" },
+  { id: "mahad-abu-bakar", name: "Masjid Ma'had Abu Bakar" },
+  { id: "ar-razi", name: "Masjid Ar-Razi FKG" },
+  { id: "munajat-shabran", name: "Masjid Al-Munajat Pondok Shabran" },
 ];
 
 type PrayerKey = "SUBUH" | "DZUHUR" | "ASHAR" | "MAGHRIB" | "ISYA";
@@ -44,31 +44,28 @@ interface PrayerOption {
   key: PrayerKey;
   label: string;
   timeHint: string;
+  startMinutes: number; // minutes from midnight WIB (UTC+7)
+  startTimeFormatted: string;
 }
 
 const PRAYERS: PrayerOption[] = [
-  { key: "SUBUH", label: "Shalat Subuh", timeHint: "04:15 - 05:30 WIB" },
-  { key: "DZUHUR", label: "Shalat Dzuhur", timeHint: "11:35 - 13:00 WIB" },
-  { key: "ASHAR", label: "Shalat Ashar", timeHint: "14:50 - 16:30 WIB" },
-  { key: "MAGHRIB", label: "Shalat Maghrib", timeHint: "17:40 - 18:30 WIB" },
-  { key: "ISYA", label: "Shalat Isya", timeHint: "18:50 - 20:30 WIB" },
+  { key: "SUBUH", label: "Shalat Subuh", timeHint: "04:15 - 05:30 WIB", startMinutes: 4 * 60 + 10, startTimeFormatted: "04:15" },
+  { key: "DZUHUR", label: "Shalat Dzuhur", timeHint: "11:35 - 13:00 WIB", startMinutes: 11 * 60 + 30, startTimeFormatted: "11:35" },
+  { key: "ASHAR", label: "Shalat Ashar", timeHint: "14:50 - 16:30 WIB", startMinutes: 14 * 60 + 50, startTimeFormatted: "14:50" },
+  { key: "MAGHRIB", label: "Shalat Maghrib", timeHint: "17:40 - 18:30 WIB", startMinutes: 17 * 60 + 40, startTimeFormatted: "17:40" },
+  { key: "ISYA", label: "Shalat Isya", timeHint: "18:50 - 20:30 WIB", startMinutes: 18 * 60 + 50, startTimeFormatted: "18:50" },
 ];
 
-function getAutoPrayerKey(): PrayerKey {
+function computeWibMinutes(): number {
   const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const decimalHour = hours + minutes / 60;
-
-  if (decimalHour >= 3.5 && decimalHour < 7.0) return "SUBUH";
-  if (decimalHour >= 11.0 && decimalHour < 14.5) return "DZUHUR";
-  if (decimalHour >= 14.5 && decimalHour < 17.5) return "ASHAR";
-  if (decimalHour >= 17.5 && decimalHour < 18.8) return "MAGHRIB";
-  return "ISYA";
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  const wib = new Date(utc + 7 * 3600000);
+  return wib.getHours() * 60 + wib.getMinutes();
 }
 
 export default function ShalatPresensiPage() {
   const [selectedPrayer, setSelectedPrayer] = useState<PrayerKey>("SUBUH");
+  const [currentWibMinutes, setCurrentWibMinutes] = useState<number | null>(null);
   const [selectedMosque, setSelectedMosque] = useState<string>("sudalmiyah");
   const [participantRole, setParticipantRole] = useState<"MAHASISWA" | "DOSEN_KARYAWAN" | "UMUM">("MAHASISWA");
   const [fullName, setFullName] = useState("");
@@ -77,8 +74,26 @@ export default function ShalatPresensiPage() {
   const [phone, setPhone] = useState("");
 
   useEffect(() => {
-    setSelectedPrayer(getAutoPrayerKey());
+    const updateTime = () => {
+      const minutes = computeWibMinutes();
+      setCurrentWibMinutes(minutes);
+
+      if (minutes >= 18 * 60 + 50) setSelectedPrayer("ISYA");
+      else if (minutes >= 17 * 60 + 40) setSelectedPrayer("MAGHRIB");
+      else if (minutes >= 14 * 60 + 50) setSelectedPrayer("ASHAR");
+      else if (minutes >= 11 * 60 + 30) setSelectedPrayer("DZUHUR");
+      else setSelectedPrayer("SUBUH");
+    };
+
+    updateTime();
+    const timer = setInterval(updateTime, 30000);
+    return () => clearInterval(timer);
   }, []);
+
+  const isPrayerUnlocked = (startMinutes: number): boolean => {
+    if (currentWibMinutes === null) return true;
+    return currentWibMinutes >= startMinutes;
+  };
 
   // Photo
   const [photoUrl, setPhotoUrl] = useState("");
@@ -228,6 +243,15 @@ export default function ShalatPresensiPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError("");
+
+    const nowMinutes = computeWibMinutes();
+    const currentPrayerObj = PRAYERS.find((p) => p.key === selectedPrayer);
+    if (currentPrayerObj && nowMinutes < currentPrayerObj.startMinutes) {
+      setSubmitError(
+        `Waktu ${currentPrayerObj.label} belum dimulai (jadwal mulai pukul ${currentPrayerObj.startTimeFormatted} WIB). Presensi hanya dapat diisi setelah waktu shalat tiba.`
+      );
+      return;
+    }
 
     if (!fullName.trim()) {
       alert("Nama lengkap wajib diisi.");
@@ -438,20 +462,44 @@ export default function ShalatPresensiPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                   {PRAYERS.map((p) => {
                     const isSelected = selectedPrayer === p.key;
+                    const isUnlocked = isPrayerUnlocked(p.startMinutes);
                     return (
                       <button
                         key={p.key}
                         type="button"
-                        onClick={() => setSelectedPrayer(p.key)}
-                        className={`p-3 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
-                          isSelected
-                            ? "bg-[#003B73] text-white border-[#003B73] shadow-md scale-[1.02]"
-                            : "bg-[#FAF8F5] text-stone-700 border-stone-200 hover:border-stone-300"
+                        disabled={!isUnlocked}
+                        onClick={() => {
+                          if (isUnlocked) setSelectedPrayer(p.key);
+                        }}
+                        title={
+                          !isUnlocked
+                            ? `Waktu ${p.label} belum dimulai (Mulai ${p.startTimeFormatted} WIB)`
+                            : p.label
+                        }
+                        className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 relative ${
+                          !isUnlocked
+                            ? "bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed opacity-60"
+                            : isSelected
+                            ? "bg-[#003B73] text-white border-[#003B73] shadow-md scale-[1.02] cursor-pointer"
+                            : "bg-[#FAF8F5] text-stone-700 border-stone-200 hover:border-stone-300 cursor-pointer"
                         }`}
                       >
+                        {!isUnlocked && (
+                          <div className="absolute top-1.5 right-1.5" title="Waktu shalat belum tiba">
+                            <Lock className="w-3 h-3 text-stone-400" />
+                          </div>
+                        )}
                         <span className="font-bold text-xs">{p.label.replace("Shalat ", "")}</span>
-                        <span className={`text-[9px] ${isSelected ? "text-amber-300" : "text-stone-400"}`}>
-                          {p.timeHint.split(" - ")[0]}
+                        <span
+                          className={`text-[9px] ${
+                            !isUnlocked
+                              ? "text-stone-400 font-mono"
+                              : isSelected
+                              ? "text-amber-300"
+                              : "text-stone-400"
+                          }`}
+                        >
+                          {!isUnlocked ? `Kunci (${p.startTimeFormatted})` : p.timeHint.split(" - ")[0]}
                         </span>
                       </button>
                     );
@@ -462,7 +510,7 @@ export default function ShalatPresensiPage() {
               {/* 2. Pilih Masjid Lokasi Jamaah */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-stone-800 uppercase tracking-wider">
-                  2. Pilih Masjid Kampus UMS <span className="text-rose-600">*</span>
+                  2. Pilih Masjid UMS <span className="text-rose-600">*</span>
                 </label>
                 <select
                   value={selectedMosque}
@@ -471,7 +519,7 @@ export default function ShalatPresensiPage() {
                 >
                   {MOSQUES.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {m.name} - ({m.campus})
+                      {m.name}
                     </option>
                   ))}
                 </select>
