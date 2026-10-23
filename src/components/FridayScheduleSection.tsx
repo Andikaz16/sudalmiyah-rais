@@ -340,7 +340,7 @@ export default function FridayScheduleSection() {
   });
 
   const getShareText = () => {
-    // Susun daftar petugas shalat jumat untuk seluruh 6 masjid kampus UMS
+    // Susun daftar petugas shalat jumat untuk seluruh 6 masjid
     const mosqueEntries = MOSQUE_LIST.map((m, idx) => {
       const sched =
         schedules.find((s) => (s.mosqueId || s.id) === m.id) ||
@@ -361,7 +361,7 @@ export default function FridayScheduleSection() {
           ? `\n• Infaq Jumat Lalu: Rp ${Number(sched.infaqAmount).toLocaleString("id-ID")}`
           : "";
 
-      return `${idx + 1}. *${m.name.toUpperCase()}* (${m.location})
+      return `${idx + 1}. *${m.name.toUpperCase()}*
 • Waktu Mulai: ${time}
 • Khatib: ${khatib}${khatibTitle}
 • Tema Khutbah: "${tema}"
@@ -377,17 +377,17 @@ export default function FridayScheduleSection() {
       activeSchedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") ||
       "5 Jumadilawal 1448 H";
 
-    return `*JADWAL PETUGAS SHALAT JUMAT MASJID KAMPUS UMS*
+    return `*JADWAL PETUGAS SHALAT JUMAT 6 MASJID UMS*
 Hari / Tanggal: ${activeDate} (${activeHijri})
 ----------------------------------------
 Assalamu'alaikum Warahmatullahi Wabarakatuh.
-Berikut daftar lengkap petugas Shalat Jumat di 6 Masjid Lingkungan Universitas Muhammadiyah Surakarta:
+Berikut daftar petugas Shalat Jumat di 6 Masjid UMS:
 
 ${mosqueEntries}
 
 ----------------------------------------
 Himbauan Jamaah:
-Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, merapatkan saf, serta menjaga ketertiban, kekhusyukan, dan kebersihan masjid kampus.
+Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, merapatkan saf, serta menjaga ketertiban, kekhusyukan, dan kebersihan masjid.
 
 Infaq Operasional Shalat Jumat & Masjid:
 Bank Jateng Syariah - Rekening LAZ UMS (QRIS Resmi di Web)
