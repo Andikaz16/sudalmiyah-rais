@@ -291,3 +291,42 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const action = searchParams.get("action");
+    const id = searchParams.get("id");
+
+    const db = await getDbAsync();
+
+    if (action === "clear-all") {
+      db.prayerAttendances = [];
+      await saveDb(db);
+      return NextResponse.json({
+        success: true,
+        message: "Seluruh data absensi shalat berhasil dikosongkan.",
+      });
+    }
+
+    if (id) {
+      db.prayerAttendances = (db.prayerAttendances || []).filter((p) => p.id !== id);
+      await saveDb(db);
+      return NextResponse.json({
+        success: true,
+        message: "Data presensi shalat berhasil dihapus.",
+      });
+    }
+
+    return NextResponse.json(
+      { error: "Parameter aksi tidak valid." },
+      { status: 400 }
+    );
+  } catch (error) {
+    console.error("Failed to delete prayer attendance:", error);
+    return NextResponse.json(
+      { error: "Gagal menghapus data presensi shalat." },
+      { status: 500 }
+    );
+  }
+}

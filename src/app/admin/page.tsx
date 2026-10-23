@@ -65,6 +65,23 @@ import {
   PrayerName,
 } from "@/lib/types";
 import { normalizeImageUrl } from "@/lib/utils";
+import { getHijriDate } from "@/lib/prayer-times";
+
+function calculateFridayInfo(weeksOffset: number = 0) {
+  const now = new Date();
+  const day = now.getDay(); // 0 = Minggu, 5 = Jumat
+  const daysUntilFriday = (5 - day + 7) % 7;
+  const target = new Date(now);
+  target.setDate(now.getDate() + daysUntilFriday + weeksOffset * 7);
+
+  const masehi = target.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const hijri = getHijriDate(target, false, "id");
+  return { masehi, hijri, target };
+}
 
 const ADMIN_MOSQUES = [
   { id: "sudalmiyah", name: "Masjid Hj. Sudalmiyah Rais", location: "Kampus 2 UMS" },
@@ -871,6 +888,69 @@ export default function AdminDashboardPage() {
         updatedAt: new Date().toISOString(),
       };
       setFridaySchedule(newSchedule);
+    }
+  };
+
+  const handleAutoSetFriday = (weeksOffset: number = 0, applyToAll: boolean = false) => {
+    if (!fridaySchedule) return;
+    const info = calculateFridayInfo(weeksOffset);
+    const updated: FridayOfficerSchedule = {
+      ...fridaySchedule,
+      date: info.masehi,
+      hijriDate: info.hijri,
+    };
+    setFridaySchedule(updated);
+
+    if (applyToAll) {
+      setFridaySchedules((prev) =>
+        prev.map((s) => ({
+          ...s,
+          date: info.masehi,
+          hijriDate: info.hijri,
+        }))
+      );
+      alert(`Berhasil mengatur tanggal (${info.masehi} / ${info.hijri}) untuk seluruh 6 masjid.`);
+    } else {
+      setFridaySchedules((prev) =>
+        prev.map((s) => ((s.mosqueId || s.id) === selectedMosqueId ? updated : s))
+      );
+    }
+  };
+
+  const handleClearAllPrayerAttendances = async () => {
+    if (
+      !confirm(
+        "Apakah Anda yakin ingin mengosongkan SELURUH data presensi shalat? Tindakan ini akan menghapus semua riwayat presensi agar dapat dioperasikan dengan data asli."
+      )
+    ) {
+      return;
+    }
+    try {
+      const res = await fetch("/api/presensi/shalat?action=clear-all", { method: "DELETE" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPrayerAttendances([]);
+        alert("Seluruh data absensi shalat berhasil dikosongkan.");
+      } else {
+        alert(data.error || "Gagal mengosongkan data absensi.");
+      }
+    } catch {
+      alert("Terjadi kesalahan jaringan.");
+    }
+  };
+
+  const handleDeletePrayerAttendance = async (id: string, name: string) => {
+    if (!confirm(`Hapus data presensi jamaah ${name}?`)) return;
+    try {
+      const res = await fetch(`/api/presensi/shalat?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPrayerAttendances((prev) => prev.filter((p) => p.id !== id));
+      } else {
+        alert(data.error || "Gagal menghapus data presensi.");
+      }
+    } catch {
+      alert("Terjadi kesalahan jaringan.");
     }
   };
 
@@ -2546,43 +2626,80 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                {/* Date & Time Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1">
-                      Tanggal Masehi
-                    </label>
-                    <input
-                      type="text"
-                      value={fridaySchedule.date}
-                      onChange={(e) => setFridaySchedule({ ...fridaySchedule, date: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
-                      placeholder="Contoh: Jumat Pekan Ini"
-                    />
+                {/* Date & Time Row with Automatic Friday Helpers */}
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-amber-50/70 border border-amber-200/80">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span className="text-xs font-bold text-amber-950">
+                        Otomatis Tanggal Setiap Jumat (Hisab KHGT Muhammadiyah)
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleAutoSetFriday(0, false)}
+                        className="px-2.5 py-1 rounded-lg bg-white border border-amber-300 hover:bg-amber-100/70 text-amber-900 text-[11px] font-semibold transition-all cursor-pointer shadow-2xs"
+                        title="Setel tanggal ke Jumat pekan ini / terdekat"
+                      >
+                        Jumat Ini ({calculateFridayInfo(0).masehi})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleAutoSetFriday(1, false)}
+                        className="px-2.5 py-1 rounded-lg bg-white border border-amber-300 hover:bg-amber-100/70 text-amber-900 text-[11px] font-semibold transition-all cursor-pointer shadow-2xs"
+                        title="Setel tanggal ke Jumat pekan depan"
+                      >
+                        Jumat Depan ({calculateFridayInfo(1).masehi})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleAutoSetFriday(0, true)}
+                        className="px-2.5 py-1 rounded-lg bg-[#003B73] hover:bg-[#002855] text-white text-[11px] font-semibold transition-all cursor-pointer shadow-2xs"
+                        title="Terapkan tanggal Jumat pekan ini ke 6 masjid sekaligus"
+                      >
+                        Terapkan ke 6 Masjid
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1">
-                      Tanggal Hijriyah
-                    </label>
-                    <input
-                      type="text"
-                      value={fridaySchedule.hijriDate}
-                      onChange={(e) => setFridaySchedule({ ...fridaySchedule, hijriDate: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
-                      placeholder="Contoh: 5 Jumadilawal 1448 H"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-stone-700 mb-1">
-                      Waktu Pelaksanaan
-                    </label>
-                    <input
-                      type="text"
-                      value={fridaySchedule.time}
-                      onChange={(e) => setFridaySchedule({ ...fridaySchedule, time: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
-                      placeholder="Contoh: 11:35 WIB"
-                    />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        Tanggal Masehi
+                      </label>
+                      <input
+                        type="text"
+                        value={fridaySchedule.date}
+                        onChange={(e) => setFridaySchedule({ ...fridaySchedule, date: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-medium"
+                        placeholder="Contoh: 23 Oktober 2026"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        Tanggal Hijriyah
+                      </label>
+                      <input
+                        type="text"
+                        value={fridaySchedule.hijriDate}
+                        onChange={(e) => setFridaySchedule({ ...fridaySchedule, hijriDate: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-medium"
+                        placeholder="Contoh: 12 Jumadilawal 1448 H"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        Waktu Pelaksanaan
+                      </label>
+                      <input
+                        type="text"
+                        value={fridaySchedule.time}
+                        onChange={(e) => setFridaySchedule({ ...fridaySchedule, time: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-medium"
+                        placeholder="Contoh: 11:35 WIB"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -2600,20 +2717,45 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={fridaySchedule.imamName}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, imamName: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-medium"
                         placeholder="Nama imam (contoh: Dalam Konfirmasi)"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-stone-700 mb-1">
-                        Peran / Tugas
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-semibold text-stone-700">
+                          Status Civitas (Dosen / Tendik / Mahasiswa)
+                        </label>
+                        <span className="text-[10px] text-stone-400">Pilih cepat:</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {["Dosen", "Tendik", "Mahasiswa", "Umum"].map((role) => (
+                          <button
+                            key={role}
+                            type="button"
+                            onClick={() => {
+                              const updated = { ...fridaySchedule, imamRole: role };
+                              setFridaySchedule(updated);
+                              setFridaySchedules((prev) =>
+                                prev.map((s) => ((s.mosqueId || s.id) === selectedMosqueId ? updated : s))
+                              );
+                            }}
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-semibold border transition-all cursor-pointer ${
+                              fridaySchedule.imamRole === role
+                                ? "bg-[#003B73] text-white border-[#003B73]"
+                                : "bg-white text-stone-600 border-stone-200 hover:border-stone-300"
+                            }`}
+                          >
+                            {role}
+                          </button>
+                        ))}
+                      </div>
                       <input
                         type="text"
                         value={fridaySchedule.imamRole}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, imamRole: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
-                        placeholder="Peran imam"
+                        placeholder="Pilih atau ketik status (contoh: Dosen, Tendik, Mahasiswa)"
                       />
                     </div>
                   </div>
@@ -2630,20 +2772,45 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={fridaySchedule.muadzinName}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, muadzinName: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-medium"
                         placeholder="Nama muadzin (contoh: Dalam Konfirmasi)"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-stone-700 mb-1">
-                        Peran / Tugas
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-semibold text-stone-700">
+                          Status Civitas (Mahasiswa / Tendik / Dosen)
+                        </label>
+                        <span className="text-[10px] text-stone-400">Pilih cepat:</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {["Mahasiswa", "Tendik", "Dosen", "Umum"].map((role) => (
+                          <button
+                            key={role}
+                            type="button"
+                            onClick={() => {
+                              const updated = { ...fridaySchedule, muadzinRole: role };
+                              setFridaySchedule(updated);
+                              setFridaySchedules((prev) =>
+                                prev.map((s) => ((s.mosqueId || s.id) === selectedMosqueId ? updated : s))
+                              );
+                            }}
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-semibold border transition-all cursor-pointer ${
+                              fridaySchedule.muadzinRole === role
+                                ? "bg-stone-800 text-white border-stone-800"
+                                : "bg-white text-stone-600 border-stone-200 hover:border-stone-300"
+                            }`}
+                          >
+                            {role}
+                          </button>
+                        ))}
+                      </div>
                       <input
                         type="text"
                         value={fridaySchedule.muadzinRole}
                         onChange={(e) => setFridaySchedule({ ...fridaySchedule, muadzinRole: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs"
-                        placeholder="Peran muadzin"
+                        placeholder="Pilih atau ketik status (contoh: Mahasiswa, Tendik, Dosen)"
                       />
                     </div>
                   </div>
@@ -3363,6 +3530,17 @@ export default function AdminDashboardPage() {
                     <Download className="w-3.5 h-3.5 text-emerald-100" />
                     <span>Download Spreadsheet / Excel (.csv)</span>
                   </button>
+                  {prayerAttendances.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleClearAllPrayerAttendances}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold shadow-sm transition-all whitespace-nowrap cursor-pointer active:scale-95"
+                      title="Kosongkan semua data presensi shalat untuk memulai dengan data riil"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                      <span>Kosongkan Data Presensi</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -3504,9 +3682,19 @@ export default function AdminDashboardPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
                             <h4 className="font-bold text-stone-900 text-xs sm:text-sm truncate">{item.fullName}</h4>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 border border-amber-300 font-extrabold shrink-0">
-                              {item.prayerName}
-                            </span>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 border border-amber-300 font-extrabold">
+                                {item.prayerName}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleDeletePrayerAttendance(item.id, item.fullName)}
+                                className="p-1 text-stone-400 hover:text-rose-600 rounded transition-colors"
+                                title="Hapus presensi"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                              </button>
+                            </div>
                           </div>
                           <p className="text-[11px] text-stone-600 mt-0.5">
                             {item.participantRole === "MAHASISWA" ? (
@@ -3548,12 +3736,13 @@ export default function AdminDashboardPage() {
                         <th className="py-3.5 px-4 font-semibold">Waktu Presensi</th>
                         <th className="py-3.5 px-4 font-semibold text-center">GPS Valid</th>
                         <th className="py-3.5 px-4 text-center font-semibold">Status</th>
+                        <th className="py-3.5 px-4 text-center font-semibold">Aksi</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-100 font-medium">
                       {filtered.length === 0 ? (
                         <tr>
-                          <td colSpan={8} className="py-8 text-center text-stone-400 text-xs">
+                          <td colSpan={9} className="py-8 text-center text-stone-400 text-xs">
                             Belum ada data absensi shalat untuk filter ini.
                           </td>
                         </tr>
@@ -3614,6 +3803,16 @@ export default function AdminDashboardPage() {
                               <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
                                 Hadir
                               </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleDeletePrayerAttendance(item.id, item.fullName)}
+                                className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                title="Hapus presensi ini"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
                             </td>
                           </tr>
                         ))

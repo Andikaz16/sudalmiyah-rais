@@ -297,9 +297,9 @@
     "khatibPhotoUrl": "",
     "khutbahTheme": "Tema Khutbah Dalam Konfirmasi",
     "imamName": "Dalam Konfirmasi",
-    "imamRole": "Imam Shalat Jumat",
+    "imamRole": "Dosen",
     "muadzinName": "Dalam Konfirmasi",
-    "muadzinRole": "Muadzin Shalat Jumat",
+    "muadzinRole": "Mahasiswa",
     "time": "11:35 WIB",
     "notes": "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     "updatedAt": "2026-10-17T10:00:00.000Z"
@@ -317,9 +317,9 @@
       "khatibPhotoUrl": "",
       "khutbahTheme": "Tema Khutbah Dalam Konfirmasi",
       "imamName": "Dalam Konfirmasi",
-      "imamRole": "Imam Shalat Jumat",
+      "imamRole": "Dosen",
       "muadzinName": "Dalam Konfirmasi",
-      "muadzinRole": "Muadzin Shalat Jumat",
+      "muadzinRole": "Mahasiswa",
       "time": "11:35 WIB",
       "notes": "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
       "updatedAt": "2026-10-17T10:00:00.000Z"
@@ -336,9 +336,9 @@
       "khatibPhotoUrl": "",
       "khutbahTheme": "Tema Khutbah Dalam Konfirmasi",
       "imamName": "Dalam Konfirmasi",
-      "imamRole": "Imam Shalat Jumat",
+      "imamRole": "Dosen",
       "muadzinName": "Dalam Konfirmasi",
-      "muadzinRole": "Muadzin Shalat Jumat",
+      "muadzinRole": "Mahasiswa",
       "time": "11:35 WIB",
       "notes": "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
       "updatedAt": "2026-10-17T10:00:00.000Z"
@@ -355,9 +355,9 @@
       "khatibPhotoUrl": "",
       "khutbahTheme": "Tema Khutbah Dalam Konfirmasi",
       "imamName": "Dalam Konfirmasi",
-      "imamRole": "Imam Shalat Jumat",
+      "imamRole": "Dosen",
       "muadzinName": "Dalam Konfirmasi",
-      "muadzinRole": "Muadzin Shalat Jumat",
+      "muadzinRole": "Mahasiswa",
       "time": "11:35 WIB",
       "notes": "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
       "updatedAt": "2026-10-17T10:00:00.000Z"
@@ -374,9 +374,9 @@
       "khatibPhotoUrl": "",
       "khutbahTheme": "Tema Khutbah Dalam Konfirmasi",
       "imamName": "Dalam Konfirmasi",
-      "imamRole": "Imam Shalat Jumat",
+      "imamRole": "Dosen",
       "muadzinName": "Dalam Konfirmasi",
-      "muadzinRole": "Muadzin Shalat Jumat",
+      "muadzinRole": "Mahasiswa",
       "time": "11:35 WIB",
       "notes": "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
       "updatedAt": "2026-10-17T10:00:00.000Z"
@@ -393,9 +393,9 @@
       "khatibPhotoUrl": "",
       "khutbahTheme": "Tema Khutbah Dalam Konfirmasi",
       "imamName": "Dalam Konfirmasi",
-      "imamRole": "Imam Shalat Jumat",
+      "imamRole": "Dosen",
       "muadzinName": "Dalam Konfirmasi",
-      "muadzinRole": "Muadzin Shalat Jumat",
+      "muadzinRole": "Mahasiswa",
       "time": "11:35 WIB",
       "notes": "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
       "updatedAt": "2026-10-17T10:00:00.000Z"
@@ -412,9 +412,9 @@
       "khatibPhotoUrl": "",
       "khutbahTheme": "Tema Khutbah Dalam Konfirmasi",
       "imamName": "Dalam Konfirmasi",
-      "imamRole": "Imam Shalat Jumat",
+      "imamRole": "Dosen",
       "muadzinName": "Dalam Konfirmasi",
-      "muadzinRole": "Muadzin Shalat Jumat",
+      "muadzinRole": "Mahasiswa",
       "time": "11:35 WIB",
       "notes": "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
       "updatedAt": "2026-10-17T10:00:00.000Z"
@@ -673,5 +673,6 @@
       "notes": "Khutbah Jumat di Masjid Fadhlurrahman Kampus 1 UMS.",
       "updatedAt": "2026-10-16T13:00:00Z"
     }
-  ]
+  ],
+  "prayerAttendances": []
 }

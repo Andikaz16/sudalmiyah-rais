@@ -83,9 +83,9 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     khatibPhotoUrl: primary?.khatibPhotoUrl || "",
     khutbahTheme: primary?.khutbahTheme || "Tema Khutbah Dalam Konfirmasi",
     imamName: primary?.imamName || "Dalam Konfirmasi",
-    imamRole: primary?.imamRole || "Imam Shalat Jumat",
+    imamRole: primary?.imamRole || "Dosen",
     muadzinName: primary?.muadzinName || "Dalam Konfirmasi",
-    muadzinRole: primary?.muadzinRole || "Muadzin Shalat Jumat",
+    muadzinRole: primary?.muadzinRole || "Mahasiswa",
     time: primary?.time || "11:35 WIB",
     notes: primary?.notes || "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: primary?.updatedAt || new Date().toISOString(),
@@ -103,9 +103,9 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     khatibPhotoUrl: "",
     khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
     imamName: "Dalam Konfirmasi",
-    imamRole: "Imam Shalat Jumat",
+    imamRole: "Dosen",
     muadzinName: "Dalam Konfirmasi",
-    muadzinRole: "Muadzin Shalat Jumat",
+    muadzinRole: "Mahasiswa",
     time: "11:35 WIB",
     notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
@@ -123,9 +123,9 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     khatibPhotoUrl: "",
     khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
     imamName: "Dalam Konfirmasi",
-    imamRole: "Imam Shalat Jumat",
+    imamRole: "Dosen",
     muadzinName: "Dalam Konfirmasi",
-    muadzinRole: "Muadzin Shalat Jumat",
+    muadzinRole: "Mahasiswa",
     time: "11:35 WIB",
     notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
@@ -143,9 +143,9 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     khatibPhotoUrl: "",
     khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
     imamName: "Dalam Konfirmasi",
-    imamRole: "Imam Shalat Jumat",
+    imamRole: "Dosen",
     muadzinName: "Dalam Konfirmasi",
-    muadzinRole: "Muadzin Shalat Jumat",
+    muadzinRole: "Mahasiswa",
     time: "11:35 WIB",
     notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
@@ -163,9 +163,9 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     khatibPhotoUrl: "",
     khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
     imamName: "Dalam Konfirmasi",
-    imamRole: "Imam Shalat Jumat",
+    imamRole: "Dosen",
     muadzinName: "Dalam Konfirmasi",
-    muadzinRole: "Muadzin Shalat Jumat",
+    muadzinRole: "Mahasiswa",
     time: "11:35 WIB",
     notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
@@ -183,9 +183,9 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     khatibPhotoUrl: "",
     khutbahTheme: "Tema Khutbah Dalam Konfirmasi",
     imamName: "Dalam Konfirmasi",
-    imamRole: "Imam Shalat Jumat",
+    imamRole: "Dosen",
     muadzinName: "Dalam Konfirmasi",
-    muadzinRole: "Muadzin Shalat Jumat",
+    muadzinRole: "Mahasiswa",
     time: "11:35 WIB",
     notes: "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid.",
     updatedAt: new Date().toISOString(),
@@ -382,111 +382,7 @@ export function getDefaultPopupBanners(): PopupBanner[] {
 }
 
 export function getDefaultPrayerAttendances(): PrayerAttendance[] {
-  const today = new Date().toISOString().split("T")[0];
-  return [
-    {
-      id: "shlt-sample-01",
-      prayerName: "SUBUH",
-      mosqueId: "sudalmiyah",
-      mosqueName: "Masjid Hj. Sudalmiyah Rais",
-      mosqueLocation: "Kampus 2 UMS",
-      fullName: "Ahmad Fauzi",
-      participantRole: "MAHASISWA",
-      nim: "L200210001",
-      faculty: "Fakultas Komunikasi dan Informatika",
-      phone: "089876543210",
-      email: "l200210001@student.ums.ac.id",
-      photoUrl: "/images/masjid-sudalmiyah.jpg",
-      ticketCode: "SHLT-SBH-001",
-      attendedAt: `${today}T04:35:10.000Z`,
-      date: today,
-      userLat: -7.5583,
-      userLng: 110.7719,
-      locationVerified: true,
-      distanceMeters: 25,
-    },
-    {
-      id: "shlt-sample-02",
-      prayerName: "DZUHUR",
-      mosqueId: "fadhlurrahman",
-      mosqueName: "Masjid Fadhlurrahman",
-      mosqueLocation: "Kampus 1 UMS",
-      fullName: "Dr. Muhammad Ikhsan, M.Ag.",
-      participantRole: "DOSEN_KARYAWAN",
-      faculty: "Fakultas Agama Islam",
-      phone: "081234567891",
-      email: "ikhsan@ums.ac.id",
-      photoUrl: "/images/hero-fadhlurrahman.jpg",
-      ticketCode: "SHLT-DZH-002",
-      attendedAt: `${today}T11:55:00.000Z`,
-      date: today,
-      userLat: -7.5587,
-      userLng: 110.7766,
-      locationVerified: true,
-      distanceMeters: 40,
-    },
-    {
-      id: "shlt-sample-03",
-      prayerName: "ASHAR",
-      mosqueId: "mas-mansur",
-      mosqueName: "Masjid KH. Mas Mansur",
-      mosqueLocation: "Kampus 4 UMS (Pesma)",
-      fullName: "Ilham Ramadhan",
-      participantRole: "MAHASISWA",
-      nim: "D100220045",
-      faculty: "Fakultas Teknik",
-      phone: "085678901234",
-      email: "d100220045@student.ums.ac.id",
-      photoUrl: "/images/hero-mas-mansur.jpg",
-      ticketCode: "SHLT-ASH-003",
-      attendedAt: `${today}T15:15:30.000Z`,
-      date: today,
-      userLat: -7.5558,
-      userLng: 110.7634,
-      locationVerified: true,
-      distanceMeters: 30,
-    },
-    {
-      id: "shlt-sample-04",
-      prayerName: "MAGHRIB",
-      mosqueId: "ar-razi",
-      mosqueName: "Masjid Ar-Razi FKG",
-      mosqueLocation: "Kampus 4 UMS (FKG)",
-      fullName: "Farhan Pratama",
-      participantRole: "MAHASISWA",
-      nim: "J500210012",
-      faculty: "Fakultas Kedokteran Gigi",
-      phone: "087890123456",
-      email: "j500210012@student.ums.ac.id",
-      photoUrl: "/images/hero-ar-razi.jpg",
-      ticketCode: "SHLT-MGH-004",
-      attendedAt: `${today}T17:50:15.000Z`,
-      date: today,
-      userLat: -7.5549,
-      userLng: 110.7645,
-      locationVerified: true,
-      distanceMeters: 18,
-    },
-    {
-      id: "shlt-sample-05",
-      prayerName: "ISYA",
-      mosqueId: "sudalmiyah",
-      mosqueName: "Masjid Hj. Sudalmiyah Rais",
-      mosqueLocation: "Kampus 2 UMS",
-      fullName: "Bambang Wahyudi",
-      participantRole: "UMUM",
-      phone: "081390123456",
-      email: "bambang.w@gmail.com",
-      photoUrl: "/images/masjid-sudalmiyah.jpg",
-      ticketCode: "SHLT-ISY-005",
-      attendedAt: `${today}T19:10:00.000Z`,
-      date: today,
-      userLat: -7.5583,
-      userLng: 110.7719,
-      locationVerified: true,
-      distanceMeters: 15,
-    },
-  ];
+  return [];
 }
 
 function getInitialData(): DatabaseSchema {
@@ -822,8 +718,22 @@ export function ensureDbDefaults(data: DatabaseSchema): DatabaseSchema {
       });
     }
   }
+  if (data.fridaySchedules) {
+    data.fridaySchedules.forEach((s) => {
+      if (s.imamRole === "Imam Shalat Jumat" || !s.imamRole) s.imamRole = "Dosen";
+      if (s.muadzinRole === "Muadzin Shalat Jumat" || !s.muadzinRole) s.muadzinRole = "Mahasiswa";
+    });
+  }
   if (!data.fridaySchedule && data.fridaySchedules && data.fridaySchedules[0]) {
     data.fridaySchedule = data.fridaySchedules[0];
+  }
+  if (data.fridaySchedule) {
+    if (data.fridaySchedule.imamRole === "Imam Shalat Jumat" || !data.fridaySchedule.imamRole) {
+      data.fridaySchedule.imamRole = "Dosen";
+    }
+    if (data.fridaySchedule.muadzinRole === "Muadzin Shalat Jumat" || !data.fridaySchedule.muadzinRole) {
+      data.fridaySchedule.muadzinRole = "Mahasiswa";
+    }
   }
   if (!data.qrisSettings) {
     data.qrisSettings = getInitialData().qrisSettings;
@@ -865,8 +775,8 @@ export function ensureDbDefaults(data: DatabaseSchema): DatabaseSchema {
       createdAt: new Date().toISOString(),
     });
   }
-  if (!Array.isArray(data.prayerAttendances) || data.prayerAttendances.length === 0) {
-    data.prayerAttendances = getDefaultPrayerAttendances();
+  if (!Array.isArray(data.prayerAttendances)) {
+    data.prayerAttendances = [];
   }
   if (!Array.isArray(data.popupBanners) || data.popupBanners.length === 0) {
     if (data.popupBanner) {

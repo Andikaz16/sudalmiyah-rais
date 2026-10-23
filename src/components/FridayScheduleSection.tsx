@@ -616,7 +616,7 @@ https://sudalmiyah-rais.vercel.app/?s=jumat`;
                   </h4>
                   <p className="text-xs text-stone-500 mt-0.5 mb-2.5">
                     {activeSchedule.imamRole === "Imam Shalat Jumat"
-                      ? (isEn ? "Friday Prayer Imam" : activeSchedule.imamRole)
+                      ? (isEn ? "Lecturer / Academic Staff" : "Dosen")
                       : activeSchedule.imamRole}
                   </p>
                   <div className="pt-2 border-t border-stone-200/70 text-[11px] text-stone-500">
@@ -640,7 +640,7 @@ https://sudalmiyah-rais.vercel.app/?s=jumat`;
                   </h4>
                   <p className="text-xs text-stone-500 mt-0.5 mb-2.5">
                     {activeSchedule.muadzinRole === "Muadzin Shalat Jumat"
-                      ? (isEn ? "Friday Prayer Muadzin" : activeSchedule.muadzinRole)
+                      ? (isEn ? "Student / University Staff" : "Mahasiswa")
                       : activeSchedule.muadzinRole}
                   </p>
                   <div className="pt-2 border-t border-stone-200/70 text-[11px] text-stone-500">
