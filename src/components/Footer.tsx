@@ -215,7 +215,10 @@ export default function Footer() {
             <span>Jam&apos;iyah</span>
             <span>Jariyah</span>
             <span className="text-stone-500">•</span>
-            <Link href="/auth/login" className="hover:text-amber-300 transition-colors">
+            <Link
+              href="/auth/login"
+              className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-stone-300 hover:text-amber-300 transition-all font-semibold border border-white/10 hover:border-amber-400/30 inline-flex items-center gap-1.5"
+            >
               {t.footer.takmirAccess}
             </Link>
           </div>

@@ -109,8 +109,8 @@ export default function TanyaTarjihWidget() {
 
   return (
     <>
-      {/* Floating Action Trigger Button - positioned above MobileBottomNav on small screens */}
-      <div className="fixed bottom-20 right-3.5 sm:bottom-6 sm:right-6 z-40">
+      {/* Floating Action Trigger Button - positioned above MobileBottomNav on small screens and elevated on desktop so it doesn't cover Takmir access in footer */}
+      <div className="fixed bottom-24 sm:bottom-24 right-4 sm:right-6 z-40">
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}
