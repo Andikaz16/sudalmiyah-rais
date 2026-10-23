@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { User, History, X, Clock, Calendar, ChevronLeft, ChevronRight, Coins, ArrowRight, Share2, Check, Copy } from "lucide-react";
+import { User, History, X, Clock, Calendar, ChevronLeft, ChevronRight, Coins, ArrowRight, Share2 } from "lucide-react";
 import { FridayOfficerSchedule } from "@/lib/types";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -222,7 +222,6 @@ export default function FridayScheduleSection() {
   // History Modal State
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [historyFilterMosque, setHistoryFilterMosque] = useState<string>("all");
-  const [copiedShare, setCopiedShare] = useState(false);
 
   // Synchronize with Hero banner slide change or banner click
   useEffect(() => {
@@ -415,17 +414,6 @@ https://sudalmiyah-rais.vercel.app/?s=jumat`;
     }
   };
 
-  const handleCopyShareText = async () => {
-    const text = getShareText();
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedShare(true);
-      setTimeout(() => setCopiedShare(false), 3000);
-    } catch {
-      handleShareWhatsApp();
-    }
-  };
-
   return (
     <section
       id="petugas-jumat"
@@ -598,35 +586,16 @@ https://sudalmiyah-rais.vercel.app/?s=jumat`;
                     : (activeSchedule.notes || (isEn ? "Congregants are encouraged to arrive early before the adhan is called, maintain reverence and mosque cleanliness." : "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, menjaga kekhusyukan dan kebersihan masjid."))}
                 </div>
 
-                {/* Share Action Row inside Khatib card */}
-                <div className="mt-3.5 pt-3 border-t border-stone-200/80 flex flex-wrap items-center justify-between gap-2">
+                {/* Share Action inside Khatib card */}
+                <div className="mt-3.5 pt-3 border-t border-stone-200/80 flex items-center justify-start">
                   <button
                     type="button"
                     onClick={handleShareWhatsApp}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
-                    title={isEn ? "Share all 6 mosques Friday schedules to WhatsApp" : "Bagikan jadwal Shalat Jumat 6 masjid ke WhatsApp"}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+                    title={isEn ? "Share" : "Bagikan"}
                   >
                     <Share2 className="w-3.5 h-3.5 text-emerald-200" />
-                    <span>{isEn ? "Share 6 Mosques Schedule (WhatsApp)" : "Bagikan Jadwal Shalat Jumat (6 Masjid)"}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleCopyShareText}
-                    className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-white hover:bg-stone-100 text-stone-700 text-xs font-semibold border border-stone-300 transition-colors cursor-pointer active:scale-95"
-                    title={isEn ? "Copy text for all 6 mosques" : "Salin teks jadwal seluruh 6 masjid"}
-                  >
-                    {copiedShare ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        <span className="text-emerald-700 font-bold">{isEn ? "Copied" : "Tersalin"}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5 text-stone-500" />
-                        <span>{isEn ? "Copy 6 Mosques Text" : "Salin Teks (6 Masjid)"}</span>
-                      </>
-                    )}
+                    <span>{isEn ? "Share" : "Bagikan"}</span>
                   </button>
                 </div>
               </div>
