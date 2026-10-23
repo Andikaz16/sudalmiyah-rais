@@ -340,34 +340,54 @@ export default function FridayScheduleSection() {
   });
 
   const getShareText = () => {
-    const mosque = activeMosqueInfo.name;
-    const loc = activeMosqueInfo.location;
-    const date = activeSchedule.date === "Jumat Pekan Ini" ? "Jumat Pekan Ini" : activeSchedule.date;
-    const hijri = activeSchedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H";
-    const time = activeSchedule.time || "11:35 WIB";
-    const khatib = activeSchedule.khatibName || "Dalam Konfirmasi";
-    const khatibTitle = activeSchedule.khatibTitle ? ` (${activeSchedule.khatibTitle})` : "";
-    const tema = activeSchedule.khutbahTheme || "Tema Khutbah Dalam Konfirmasi";
-    const imam = activeSchedule.imamName || "Imam Shalat Jumat";
-    const muadzin = activeSchedule.muadzinName || "Muadzin Shalat Jumat";
-    const infaqStr =
-      activeSchedule.infaqAmount && Number(activeSchedule.infaqAmount) > 0
-        ? `\nInfaq Shalat Jumat Pekan Lalu: Rp ${Number(activeSchedule.infaqAmount).toLocaleString("id-ID")}`
-        : "";
+    // Susun daftar petugas shalat jumat untuk seluruh 6 masjid kampus UMS
+    const mosqueEntries = MOSQUE_LIST.map((m, idx) => {
+      const sched =
+        schedules.find((s) => (s.mosqueId || s.id) === m.id) ||
+        fallbackSchedules.find((f) => (f.mosqueId || f.id) === m.id) ||
+        fallbackSchedules[idx];
 
-    return `JADWAL PETUGAS SHALAT JUMAT PEKAN INI
-*${mosque.toUpperCase()}*
-Lokasi: ${loc}
-Hari / Tanggal: ${date} (${hijri})
-Waktu Mulai: ${time}
+      const khatib = sched?.khatibName || "Dalam Konfirmasi";
+      const khatibTitle =
+        sched?.khatibTitle && sched.khatibTitle !== "Akan Diumumkan Takmir"
+          ? ` (${sched.khatibTitle})`
+          : "";
+      const tema = sched?.khutbahTheme || "Tema Khutbah Dalam Konfirmasi";
+      const imam = sched?.imamName || "Imam Shalat Jumat";
+      const muadzin = sched?.muadzinName || "Muadzin Shalat Jumat";
+      const time = sched?.time || "11:35 WIB";
+      const infaqStr =
+        sched?.infaqAmount && Number(sched.infaqAmount) > 0
+          ? `\n• Infaq Jumat Lalu: Rp ${Number(sched.infaqAmount).toLocaleString("id-ID")}`
+          : "";
 
-Khatib: ${khatib}${khatibTitle}
-Tema Khutbah: "${tema}"
-Imam Shalat Jumat: ${imam}
-Muadzin: ${muadzin}${infaqStr}
+      return `${idx + 1}. *${m.name.toUpperCase()}* (${m.location})
+• Waktu Mulai: ${time}
+• Khatib: ${khatib}${khatibTitle}
+• Tema Khutbah: "${tema}"
+• Imam: ${imam}
+• Muadzin: ${muadzin}${infaqStr}`;
+    }).join("\n\n");
 
+    const activeDate =
+      activeSchedule.date === "Jumat Pekan Ini"
+        ? "Jumat Pekan Ini"
+        : activeSchedule.date;
+    const activeHijri =
+      activeSchedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") ||
+      "5 Jumadilawal 1448 H";
+
+    return `*JADWAL PETUGAS SHALAT JUMAT MASJID KAMPUS UMS*
+Hari / Tanggal: ${activeDate} (${activeHijri})
+----------------------------------------
+Assalamu'alaikum Warahmatullahi Wabarakatuh.
+Berikut daftar lengkap petugas Shalat Jumat di 6 Masjid Lingkungan Universitas Muhammadiyah Surakarta:
+
+${mosqueEntries}
+
+----------------------------------------
 Himbauan Jamaah:
-Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, merapatkan saf, serta menjaga kekhusyukan dan kebersihan masjid kampus.
+Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, merapatkan saf, serta menjaga ketertiban, kekhusyukan, dan kebersihan masjid kampus.
 
 Infaq Operasional Shalat Jumat & Masjid:
 Bank Jateng Syariah - Rekening LAZ UMS (QRIS Resmi di Web)
@@ -411,17 +431,8 @@ https://sudalmiyah-rais.vercel.app/#petugas-jumat`;
             {t.friday.desc}
           </p>
 
-          {/* Button Actions: Lihat Arsip & Bagikan Jadwal WA */}
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={handleShareWhatsApp}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
-            >
-              <Share2 className="w-4 h-4 text-emerald-200" />
-              <span>{isEn ? "Share Friday Schedule (WhatsApp)" : "Bagikan Jadwal Shalat Jumat (WhatsApp)"}</span>
-            </button>
-
+          {/* Action: Lihat Arsip Petugas Sebelumnya */}
+          <div className="mt-4 flex items-center justify-center">
             <button
               type="button"
               onClick={() => setIsHistoryModalOpen(true)}
@@ -454,16 +465,6 @@ https://sudalmiyah-rais.vercel.app/#petugas-jumat`;
 
             {/* Navigation Controls: Prev & Next Arrow Buttons */}
             <div className="flex items-center gap-2 self-end sm:self-auto">
-              <button
-                type="button"
-                onClick={handleShareWhatsApp}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 border border-emerald-400 text-white transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer shadow-xs"
-                title={isEn ? "Share to WhatsApp" : "Bagikan ke WhatsApp"}
-              >
-                <Share2 className="w-3.5 h-3.5 text-emerald-100" />
-                <span className="hidden sm:inline">{isEn ? "Share" : "Bagikan"}</span>
-              </button>
-
               <button
                 onClick={prevSlide}
                 className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/20 text-white transition-all flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
@@ -591,26 +592,28 @@ https://sudalmiyah-rais.vercel.app/#petugas-jumat`;
                   <button
                     type="button"
                     onClick={handleShareWhatsApp}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+                    title={isEn ? "Share all 6 mosques Friday schedules to WhatsApp" : "Bagikan jadwal Shalat Jumat 6 masjid ke WhatsApp"}
                   >
                     <Share2 className="w-3.5 h-3.5 text-emerald-200" />
-                    <span>Bagikan Jadwal ({activeMosqueInfo.shortName})</span>
+                    <span>{isEn ? "Share 6 Mosques Schedule (WhatsApp)" : "Bagikan Jadwal Shalat Jumat (6 Masjid)"}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleCopyShareText}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-stone-100 text-stone-700 text-xs font-semibold border border-stone-300 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-white hover:bg-stone-100 text-stone-700 text-xs font-semibold border border-stone-300 transition-colors cursor-pointer active:scale-95"
+                    title={isEn ? "Copy text for all 6 mosques" : "Salin teks jadwal seluruh 6 masjid"}
                   >
                     {copiedShare ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        <span className="text-emerald-700 font-bold">Tersalin</span>
+                        <span className="text-emerald-700 font-bold">{isEn ? "Copied" : "Tersalin"}</span>
                       </>
                     ) : (
                       <>
                         <Copy className="w-3.5 h-3.5 text-stone-500" />
-                        <span>Salin Teks</span>
+                        <span>{isEn ? "Copy 6 Mosques Text" : "Salin Teks (6 Masjid)"}</span>
                       </>
                     )}
                   </button>
