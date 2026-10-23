@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Clock, ArrowDown } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface HeroSlide {
@@ -132,15 +132,15 @@ export default function HeroSection() {
 
   return (
     <section
+      onClick={handleGoToFridaySchedule}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full min-h-[580px] sm:min-h-[660px] lg:min-h-[720px] flex items-center justify-center overflow-hidden"
+      title={`Klik gambar untuk melihat jadwal Shalat Jumat ${active.mosqueName}`}
+      className="relative w-full min-h-[580px] sm:min-h-[660px] lg:min-h-[720px] flex items-center justify-center overflow-hidden cursor-pointer"
     >
       {/* Full-Bleed Background Mosque Images Carousel */}
       <div
-        onClick={handleGoToFridaySchedule}
-        title={`Klik untuk melihat jadwal Shalat Jumat ${active.mosqueName}`}
-        className="absolute inset-0 w-full h-full z-0 overflow-hidden cursor-pointer group"
+        className="absolute inset-0 w-full h-full z-0 overflow-hidden"
       >
         {HERO_SLIDES.map((slide, idx) => (
           <div
@@ -166,7 +166,10 @@ export default function HeroSection() {
 
       {/* Minimalist Left and Right Slide Controls */}
       <button
-        onClick={prevSlide}
+        onClick={(e) => {
+          e.stopPropagation();
+          prevSlide();
+        }}
         aria-label="Slide Sebelumnya"
         className="hidden sm:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-black/40 hover:bg-black/70 text-white/90 hover:text-white border border-white/20 items-center justify-center backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-lg"
       >
@@ -174,7 +177,10 @@ export default function HeroSection() {
       </button>
 
       <button
-        onClick={nextSlide}
+        onClick={(e) => {
+          e.stopPropagation();
+          nextSlide();
+        }}
         aria-label="Slide Berikutnya"
         className="hidden sm:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-black/40 hover:bg-black/70 text-white/90 hover:text-white border border-white/20 items-center justify-center backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-lg"
       >
@@ -182,7 +188,7 @@ export default function HeroSection() {
       </button>
 
       {/* Hero Content Overlay */}
-      <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-8 sm:pt-12 lg:pt-14 pb-20 sm:pb-24">
+      <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-8 sm:pt-12 lg:pt-14 pb-20 sm:pb-24 pointer-events-none">
         {/* Logo LPCR-PM & Lencana AUM - Khusus Slide Masjid Sudalmiyah */}
         {active.id === "sudalmiyah" ? (
           <div className="flex flex-col items-center justify-center animate-fade-up">
@@ -222,27 +228,19 @@ export default function HeroSection() {
         </p>
 
         {/* Centered CTA Pill Buttons */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-          <button
-            type="button"
-            onClick={handleGoToFridaySchedule}
-            className="px-6 py-3.5 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-950 text-xs sm:text-sm font-bold shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 inline-flex items-center gap-2 cursor-pointer border border-amber-300"
-          >
-            <Clock className="w-4 h-4 text-stone-950" />
-            <span>Jadwal Shalat Jumat {active.mosqueName.replace("Masjid ", "")}</span>
-            <ArrowDown className="w-3.5 h-3.5 text-stone-950" />
-          </button>
-
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 pointer-events-auto">
           <Link
             href="/agenda"
-            className="px-7 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-bold shadow-2xl border border-amber-400/40 hover:scale-105 active:scale-95 transition-all duration-300"
+            onClick={(e) => e.stopPropagation()}
+            className="px-8 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-sm sm:text-base font-bold shadow-2xl border border-amber-400/40 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
           >
             {t.hero.ctaAgenda}
           </Link>
 
           <Link
             href="/donasi"
-            className="px-6 py-3.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-stone-200 hover:text-white text-xs sm:text-sm font-semibold backdrop-blur-md border border-stone-600/70 hover:border-amber-400/60 transition-all duration-300 hover:scale-105"
+            onClick={(e) => e.stopPropagation()}
+            className="px-7 py-3.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-stone-200 hover:text-white text-sm sm:text-base font-semibold backdrop-blur-md border border-stone-600/70 hover:border-amber-400/60 transition-all duration-300 hover:scale-105 cursor-pointer"
           >
             {t.hero.ctaDonation}
           </Link>
