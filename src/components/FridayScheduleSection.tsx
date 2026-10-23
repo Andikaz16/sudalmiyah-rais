@@ -236,6 +236,17 @@ export default function FridayScheduleSection() {
       }
     };
     window.addEventListener("sync-mosque-schedule", handleSync);
+
+    // Auto scroll jika pengunjung datang dari tautan WhatsApp (?s=jumat)
+    if (typeof window !== "undefined" && window.location.search.includes("s=jumat")) {
+      setTimeout(() => {
+        const el = document.getElementById("petugas-jumat");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 500);
+    }
+
     return () => window.removeEventListener("sync-mosque-schedule", handleSync);
   }, []);
 
@@ -393,7 +404,7 @@ Infaq Operasional Shalat Jumat & Masjid:
 Bank Jateng Syariah - Rekening LAZ UMS (QRIS Resmi di Web)
 
 Portal Resmi Masjid UMS:
-https://sudalmiyah-rais.vercel.app/#petugas-jumat`;
+https://sudalmiyah-rais.vercel.app/?s=jumat`;
   };
 
   const handleShareWhatsApp = () => {

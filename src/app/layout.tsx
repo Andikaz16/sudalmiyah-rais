@@ -49,28 +49,28 @@ export const metadata: Metadata = {
     apple: "/images/logo/logo-masjid.png",
   },
   openGraph: {
-    title: "Masjid Hj. Sudalmiyah Rais - Universitas Muhammadiyah Surakarta",
+    title: "Masjid UMS - Universitas Muhammadiyah Surakarta",
     description:
-      "Portal Resmi Masjid Kampus Universitas Muhammadiyah Surakarta - Model Masjid Percontohan LPCR-PM PP Muhammadiyah.",
+      "Portal Resmi Masjid Kampus UMS - Jadwal Shalat Jumat, Kajian & Ruang Ibadah Digital.",
     url: "https://sudalmiyah-rais.vercel.app",
-    siteName: "Masjid Sudalmiyah Rais UMS",
+    siteName: "Masjid UMS",
     images: [
       {
-        url: "/images/logo/logo-masjid.png",
-        width: 800,
-        height: 800,
-        alt: "Logo Resmi Masjid Hj. Sudalmiyah Rais UMS",
+        url: "https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png",
+        width: 512,
+        height: 512,
+        alt: "Logo Resmi Masjid UMS",
       },
     ],
     locale: "id_ID",
     type: "website",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Masjid Hj. Sudalmiyah Rais - Universitas Muhammadiyah Surakarta",
+    card: "summary",
+    title: "Masjid UMS - Universitas Muhammadiyah Surakarta",
     description:
-      "Portal Resmi Masjid Kampus Universitas Muhammadiyah Surakarta - Model Masjid Percontohan LPCR-PM PP Muhammadiyah.",
-    images: ["/images/logo/logo-masjid.png"],
+      "Portal Resmi Masjid Kampus UMS - Jadwal Shalat Jumat, Kajian & Ruang Ibadah Digital.",
+    images: ["https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png"],
   },
   appleWebApp: {
     capable: true,
@@ -103,6 +103,12 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
           rel="stylesheet"
         />
+        <meta property="og:image" content="https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png" />
+        <meta property="og:image:secure_url" content="https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="512" />
+        <meta property="og:image:height" content="512" />
+        <meta property="og:image:alt" content="Logo Resmi Masjid UMS" />
       </head>
       <body className="min-h-full flex flex-col bg-[#FAF8F5] text-slate-800 font-sans selection:bg-[#C59B27] selection:text-white">
         <LanguageProvider>
