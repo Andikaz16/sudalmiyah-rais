@@ -175,8 +175,11 @@ export default function Navbar() {
                               <BookOpen className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-xs font-bold leading-tight">
-                                {t.navbar.downloadCenter}
+                              <div className="text-xs font-bold leading-tight flex items-center gap-1.5">
+                                <span>{t.navbar.downloadCenter}</span>
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                                  Terkunci
+                                </span>
                               </div>
                               <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
                                 {t.navbar.downloadCenterDesc}
@@ -339,12 +342,19 @@ export default function Navbar() {
             <Link
               href="/layanan/unduhan"
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold ${
+              className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold ${
                 pathname === "/layanan/unduhan" ? "bg-[#003B73] text-white" : "text-stone-800 hover:bg-white"
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>{t.navbar.downloadCenter}</span>
+              <div className="flex items-center gap-2.5">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>{t.navbar.downloadCenter}</span>
+              </div>
+              <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                pathname === "/layanan/unduhan" ? "bg-white/20 text-white" : "bg-amber-100 text-amber-900"
+              }`}>
+                Terkunci
+              </span>
             </Link>
           </div>
 

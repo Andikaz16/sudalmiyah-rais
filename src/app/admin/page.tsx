@@ -46,6 +46,9 @@ import {
   ChevronRight,
   Upload,
   LogOut,
+  Lock,
+  Unlock,
+  ShieldAlert,
 } from "lucide-react";
 import {
   Agenda,
@@ -598,6 +601,8 @@ export default function AdminDashboardPage() {
 
   // Document Management State
   const [documents, setDocuments] = useState<DownloadDocument[]>([]);
+  const [documentsLocked, setDocumentsLocked] = useState<boolean>(true);
+  const [togglingDocLock, setTogglingDocLock] = useState<boolean>(false);
   const [loadingDocs, setLoadingDocs] = useState(false);
   const [isDocModalOpen, setIsDocModalOpen] = useState(false);
   const [editingDocId, setEditingDocId] = useState<string | null>(null);
@@ -644,7 +649,7 @@ export default function AdminDashboardPage() {
         fetch("/api/friday-schedule"),
         fetch("/api/qris"),
         fetch(`/api/popup?admin=1&t=${Date.now()}`, { cache: "no-store" }),
-        fetch("/api/documents"),
+        fetch(`/api/admin/documents?t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/admin/system-status"),
         fetch(`/api/admin/news?t=${Date.now()}`, { cache: "no-store" }),
       ]);
@@ -738,6 +743,9 @@ export default function AdminDashboardPage() {
       if (docRes.ok) {
         const docJson = await docRes.json();
         setDocuments(docJson.documents || []);
+        if (docJson.isLocked !== undefined) {
+          setDocumentsLocked(docJson.isLocked);
+        }
       }
       if (newsRes.ok) {
         const newsJson = await newsRes.json();
@@ -1764,6 +1772,33 @@ export default function AdminDashboardPage() {
       loadData();
     } catch (err: any) {
       alert(err.message || "Gagal menghapus dokumen.");
+    }
+  };
+
+  const handleToggleDocumentsLock = async () => {
+    setTogglingDocLock(true);
+    const newLocked = !documentsLocked;
+    try {
+      const res = await fetch("/api/admin/documents", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isLocked: newLocked }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setDocumentsLocked(data.isLocked);
+        alert(
+          `Akses publik Pusat Unduhan Dokumen (/layanan/unduhan) berhasil ${
+            data.isLocked ? "DIKUNCI" : "DIBUKA"
+          }.`
+        );
+      } else {
+        alert(data.error || "Gagal mengubah status akses dokumen.");
+      }
+    } catch {
+      alert("Terjadi kesalahan jaringan.");
+    } finally {
+      setTogglingDocLock(false);
     }
   };
 
@@ -4825,6 +4860,74 @@ export default function AdminDashboardPage() {
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah Dokumen Baru</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Lock / Unlock Control Card */}
+            <div
+              className={`p-5 rounded-3xl border transition-all ${
+                documentsLocked
+                  ? "bg-amber-50/80 border-amber-300"
+                  : "bg-emerald-50/80 border-emerald-300"
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div
+                    className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs ${
+                      documentsLocked
+                        ? "bg-amber-200 text-amber-900 border border-amber-300"
+                        : "bg-emerald-200 text-emerald-900 border border-emerald-300"
+                    }`}
+                  >
+                    {documentsLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-bold text-stone-900 text-xs sm:text-sm">
+                        Status Akses Publik Halaman Unduhan (/layanan/unduhan)
+                      </span>
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
+                          documentsLocked
+                            ? "bg-amber-200 text-amber-900 border border-amber-300"
+                            : "bg-emerald-200 text-emerald-900 border border-emerald-300"
+                        }`}
+                      >
+                        {documentsLocked ? "TERKUNCI SEMENTARA" : "TERBUKA UNTUK UMUM"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
+                      {documentsLocked
+                        ? "Halaman publik saat ini dikunci. Pengunjung umum tidak bisa mengakses atau mengunduh data dummy, melainkan akan melihat pesan bahwa dokumen resmi sedang disiapkan oleh takmir."
+                        : "Halaman publik saat ini terbuka. Seluruh jamaah dan pengunjung dapat melihat daftar dokumen dan mengunduh berkas PDF resmi."}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleToggleDocumentsLock}
+                  disabled={togglingDocLock}
+                  className={`px-5 py-2.5 rounded-full text-xs font-bold shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
+                    documentsLocked
+                      ? "bg-emerald-700 hover:bg-emerald-800 text-white"
+                      : "bg-amber-600 hover:bg-amber-700 text-white"
+                  }`}
+                >
+                  {togglingDocLock ? (
+                    <span>Memproses...</span>
+                  ) : documentsLocked ? (
+                    <>
+                      <Unlock className="w-4 h-4 text-emerald-200" />
+                      <span>Buka Kunci Akses Publik</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4 text-amber-200" />
+                      <span>Kunci Akses Publik</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

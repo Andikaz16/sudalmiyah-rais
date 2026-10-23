@@ -7,6 +7,17 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get("search");
 
   const db = await getDbAsync();
+  const isLocked = db.documentsLocked ?? true;
+
+  if (isLocked) {
+    return NextResponse.json({
+      success: true,
+      isLocked: true,
+      documents: [],
+      message: "Pusat Unduhan & Pustaka Dokumen sedang dikunci sementara oleh Takmir.",
+    });
+  }
+
   let documents = db.documents || [];
 
   if (category && category !== "ALL") {
@@ -31,6 +42,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     success: true,
+    isLocked: false,
     documents,
   });
 }

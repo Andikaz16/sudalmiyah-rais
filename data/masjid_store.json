@@ -674,5 +674,6 @@
       "updatedAt": "2026-10-16T13:00:00Z"
     }
   ],
-  "prayerAttendances": []
+  "prayerAttendances": [],
+  "documentsLocked": true
 }

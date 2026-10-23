@@ -38,6 +38,7 @@ export interface DatabaseSchema {
   popupBanner?: PopupBanner | null;
   popupBanners?: PopupBanner[];
   documents?: DownloadDocument[];
+  documentsLocked?: boolean;
   manualNews?: ManualNewsItem[];
   prayerAttendances?: PrayerAttendance[];
 }
@@ -691,6 +692,7 @@ function getInitialData(): DatabaseSchema {
       },
     ],
     documents: getDefaultDocuments(),
+    documentsLocked: true,
     manualNews: getDefaultManualNews(),
     prayerAttendances: getDefaultPrayerAttendances(),
   };
@@ -743,6 +745,9 @@ export function ensureDbDefaults(data: DatabaseSchema): DatabaseSchema {
   }
   if (!data.documents || data.documents.length === 0) {
     data.documents = getDefaultDocuments();
+  }
+  if (data.documentsLocked === undefined) {
+    data.documentsLocked = true;
   }
   if (data.agendas) {
     const initial = getInitialData();

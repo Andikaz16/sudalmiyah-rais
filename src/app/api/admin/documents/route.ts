@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
   const db = await getDbAsync();
   return NextResponse.json({
     success: true,
+    isLocked: db.documentsLocked ?? true,
     documents: db.documents || [],
   });
 }
@@ -219,4 +220,46 @@ export async function DELETE(request: NextRequest) {
   );
 
   return NextResponse.json({ success: true, message: "Dokumen berhasil dihapus." });
+}
+
+export async function PATCH(request: NextRequest) {
+  const token = request.cookies.get("sudalmiyah_session")?.value;
+  if (!token) {
+    return NextResponse.json({ error: "Otentikasi dibutuhkan." }, { status: 401 });
+  }
+
+  const session = await verifySessionToken(token);
+  if (!session || (session.role !== "ADMIN_TAKMIR" && session.role !== "PENGURUS_AGENDA")) {
+    return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+  }
+
+  try {
+    const body = await request.json();
+    const { isLocked } = body;
+
+    const db = await getDbAsync();
+    db.documentsLocked = Boolean(isLocked);
+    await saveDb(db);
+
+    const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
+    logSecurityEvent(
+      "TOGGLE_DOCUMENTS_LOCK",
+      session.email,
+      ip,
+      "SUCCESS",
+      `Akses publik dokumen diubah menjadi: ${db.documentsLocked ? "TERKUNCI" : "TERBUKA"}`
+    );
+
+    return NextResponse.json({
+      success: true,
+      isLocked: db.documentsLocked,
+      message: `Akses publik dokumen berhasil ${db.documentsLocked ? "dikunci" : "dibuka"}.`,
+    });
+  } catch (err: any) {
+    console.error("Toggle documents lock error:", err);
+    return NextResponse.json(
+      { error: err.message || "Gagal mengubah status akses dokumen." },
+      { status: 500 }
+    );
+  }
 }
