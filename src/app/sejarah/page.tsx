@@ -188,6 +188,25 @@ export default function SejarahPage() {
         "Mewarisi kejujuran, komitmen, dan keteguhan ash-Shiddiq dalam mendalami ilmu-ilmu syar'i dan mendakwahkannya dengan hikmah.",
     },
     {
+      id: "munajat-shabran",
+      name: "Masjid Al-Munajat",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Masjid+Munajat+Pondok+Shabran+Makamhaji",
+      location: "Pondok Pesantren Mahasiswa H. Ahmad Dahlan (Shabran), Makamhaji",
+      established: "1982 M / 1403 H",
+      image: "/images/hero-munajat-shabran.jpg",
+      leadWord: "Pusat Perkaderan",
+      tagline: "Kawah Candradimuka Intelek Ulama & Ulama Intelek Persyarikatan",
+      historicalContext:
+        "Pondok Shabran didirikan atas wasiat dan wakaf keluarga H. Ahmad Dahlan dan H. Nuriyah Shabran untuk mencetak kader ulama tarjih Muhammadiyah. Masjid Al-Munajat Pondok Shabran menjadi pusat peribadatan malam, qiyamul lail berjamaah, munajat, serta gemblengan ideologis kader-kader utusan Pimpinan Wilayah Muhammadiyah (PWM) dari 38 provinsi di Indonesia yang kelak diterjunkan berdakwah ke pelosok nusantara.",
+      keyFigures: "Keluarga Pewakaf Hj. Nuriyah Shabran & Pimpinan PP Muhammadiyah",
+      facilities: [
+        "Dukuh: Asrama Putra & Putri",
+        "Saripan: Gedung 4 Lantai, Halaman/Tempat Parkir Luas, Shobron Bakery",
+      ],
+      philosophicalMeaning:
+        "Kata 'Munajat' menyimbolkan doa tulus dan permohonan tiada putus kepada Allah SWT agar setiap kader senantiasa diberi keistiqamahan dalam memikul risalah dakwah Islam berkemajuan.",
+    },
+    {
       id: "ar-razi",
       name: "Masjid Ar-Razi FKG",
       mapsUrl: "https://www.google.com/maps/search/?api=1&query=Masjid+Ar-Razi+FKG+UMS",
@@ -208,25 +227,6 @@ export default function SejarahPage() {
       ],
       philosophicalMeaning:
         "Terinspirasi dari Al-Razi, ilmuwan polimatik dan pelopor kedokteran klinis Islam yang meletakkan dasar farmakologi, etika medis, dan penanganan pasien tanpa diskriminasi.",
-    },
-    {
-      id: "munajat-shabran",
-      name: "Masjid Al-Munajat Pondok Shabran",
-      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Masjid+Munajat+Pondok+Shabran+Makamhaji",
-      location: "Pondok Pesantren Mahasiswa H. Ahmad Dahlan (Shabran), Makamhaji",
-      established: "1982 M / 1403 H",
-      image: "/images/hero-munajat-shabran.jpg",
-      leadWord: "Pusat Perkaderan",
-      tagline: "Kawah Candradimuka Intelek Ulama & Ulama Intelek Persyarikatan",
-      historicalContext:
-        "Pondok Shabran didirikan atas wasiat dan wakaf keluarga H. Ahmad Dahlan dan H. Nuriyah Shabran untuk mencetak kader ulama tarjih Muhammadiyah. Masjid Al-Munajat Pondok Shabran menjadi pusat peribadatan malam, qiyamul lail berjamaah, munajat, serta gemblengan ideologis kader-kader utusan Pimpinan Wilayah Muhammadiyah (PWM) dari 38 provinsi di Indonesia yang kelak diterjunkan berdakwah ke pelosok nusantara.",
-      keyFigures: "Keluarga Pewakaf Hj. Nuriyah Shabran & Pimpinan PP Muhammadiyah",
-      facilities: [
-        "Dukuh: Asrama Putra & Putri",
-        "Saripan: Gedung 4 Lantai, Halaman/Tempat Parkir Luas, Shobron Bakery",
-      ],
-      philosophicalMeaning:
-        "Kata 'Munajat' menyimbolkan doa tulus dan permohonan tiada putus kepada Allah SWT agar setiap kader senantiasa diberi keistiqamahan dalam memikul risalah dakwah Islam berkemajuan.",
     },
   ];
 

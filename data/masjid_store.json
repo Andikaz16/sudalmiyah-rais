@@ -382,10 +382,10 @@
       "updatedAt": "2026-10-17T10:00:00.000Z"
     },
     {
-      "id": "fri-ar-razi",
-      "mosqueId": "ar-razi",
-      "mosqueName": "Masjid Ar-Razi FKG",
-      "mosqueLocation": "Kampus 4 UMS (FKG)",
+      "id": "fri-munajat-shabran",
+      "mosqueId": "munajat-shabran",
+      "mosqueName": "Masjid Al-Munajat",
+      "mosqueLocation": "Makamhaji (Pondok Shabran)",
       "date": "Jumat Pekan Ini",
       "hijriDate": "5 Jumadilawal 1448 H",
       "khatibName": "Dalam Konfirmasi",
@@ -401,10 +401,10 @@
       "updatedAt": "2026-10-17T10:00:00.000Z"
     },
     {
-      "id": "fri-munajat-shabran",
-      "mosqueId": "munajat-shabran",
-      "mosqueName": "Masjid Munajat Shabran",
-      "mosqueLocation": "Makamhaji (Pondok Shabran)",
+      "id": "fri-ar-razi",
+      "mosqueId": "ar-razi",
+      "mosqueName": "Masjid Ar-Razi FKG",
+      "mosqueLocation": "Kampus 4 UMS (FKG)",
       "date": "Jumat Pekan Ini",
       "hijriDate": "5 Jumadilawal 1448 H",
       "khatibName": "Dalam Konfirmasi",

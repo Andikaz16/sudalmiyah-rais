@@ -16,8 +16,8 @@ const MOSQUE_OPTIONS = [
   "Masjid Fadhlurrahman",
   "Masjid KH. Mas Mansur",
   "Masjid Ma'had Abu Bakar",
+  "Masjid Al-Munajat",
   "Masjid Ar-Razi FKG",
-  "Masjid Munajat Shabran",
   "Semua Masjid Kampus",
 ];
 

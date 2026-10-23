@@ -35,8 +35,8 @@ const MOSQUES: MosqueOption[] = [
   { id: "fadhlurrahman", name: "Masjid Fadhlurrahman" },
   { id: "mas-mansur", name: "Masjid KH. Mas Mansur" },
   { id: "mahad-abu-bakar", name: "Masjid Ma'had Abu Bakar" },
+  { id: "munajat-shabran", name: "Masjid Al-Munajat" },
   { id: "ar-razi", name: "Masjid Ar-Razi FKG" },
-  { id: "munajat-shabran", name: "Masjid Al-Munajat Pondok Shabran" },
 ];
 
 type PrayerKey = "SUBUH" | "DZUHUR" | "ASHAR" | "MAGHRIB" | "ISYA";

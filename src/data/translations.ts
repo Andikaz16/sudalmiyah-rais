@@ -234,18 +234,18 @@ export const translations: Record<Language, TranslationDictionary> = {
             "Pusat dirasat Islamiyah dan bahasa Arab Ma'had Abu bakar Ash-Shiddiq yang sekarang statusnya menjadi Amal Usaha Muhammadiyah (AUM) di lingkungan UMS",
         },
         {
+          id: "munajat-shabran",
+          leadWord: "Pusat Perkaderan di",
+          mosqueName: "Masjid Al-Munajat",
+          description:
+            "Pusat perkaderan mahasiswa utusan wilayah Muhammadiyah seluruh Indonesia yang diorbitkan menjadi kader intelek ulama', ulama' intelek.",
+        },
+        {
           id: "ar-razi",
           leadWord: "Integrasi Keislaman & Keilmuan di",
           mosqueName: "Masjid Ar-Razi FKG",
           description:
             "Masjid yang terinspirasi ilmuwan polimatik terkemuka dan ahli di beberapa bidang utama, terutama kedokteran, kimia dan filsafat yakni Abu Bakar Muhammad bin Zakariya al-Razi",
-        },
-        {
-          id: "munajat-shabran",
-          leadWord: "Pusat Perkaderan di",
-          mosqueName: "Masjid Al-Munajat Pondok Shabran",
-          description:
-            "Pusat perkaderan mahasiswa utusan wilayah Muhammadiyah seluruh Indonesia yang diorbitkan menjadi kader intelek ulama', ulama' intelek.",
         },
       ],
       ctaAgenda: "Daftar Kajian & Kegiatan",
@@ -475,18 +475,18 @@ export const translations: Record<Language, TranslationDictionary> = {
             "Center for Islamic studies and Arabic language at Ma'had Abu Bakar Ash-Shiddiq, an official institutional undertaking at UMS",
         },
         {
+          id: "munajat-shabran",
+          leadWord: "Cadre Training Center at",
+          mosqueName: "Al-Munajat Mosque",
+          description:
+            "National cadre development center nurturing intellectual scholars and scholarly intellectuals across Indonesia",
+        },
+        {
           id: "ar-razi",
           leadWord: "Integration of Faith & Science at",
           mosqueName: "Ar-Razi Dental Mosque",
           description:
             "Mosque inspired by the prominent polymath, physician, chemist, and philosopher Abu Bakr Muhammad ibn Zakariya al-Razi",
-        },
-        {
-          id: "munajat-shabran",
-          leadWord: "Cadre Training Center at",
-          mosqueName: "Al-Munajat Mosque Pondok Shabran",
-          description:
-            "National cadre development center nurturing intellectual scholars and scholarly intellectuals across Indonesia",
         },
       ],
       ctaAgenda: "Schedule & Activities",

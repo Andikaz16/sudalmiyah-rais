@@ -53,21 +53,21 @@ const HERO_SLIDES: HeroSlide[] = [
     objectPosition: "object-[center_40%]",
   },
   {
+    id: "munajat-shabran",
+    image: "/images/hero-munajat-shabran.jpg",
+    leadWord: "Pusat Perkaderan di",
+    mosqueName: "Masjid Al-Munajat",
+    description:
+      "Pusat perkaderan mahasiswa utusan wilayah Muhammadiyah seluruh Indonesia yang diorbitkan menjadi kader intelek ulama', ulama' intelek.",
+    objectPosition: "object-center",
+  },
+  {
     id: "ar-razi",
     image: "/images/hero-ar-razi.jpg",
     leadWord: "Integrasi Keislaman & Keilmuan di",
     mosqueName: "Masjid Ar-Razi FKG",
     description:
       "Masjid yang terinspirasi ilmuwan polimatik terkemuka dan ahli di beberapa bidang utama, terutama kedokteran, kimia dan filsafat yakni Abu Bakar Muhammad bin Zakariya al-Razi",
-    objectPosition: "object-center",
-  },
-  {
-    id: "munajat-shabran",
-    image: "/images/hero-munajat-shabran.jpg",
-    leadWord: "Pusat Perkaderan di",
-    mosqueName: "Masjid Al-Munajat Pondok Shabran",
-    description:
-      "Pusat perkaderan mahasiswa utusan wilayah Muhammadiyah seluruh Indonesia yang diorbitkan menjadi kader intelek ulama', ulama' intelek.",
     objectPosition: "object-center",
   },
 ];

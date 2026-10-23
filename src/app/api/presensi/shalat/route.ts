@@ -10,8 +10,8 @@ const CAMPUS_MOSQUES: Record<string, { name: string; location: string; lat: numb
   fadhlurrahman: { name: "Masjid Fadhlurrahman", location: "Kampus 1 UMS", lat: -7.5587, lng: 110.7766 },
   "mas-mansur": { name: "Masjid KH. Mas Mansur", location: "Kampus 4 UMS (Pesma)", lat: -7.5558, lng: 110.7634 },
   "mahad-abu-bakar": { name: "Masjid Ma'had Abu Bakar", location: "Kampus 2 UMS", lat: -7.5574, lng: 110.7712 },
+  "munajat-shabran": { name: "Masjid Al-Munajat", location: "Makamhaji (Pondok Shabran)", lat: -7.5681, lng: 110.7698 },
   "ar-razi": { name: "Masjid Ar-Razi FKG", location: "Kampus 4 UMS (FKG)", lat: -7.5549, lng: 110.7645 },
-  "munajat-shabran": { name: "Masjid Al-Munajat Pondok Shabran", location: "Makamhaji (Pondok Shabran)", lat: -7.5681, lng: 110.7698 },
 };
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {

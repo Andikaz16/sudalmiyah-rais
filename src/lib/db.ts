@@ -175,7 +175,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
   const munajatShabran: FridayOfficerSchedule = {
     id: "fri-munajat-shabran",
     mosqueId: "munajat-shabran",
-    mosqueName: "Masjid Munajat Shabran",
+    mosqueName: "Masjid Al-Munajat",
     mosqueLocation: "Makamhaji (Pondok Shabran)",
     date: primary?.date || "Jumat Pekan Ini",
     hijriDate: getSafeHijri(primary?.hijriDate),
@@ -192,7 +192,7 @@ export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): Frid
     updatedAt: new Date().toISOString(),
   };
 
-  return [sudalmiyah, fadhlurrahman, masMansur, mahadAbuBakar, arRazi, munajatShabran];
+  return [sudalmiyah, fadhlurrahman, masMansur, mahadAbuBakar, munajatShabran, arRazi];
 }
 
 export function getDefaultFridayScheduleHistory(): FridayOfficerSchedule[] {

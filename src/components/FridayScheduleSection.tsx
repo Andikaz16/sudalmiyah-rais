@@ -39,16 +39,16 @@ const MOSQUE_LIST: MosqueInfo[] = [
     shortName: "Ma'had Abu Bakar",
   },
   {
+    id: "munajat-shabran",
+    name: "Masjid Al-Munajat",
+    location: "Makamhaji (Pondok Shabran)",
+    shortName: "Al-Munajat",
+  },
+  {
     id: "ar-razi",
     name: "Masjid Ar-Razi FKG",
     location: "Kampus 4 UMS (FKG)",
     shortName: "Ar-Razi FKG",
-  },
-  {
-    id: "munajat-shabran",
-    name: "Masjid Munajat Shabran",
-    location: "Makamhaji (Pondok Shabran)",
-    shortName: "Munajat Shabran",
   },
 ];
 
@@ -130,10 +130,10 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: "fri-ar-razi",
-    mosqueId: "ar-razi",
-    mosqueName: "Masjid Ar-Razi FKG",
-    mosqueLocation: "Kampus 4 UMS (FKG)",
+    id: "fri-munajat-shabran",
+    mosqueId: "munajat-shabran",
+    mosqueName: "Masjid Al-Munajat",
+    mosqueLocation: "Makamhaji (Pondok Shabran)",
     date: "Jumat Pekan Ini",
     hijriDate: "5 Jumadilawal 1448 H",
     khatibName: "Dalam Konfirmasi",
@@ -149,10 +149,10 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: "fri-munajat-shabran",
-    mosqueId: "munajat-shabran",
-    mosqueName: "Masjid Munajat Shabran",
-    mosqueLocation: "Makamhaji (Pondok Shabran)",
+    id: "fri-ar-razi",
+    mosqueId: "ar-razi",
+    mosqueName: "Masjid Ar-Razi FKG",
+    mosqueLocation: "Kampus 4 UMS (FKG)",
     date: "Jumat Pekan Ini",
     hijriDate: "5 Jumadilawal 1448 H",
     khatibName: "Dalam Konfirmasi",

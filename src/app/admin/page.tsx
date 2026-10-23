@@ -91,8 +91,8 @@ const ADMIN_MOSQUES = [
   { id: "fadhlurrahman", name: "Masjid Fadhlurrahman", location: "Kampus 1 UMS" },
   { id: "mas-mansur", name: "Masjid KH. Mas Mansur", location: "Kampus 4 UMS (Pesma)" },
   { id: "mahad-abu-bakar", name: "Masjid Ma'had Abu Bakar", location: "Kampus 2 UMS" },
+  { id: "munajat-shabran", name: "Masjid Al-Munajat", location: "Makamhaji (Pondok Shabran)" },
   { id: "ar-razi", name: "Masjid Ar-Razi FKG", location: "Kampus 4 UMS (FKG)" },
-  { id: "munajat-shabran", name: "Masjid Al-Munajat Pondok Shabran", location: "Makamhaji (Pondok Shabran)" },
 ];
 
 const DOCUMENT_CATEGORIES: { value: DocumentCategory; label: string }[] = [
@@ -3941,8 +3941,8 @@ export default function AdminDashboardPage() {
                   <option value="Masjid Fadhlurrahman">Masjid Fadhlurrahman</option>
                   <option value="Masjid KH. Mas Mansur">Masjid KH. Mas Mansur</option>
                   <option value="Masjid Ma'had Abu Bakar">Masjid Ma'had Abu Bakar</option>
+                  <option value="Masjid Al-Munajat">Masjid Al-Munajat</option>
                   <option value="Masjid Ar-Razi FKG">Masjid Ar-Razi FKG</option>
-                  <option value="Masjid Munajat Shabran">Masjid Munajat Shabran</option>
                   <option value="Semua Masjid Kampus">Saran Umum Seluruh Masjid</option>
                 </select>
               </div>
