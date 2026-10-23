@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, ArrowDown } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface HeroSlide {
@@ -93,6 +93,34 @@ export default function HeroSection() {
     return () => clearInterval(timer);
   }, [isPaused, nextSlide]);
 
+  // Synchronize banner slide with Friday prayer schedule component
+  useEffect(() => {
+    const current = HERO_SLIDES[currentSlide];
+    if (current && typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("sync-mosque-schedule", {
+          detail: { mosqueId: current.id },
+        })
+      );
+    }
+  }, [currentSlide]);
+
+  const handleGoToFridaySchedule = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const current = HERO_SLIDES[currentSlide];
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("sync-mosque-schedule", {
+          detail: { mosqueId: current.id },
+        })
+      );
+      const target = document.getElementById("petugas-jumat");
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
   const baseSlide = HERO_SLIDES[currentSlide];
   const translatedSlide = t.hero.slides.find((s) => s.id === baseSlide.id) || baseSlide;
   const active = {
@@ -109,7 +137,11 @@ export default function HeroSection() {
       className="relative w-full min-h-[580px] sm:min-h-[660px] lg:min-h-[720px] flex items-center justify-center overflow-hidden"
     >
       {/* Full-Bleed Background Mosque Images Carousel */}
-      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+      <div
+        onClick={handleGoToFridaySchedule}
+        title={`Klik untuk melihat jadwal Shalat Jumat ${active.mosqueName}`}
+        className="absolute inset-0 w-full h-full z-0 overflow-hidden cursor-pointer group"
+      >
         {HERO_SLIDES.map((slide, idx) => (
           <div
             key={slide.id}
@@ -190,17 +222,27 @@ export default function HeroSection() {
         </p>
 
         {/* Centered CTA Pill Buttons */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+          <button
+            type="button"
+            onClick={handleGoToFridaySchedule}
+            className="px-6 py-3.5 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-950 text-xs sm:text-sm font-bold shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 inline-flex items-center gap-2 cursor-pointer border border-amber-300"
+          >
+            <Clock className="w-4 h-4 text-stone-950" />
+            <span>Jadwal Shalat Jumat {active.mosqueName.replace("Masjid ", "")}</span>
+            <ArrowDown className="w-3.5 h-3.5 text-stone-950" />
+          </button>
+
           <Link
             href="/agenda"
-            className="px-8 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-sm sm:text-base font-bold shadow-2xl border border-amber-400/40 hover:scale-105 active:scale-95 transition-all duration-300"
+            className="px-7 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs sm:text-sm font-bold shadow-2xl border border-amber-400/40 hover:scale-105 active:scale-95 transition-all duration-300"
           >
             {t.hero.ctaAgenda}
           </Link>
 
           <Link
             href="/donasi"
-            className="px-7 py-3.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-stone-200 hover:text-white text-sm sm:text-base font-semibold backdrop-blur-md border border-stone-600/70 hover:border-amber-400/60 transition-all duration-300 hover:scale-105"
+            className="px-6 py-3.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-stone-200 hover:text-white text-xs sm:text-sm font-semibold backdrop-blur-md border border-stone-600/70 hover:border-amber-400/60 transition-all duration-300 hover:scale-105"
           >
             {t.hero.ctaDonation}
           </Link>

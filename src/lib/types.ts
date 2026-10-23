@@ -103,6 +103,30 @@ export interface Registration {
   photoUrl?: string;
 }
 
+export type PrayerName = "SUBUH" | "DZUHUR" | "ASHAR" | "MAGHRIB" | "ISYA";
+
+export interface PrayerAttendance {
+  id: string;
+  prayerName: PrayerName;
+  mosqueId: string;
+  mosqueName: string;
+  mosqueLocation?: string;
+  fullName: string;
+  participantRole: "MAHASISWA" | "DOSEN_KARYAWAN" | "UMUM";
+  nim?: string;
+  faculty?: string;
+  phone?: string;
+  email?: string;
+  photoUrl: string;
+  ticketCode: string;
+  attendedAt: string;
+  date: string;
+  userLat: number;
+  userLng: number;
+  locationVerified: boolean;
+  distanceMeters?: number;
+}
+
 export interface PopupBanner {
   id: string;
   imageUrl: string;

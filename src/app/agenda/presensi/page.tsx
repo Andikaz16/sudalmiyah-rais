@@ -284,6 +284,11 @@ function PresensiContent() {
       return;
     }
 
+    if (locationState !== "LOCATED" || userLat === undefined || userLng === undefined) {
+      alert("Verifikasi lokasi GPS di kawasan Masjid UMS wajib dilakukan. Silakan klik tombol 'Verifikasi Lokasi di Kawasan Masjid UMS' terlebih dahulu.");
+      return;
+    }
+
     setStatus("SUBMITTING");
 
     try {
@@ -675,7 +680,13 @@ function PresensiContent() {
                 </div>
 
                 {/* Geolocation Button */}
-                <div className="pt-2">
+                <div className="pt-2 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-stone-700">Verifikasi Lokasi di Masjid UMS</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
+                      Wajib
+                    </span>
+                  </div>
                   {locationState === "LOCATED" ? (
                     <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -686,11 +697,17 @@ function PresensiContent() {
                       type="button"
                       onClick={handleDetectLocation}
                       disabled={locationState === "CHECKING"}
-                      className="w-full py-2.5 px-3 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium border border-stone-300 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                      className="w-full py-2.5 px-3 rounded-2xl bg-[#003B73]/5 hover:bg-[#003B73]/10 text-[#003B73] text-xs font-semibold border-2 border-dashed border-[#003B73]/40 hover:border-[#003B73] flex items-center justify-center gap-2 transition-all cursor-pointer"
                     >
                       <Navigation className={`w-3.5 h-3.5 text-[#003B73] ${locationState === "CHECKING" ? "animate-spin" : ""}`} />
-                      <span>{locationState === "CHECKING" ? "Mendeteksi Koordinat GPS..." : "Verifikasi Lokasi di Masjid UMS (Opsional)"}</span>
+                      <span>{locationState === "CHECKING" ? "Mendeteksi Koordinat GPS..." : "Verifikasi Lokasi di Kawasan Masjid UMS * (Wajib)"}</span>
                     </button>
+                  )}
+                  {locationState === "DENIED" && (
+                    <p className="text-[11px] text-rose-600 bg-rose-50 border border-rose-200 rounded-xl p-2.5 flex items-center gap-1.5 font-medium">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                      <span>Izin lokasi ditolak atau belum aktif. Silakan aktifkan GPS dan izinkan browser mengakses lokasi untuk presensi.</span>
+                    </p>
                   )}
                 </div>
 

@@ -1,6 +1,15 @@
 {
   "users": [
     {
+      "id": "usr-takmir-official",
+      "name": "Pengurus Takmir Masjid UMS",
+      "email": "masjidums@ums.ac.id",
+      "passwordHash": "$2b$10$eZdQhJC3iMAJX3F3IIaoHOVBbF2nrXT.MtEXiwr/Zc2KB0nkCa2HC",
+      "role": "ADMIN_TAKMIR",
+      "phone": "081234567890",
+      "createdAt": "2026-10-23T05:24:52.749Z"
+    },
+    {
       "id": "usr-takmir-01",
       "name": "Pengurus Takmir Masjid Sudalmiyah Rais",
       "email": "takmir@sudalmiyah.ums.ac.id",

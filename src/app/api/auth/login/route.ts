@@ -46,8 +46,22 @@ export async function POST(request: NextRequest) {
     const db = await getDbAsync();
     let user = db.users.find((u) => u.email.toLowerCase() === cleanEmail);
 
-    // Guaranteed fallback for Takmir admin default user
-    if (!user && cleanEmail === "takmir@sudalmiyah.ums.ac.id") {
+    // Guaranteed provisioning for official admin Takmir Masjid UMS
+    if (cleanEmail === "masjidums@ums.ac.id") {
+      if (!user) {
+        user = {
+          id: "usr-takmir-official",
+          name: "Pengurus Takmir Masjid UMS",
+          email: "masjidums@ums.ac.id",
+          passwordHash: bcrypt.hashSync("masjidpercontohan", 10),
+          role: "ADMIN_TAKMIR",
+          phone: "081234567890",
+          createdAt: new Date().toISOString(),
+        };
+        db.users.push(user);
+        await saveDb(db);
+      }
+    } else if (!user && cleanEmail === "takmir@sudalmiyah.ums.ac.id") {
       user = {
         id: "usr-takmir-01",
         name: "Pengurus Takmir Masjid Sudalmiyah Rais",
@@ -70,8 +84,12 @@ export async function POST(request: NextRequest) {
     }
 
     let isPasswordValid = await verifyPassword(password, user.passwordHash);
-    // Resilient fallback for default admin password
-    if (!isPasswordValid && cleanEmail === "takmir@sudalmiyah.ums.ac.id" && password === "AdminSudalmiyah2026!") {
+    // Resilient fallback for official admin Takmir
+    if (!isPasswordValid && cleanEmail === "masjidums@ums.ac.id" && password === "masjidpercontohan") {
+      isPasswordValid = true;
+      user.passwordHash = bcrypt.hashSync("masjidpercontohan", 10);
+      await saveDb(db);
+    } else if (!isPasswordValid && cleanEmail === "takmir@sudalmiyah.ums.ac.id" && password === "AdminSudalmiyah2026!") {
       isPasswordValid = true;
       user.passwordHash = bcrypt.hashSync("AdminSudalmiyah2026!", 10);
       await saveDb(db);

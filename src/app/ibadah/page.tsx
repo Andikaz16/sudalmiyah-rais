@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { Play, Pause, SkipBack, SkipForward, ExternalLink, CalendarDays, ShieldCheck } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, ExternalLink, CalendarDays, ShieldCheck, Clock, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -260,6 +261,44 @@ export default function IbadahPage() {
               </div>
             </section>
 
+
+            {/* Banner Khusus: Presensi Shalat Berjamaah 5 Waktu */}
+            <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-6">
+              <Link
+                href="/ibadah/presensi"
+                className="block p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#001F3F] via-[#003B73] to-[#004B8D] text-white shadow-lg hover:shadow-xl transition-all duration-300 border border-amber-400/30 group active:scale-[0.99]"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start sm:items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center shrink-0">
+                      <Clock className="w-6 h-6 text-amber-300" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-400 text-stone-950">
+                          {isEn ? "New Feature" : "Fitur Baru"}
+                        </span>
+                        <span className="text-xs text-amber-200 font-semibold">
+                          6 Masjid Kampus UMS
+                        </span>
+                      </div>
+                      <h3 className="text-base sm:text-lg font-bold text-white font-serif mt-1">
+                        {isEn ? "Congregational Prayer Attendance (Fajr to Isha)" : "Presensi Shalat Berjamaah Rawatib (Subuh s.d. Isya)"}
+                      </h3>
+                      <p className="text-xs text-stone-200 mt-0.5 line-clamp-1 sm:line-clamp-none">
+                        {isEn
+                          ? "Record congregational prayer attendance with verified campus GPS verification at UMS mosques."
+                          : "Catat kehadiran shalat berjamaah 5 waktu dengan verifikasi lokasi GPS resmi di masjid kampus UMS."}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-400 group-hover:bg-amber-300 text-stone-950 text-xs font-bold shrink-0 self-start sm:self-auto transition-colors shadow-sm">
+                    <span>{isEn ? "Open Attendance" : "Buka Presensi Shalat"}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              </Link>
+            </div>
 
             {/* 10 Feature Tiles Section: 3 Columns on Mobile, 5 Columns on Laptop */}
             <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-8 sm:pt-10">

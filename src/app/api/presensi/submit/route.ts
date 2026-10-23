@@ -115,13 +115,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Evaluasi lokasi Geolocation jika dikirim oleh browser
-    let locationVerified = false;
-    let distanceMeters: number | undefined;
+    // Evaluasi lokasi Geolocation (Wajib diverifikasi di kawasan masjid UMS)
+    if (data.userLat === undefined || data.userLng === undefined) {
+      return NextResponse.json(
+        { error: "Verifikasi lokasi GPS di kawasan Masjid UMS wajib dilakukan untuk menyelesaikan presensi." },
+        { status: 400 }
+      );
+    }
 
-    if (data.userLat !== undefined && data.userLng !== undefined) {
-      distanceMeters = calculateDistanceMeters(data.userLat, data.userLng);
-      locationVerified = distanceMeters <= MASJID_COORDINATES.maxRadiusMeters;
+    const distanceMeters = calculateDistanceMeters(data.userLat, data.userLng);
+    // Toleransi radius kawasan kampus UMS (hingga 500 meter mencakup seluruh aula & kompleks masjid)
+    const locationVerified = distanceMeters <= Math.max(MASJID_COORDINATES.maxRadiusMeters, 500);
+
+    if (!locationVerified) {
+      return NextResponse.json(
+        {
+          error: `Posisi GPS Anda berjarak ${Math.round(distanceMeters)} meter dari Masjid UMS. Presensi hanya dapat dilakukan jika Anda hadir langsung di kawasan kampus/masjid UMS.`,
+        },
+        { status: 400 }
+      );
     }
 
     // Periksa apakah peserta sebelumnya sudah mendaftar (pre-register, status CONFIRMED)

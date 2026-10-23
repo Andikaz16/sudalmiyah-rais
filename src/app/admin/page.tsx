@@ -61,6 +61,8 @@ import {
   isPopupExpired,
   getPopupRemainingTime,
   ManualNewsItem,
+  PrayerAttendance,
+  PrayerName,
 } from "@/lib/types";
 import { normalizeImageUrl } from "@/lib/utils";
 
@@ -86,7 +88,8 @@ const ADMIN_TABS = [
   { id: "AGENDAS", label: "Kelola Agenda & Kajian", shortLabel: "Agenda & Kajian", icon: Calendar },
   { id: "PETUGAS_JUMAT", label: "Petugas Shalat Jumat", shortLabel: "Petugas Jumat", icon: Clock },
   { id: "QRIS_INFAQ", label: "Kelola QRIS Infaq", shortLabel: "QRIS Infaq", icon: QrCode },
-  { id: "REGISTRATIONS", label: "Presensi Kehadiran", shortLabel: "Presensi Jamaah", icon: Users },
+  { id: "REGISTRATIONS", label: "Presensi Kehadiran Agenda", shortLabel: "Presensi Agenda", icon: Users },
+  { id: "ABSENSI_SHALAT", label: "Absensi Shalat Berjamaah", shortLabel: "Absensi Shalat", icon: CheckCircle2 },
   { id: "FEEDBACK", label: "Kotak Saran & Aspirasi", shortLabel: "Kotak Saran", icon: MessageSquare },
   { id: "POPUP_BANNER", label: "Pop-up Banner Beranda", shortLabel: "Pop-up Banner", icon: Sparkles },
   { id: "DOCUMENTS", label: "Pustaka & Dokumen", shortLabel: "Pustaka Dokumen", icon: BookOpen },
@@ -158,7 +161,7 @@ async function compressImageForUpload(
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID"
+    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "ABSENSI_SHALAT" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID"
   >("AGENDAS");
 
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -213,6 +216,158 @@ export default function AdminDashboardPage() {
 
   const [agendas, setAgendas] = useState<Agenda[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [registrationAgendaFilter, setRegistrationAgendaFilter] = useState<string>("ALL");
+
+  const exportPresensiCsv = () => {
+    const listToExport =
+      registrationAgendaFilter === "ALL"
+        ? registrations
+        : registrations.filter((r) => r.agendaId === registrationAgendaFilter);
+
+    if (listToExport.length === 0) {
+      alert("Tidak ada data presensi agenda untuk diunduh.");
+      return;
+    }
+
+    const headers = [
+      "No",
+      "Kode Tiket",
+      "Nama Lengkap",
+      "Peran Jamaah",
+      "NIM",
+      "Fakultas",
+      "Email",
+      "No WhatsApp",
+      "Agenda Kegiatan",
+      "Tanggal Presensi",
+      "Waktu Presensi",
+      "Verifikasi Lokasi GPS",
+      "Status",
+      "URL Foto Bukti",
+    ];
+
+    const rows = listToExport.map((reg, idx) => {
+      const dateStr = reg.attendedAt
+        ? new Date(reg.attendedAt).toLocaleDateString("id-ID")
+        : reg.registeredAt
+        ? new Date(reg.registeredAt).toLocaleDateString("id-ID")
+        : "-";
+      const timeStr = reg.attendedAt
+        ? new Date(reg.attendedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB"
+        : "-";
+
+      return [
+        idx + 1,
+        `"${reg.ticketCode || "-"}"`,
+        `"${(reg.fullName || "").replace(/"/g, '""')}"`,
+        `"${reg.participantRole || (reg.isUmsStudent ? "MAHASISWA" : "UMUM")}"`,
+        `"${reg.nim || "-"}"`,
+        `"${(reg.faculty || "-").replace(/"/g, '""')}"`,
+        `"${reg.email || "-"}"`,
+        `"${reg.phone || "-"}"`,
+        `"${(reg.agendaTitle || "-").replace(/"/g, '""')}"`,
+        `"${dateStr}"`,
+        `"${timeStr}"`,
+        `"${reg.locationVerified ? "Terverifikasi di Kawasan Masjid UMS" : "Manual"}"`,
+        `"${reg.status}"`,
+        `"${reg.photoUrl || "-"}"`,
+      ].join(",");
+    });
+
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const agendaTitle =
+      registrationAgendaFilter === "ALL"
+        ? "Semua_Agenda"
+        : (agendas.find((a) => a.id === registrationAgendaFilter)?.title || "Agenda").replace(/[^a-zA-Z0-9]/g, "_").substring(0, 30);
+    const todayStr = new Date().toISOString().split("T")[0];
+    link.href = url;
+    link.setAttribute("download", `Rekap_Presensi_${agendaTitle}_${todayStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Absensi Shalat Berjamaah State & Export
+  const [prayerAttendances, setPrayerAttendances] = useState<PrayerAttendance[]>([]);
+  const [prayerFilter, setPrayerFilter] = useState<string>("ALL");
+  const [prayerMosqueFilter, setPrayerMosqueFilter] = useState<string>("ALL");
+  const [prayerDateFilter, setPrayerDateFilter] = useState<string>("");
+
+  const exportPrayerCsv = () => {
+    let list = prayerAttendances;
+    if (prayerFilter !== "ALL") {
+      list = list.filter((p) => p.prayerName.toUpperCase() === prayerFilter.toUpperCase());
+    }
+    if (prayerMosqueFilter !== "ALL") {
+      list = list.filter((p) => p.mosqueId === prayerMosqueFilter);
+    }
+    if (prayerDateFilter) {
+      list = list.filter((p) => p.date === prayerDateFilter);
+    }
+
+    if (list.length === 0) {
+      alert("Tidak ada data absensi shalat untuk diunduh.");
+      return;
+    }
+
+    const headers = [
+      "No",
+      "Kode Tiket",
+      "Waktu Shalat",
+      "Masjid Kampus",
+      "Lokasi Kampus",
+      "Nama Jamaah",
+      "Kategori Jamaah",
+      "NIM",
+      "Fakultas",
+      "No WhatsApp",
+      "Tanggal",
+      "Waktu Presensi",
+      "Verifikasi GPS",
+      "Jarak (Meter)",
+      "URL Foto Bukti",
+    ];
+
+    const rows = list.map((item, idx) => {
+      const timeStr = item.attendedAt
+        ? new Date(item.attendedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB"
+        : "-";
+
+      return [
+        idx + 1,
+        `"${item.ticketCode || "-"}"`,
+        `"${item.prayerName}"`,
+        `"${(item.mosqueName || "-").replace(/"/g, '""')}"`,
+        `"${(item.mosqueLocation || "-").replace(/"/g, '""')}"`,
+        `"${(item.fullName || "").replace(/"/g, '""')}"`,
+        `"${item.participantRole}"`,
+        `"${item.nim || "-"}"`,
+        `"${(item.faculty || "-").replace(/"/g, '""')}"`,
+        `"${item.phone || "-"}"`,
+        `"${item.date || "-"}"`,
+        `"${timeStr}"`,
+        `"${item.locationVerified ? "Terverifikasi di Kawasan Masjid UMS" : "Manual"}"`,
+        `"${item.distanceMeters || 0}"`,
+        `"${item.photoUrl || "-"}"`,
+      ].join(",");
+    });
+
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const todayStr = new Date().toISOString().split("T")[0];
+    link.href = url;
+    link.setAttribute("download", `Rekap_Absensi_Shalat_Berjamaah_${prayerFilter}_${todayStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
   const [systemStatus, setSystemStatus] = useState<{ firebaseConfigured: boolean; imgbbConfigured?: boolean; blobConfigured?: boolean } | null>(null);
   const [showFirebaseModal, setShowFirebaseModal] = useState(false);
   const [copiedEnv, setCopiedEnv] = useState(false);
@@ -494,7 +649,8 @@ export default function AdminDashboardPage() {
 
       setStats(statsJson.stats);
       setAgendas(agendaJson.agendas || []);
-      setRegistrations(statsJson.recentRegistrations || []);
+      setRegistrations(statsJson.registrations || statsJson.recentRegistrations || []);
+      setPrayerAttendances(statsJson.prayerAttendances || []);
       if (fridayJson.success) {
         if (Array.isArray(fridayJson.schedules) && fridayJson.schedules.length > 0) {
           const sanitizedSchedules = fridayJson.schedules.map((s: FridayOfficerSchedule) => ({
@@ -2915,163 +3071,560 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 4: REGISTRATIONS */}
-        {activeTab === "REGISTRATIONS" && (
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-bold text-stone-900 font-serif">Data Jamaah Terdaftar (Presensi E-Ticket)</h2>
-                <p className="text-xs text-stone-500 mt-0.5">Daftar mahasiswa dan jamaah yang memegang tiket barcode kegiatan</p>
-              </div>
-              <Link
-                href="/agenda/presensi-live"
-                target="_blank"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-sm transition-all whitespace-nowrap self-start sm:self-auto cursor-pointer active:scale-95"
-              >
-                <Tv className="w-3.5 h-3.5 text-amber-400" />
-                <span>Buka Layar Proyektor Presensi</span>
-                <ExternalLink className="w-3 h-3 text-stone-300" />
-              </Link>
-            </div>
-            <div className="rounded-3xl bg-white border border-stone-200 overflow-hidden shadow-sm">
-              {/* Mobile Card View (Phone screens: Android & iOS) */}
-              <div className="block md:hidden divide-y divide-stone-100">
-                {registrations.length === 0 ? (
-                  <div className="p-8 text-center text-stone-400 text-xs">
-                    Belum ada data presensi jamaah yang tercatat.
-                  </div>
-                ) : (
-                  registrations.map((reg) => (
-                    <div key={reg.id} className="p-4 flex items-start gap-3 bg-white hover:bg-stone-50/60 transition-colors">
-                      {reg.photoUrl ? (
-                        <a
-                          href={reg.photoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block w-12 h-12 rounded-xl overflow-hidden border border-stone-200 shadow-2xs shrink-0 bg-stone-100"
-                          title="Lihat foto presensi ukuran penuh"
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={reg.photoUrl} alt={reg.fullName} className="w-full h-full object-cover" />
-                        </a>
-                      ) : (
-                        <div className="w-12 h-12 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center text-xs text-stone-400 font-medium shrink-0">
-                          -
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <h4 className="font-bold text-stone-900 text-xs sm:text-sm truncate">{reg.fullName}</h4>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold shrink-0">
-                            Hadir
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-stone-600 mt-0.5">
-                          {reg.isUmsStudent ? (
-                            <span className="text-sky-700 font-semibold">Mahasiswa ({reg.nim})</span>
-                          ) : (
-                            <span className="text-stone-500">Jamaah Umum</span>
-                          )}
-                        </p>
-                        <p className="text-[11px] text-stone-500 truncate mt-0.5 font-sans">
-                          {reg.agendaTitle}
-                        </p>
-                        <p className="text-[10px] text-stone-400 font-mono mt-1">
-                          {reg.attendedAt
-                            ? new Date(reg.attendedAt).toLocaleTimeString("id-ID", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                timeZone: "Asia/Jakarta",
-                              }) + " WIB"
-                            : reg.registeredAt
-                            ? new Date(reg.registeredAt).toLocaleDateString("id-ID")
-                            : "-"}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                )}
+        {/* Tab 4: REGISTRATIONS (Presensi Kehadiran Agenda Terpisah Per Kegiatan + Download Excel) */}
+        {activeTab === "REGISTRATIONS" && (() => {
+          const filteredRegistrations = registrationAgendaFilter === "ALL"
+            ? registrations
+            : registrations.filter((r) => r.agendaId === registrationAgendaFilter);
+          
+          const regTotal = filteredRegistrations.length;
+          const regMahasiswa = filteredRegistrations.filter((r) => r.isUmsStudent || r.participantRole === "MAHASISWA").length;
+          const regUmum = regTotal - regMahasiswa;
+          const regGps = filteredRegistrations.filter((r) => r.locationVerified).length;
+
+          return (
+            <div className="space-y-5">
+              {/* Header & Main Actions */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-bold text-stone-900 font-serif">Data Presensi Kehadiran Agenda & Kajian</h2>
+                  <p className="text-xs text-stone-500 mt-0.5">
+                    Data kehadiran jamaah dipisahkan per agenda kegiatan untuk mempermudah rekapitulasi takmir
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+                  <Link
+                    href="/agenda/presensi-live"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-sm transition-all whitespace-nowrap cursor-pointer active:scale-95"
+                  >
+                    <Tv className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Layar Proyektor Presensi</span>
+                    <ExternalLink className="w-3 h-3 text-stone-300" />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={exportPresensiCsv}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm transition-all whitespace-nowrap cursor-pointer active:scale-95"
+                  >
+                    <Download className="w-3.5 h-3.5 text-emerald-100" />
+                    <span>Download Spreadsheet / Excel (.csv)</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Desktop Table View */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-stone-200 text-stone-500 uppercase text-[10px] tracking-wider bg-[#FAF8F5]">
-                      <th className="py-3.5 px-4 font-semibold">Foto Presensi</th>
-                      <th className="py-3.5 px-4 font-semibold">Nama Jamaah</th>
-                      <th className="py-3.5 px-4 font-semibold">Status Sivitas</th>
-                      <th className="py-3.5 px-4 font-semibold">Agenda Kegiatan</th>
-                      <th className="py-3.5 px-4 font-semibold">Waktu Presensi</th>
-                      <th className="py-3.5 px-4 text-center font-semibold">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-stone-100 font-medium">
-                    {registrations.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="py-8 text-center text-stone-400 text-xs">
-                          Belum ada data presensi jamaah yang tercatat.
-                        </td>
-                      </tr>
-                    ) : (
-                      registrations.map((reg) => (
-                        <tr key={reg.id} className="hover:bg-stone-50">
-                          <td className="py-3 px-4">
-                            {reg.photoUrl ? (
-                              <a
-                                href={reg.photoUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="block w-10 h-10 rounded-xl overflow-hidden border border-stone-200 shadow-2xs hover:scale-105 transition-transform bg-stone-100 shrink-0"
-                                title="Lihat foto presensi ukuran penuh"
-                              >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={reg.photoUrl} alt={reg.fullName} className="w-full h-full object-cover" />
-                              </a>
-                            ) : (
-                              <div className="w-10 h-10 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center text-[10px] text-stone-400 font-medium">
-                                -
-                              </div>
-                            )}
-                          </td>
-                          <td className="py-3.5 px-4 text-stone-900 font-semibold">{reg.fullName}</td>
-                          <td className="py-3.5 px-4 text-stone-700">
+              {/* Filter Agenda Dropdown Bar */}
+              <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-[11px] font-bold text-stone-600 uppercase tracking-wider mb-1">
+                    Pilih Agenda Kegiatan (Rekap Per Agenda)
+                  </label>
+                  <select
+                    value={registrationAgendaFilter}
+                    onChange={(e) => setRegistrationAgendaFilter(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs sm:text-sm font-semibold focus:outline-none focus:border-[#003B73]"
+                  >
+                    <option value="ALL">Semua Agenda Kegiatan ({registrations.length} Total Jamaah)</option>
+                    {agendas.map((ag) => {
+                      const count = registrations.filter((r) => r.agendaId === ag.id).length;
+                      return (
+                        <option key={ag.id} value={ag.id}>
+                          {ag.title} ({count} Hadir) - {ag.date}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </div>
+
+              {/* Summary Metrics for Selected Agenda */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
+                  <span className="text-[11px] text-stone-500 font-medium block">Total Hadir</span>
+                  <span className="text-xl sm:text-2xl font-black text-stone-900 font-mono mt-0.5 block">{regTotal}</span>
+                  <span className="text-[10px] text-stone-400 mt-1 block">Jamaah terdaftar</span>
+                </div>
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
+                  <span className="text-[11px] text-sky-700 font-medium block">Mahasiswa UMS</span>
+                  <span className="text-xl sm:text-2xl font-black text-sky-900 font-mono mt-0.5 block">{regMahasiswa}</span>
+                  <span className="text-[10px] text-stone-400 mt-1 block">Dengan NIM terverifikasi</span>
+                </div>
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
+                  <span className="text-[11px] text-amber-700 font-medium block">Dosen & Umum</span>
+                  <span className="text-xl sm:text-2xl font-black text-amber-900 font-mono mt-0.5 block">{regUmum}</span>
+                  <span className="text-[10px] text-stone-400 mt-1 block">Civitas & Tamu luar</span>
+                </div>
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
+                  <span className="text-[11px] text-emerald-700 font-medium block">Verifikasi Lokasi GPS</span>
+                  <span className="text-xl sm:text-2xl font-black text-emerald-900 font-mono mt-0.5 block">{regGps}</span>
+                  <span className="text-[10px] text-emerald-600 mt-1 block">Hadir langsung di masjid</span>
+                </div>
+              </div>
+
+              {/* List Container */}
+              <div className="rounded-3xl bg-white border border-stone-200 overflow-hidden shadow-sm">
+                {/* Mobile Card View (Phone screens: Android & iOS) */}
+                <div className="block md:hidden divide-y divide-stone-100">
+                  {filteredRegistrations.length === 0 ? (
+                    <div className="p-8 text-center text-stone-400 text-xs">
+                      Belum ada data presensi jamaah untuk agenda ini.
+                    </div>
+                  ) : (
+                    filteredRegistrations.map((reg) => (
+                      <div key={reg.id} className="p-4 flex items-start gap-3 bg-white hover:bg-stone-50/60 transition-colors">
+                        {reg.photoUrl ? (
+                          <a
+                            href={reg.photoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block w-12 h-12 rounded-xl overflow-hidden border border-stone-200 shadow-2xs shrink-0 bg-stone-100"
+                            title="Lihat foto presensi ukuran penuh"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={reg.photoUrl} alt={reg.fullName} className="w-full h-full object-cover" />
+                          </a>
+                        ) : (
+                          <div className="w-12 h-12 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center text-xs text-stone-400 font-medium shrink-0">
+                            -
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="font-bold text-stone-900 text-xs sm:text-sm truncate">{reg.fullName}</h4>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold shrink-0">
+                              Hadir
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-stone-600 mt-0.5">
                             {reg.isUmsStudent ? (
-                              <span className="text-sky-700 font-semibold">
-                                Mahasiswa ({reg.nim})
-                              </span>
+                              <span className="text-sky-700 font-semibold">Mahasiswa ({reg.nim})</span>
                             ) : (
                               <span className="text-stone-500">Jamaah Umum</span>
                             )}
-                          </td>
-                          <td className="py-3.5 px-4 text-stone-600 max-w-xs truncate">
+                          </p>
+                          <p className="text-[11px] text-stone-500 truncate mt-0.5 font-sans">
                             {reg.agendaTitle}
-                          </td>
-                          <td className="py-3.5 px-4 text-stone-500 font-mono text-[11px]">
-                            {reg.attendedAt
-                              ? new Date(reg.attendedAt).toLocaleTimeString("id-ID", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  timeZone: "Asia/Jakarta",
-                                }) + " WIB"
-                              : reg.registeredAt
-                              ? new Date(reg.registeredAt).toLocaleDateString("id-ID")
-                              : "-"}
-                          </td>
-                          <td className="py-3.5 px-4 text-center">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
-                              Hadir
+                          </p>
+                          <div className="flex items-center justify-between text-[10px] text-stone-400 font-mono mt-1">
+                            <span>
+                              {reg.attendedAt
+                                ? new Date(reg.attendedAt).toLocaleTimeString("id-ID", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    timeZone: "Asia/Jakarta",
+                                  }) + " WIB"
+                                : "-"}
                             </span>
+                            {reg.locationVerified && (
+                              <span className="text-emerald-700 font-bold">GPS Terverifikasi</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-stone-200 text-stone-500 uppercase text-[10px] tracking-wider bg-[#FAF8F5]">
+                        <th className="py-3.5 px-4 font-semibold">Foto Presensi</th>
+                        <th className="py-3.5 px-4 font-semibold">Nama Jamaah</th>
+                        <th className="py-3.5 px-4 font-semibold">Status Sivitas</th>
+                        <th className="py-3.5 px-4 font-semibold">Agenda Kegiatan</th>
+                        <th className="py-3.5 px-4 font-semibold">Waktu Presensi</th>
+                        <th className="py-3.5 px-4 font-semibold text-center">Verifikasi Lokasi</th>
+                        <th className="py-3.5 px-4 text-center font-semibold">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-100 font-medium">
+                      {filteredRegistrations.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="py-8 text-center text-stone-400 text-xs">
+                            Belum ada data presensi jamaah untuk agenda ini.
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                      ) : (
+                        filteredRegistrations.map((reg) => (
+                          <tr key={reg.id} className="hover:bg-stone-50">
+                            <td className="py-3 px-4">
+                              {reg.photoUrl ? (
+                                <a
+                                  href={reg.photoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="block w-10 h-10 rounded-xl overflow-hidden border border-stone-200 shadow-2xs hover:scale-105 transition-transform bg-stone-100 shrink-0"
+                                  title="Lihat foto presensi ukuran penuh"
+                                >
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src={reg.photoUrl} alt={reg.fullName} className="w-full h-full object-cover" />
+                                </a>
+                              ) : (
+                                <div className="w-10 h-10 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center text-[10px] text-stone-400 font-medium">
+                                  -
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-stone-900 font-semibold">{reg.fullName}</td>
+                            <td className="py-3.5 px-4 text-stone-700">
+                              {reg.isUmsStudent ? (
+                                <span className="text-sky-700 font-semibold">
+                                  Mahasiswa ({reg.nim})
+                                </span>
+                              ) : (
+                                <span className="text-stone-500">Jamaah Umum</span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-stone-600 max-w-xs truncate">
+                              {reg.agendaTitle}
+                            </td>
+                            <td className="py-3.5 px-4 text-stone-500 font-mono text-[11px]">
+                              {reg.attendedAt
+                                ? new Date(reg.attendedAt).toLocaleTimeString("id-ID", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    timeZone: "Asia/Jakarta",
+                                  }) + " WIB"
+                                : reg.registeredAt
+                                ? new Date(reg.registeredAt).toLocaleDateString("id-ID")
+                                : "-"}
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              {reg.locationVerified ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                  <span>Masjid UMS</span>
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-stone-400">Manual</span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                                Hadir
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
+
+        {/* Tab 5: ABSENSI_SHALAT (Absensi Shalat Berjamaah Subuh s.d. Isya) */}
+        {activeTab === "ABSENSI_SHALAT" && (() => {
+          let filtered = prayerAttendances;
+          if (prayerFilter !== "ALL") {
+            filtered = filtered.filter((p) => p.prayerName.toUpperCase() === prayerFilter.toUpperCase());
+          }
+          if (prayerMosqueFilter !== "ALL") {
+            filtered = filtered.filter((p) => p.mosqueId === prayerMosqueFilter);
+          }
+          if (prayerDateFilter) {
+            filtered = filtered.filter((p) => p.date === prayerDateFilter);
+          }
+
+          const countSubuh = prayerAttendances.filter((p) => p.prayerName === "SUBUH").length;
+          const countDzuhur = prayerAttendances.filter((p) => p.prayerName === "DZUHUR").length;
+          const countAshar = prayerAttendances.filter((p) => p.prayerName === "ASHAR").length;
+          const countMaghrib = prayerAttendances.filter((p) => p.prayerName === "MAGHRIB").length;
+          const countIsya = prayerAttendances.filter((p) => p.prayerName === "ISYA").length;
+
+          return (
+            <div className="space-y-5">
+              {/* Header */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-bold text-stone-900 font-serif">Absensi Shalat Berjamaah (Subuh s.d. Isya)</h2>
+                  <p className="text-xs text-stone-500 mt-0.5">
+                    Rekapitulasi kehadiran jamaah shalat fardhu 5 waktu dengan verifikasi lokasi GPS resmi di 6 masjid kampus UMS
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+                  <Link
+                    href="/ibadah/presensi"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-sm transition-all whitespace-nowrap cursor-pointer active:scale-95"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Buka Form Presensi</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={exportPrayerCsv}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm transition-all whitespace-nowrap cursor-pointer active:scale-95"
+                  >
+                    <Download className="w-3.5 h-3.5 text-emerald-100" />
+                    <span>Download Spreadsheet / Excel (.csv)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Shalat Pills Filter (Subuh, Dzuhur, Ashar, Maghrib, Isya) */}
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                <button
+                  type="button"
+                  onClick={() => setPrayerFilter("ALL")}
+                  className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    prayerFilter === "ALL"
+                      ? "bg-[#003B73] text-white shadow-sm"
+                      : "bg-white text-stone-600 hover:bg-stone-100 border border-stone-200"
+                  }`}
+                >
+                  Semua Shalat ({prayerAttendances.length})
+                </button>
+                {[
+                  { key: "SUBUH", label: "Subuh", count: countSubuh },
+                  { key: "DZUHUR", label: "Dzuhur", count: countDzuhur },
+                  { key: "ASHAR", label: "Ashar", count: countAshar },
+                  { key: "MAGHRIB", label: "Maghrib", count: countMaghrib },
+                  { key: "ISYA", label: "Isya", count: countIsya },
+                ].map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => setPrayerFilter(item.key)}
+                    className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                      prayerFilter === item.key
+                        ? "bg-amber-400 text-stone-950 shadow-sm font-extrabold"
+                        : "bg-white text-stone-600 hover:bg-stone-100 border border-stone-200"
+                    }`}
+                  >
+                    {item.label} ({item.count})
+                  </button>
+                ))}
+              </div>
+
+              {/* Dropdown Filters for Mosque & Date */}
+              <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-600 uppercase tracking-wider mb-1">
+                    Filter Masjid Kampus UMS
+                  </label>
+                  <select
+                    value={prayerMosqueFilter}
+                    onChange={(e) => setPrayerMosqueFilter(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs sm:text-sm font-semibold focus:outline-none focus:border-[#003B73]"
+                  >
+                    <option value="ALL">Semua Masjid Kampus UMS (6 Masjid)</option>
+                    {ADMIN_MOSQUES.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name} ({m.location})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-600 uppercase tracking-wider mb-1">
+                    Filter Tanggal
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="date"
+                      value={prayerDateFilter}
+                      onChange={(e) => setPrayerDateFilter(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs sm:text-sm font-semibold focus:outline-none focus:border-[#003B73]"
+                    />
+                    {prayerDateFilter && (
+                      <button
+                        type="button"
+                        onClick={() => setPrayerDateFilter("")}
+                        className="px-3 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs font-semibold whitespace-nowrap cursor-pointer"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary Metrics */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
+                  <span className="text-[11px] text-stone-500 font-medium block">Total Hadir Shalat</span>
+                  <span className="text-xl sm:text-2xl font-black text-stone-900 font-mono mt-0.5 block">{filtered.length}</span>
+                  <span className="text-[10px] text-stone-400 mt-1 block">Jamaah terabsen</span>
+                </div>
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
+                  <span className="text-[11px] text-sky-700 font-medium block">Mahasiswa</span>
+                  <span className="text-xl sm:text-2xl font-black text-sky-900 font-mono mt-0.5 block">
+                    {filtered.filter((p) => p.participantRole === "MAHASISWA").length}
+                  </span>
+                  <span className="text-[10px] text-stone-400 mt-1 block">Civitas mahasiswa</span>
+                </div>
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
+                  <span className="text-[11px] text-amber-700 font-medium block">Dosen / Tendik / Umum</span>
+                  <span className="text-xl sm:text-2xl font-black text-amber-900 font-mono mt-0.5 block">
+                    {filtered.filter((p) => p.participantRole !== "MAHASISWA").length}
+                  </span>
+                  <span className="text-[10px] text-stone-400 mt-1 block">Jamaah umum & staf</span>
+                </div>
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
+                  <span className="text-[11px] text-emerald-700 font-medium block">Verifikasi Lokasi GPS</span>
+                  <span className="text-xl sm:text-2xl font-black text-emerald-900 font-mono mt-0.5 block">
+                    {filtered.filter((p) => p.locationVerified).length}
+                  </span>
+                  <span className="text-[10px] text-emerald-600 mt-1 block">100% Valid di masjid</span>
+                </div>
+              </div>
+
+              {/* Data List Container */}
+              <div className="rounded-3xl bg-white border border-stone-200 overflow-hidden shadow-sm">
+                {/* Mobile View */}
+                <div className="block md:hidden divide-y divide-stone-100">
+                  {filtered.length === 0 ? (
+                    <div className="p-8 text-center text-stone-400 text-xs">
+                      Belum ada data absensi shalat untuk filter ini.
+                    </div>
+                  ) : (
+                    filtered.map((item) => (
+                      <div key={item.id} className="p-4 flex items-start gap-3 bg-white hover:bg-stone-50/60 transition-colors">
+                        {item.photoUrl ? (
+                          <a
+                            href={item.photoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block w-12 h-12 rounded-xl overflow-hidden border border-stone-200 shadow-2xs shrink-0 bg-stone-100"
+                            title="Lihat foto presensi shalat"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={item.photoUrl} alt={item.fullName} className="w-full h-full object-cover" />
+                          </a>
+                        ) : (
+                          <div className="w-12 h-12 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center text-xs text-stone-400 font-medium shrink-0">
+                            -
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="font-bold text-stone-900 text-xs sm:text-sm truncate">{item.fullName}</h4>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 border border-amber-300 font-extrabold shrink-0">
+                              {item.prayerName}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-stone-600 mt-0.5">
+                            {item.participantRole === "MAHASISWA" ? (
+                              <span className="text-sky-700 font-semibold">Mahasiswa ({item.nim || "-"})</span>
+                            ) : (
+                              <span className="text-stone-500">{item.participantRole}</span>
+                            )}
+                          </p>
+                          <p className="text-[11px] text-stone-500 truncate mt-0.5">
+                            {item.mosqueName}
+                          </p>
+                          <div className="flex items-center justify-between text-[10px] text-stone-400 font-mono mt-1">
+                            <span>
+                              {new Date(item.attendedAt).toLocaleTimeString("id-ID", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                timeZone: "Asia/Jakarta",
+                              })}{" "}
+                              WIB • {item.date}
+                            </span>
+                            <span className="text-emerald-700 font-bold">GPS: {item.distanceMeters || 0}m</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Desktop View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-stone-200 text-stone-500 uppercase text-[10px] tracking-wider bg-[#FAF8F5]">
+                        <th className="py-3.5 px-4 font-semibold">Foto</th>
+                        <th className="py-3.5 px-4 font-semibold">Nama Jamaah</th>
+                        <th className="py-3.5 px-4 font-semibold">Kategori</th>
+                        <th className="py-3.5 px-4 font-semibold text-center">Waktu Shalat</th>
+                        <th className="py-3.5 px-4 font-semibold">Masjid Kampus</th>
+                        <th className="py-3.5 px-4 font-semibold">Waktu Presensi</th>
+                        <th className="py-3.5 px-4 font-semibold text-center">GPS Valid</th>
+                        <th className="py-3.5 px-4 text-center font-semibold">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-100 font-medium">
+                      {filtered.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} className="py-8 text-center text-stone-400 text-xs">
+                            Belum ada data absensi shalat untuk filter ini.
+                          </td>
+                        </tr>
+                      ) : (
+                        filtered.map((item) => (
+                          <tr key={item.id} className="hover:bg-stone-50">
+                            <td className="py-3 px-4">
+                              {item.photoUrl ? (
+                                <a
+                                  href={item.photoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="block w-10 h-10 rounded-xl overflow-hidden border border-stone-200 shadow-2xs hover:scale-105 transition-transform bg-stone-100 shrink-0"
+                                  title="Lihat foto presensi shalat"
+                                >
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src={item.photoUrl} alt={item.fullName} className="w-full h-full object-cover" />
+                                </a>
+                              ) : (
+                                <div className="w-10 h-10 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center text-[10px] text-stone-400 font-medium">
+                                  -
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-stone-900 font-semibold">{item.fullName}</td>
+                            <td className="py-3.5 px-4 text-stone-700">
+                              {item.participantRole === "MAHASISWA" ? (
+                                <span className="text-sky-700 font-semibold">
+                                  Mahasiswa ({item.nim || "-"})
+                                </span>
+                              ) : (
+                                <span className="text-stone-500">{item.participantRole}</span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 border border-amber-300 font-extrabold">
+                                {item.prayerName}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-stone-700 font-medium">
+                              {item.mosqueName}
+                            </td>
+                            <td className="py-3.5 px-4 text-stone-500 font-mono text-[11px]">
+                              {new Date(item.attendedAt).toLocaleTimeString("id-ID", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                timeZone: "Asia/Jakarta",
+                              })}{" "}
+                              WIB • {item.date}
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                <span>{item.distanceMeters || 0}m</span>
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                                Hadir
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Tab 5: FEEDBACK (Kotak Saran & Aspirasi Jamaah) */}
         {activeTab === "FEEDBACK" && (

@@ -19,8 +19,8 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTarget = searchParams.get("redirect") || "/admin";
 
-  const [email, setEmail] = useState("takmir@sudalmiyah.ums.ac.id");
-  const [password, setPassword] = useState("AdminSudalmiyah2026!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,7 +76,7 @@ function LoginForm() {
             <input
               type="email"
               required
-              placeholder="takmir@sudalmiyah.ums.ac.id"
+              placeholder="masjidums@ums.ac.id"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 placeholder-stone-400 text-sm focus:outline-none focus:border-[#003B73]"
@@ -95,6 +95,7 @@ function LoginForm() {
             <input
               type="password"
               required
+              placeholder="••••••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 placeholder-stone-400 text-sm focus:outline-none focus:border-[#003B73]"
@@ -105,30 +106,11 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full text-center px-6 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] disabled:bg-stone-300 text-white font-bold text-sm shadow-md transition-all active:scale-[0.99]"
+          className="w-full text-center px-6 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] disabled:bg-stone-300 text-white font-bold text-sm shadow-md transition-all active:scale-[0.99] cursor-pointer"
         >
           {loading ? "Memverifikasi Kredensial..." : "Masuk ke Dashboard"}
         </button>
       </form>
-
-      {/* Test Credentials Sandbox Helper */}
-      <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 text-xs space-y-2">
-        <div className="font-semibold text-[#003B73] flex items-center gap-1.5">
-          <ShieldCheck className="w-4 h-4 text-[#003B73]" />
-          <span>Kredensial Pengujian:</span>
-        </div>
-        <div className="text-stone-700 space-y-1 font-mono text-[11px]">
-          <div>
-            <strong>Admin Takmir:</strong> takmir@sudalmiyah.ums.ac.id
-          </div>
-          <div>
-            <strong>Password:</strong> AdminSudalmiyah2026!
-          </div>
-        </div>
-        <p className="text-[10px] text-stone-500 pt-1">
-          Diproteksi dengan Rate Limiter (maks 5 percobaan/menit), hashing Bcrypt cost 12, dan token JWT bertanda tangan kriptografis.
-        </p>
-      </div>
     </div>
   );
 }
