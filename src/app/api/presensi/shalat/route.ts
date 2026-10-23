@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     const data = parseResult.data;
 
-    // Validasi waktu shalat: shalat yang belum tiba waktunya tidak dapat dipresensi (standar hisab MASA/Tarjih Muhammadiyah/KHGT)
+    // Validasi waktu shalat: shalat yang belum tiba waktunya atau sudah kelewat tidak dapat dipresensi (standar hisab MASA/Tarjih Muhammadiyah/KHGT)
     const nowUtc = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
     const nowWib = new Date(nowUtc + 7 * 3600000);
     const currentWibMinutes = nowWib.getHours() * 60 + nowWib.getMinutes();
@@ -79,22 +79,65 @@ export async function POST(request: NextRequest) {
       return h * 60 + m;
     };
 
-    const PRAYER_SCHEDULE: Record<PrayerName, { start: number; label: string; timeStr: string }> = {
-      SUBUH: { start: parseTimeToMinutes(times.Subuh), label: "Subuh", timeStr: `${times.Subuh} WIB` },
-      DZUHUR: { start: parseTimeToMinutes(times.Dzuhur), label: "Dzuhur", timeStr: `${times.Dzuhur} WIB` },
-      ASHAR: { start: parseTimeToMinutes(times.Ashar), label: "Ashar", timeStr: `${times.Ashar} WIB` },
-      MAGHRIB: { start: parseTimeToMinutes(times.Maghrib), label: "Maghrib", timeStr: `${times.Maghrib} WIB` },
-      ISYA: { start: parseTimeToMinutes(times.Isya), label: "Isya", timeStr: `${times.Isya} WIB` },
+    const PRAYER_SCHEDULE: Record<
+      PrayerName,
+      { start: number; end: number; label: string; timeStr: string; endTimeStr: string }
+    > = {
+      SUBUH: {
+        start: parseTimeToMinutes(times.Subuh),
+        end: parseTimeToMinutes(times.Dhuha),
+        label: "Subuh",
+        timeStr: `${times.Subuh} WIB`,
+        endTimeStr: `${times.Dhuha} WIB`,
+      },
+      DZUHUR: {
+        start: parseTimeToMinutes(times.Dzuhur),
+        end: parseTimeToMinutes(times.Ashar),
+        label: "Dzuhur",
+        timeStr: `${times.Dzuhur} WIB`,
+        endTimeStr: `${times.Ashar} WIB`,
+      },
+      ASHAR: {
+        start: parseTimeToMinutes(times.Ashar),
+        end: parseTimeToMinutes(times.Maghrib),
+        label: "Ashar",
+        timeStr: `${times.Ashar} WIB`,
+        endTimeStr: `${times.Maghrib} WIB`,
+      },
+      MAGHRIB: {
+        start: parseTimeToMinutes(times.Maghrib),
+        end: parseTimeToMinutes(times.Isya),
+        label: "Maghrib",
+        timeStr: `${times.Maghrib} WIB`,
+        endTimeStr: `${times.Isya} WIB`,
+      },
+      ISYA: {
+        start: parseTimeToMinutes(times.Isya),
+        end: 23 * 60 + 59,
+        label: "Isya",
+        timeStr: `${times.Isya} WIB`,
+        endTimeStr: "23:59 WIB",
+      },
     };
 
     const targetPrayer = PRAYER_SCHEDULE[data.prayerName];
-    if (targetPrayer && currentWibMinutes < targetPrayer.start) {
-      return NextResponse.json(
-        {
-          error: `Waktu Shalat ${targetPrayer.label} belum dimulai (Jadwal MASA/Tarjih: ${targetPrayer.timeStr}). Presensi hanya dapat diisi setelah waktu shalat tiba.`,
-        },
-        { status: 400 }
-      );
+    if (targetPrayer) {
+      if (currentWibMinutes < targetPrayer.start) {
+        return NextResponse.json(
+          {
+            error: `Waktu Shalat ${targetPrayer.label} belum dimulai (Jadwal MASA/Tarjih: ${targetPrayer.timeStr}). Presensi hanya dapat diisi saat waktu shalat tiba.`,
+          },
+          { status: 400 }
+        );
+      }
+      if (currentWibMinutes > targetPrayer.end) {
+        return NextResponse.json(
+          {
+            error: `Waktu Shalat ${targetPrayer.label} telah berakhir / sudah lewat (Batas hisab Tarjih: ${targetPrayer.endTimeStr}). Presensi untuk waktu shalat yang sudah kelewat tidak dapat diisi.`,
+          },
+          { status: 400 }
+        );
+      }
     }
     const mosqueData = CAMPUS_MOSQUES[data.mosqueId] || {
       name: "Masjid Kampus UMS",

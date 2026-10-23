@@ -51,12 +51,14 @@ export default function ShalatPresensiPage() {
   const [currentWibMinutes, setCurrentWibMinutes] = useState<number | null>(null);
   const [prayerTimes, setPrayerTimes] = useState<{
     Subuh: string;
+    Dhuha: string;
     Dzuhur: string;
     Ashar: string;
     Maghrib: string;
     Isya: string;
   }>({
     Subuh: "04:03",
+    Dhuha: "05:43",
     Dzuhur: "11:23",
     Ashar: "14:33",
     Maghrib: "17:33",
@@ -81,48 +83,114 @@ export default function ShalatPresensiPage() {
       const calculated = calculatePrayerTimes(wib, "tarjih");
       setPrayerTimes({
         Subuh: calculated.Subuh,
+        Dhuha: calculated.Dhuha,
         Dzuhur: calculated.Dzuhur,
         Ashar: calculated.Ashar,
         Maghrib: calculated.Maghrib,
         Isya: calculated.Isya,
       });
 
-      const isyaMin = parseTimeToMinutes(calculated.Isya);
-      const maghribMin = parseTimeToMinutes(calculated.Maghrib);
-      const asharMin = parseTimeToMinutes(calculated.Ashar);
-      const dzuhurMin = parseTimeToMinutes(calculated.Dzuhur);
-      const subuhMin = parseTimeToMinutes(calculated.Subuh);
+      const subuhStart = parseTimeToMinutes(calculated.Subuh);
+      const subuhEnd = parseTimeToMinutes(calculated.Dhuha);
+      const dzuhurStart = parseTimeToMinutes(calculated.Dzuhur);
+      const dzuhurEnd = parseTimeToMinutes(calculated.Ashar);
+      const asharStart = parseTimeToMinutes(calculated.Ashar);
+      const asharEnd = parseTimeToMinutes(calculated.Maghrib);
+      const maghribStart = parseTimeToMinutes(calculated.Maghrib);
+      const maghribEnd = parseTimeToMinutes(calculated.Isya);
+      const isyaStart = parseTimeToMinutes(calculated.Isya);
+      const isyaEnd = 23 * 60 + 59;
 
-      if (minutes >= isyaMin) setSelectedPrayer("ISYA");
-      else if (minutes >= maghribMin) setSelectedPrayer("MAGHRIB");
-      else if (minutes >= asharMin) setSelectedPrayer("ASHAR");
-      else if (minutes >= dzuhurMin) setSelectedPrayer("DZUHUR");
-      else if (minutes >= subuhMin) setSelectedPrayer("SUBUH");
-      else setSelectedPrayer("SUBUH");
+      // Pilih otomatis shalat yang sedang aktif; jika di luar jendela, arahkan ke shalat berikutnya
+      if (minutes >= subuhStart && minutes <= subuhEnd) {
+        setSelectedPrayer("SUBUH");
+      } else if (minutes >= dzuhurStart && minutes <= dzuhurEnd) {
+        setSelectedPrayer("DZUHUR");
+      } else if (minutes >= asharStart && minutes <= asharEnd) {
+        setSelectedPrayer("ASHAR");
+      } else if (minutes >= maghribStart && minutes <= maghribEnd) {
+        setSelectedPrayer("MAGHRIB");
+      } else if (minutes >= isyaStart && minutes <= isyaEnd) {
+        setSelectedPrayer("ISYA");
+      } else {
+        if (minutes < subuhStart) setSelectedPrayer("SUBUH");
+        else if (minutes < dzuhurStart) setSelectedPrayer("DZUHUR");
+        else if (minutes < asharStart) setSelectedPrayer("ASHAR");
+        else if (minutes < maghribStart) setSelectedPrayer("MAGHRIB");
+        else if (minutes < isyaStart) setSelectedPrayer("ISYA");
+        else setSelectedPrayer("SUBUH");
+      }
     };
 
     updateTime();
-    const timer = setInterval(updateTime, 30000);
+    const timer = setInterval(updateTime, 15000);
     return () => clearInterval(timer);
   }, []);
 
-  const isPrayerUnlocked = (startMinutes: number): boolean => {
-    if (currentWibMinutes === null) return true;
-    return currentWibMinutes >= startMinutes;
+  type PrayerStatus = "UPCOMING" | "ACTIVE" | "PASSED";
+
+  const getPrayerStatus = (startMinutes: number, endMinutes: number): PrayerStatus => {
+    if (currentWibMinutes === null) return "ACTIVE";
+    if (currentWibMinutes < startMinutes) return "UPCOMING";
+    if (currentWibMinutes > endMinutes) return "PASSED";
+    return "ACTIVE";
   };
 
   const prayersList: Array<{
     key: PrayerKey;
     label: string;
     time: string;
+    endTime: string;
     startMinutes: number;
+    endMinutes: number;
   }> = [
-    { key: "SUBUH", label: "Shalat Subuh", time: prayerTimes.Subuh, startMinutes: parseTimeToMinutes(prayerTimes.Subuh) },
-    { key: "DZUHUR", label: "Shalat Dzuhur", time: prayerTimes.Dzuhur, startMinutes: parseTimeToMinutes(prayerTimes.Dzuhur) },
-    { key: "ASHAR", label: "Shalat Ashar", time: prayerTimes.Ashar, startMinutes: parseTimeToMinutes(prayerTimes.Ashar) },
-    { key: "MAGHRIB", label: "Shalat Maghrib", time: prayerTimes.Maghrib, startMinutes: parseTimeToMinutes(prayerTimes.Maghrib) },
-    { key: "ISYA", label: "Shalat Isya", time: prayerTimes.Isya, startMinutes: parseTimeToMinutes(prayerTimes.Isya) },
+    {
+      key: "SUBUH",
+      label: "Shalat Subuh",
+      time: prayerTimes.Subuh,
+      endTime: prayerTimes.Dhuha,
+      startMinutes: parseTimeToMinutes(prayerTimes.Subuh),
+      endMinutes: parseTimeToMinutes(prayerTimes.Dhuha),
+    },
+    {
+      key: "DZUHUR",
+      label: "Shalat Dzuhur",
+      time: prayerTimes.Dzuhur,
+      endTime: prayerTimes.Ashar,
+      startMinutes: parseTimeToMinutes(prayerTimes.Dzuhur),
+      endMinutes: parseTimeToMinutes(prayerTimes.Ashar),
+    },
+    {
+      key: "ASHAR",
+      label: "Shalat Ashar",
+      time: prayerTimes.Ashar,
+      endTime: prayerTimes.Maghrib,
+      startMinutes: parseTimeToMinutes(prayerTimes.Ashar),
+      endMinutes: parseTimeToMinutes(prayerTimes.Maghrib),
+    },
+    {
+      key: "MAGHRIB",
+      label: "Shalat Maghrib",
+      time: prayerTimes.Maghrib,
+      endTime: prayerTimes.Isya,
+      startMinutes: parseTimeToMinutes(prayerTimes.Maghrib),
+      endMinutes: parseTimeToMinutes(prayerTimes.Isya),
+    },
+    {
+      key: "ISYA",
+      label: "Shalat Isya",
+      time: prayerTimes.Isya,
+      endTime: "23:59",
+      startMinutes: parseTimeToMinutes(prayerTimes.Isya),
+      endMinutes: 23 * 60 + 59,
+    },
   ];
+
+  const currentPrayerItem = prayersList.find((p) => p.key === selectedPrayer);
+  const currentPrayerStatus: PrayerStatus = currentPrayerItem
+    ? getPrayerStatus(currentPrayerItem.startMinutes, currentPrayerItem.endMinutes)
+    : "UPCOMING";
+  const isCurrentPrayerActive = currentPrayerStatus === "ACTIVE";
 
   // Photo
   const [photoUrl, setPhotoUrl] = useState("");
@@ -274,9 +342,22 @@ export default function ShalatPresensiPage() {
     setSubmitError("");
 
     const currentPrayerObj = prayersList.find((p) => p.key === selectedPrayer);
-    if (currentPrayerObj && !isPrayerUnlocked(currentPrayerObj.startMinutes)) {
+    if (!currentPrayerObj) {
+      setSubmitError("Silakan pilih waktu shalat yang sedang aktif.");
+      return;
+    }
+
+    const prayerStatus = getPrayerStatus(currentPrayerObj.startMinutes, currentPrayerObj.endMinutes);
+    if (prayerStatus === "UPCOMING") {
       setSubmitError(
-        `Waktu ${currentPrayerObj.label} belum dimulai (Jadwal MASA/Tarjih Muhammadiyah: ${currentPrayerObj.time} WIB). Presensi hanya dapat diisi setelah waktu shalat tiba.`
+        `Waktu ${currentPrayerObj.label} belum dimulai (Jadwal hisab MASA/Tarjih Muhammadiyah: ${currentPrayerObj.time} WIB). Presensi hanya dapat diisi saat waktu shalat tiba.`
+      );
+      return;
+    }
+
+    if (prayerStatus === "PASSED") {
+      setSubmitError(
+        `Waktu ${currentPrayerObj.label} telah berakhir / sudah lewat (Batas akhir hisab: ${currentPrayerObj.endTime} WIB). Presensi tidak dapat diisi untuk shalat yang sudah kelewat.`
       );
       return;
     }
@@ -496,7 +577,20 @@ export default function ShalatPresensiPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                   {prayersList.map((p) => {
                     const isSelected = selectedPrayer === p.key;
-                    const isUnlocked = isPrayerUnlocked(p.startMinutes);
+                    const status = getPrayerStatus(p.startMinutes, p.endMinutes);
+                    const isUnlocked = status === "ACTIVE";
+
+                    let statusLabel = p.time;
+                    let tooltipText = `${p.label} (Aktif: ${p.time} - ${p.endTime} WIB)`;
+
+                    if (status === "UPCOMING") {
+                      statusLabel = `Kunci (${p.time})`;
+                      tooltipText = `Waktu ${p.label} belum dimulai (Jadwal Buka: ${p.time} WIB)`;
+                    } else if (status === "PASSED") {
+                      statusLabel = `Lewat (${p.endTime})`;
+                      tooltipText = `Waktu ${p.label} telah berakhir / sudah lewat (Batas hisab: ${p.endTime} WIB)`;
+                    }
+
                     return (
                       <button
                         key={p.key}
@@ -505,21 +599,19 @@ export default function ShalatPresensiPage() {
                         onClick={() => {
                           if (isUnlocked) setSelectedPrayer(p.key);
                         }}
-                        title={
-                          !isUnlocked
-                            ? `Waktu ${p.label} belum dimulai (Jadwal Tarjih/KHGT: ${p.time} WIB)`
-                            : `${p.label} (Jadwal Tarjih/KHGT: ${p.time} WIB)`
-                        }
+                        title={tooltipText}
                         className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 relative ${
                           !isUnlocked
-                            ? "bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed opacity-60"
+                            ? status === "PASSED"
+                              ? "bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed opacity-50"
+                              : "bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed opacity-60"
                             : isSelected
                             ? "bg-[#003B73] text-white border-[#003B73] shadow-md scale-[1.02] cursor-pointer"
                             : "bg-[#FAF8F5] text-stone-700 border-stone-200 hover:border-stone-300 cursor-pointer"
                         }`}
                       >
                         {!isUnlocked && (
-                          <div className="absolute top-1.5 right-1.5" title="Waktu shalat belum tiba">
+                          <div className="absolute top-1.5 right-1.5" title={tooltipText}>
                             <Lock className="w-3 h-3 text-stone-400" />
                           </div>
                         )}
@@ -533,12 +625,28 @@ export default function ShalatPresensiPage() {
                               : "text-stone-500 font-mono"
                           }`}
                         >
-                          {!isUnlocked ? `Kunci (${p.time})` : p.time}
+                          {statusLabel}
                         </span>
                       </button>
                     );
                   })}
                 </div>
+
+                {!isCurrentPrayerActive && currentWibMinutes !== null && (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-2.5 text-xs text-amber-900 mt-2">
+                    <Clock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">
+                        {currentPrayerStatus === "PASSED"
+                          ? `Waktu ${currentPrayerItem?.label} telah berakhir / lewat.`
+                          : `Waktu ${currentPrayerItem?.label} belum dibuka.`}
+                      </p>
+                      <p className="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
+                        Presensi hanya dapat diisi tepat pada waktu shalat yang sedang aktif sesuai hisab Tarjih Muhammadiyah (KHGT). Shalat yang sudah kelewat atau belum tiba otomatis terkunci.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* 2. Pilih Masjid Lokasi Jamaah */}
@@ -757,10 +865,19 @@ export default function ShalatPresensiPage() {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting || uploadingPhoto}
-                className="w-full py-4 rounded-2xl bg-[#003B73] hover:bg-[#002855] active:scale-[0.99] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                disabled={isSubmitting || uploadingPhoto || !isCurrentPrayerActive}
+                className={`w-full py-4 rounded-2xl font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 ${
+                  !isCurrentPrayerActive
+                    ? "bg-stone-200 text-stone-500 border border-stone-300 cursor-not-allowed"
+                    : "bg-[#003B73] hover:bg-[#002855] active:scale-[0.99] text-white cursor-pointer"
+                }`}
               >
-                {isSubmitting ? (
+                {!isCurrentPrayerActive ? (
+                  <>
+                    <Lock className="w-4 h-4 text-stone-500" />
+                    <span>Presensi Terkunci (Di Luar Waktu Shalat Aktif)</span>
+                  </>
+                ) : isSubmitting ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
                     <span>Memproses Presensi Shalat Berjamaah...</span>
