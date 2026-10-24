@@ -68,8 +68,8 @@ export default function DonationSection() {
           </h2>
           <p className="text-sm sm:text-base text-stone-600 mt-3 leading-relaxed">
             {isEn
-              ? "Channel infaq and continuous charity easily, safely, and blessedly by scanning the official QRIS codes of Sudalmiyah Rais Mosque Campus 2 UMS."
-              : "Salurkan infaq dan sedekah jariyah secara mudah, amanah, dan berkah melalui pemindaian kode QRIS resmi Masjid Sudalmiyah Rais Kampus 2 UMS."}
+              ? "Donate to AUM model mosque activities easily, safely, and blessedly by scanning the official QRIS codes of Sudalmiyah Rais Mosque Campus 2 UMS."
+              : "Donasi kegiatan masjid percontohan AUM secara mudah, amanah, dan berkah melalui pemindaian kode QRIS resmi Masjid Sudalmiyah Rais Kampus 2 UMS."}
           </p>
         </div>
 
