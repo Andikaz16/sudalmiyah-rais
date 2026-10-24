@@ -1,19 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { MessageCircle, ShieldCheck, Users, X, Send, ExternalLink, CheckCircle2 } from "lucide-react";
+import { MessageCircle, ShieldCheck, Users, X, Send, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface WhatsAppGroupWidgetProps {
   adminPhone?: string;
   adminName?: string;
-  groupInviteUrl?: string;
 }
 
 export default function WhatsAppGroupWidget({
   adminPhone = "628122684688",
   adminName = "Bapak Dodi",
-  groupInviteUrl = "https://chat.whatsapp.com/GH8IlUA4xCnLi3l6k8lHQp?s=sw&p=a&mlu=0",
 }: WhatsAppGroupWidgetProps) {
   const { language } = useLanguage();
   const isEn = language === "en";
@@ -33,10 +31,6 @@ export default function WhatsAppGroupWidget({
 
     const waUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
     window.open(waUrl, "_blank", "noopener,noreferrer");
-  };
-
-  const handleOpenDirectGroup = () => {
-    window.open(groupInviteUrl, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -209,42 +203,38 @@ export default function WhatsAppGroupWidget({
               )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-2.5 pt-2">
-              {/* Opsi 1: Rekomendasi Utama kirim izin ke WA Pak Dodi */}
+            {/* Action Button & Explainer */}
+            <div className="space-y-3 pt-2">
               <button
                 type="button"
                 onClick={handleOpenWhatsappAdmin}
-                className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-colors cursor-pointer"
+                className="w-full py-3.5 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-700/20 active:scale-[0.99] transition-all cursor-pointer"
               >
                 <Send className="w-4 h-4" />
                 <span>
                   {isEn
-                    ? `1. Send Permission to ${adminName} (WhatsApp)`
-                    : `1. Kirim Permohonan Izin ke ${adminName} (WhatsApp)`}
+                    ? `Kirim Permohonan Izin ke ${adminName} (WhatsApp)`
+                    : `Kirim Permohonan Izin ke ${adminName} (WhatsApp)`}
                 </span>
               </button>
 
-              {/* Opsi 2: Link Langsung ke WhatsApp Group */}
-              <button
-                type="button"
-                onClick={handleOpenDirectGroup}
-                className="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
-              >
-                <ExternalLink className="w-3.5 h-3.5 text-stone-500" />
-                <span>
+              <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-stone-600 text-[11px] leading-relaxed space-y-1">
+                <p className="font-semibold text-stone-800">
+                  {isEn ? "Why is this verification step necessary?" : "Mengapa melalui verifikasi WhatsApp?"}
+                </p>
+                <p>
                   {isEn
-                    ? "2. Open WhatsApp Group Link (Wait for Admin Approval)"
-                    : "2. Buka Link Grup WA (Menunggu Persetujuan Admin)"}
-                </span>
-              </button>
+                    ? `After you send the request message, ${adminName} will review your identity and provide the official group invitation link directly via private WhatsApp message. This ensures the group remains clean, secure, and private.`
+                    : `Setelah mengirim permohonan izin di atas, ${adminName} akan meninjau identitas Anda dan mengirimkan tautan grup secara langsung melalui pesan WhatsApp pribadi. Tautan grup tidak ditampilkan untuk publik agar terhindar dari spammer dan orang sembarangan.`}
+                </p>
+              </div>
             </div>
 
             {/* Footnote */}
             <p className="text-[11px] text-stone-400 text-center leading-relaxed">
               {isEn
-                ? `Admin contact: ${adminName} (+62 812-2684-688). Links will open directly in the WhatsApp application.`
-                : `Kontak admin: ${adminName} (+62 812-2684-688). Tautan akan membuka aplikasi WhatsApp secara langsung.`}
+                ? `Admin contact: ${adminName} (+62 812-2684-688). Automatically connects to WhatsApp.`
+                : `Kontak admin: ${adminName} (+62 812-2684-688). Terhubung langsung ke WhatsApp.`}
             </p>
           </div>
         </div>
