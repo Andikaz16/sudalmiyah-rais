@@ -98,11 +98,6 @@ export default function WhatsAppGroupWidget({
                   <MessageCircle className="w-5 h-5 fill-current" />
                   <span>{isEn ? "Join WhatsApp Group" : "Gabung Grup Informasi"}</span>
                 </button>
-                <p className="text-[11px] text-emerald-200/75 mt-2.5 text-center lg:text-right">
-                  {isEn
-                    ? `Verification supervised by ${adminName} (+${adminPhone.slice(0, 2)} ${adminPhone.slice(2, 5)}-${adminPhone.slice(5, 9)}-${adminPhone.slice(9)})`
-                    : `Verifikasi diarahkan ke ${adminName} (+${adminPhone.slice(0, 2)} ${adminPhone.slice(2, 5)}-${adminPhone.slice(5, 9)}-${adminPhone.slice(9)})`}
-                </p>
               </div>
             </div>
           </div>
@@ -233,8 +228,8 @@ export default function WhatsAppGroupWidget({
             {/* Footnote */}
             <p className="text-[11px] text-stone-400 text-center leading-relaxed">
               {isEn
-                ? `Admin contact: ${adminName} (+62 812-2684-688). Automatically connects to WhatsApp.`
-                : `Kontak admin: ${adminName} (+62 812-2684-688). Terhubung langsung ke WhatsApp.`}
+                ? "Connects directly to the campus mosque management WhatsApp."
+                : "Terhubung langsung ke aplikasi WhatsApp pengurus masjid kampus."}
             </p>
           </div>
         </div>
