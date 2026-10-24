@@ -8,6 +8,7 @@ import MasjidMuSection from "@/components/MasjidMuSection";
 import FridayScheduleSection from "@/components/FridayScheduleSection";
 import MutiaraHaditsSection from "@/components/MutiaraHaditsSection";
 import NewsSection from "@/components/NewsSection";
+import WhatsAppGroupWidget from "@/components/WhatsAppGroupWidget";
 import DonationSection from "@/components/DonationSection";
 import FeedbackSection from "@/components/FeedbackSection";
 import Footer from "@/components/Footer";
@@ -62,6 +63,11 @@ export default function Home() {
         {/* 2. Kabar Persyarikatan, Warta LPCR-PM & Kampus UMS */}
         <AnimatedSection animation="fade-up" duration={700}>
           <NewsSection />
+        </AnimatedSection>
+
+        {/* 2.5 Widget Resmi Join Grup Informasi WhatsApp Masjid Kampus UMS */}
+        <AnimatedSection animation="fade-up" duration={700}>
+          <WhatsAppGroupWidget />
         </AnimatedSection>
 
         {/* 3. Infaq Digital & QRIS Section */}
