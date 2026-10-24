@@ -431,62 +431,7 @@
     "institution": "Universitas Muhammadiyah Surakarta",
     "updatedAt": "2026-10-17T10:40:00.000Z"
   },
-  "feedbacks": [
-    {
-      "id": "fb-01",
-      "name": "Muhammad Rizky Pratama",
-      "isAnonymous": false,
-      "contact": "081392817263",
-      "targetMosque": "Masjid Hj. Sudalmiyah Rais",
-      "category": "RIAYAH",
-      "rating": 5,
-      "message": "Masjid sangat megah, sejuk, dan wangi. Mohon pertimbangkan penambahan rak sandal khusus di lorong wudhu timur lantai 1 agar saat shalat Jumat jamaah lebih tertib dan alas kaki tidak menumpuk.",
-      "status": "DITINDAKLANJUTI",
-      "adminResponse": "Jazakallahu khair Mas Rizky atas sarannya yang sangat baik. Takmir telah mengalokasikan 2 rak sepatu susun baru di sisi timur per 14 Oktober 2026.",
-      "respondedAt": "2026-10-14T10:30:00Z",
-      "respondedBy": "Takmir Sudalmiyah",
-      "createdAt": "2026-10-12T14:20:00Z"
-    },
-    {
-      "id": "fb-02",
-      "name": "Hamba Allah",
-      "isAnonymous": true,
-      "contact": "",
-      "targetMosque": "Masjid Fadhlurrahman",
-      "category": "IMARAH",
-      "rating": 5,
-      "message": "Kajian ba'da Maghrib di Kampus 1 sangat berbobot dan menenangkan hati. Kalau bisa variasi materi tentang fiqih kedokteran dan sains Islam ditambah untuk mahasiswa.",
-      "status": "DITINJAU",
-      "adminResponse": "Terima kasih atas masukannya. Bidang Imarah sedang merancang kurikulum kajian tematik integrasi Islam dan Iptek untuk semester ganjil ini.",
-      "respondedAt": "2026-10-14T15:00:00Z",
-      "respondedBy": "Takmir Fadhlurrahman",
-      "createdAt": "2026-10-13T19:15:00Z"
-    },
-    {
-      "id": "fb-03",
-      "name": "Fathimah Az-Zahra",
-      "isAnonymous": false,
-      "contact": "fathimah.zahra@student.ums.ac.id",
-      "targetMosque": "Masjid KH. Mas Mansur",
-      "category": "RAMAH_DIFABEL",
-      "rating": 4,
-      "message": "Akses ramp kursi roda menuju serambi utama pesma sudah bagus, namun mohon pegangan tangan (handrail) di tanjakan wudhu disempurnakan demi kenyamanan lansia dan rekan mahasiswa difabel.",
-      "status": "BARU",
-      "createdAt": "2026-10-15T08:45:00Z"
-    },
-    {
-      "id": "fb-04",
-      "name": "Budi Santoso",
-      "isAnonymous": false,
-      "contact": "085290123456",
-      "targetMosque": "Masjid Ma'had Abu Bakar",
-      "category": "ECO_MOSQUE",
-      "rating": 5,
-      "message": "Sangat mengapresiasi kebersihan tempat wudhu. Usul agar dipasang stiker hemat air wudhu (1 mud sesuai sunnah Nabi SAW) dan pemanfaatan air bekas wudhu untuk menyiram taman santri.",
-      "status": "BARU",
-      "createdAt": "2026-10-15T11:20:00Z"
-    }
-  ],
+  "feedbacks": [],
   "popupBanner": {
     "id": "popup-senam-donor-01",
     "title": "Senam Sehat & Donor Darah - GEMILAR Milad ke-25 Ma'had Abu Bakar Ash-Shiddiq UMS",

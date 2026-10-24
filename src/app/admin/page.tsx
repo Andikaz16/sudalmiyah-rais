@@ -863,6 +863,29 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleClearAllFeedbacks = async () => {
+    if (
+      !confirm(
+        "Apakah Anda yakin ingin mengosongkan SEMUA data masukan jamaah? Tindakan ini akan menghapus seluruh data aspirasi yang tersimpan."
+      )
+    ) {
+      return;
+    }
+    try {
+      const res = await fetch("/api/admin/feedback?action=clear-all", {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gagal mengosongkan data masukan.");
+      }
+      loadAdminFeedbacks();
+      loadData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal mengosongkan data masukan.");
+    }
+  };
+
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/auth/login");
@@ -3909,7 +3932,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Filter Bar: Search, Mosque Filter, Category Filter */}
+            {/* Filter Bar: Search & Mosque Filter */}
             <div className="bg-white p-4 rounded-3xl border border-stone-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center gap-3">
               {/* Search Box */}
               <form onSubmit={handleSearchFeedbackSubmit} className="relative flex-1">
@@ -3930,7 +3953,7 @@ export default function AdminDashboardPage() {
               </form>
 
               {/* Filter Masjid */}
-              <div className="w-full md:w-56 shrink-0">
+              <div className="w-full md:w-64 shrink-0">
                 <select
                   value={feedbackFilterMosque}
                   onChange={(e) => setFeedbackFilterMosque(e.target.value)}
@@ -3947,23 +3970,16 @@ export default function AdminDashboardPage() {
                 </select>
               </div>
 
-              {/* Filter Kategori */}
-              <div className="w-full md:w-52 shrink-0">
-                <select
-                  value={feedbackFilterCategory}
-                  onChange={(e) => setFeedbackFilterCategory(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#003B73]"
+              {feedbacks.length > 0 && (
+                <button
+                  onClick={handleClearAllFeedbacks}
+                  className="px-3.5 py-2 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
+                  title="Kosongkan Semua Data Masukan"
                 >
-                  <option value="ALL">Semua Kategori</option>
-                  <option value="RIAYAH">Ri'ayah (Fasilitas/Sarpras)</option>
-                  <option value="IMARAH">Imarah (Ibadah/Kajian)</option>
-                  <option value="IDARAH">Idarah (Pelayanan)</option>
-                  <option value="RAMAH_DIFABEL">Ramah Difabel &amp; Lansia</option>
-                  <option value="ECO_MOSQUE">Eco-Mosque (Lingkungan)</option>
-                  <option value="KEAMANAN">Keamanan &amp; Parkir</option>
-                  <option value="LAINNYA">Lainnya</option>
-                </select>
-              </div>
+                  <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                  <span>Kosongkan Data</span>
+                </button>
+              )}
             </div>
 
             {/* Feedbacks Content List */}
@@ -3987,15 +4003,12 @@ export default function AdminDashboardPage() {
                     key={fb.id}
                     className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200 shadow-xs hover:border-[#003B73]/30 transition-all space-y-4"
                   >
-                    {/* Top Row: Mosque, Category, Rating & Status */}
+                    {/* Top Row: Mosque, Rating & Status */}
                     <div className="flex flex-wrap items-center justify-between gap-2.5 pb-3 border-b border-stone-100">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#003B73]/10 text-[#003B73]">
                           <Building2 className="w-3.5 h-3.5 text-[#003B73]" />
                           <span>{fb.targetMosque}</span>
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-700">
-                          {fb.category}
                         </span>
                         <div className="flex items-center gap-0.5 ml-1">
                           {[1, 2, 3, 4, 5].map((star) => (

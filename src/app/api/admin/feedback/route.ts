@@ -147,12 +147,34 @@ export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
-    if (!id) {
-      return NextResponse.json({ error: "ID masukan diperlukan." }, { status: 400 });
-    }
+    const action = searchParams.get("action");
 
     const db = await getDbAsync();
     if (!db.feedbacks) db.feedbacks = [];
+
+    if (action === "clear-all") {
+      const count = db.feedbacks.length;
+      db.feedbacks = [];
+      await saveDb(db);
+
+      const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
+      logSecurityEvent(
+        "FEEDBACK_CLEARED",
+        session.email,
+        ip,
+        "WARNING",
+        `Mengosongkan semua data masukan jamaah (${count} pesan dihapus)`
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: "Semua data masukan jamaah berhasil dikosongkan.",
+      });
+    }
+
+    if (!id) {
+      return NextResponse.json({ error: "ID masukan diperlukan." }, { status: 400 });
+    }
 
     const exists = db.feedbacks.some((f) => f.id === id);
     if (!exists) {

@@ -21,21 +21,11 @@ const MOSQUE_OPTIONS = [
   "Semua Masjid Kampus",
 ];
 
-const CATEGORY_OPTIONS: { key: FeedbackCategory; label: string; labelEn: string; desc: string; descEn: string }[] = [
-  { key: "RIAYAH", label: "Ri'ayah (Fasilitas & Kebersihan)", labelEn: "Ri'ayah (Facilities & Cleanliness)", desc: "AC, wudhu, toilet, sound system, karpet, kerapian", descEn: "AC, ablution, restrooms, sound system, carpets, tidiness" },
-  { key: "IMARAH", label: "Imarah (Ibadah & Kajian)", labelEn: "Imarah (Worship & Study Circles)", desc: "Shalat berjamaah, materi kajian, khatib Jumat, tahsin", descEn: "Congregational prayers, lecture topics, Friday khatib, tahsin" },
-  { key: "IDARAH", label: "Idarah (Pelayanan & Manajemen)", labelEn: "Idarah (Service & Management)", desc: "Layanan takmir, transparansi infaq, keterbukaan informasi", descEn: "Takmir service, infaq transparency, public information" },
-  { key: "RAMAH_DIFABEL", label: "Ramah Difabel & Lansia", labelEn: "Accessible & Elderly Friendly", desc: "Akses kursi roda, handrail tangga, toilet ramah disabilitas", descEn: "Wheelchair access, handrails, accessible restrooms" },
-  { key: "ECO_MOSQUE", label: "Eco-Mosque (Lingkungan)", labelEn: "Eco-Mosque (Environment)", desc: "Penghematan air wudhu, efisiensi listrik, penanganan sampah", descEn: "Water conservation, electricity efficiency, waste management" },
-  { key: "KEAMANAN", label: "Keamanan & Parkir", labelEn: "Security & Parking", desc: "Penataan motor/mobil, penitipan barang, penerangan area", descEn: "Motorcycle/car parking, locker safekeeping, area lighting" },
-  { key: "LAINNYA", label: "Aspirasi Lainnya", labelEn: "Other Aspirations", desc: "Ide kreatif dan masukan kemajuan masjid kampus", descEn: "Creative ideas and input for campus mosque development" },
-];
-
 export default function FeedbackSection() {
   const { language } = useLanguage();
   const isEn = language === "en";
   const [targetMosque, setTargetMosque] = useState(MOSQUE_OPTIONS[0]);
-  const [category, setCategory] = useState<FeedbackCategory>("RIAYAH");
+  const [category] = useState<FeedbackCategory>("LAINNYA");
   const [rating, setRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [name, setName] = useState("");
@@ -225,29 +215,10 @@ export default function FeedbackSection() {
                 </select>
               </div>
 
-              {/* 2. Pilih Kategori Masukan */}
-              <div>
-                <label className="block text-xs sm:text-sm font-bold text-stone-900 mb-2">
-                  {isEn ? "2. Aspiration / Focus Category" : "2. Kategori Aspirasi / Bidang"}{" "}
-                  <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value as FeedbackCategory)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs sm:text-sm text-stone-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#003B73] focus:border-transparent cursor-pointer"
-                >
-                  {CATEGORY_OPTIONS.map((cat) => (
-                    <option key={cat.key} value={cat.key}>
-                      {isEn ? `${cat.labelEn} - ${cat.descEn}` : `${cat.label} - ${cat.desc}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 3. Rating Kepuasan / Apresiasi */}
+              {/* 2. Rating Kepuasan / Apresiasi */}
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-stone-900 mb-1.5">
-                  {isEn ? "3. Satisfaction Level & Service Appreciation" : "3. Tingkat Kepuasan & Apresiasi Pelayanan"}
+                  {isEn ? "2. Satisfaction Level & Service Appreciation" : "2. Tingkat Kepuasan & Apresiasi Pelayanan"}
                 </label>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5">
@@ -276,12 +247,12 @@ export default function FeedbackSection() {
                 </div>
               </div>
 
-              {/* 4. Pesan Saran & Aspirasi */}
+              {/* 3. Pesan Saran & Aspirasi */}
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-stone-900 mb-1.5">
                   {isEn
-                    ? "4. Suggestions, Feedback, or Constructive Appreciation"
-                    : "4. Isi Saran, Masukan, atau Apresiasi Konstruktif"}{" "}
+                    ? "3. Suggestions, Feedback, or Constructive Appreciation"
+                    : "3. Isi Saran, Masukan, atau Apresiasi Konstruktif"}{" "}
                   <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -301,11 +272,11 @@ export default function FeedbackSection() {
                 </div>
               </div>
 
-              {/* 5. Identitas Pengirim (Opsional & Ramah Anonimitas) */}
+              {/* 4. Identitas Pengirim (Opsional & Ramah Anonimitas) */}
               <div className="pt-2 border-t border-stone-100">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-xs sm:text-sm font-bold text-stone-900">
-                    {isEn ? "5. Congregant Identity (Optional)" : "5. Identitas Jamaah (Opsional)"}
+                    {isEn ? "4. Congregant Identity (Optional)" : "4. Identitas Jamaah (Opsional)"}
                   </label>
                   <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-stone-600 hover:text-stone-900">
                     <input

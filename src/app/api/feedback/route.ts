@@ -8,15 +8,18 @@ const submitFeedbackSchema = z.object({
   isAnonymous: z.boolean().optional().default(false),
   contact: z.string().optional().default(""),
   targetMosque: z.string().min(1, "Pilih masjid tujuan."),
-  category: z.enum([
-    "IDARAH",
-    "IMARAH",
-    "RIAYAH",
-    "RAMAH_DIFABEL",
-    "ECO_MOSQUE",
-    "KEAMANAN",
-    "LAINNYA",
-  ] as const),
+  category: z
+    .enum([
+      "IDARAH",
+      "IMARAH",
+      "RIAYAH",
+      "RAMAH_DIFABEL",
+      "ECO_MOSQUE",
+      "KEAMANAN",
+      "LAINNYA",
+    ] as const)
+    .optional()
+    .default("LAINNYA"),
   rating: z.number().min(1).max(5).default(5),
   message: z
     .string()
