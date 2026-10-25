@@ -403,7 +403,7 @@ Infaq Operasional Shalat Jumat & Masjid:
 Bank Jateng Syariah - Rekening LAZ UMS (QRIS Resmi di Web)
 
 Portal Resmi Masjid UMS:
-https://sudalmiyah-rais.vercel.app/?s=jumat`;
+https://masjid.ums.ac.id`;
   };
 
   const handleShareWhatsApp = () => {

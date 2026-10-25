@@ -26,8 +26,8 @@ const jsonLdPayload = {
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://sudalmiyah-rais.vercel.app/#website",
-      "url": "https://sudalmiyah-rais.vercel.app",
+      "@id": "https://masjid.ums.ac.id/#website",
+      "url": "https://masjid.ums.ac.id",
       "name": "Masjid Kampus UMS",
       "alternateName": [
         "Kampus Masjid UMS",
@@ -42,7 +42,7 @@ const jsonLdPayload = {
     },
     {
       "@type": "Mosque",
-      "@id": "https://sudalmiyah-rais.vercel.app/#mosque",
+      "@id": "https://masjid.ums.ac.id/#mosque",
       "name": "Masjid Hj. Sudalmiyah Rais - Masjid Kampus UMS",
       "alternateName": [
         "Masjid Kampus UMS",
@@ -50,9 +50,9 @@ const jsonLdPayload = {
         "Masjid Kampus 2 UMS",
         "Masjid Sudalmiyah Rais"
       ],
-      "url": "https://sudalmiyah-rais.vercel.app",
-      "logo": "https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png",
-      "image": "https://sudalmiyah-rais.vercel.app/images/hero/hero-sudalmiyah.jpg",
+      "url": "https://masjid.ums.ac.id",
+      "logo": "https://masjid.ums.ac.id/images/logo/logo-masjid.png",
+      "image": "https://masjid.ums.ac.id/images/hero/hero-sudalmiyah.jpg",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Jl. A. Yani, Pabelan, Kartasura",
@@ -103,7 +103,7 @@ const jsonLdPayload = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://sudalmiyah-rais.vercel.app"),
+  metadataBase: new URL("https://masjid.ums.ac.id"),
   title: {
     default: "Masjid Kampus UMS | Portal Resmi Masjid Sudalmiyah Rais & 6 Masjid Kampus",
     template: "%s | Masjid Kampus UMS",
@@ -148,11 +148,11 @@ export const metadata: Metadata = {
     title: "Masjid Kampus UMS - Portal Resmi 6 Masjid Kampus",
     description:
       "Portal resmi informasi dan peribadatan Masjid Kampus UMS. Jadwal Shalat Jumat, kajian, ruang ibadah digital & presensi berjamaah.",
-    url: "https://sudalmiyah-rais.vercel.app",
+    url: "https://masjid.ums.ac.id",
     siteName: "Masjid Kampus UMS",
     images: [
       {
-        url: "https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png",
+        url: "https://masjid.ums.ac.id/images/logo/logo-masjid.png",
         width: 512,
         height: 512,
         alt: "Logo Resmi Masjid Kampus UMS",
@@ -166,7 +166,7 @@ export const metadata: Metadata = {
     title: "Masjid Kampus UMS - Portal Resmi 6 Masjid Kampus",
     description:
       "Portal resmi informasi dan peribadatan Masjid Kampus UMS. Jadwal Shalat Jumat, kajian, dan presensi jamaah.",
-    images: ["https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png"],
+    images: ["https://masjid.ums.ac.id/images/logo/logo-masjid.png"],
   },
   robots: {
     index: true,
@@ -213,8 +213,8 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
           rel="stylesheet"
         />
-        <meta property="og:image" content="https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png" />
-        <meta property="og:image:secure_url" content="https://sudalmiyah-rais.vercel.app/images/logo/logo-masjid.png" />
+        <meta property="og:image" content="https://masjid.ums.ac.id/images/logo/logo-masjid.png" />
+        <meta property="og:image:secure_url" content="https://masjid.ums.ac.id/images/logo/logo-masjid.png" />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="512" />
         <meta property="og:image:height" content="512" />

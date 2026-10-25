@@ -165,7 +165,7 @@ export async function generateHadithPosterBlob(
   ctx.fillStyle = "#94A3B8"; // Slate 400
   ctx.font = "500 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.fillText(
-    "Disiarkan oleh Masjid Hj. Sudalmiyah Rais Kampus 2 UMS | Portal: sudalmiyah-rais.vercel.app",
+    "Disiarkan oleh Masjid Hj. Sudalmiyah Rais Kampus 2 UMS | Portal: masjid.ums.ac.id",
     width / 2,
     height - 54
   );

@@ -214,8 +214,8 @@ Bank Jateng Syariah (BJS): 6012275865 (a.n. MASJID UMS)`
       : `Donasi kegiatan masjid percontohan AUM:
 Bank Jateng Syariah (BJS): 6012275865 (a.n. MASJID UMS)`;
     const footer = isEn
-      ? "Broadcasted by Hj. Sudalmiyah Rais Mosque - Universitas Muhammadiyah Surakarta\nOfficial Portal: https://sudalmiyah-rais.vercel.app"
-      : "Disiarkan oleh Masjid Hj. Sudalmiyah Rais - Universitas Muhammadiyah Surakarta\nPortal Resmi: https://sudalmiyah-rais.vercel.app";
+      ? "Broadcasted by Hj. Sudalmiyah Rais Mosque - Universitas Muhammadiyah Surakarta\nOfficial Portal: https://masjid.ums.ac.id"
+      : "Disiarkan oleh Masjid Hj. Sudalmiyah Rais - Universitas Muhammadiyah Surakarta\nPortal Resmi: https://masjid.ums.ac.id";
 
     return `${title}
 ${hijriDate} (${isEn ? "KHGT" : "KHGT"}) / ${masehiDate}
@@ -271,7 +271,7 @@ ${footer}`;
   };
 
   const handleShareFB = () => {
-    const pageUrl = typeof window !== "undefined" ? window.location.href : "https://sudalmiyah-rais.vercel.app";
+    const pageUrl = typeof window !== "undefined" ? window.location.href : "https://masjid.ums.ac.id";
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}&quote=${encodeURIComponent(customShareText)}`;
     window.open(url, "_blank");
   };
