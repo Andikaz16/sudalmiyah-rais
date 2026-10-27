@@ -432,6 +432,7 @@ export default function ShalatPresensiPage() {
               width={32}
               height={32}
               className="object-contain"
+              unoptimized
             />
           </div>
           <div>

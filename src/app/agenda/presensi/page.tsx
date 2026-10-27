@@ -344,6 +344,7 @@ function PresensiContent() {
               width={36}
               height={36}
               className="object-contain"
+              unoptimized
             />
           </div>
           <div>

@@ -136,6 +136,7 @@ export default function LoginPage() {
               height={72}
               className="w-full h-full object-contain"
               priority
+              unoptimized
             />
           </div>
         </div>

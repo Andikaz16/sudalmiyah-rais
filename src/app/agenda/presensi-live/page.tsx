@@ -238,6 +238,7 @@ export default function PresensiLivePage() {
                 width={40}
                 height={40}
                 className="object-contain"
+                unoptimized
               />
             </div>
             <div>
@@ -447,6 +448,7 @@ export default function PresensiLivePage() {
                         width={40}
                         height={40}
                         className="object-contain"
+                        unoptimized
                       />
                     </div>
                   </div>

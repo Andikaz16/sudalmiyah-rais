@@ -2066,6 +2066,7 @@ export default function AdminDashboardPage() {
                 width={44}
                 height={44}
                 className="w-full h-full object-contain"
+                unoptimized
               />
             </Link>
             <div className="min-w-0">
