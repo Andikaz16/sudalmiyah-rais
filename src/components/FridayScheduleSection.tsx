@@ -399,8 +399,7 @@ ${mosqueEntries}
 Himbauan Jamaah:
 Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, merapatkan saf, serta menjaga ketertiban, kekhusyukan, dan kebersihan masjid.
 
-Infaq Operasional Shalat Jumat & Masjid:
-Bank Jateng Syariah - Rekening LAZ UMS (QRIS Resmi di Web)
+Masjid Percontohan Amal Usaha Muhammadiyah (AUM)
 
 Portal Resmi Masjid UMS:
 https://masjid.ums.ac.id`;
