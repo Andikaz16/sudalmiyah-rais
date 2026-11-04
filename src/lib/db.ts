@@ -18,6 +18,7 @@ import {
   ManualNewsItem,
   PrayerAttendance,
   PrayerName,
+  KhutbahItem,
 } from "./types";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { getFirestoreDb, isFirebaseConfigured } from "./firebase";
@@ -41,6 +42,7 @@ export interface DatabaseSchema {
   documentsLocked?: boolean;
   manualNews?: ManualNewsItem[];
   prayerAttendances?: PrayerAttendance[];
+  khutbahList?: KhutbahItem[];
 }
 
 function getDbFilePath(): string {
@@ -357,6 +359,190 @@ export function getDefaultManualNews(): ManualNewsItem[] {
   ];
 }
 
+export function getDefaultKhutbahList(): KhutbahItem[] {
+  return [
+    {
+      id: "khutbah-sm-01",
+      title: "Khutbah Jum'at: 5 Kezaliman yang Sering Dinormalkan di Era Digital",
+      slug: "5-kezaliman-yang-sering-dinormalkan-di-era-digital",
+      theme: "Akhlak & Muamalah Digital",
+      source: "SUARA_MUHAMMADIYAH",
+      author: "Dwi Arianto, S.Pd.I. (Sekretaris Majelis Tarjih & Tajdid PDM Kota Bandar Lampung)",
+      date: "30 Oktober 2026",
+      summary: "Mengulas fenomena kezaliman di era informasi modern yang sering dianggap wajar: ghibah online, penyebaran berita tanpa tabayyun, menunda bayar utang, memeras hak pekerja, hingga merusak fasilitas bersama.",
+      firstKhutbah: `إِنَّ الْحَمْدَ لِلَّهِ نَحْمَدُهُ وَنَسْتَعِينُهُ وَنَسْتَغْفِرُهُ، وَنَعُوذُ بِاللَّهِ مِنْ شُرُورِ أَنْفُسِنَا وَمِنْ سَيِّئَاتِ أَعْمَالِنَا، مَنْ يَهْدِهِ اللَّهُ فَلَا مُضِلَّ لَهُ، وَمَنْ يُضْلِلْ فَلَا هَادِيَ لَهُ.
+
+أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ سَيِّدَنَا وَنَبِيَّنَا مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ لَا نَبِيَّ بَعْدَهُ.
+
+اللَّهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ عَلَى نَبِيِّنَا مُحَمَّدٍ، وَعَلَى آلِهِ وَأَصْحَابِهِ وَمَنْ تَبِعَهُمْ بِإِحْسَانٍ إِلَى يَوْمِ الدِّينِ.
+
+أَمَّا بَعْدُ، فَيَا عِبَادَ اللَّهِ، أُوصِيكُمْ وَنَفْسِي بِتَقْوَى اللَّهِ الْعَظِيمِ، فَقَدْ فَازَ الْمُتَّقُونَ. قَالَ اللَّهُ تَعَالَى فِي الْقُرْآنِ الْكَرِيمِ:
+يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنْتُمْ مُسْلِمُونَ.
+
+Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
+
+Marilah kita senantiasa memanjatkan puji dan syukur ke hadirat Allah Subhanahu wa Ta'ala atas limpahan nikmat iman, Islam, dan kesehatan sehingga kita dapat melangkahkan kaki ke rumah Allah dalam suasana persaudaraan yang tulus. Shalawat serta salam semoga senantiasa tercurah kepada baginda Rasulullah Muhammad Shallallahu 'Alaihi Wasallam, uswah hasanah sepanjang zaman.
+
+Khatib berwasiat kepada diri sendiri dan kepada segenap jamaah sekalian, marilah kita memperkokoh ketakwaan kepada Allah dengan menunaikan segala syariat-Nya dan menjauhkan diri dari segala kemaksiatan serta kezaliman.
+
+Jamaah Shalat Jumat Rahimakumullah,
+
+Kezaliman adalah kegelapan gulita pada hari kiamat, sebagaimana sabda Rasulullah SAW:
+الظُّلْمُ ظُلُمَاتٌ يَوْمَ الْقِيَامَةِ (HR. Al-Bukhari & Muslim).
+
+Namun sungguh memprihatinkan, di zaman keterbukaan informasi dan kemudahan hidup saat ini, banyak tindakan zalim yang tanpa sadar justru dinormalkan dalam pergaulan sehari-hari. Setidaknya terdapat lima kezaliman yang wajib kita waspadai:
+
+1. Ghibah dan Mencela di Ruang Maya
+Menggunjing aib orang lain, sindir-menyindir di media sosial, dan merendahkan martabat sesama dianggap konten biasa. Padahal Allah Ta'ala berfirman dalam Surah Al-Hujurat ayat 12 mengumpamakannya seperti memakan bangkai saudara sendiri.
+
+2. Menyebarkan Informasi Tanpa Tabayyun
+Mudah meneruskan kabar viral tanpa verifikasi kebenaran. Rasulullah SAW mengingatkan: "Cukuplah seseorang dicap pendosa bila menceritakan segala yang ia dengar tanpa disaring" (HR. Muslim).
+
+3. Menunda Pembayaran Utang Padahal Mampu
+Rasulullah SAW bersabda: "مَطْلُ الْغَنِيِّ ظُلْمٌ" (Penundaan pembayaran utang oleh orang yang berkecukupan adalah perbuatan zalim - HR. Bukhari). Menunda hak orang lain demi gengsi konsumtif merusak keberkahan rezeki.
+
+4. Mengurangi Hak dan Memeras Tenaga Orang Lain
+Mengabaikan upah layak pekerja, menunda hak bawahan, atau membebankan tugas di luar batas tanpa penghargaan yang adil.
+
+5. Merusak Fasilitas Umum dan Lingkungan Bersama
+Membuang sampah seenaknya di area kampus, merusak fasilitas masjid, dan merampas hak kenyamanan orang banyak adalah kezaliman sosial yang pertanggungjawabannya sangat berat di hadapan Allah.
+
+Marilah kita bersihkan hati, bertabayyun sebelum bertindak, dan segera menunaikan hak-hak sesama hamba sebelum ajal menjemput.
+
+بَارَكَ اللَّهُ لِي وَلَكُمْ فِي الْقُرْآنِ الْعَظِيمِ، وَنَفَعَنِي وَإِيَّاكُمْ بِمَا فِيهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيمِ. أَقُولُ قَوْلِي هَذَا وَأَسْتَغْفِرُ اللَّهَ الْعَظِيمَ لِي وَلَكُمْ وَلِسَائِرِ الْمُسْلِمِينَ مِنْ كُلِّ ذَنْبٍ، فَاسْتَغْفِرُوهُ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ.`,
+      secondKhutbah: `الْحَمْدُ لِلَّهِ حَمْدًا كَثِيرًا كَمَا أَمَرَ. أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ سَيِّدَنَا مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ الشَّفِيعُ فِي الْمَحْشَرِ.
+
+اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ أَجْمَعِينَ.
+
+أَمَّا بَعْدُ، فَيَا عِبَادَ اللَّهِ، اتَّقُوا اللَّهَ تَعَالَى فِيمَا أَمَرَ، وَانْتَهُوا عَمَّا نَهَى عَنْهُ وَزَجَرَ.
+
+وَاعْلَمُوا أَنَّ اللَّهَ أَمَرَكُمْ بِأَمْرٍ عَظِيمٍ، أَمَرَكُمْ بِالصَّلَاةِ وَالسَّلَامِ عَلَى نَبِيِّهِ الْكَرِيمِ، فَقَالَ جَلَّ جَلَالُهُ:
+إِنَّ اللَّهَ وَمَلَائِكَتَهُ يُصَلُّونَ عَلَى النَّبِيِّ يَا أَيُّهَا الَّذِينَ آمَنُوا صَلُّوا عَلَيْهِ وَسَلِّمُوا تَسْلِيمًا.
+
+اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، وَبَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ فِي الْعَالَمِينَ إِنَّكَ حَمِيدٌ مَجِيدٌ.
+
+اللَّهُمَّ اغْفِرْ لِلْمُسْلِمِينَ وَالْمُسْلِمَاتِ، وَالْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ، الْأَحْيَاءِ مِنْهُمْ وَالْأَمْوَاتِ.
+اللَّهُمَّ أَعِزَّ الْإِسْلَامَ وَالْمُسْلِمِينَ، وَأَلِّفْ بَيْنَ قُلُوبِنَا، وَأَصْلِحْ ذَاتَ بَيْنِنَا، وَانْصُرْنَا عَلَى أَعْدَائِنَا.
+اللَّهُمَّ احْفَظْ بِلَادَنَا إِنْدُونِيسِيَا وَاجْعَلْهَا بَلْدَةً طَيِّبَةً آمِنَةً مُطْمَئِنَّةً سَخَاءً رَخَاءً وَسَائِرَ بِلَادِ الْمُسْلِمِينَ.
+
+رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ.
+
+عِبَادَ اللَّهِ، إِنَّ اللَّهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيتَاءِ ذِي الْقُرْبَى وَيَنْهَى عَنِ الْفَحْشَاءِ وَالْمُنْكَرِ وَالْبَغْيِ، يَعِظُكُمْ لَعَلَّكُمْ تَذَكَّرُونَ. فَاذْكُرُوا اللَّهَ الْعَظِيمَ يَذْكُرْكُمْ، وَاشْكُرُوهُ عَلَى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللَّهِ أَكْبَرُ، وَاللَّهُ يَعْلَمُ مَا تَصْنَعُونَ.`,
+      sourceUrl: "https://suaramuhammadiyah.id/read/khutbah-jum-at-5-kezaliman-yang-kita-normalkan",
+      createdAt: "2026-10-30T10:00:00.000Z",
+      isPublished: true,
+    },
+    {
+      id: "khutbah-sm-02",
+      title: "Khutbah Jum'at: Masa Muda, Kesempatan Emas yang Tak Kembali",
+      slug: "masa-muda-kesempatan-emas-yang-tak-kembali",
+      theme: "Generasi Muda & AIK",
+      source: "SUARA_MUHAMMADIYAH",
+      author: "Muhammad DN, M.H.I. (Ketua PDM Hulu Sungai Tengah, Kalimantan Selatan)",
+      date: "23 Oktober 2026",
+      summary: "Menyoroti peran strategis pemuda muslim dalam memanfaatkan masa emas usia muda untuk menuntut ilmu, berakhlak karimah, mengabdi pada persyarikatan, dan tidak terjerumus pada kesia-siaan zaman.",
+      firstKhutbah: `إِنَّ الْحَمْدَ لِلَّهِ نَحْمَدُهُ وَنَسْتَعِينُهُ وَنَسْتَغْفِرُهُ، وَنَعُوذُ بِاللَّهِ مِنْ شُرُورِ أَنْفُسِنَا وَسَيِّئَاتِ أَعْمَالِنَا. مَنْ يَهْدِهِ اللَّهُ فَلَا مُضِلَّ لَهُ، وَمَنْ يُضْلِلْ فَلَا هَادِيَ لَهُ.
+
+أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ نَبِيَّنَا مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ الصَّادِقُ الْأَمِينُ.
+اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى مُحَمَّدٍ وَعَلَى آلِهِ وَصَحَابَتِهِ أَجْمَعِينَ.
+
+أَمَّا بَعْدُ، فَيَا أَيُّهَا الْحَاضِرُونَ، أُوصِيكُمْ وَنَفْسِي بِتَقْوَى اللَّهِ الْعَلِيِّ الْقَدِيرِ، فَقَدْ فَازَ مَنِ اتَّقَى.
+
+Kaum Muslimin Sidang Shalat Jumat yang Berbahagia,
+
+Masa muda adalah fase kehidupan yang paling berharga, penuh energi, semangat, dan daya cipta. Namun ia bagaikan embun pagi yang lekas menguap seiring bergulirnya waktu. Rasulullah Shallallahu 'Alaihi Wasallam telah mengingatkan kita dalam hadits masyhur riwayat Al-Hakim:
+اِغْتَنِمْ خَمْسًا قَبْلَ خَمْسٍ: شَبَابَكَ قَبْلَ هَرَمِكَ، وَصِحَّتَكَ قَبْلَ سَقَمِكَ، وَغِنَاكَ قَبْلَ فَقْرِكَ، وَفَرَاغَكَ قَبْلَ شُغْلِكَ، وَحَيَاتَكَ قَبْلَ مَوْتِكَ.
+"Manfaatkan lima perkara sebelum lima perkara: masa mudamu sebelum masa tuamu, sehatmu sebelum sakitmu, kayamu sebelum miskinmu, luangmu sebelum sibukmu, dan hidupmu sebelum matimu."
+
+Bagi para mahasiswa dan generasi muda sivitas akademika, masa belajar di kampus bukanlah sekadar mengejar selembar ijazah, melainkan momentum pembentukan karakter ketakwaan, adab, dan keahlian yang membawa kemaslahatan bagi umat. Jadikan masa muda kita saksi pembelaan di hadapan Allah kelak di Padang Mahsyar.
+
+بَارَكَ اللَّهُ لِي وَلَكُمْ فِي الْقُرْآنِ الْعَظِيمِ، وَأَسْتَغْفِرُ اللَّهَ لِي وَلَكُمْ، فَاسْتَغْفِرُوهُ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ.`,
+      secondKhutbah: `الْحَمْدُ لِلَّهِ وَكَفَى، وَالصَّلَاةُ وَالسَّلَامُ عَلَى النَّبِيِّ الْمُصْطَفَى، وَعَلَى آلِهِ وَصَحْبِهِ أَهْلِ الصِّدْقِ وَالْوَفَا.
+
+أَمَّا بَعْدُ، فَيَا عِبَادَ اللَّهِ، اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ، وَاعْلَمُوا أَنَّ خَيْرَ الزَّادِ التَّقْوَى.
+
+اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِهِ وَأَصْحَابِهِ أَجْمَعِينَ.
+اللَّهُمَّ اغْفِرْ لِلْمُسْلِمِينَ وَالْمُسْلِمَاتِ، وَالْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ.
+اللَّهُمَّ اجْعَلْ شَبَابَنَا شَبَابًا صَالِحًا، قَوِيَّ الْإِيمَانِ، صَاحِبَ هِمَّةٍ عَالِيَةٍ فِي خِدْمَةِ الدِّينِ وَالْوَطَنِ.
+رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا.
+رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ. عِبَادَ اللَّهِ، أَقِيمُوا الصَّلَاةَ.`,
+      sourceUrl: "https://suaramuhammadiyah.id/read/khutbah-jum-at-masa-muda-kesempatan-yang-tak-kembali",
+      createdAt: "2026-10-23T10:00:00.000Z",
+      isPublished: true,
+    },
+    {
+      id: "khutbah-takmir-01",
+      title: "Khutbah Jum'at: Meneguhkan Sinergi & Akhlak Berkemajuan Sivitas Akademika",
+      slug: "meneguhkan-sinergi-dan-akhlak-berkemajuan",
+      theme: "Islam Berkemajuan & Kampus",
+      source: "TAKMIR_MASJID",
+      author: "Prof. Dr. Syamsul Hidayat, M.Ag. (Dewan Pembina Takmir Masjid Kampus UMS)",
+      date: "17 Oktober 2026",
+      summary: "Panduan khutbah resmi Masjid Hj. Sudalmiyah Rais tentang integrasi keilmuan, keadaban, dan nilai-nilai Al-Islam Kemuhammadiyahan (AIK) dalam membangun peradaban kampus yang unggul dan bermartabat.",
+      firstKhutbah: `إِنَّ الْحَمْدَ لِلَّهِ نَحْمَدُهُ وَنَسْتَعِينُهُ وَنَسْتَغْفِرُهُ، وَنَعُوذُ بِاللَّهِ مِنْ شُرُورِ أَنْفُسِنَا وَمِنْ سَيِّئَاتِ أَعْمَالِنَا.
+
+أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ.
+اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِهِ وَأَصْحَابِهِ أَجْمَعِينَ.
+
+أَمَّا بَعْدُ، فَيَا عِبَادَ اللَّهِ، أُوصِيكُمْ وَنَفْسِي بِتَقْوَى اللَّهِ الْعَظِيمِ، فَقَدْ فَازَ الْمُتَّقُونَ.
+
+Jamaah Shalat Jumat yang Dimuliakan Allah,
+
+Universitas Muhammadiyah Surakarta dengan enam masjid kampusnya mengemban amanah besar untuk melahirkan insan akademis yang berakhlak mulia, berkeunggulan intelektual, dan berjiwa pencerah. Masjid bukan hanya tempat shalat fardhu, tetapi jantung pembinaan moral, etika akademik, dan ukhuwah islamiyah.
+
+Marilah kita jadikan kejujuran akademik, ketertiban saf berjamaah, dan kepedulian sosial sebagai cerminan nyata dari nilai-nilai Islam Berkemajuan.
+
+بَارَكَ اللَّهُ لِي وَلَكُمْ فِي الْقُرْآنِ الْعَظِيمِ، وَأَسْتَغْفِرُ اللَّهَ لِي وَلَكُمْ وَلِجَمِيعِ الْمُسْلِمِينَ.`,
+      secondKhutbah: `الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ، وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِهِ الْكَرِيمِ.
+
+اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ.
+اللَّهُمَّ اغْفِرْ لِلْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ وَالْمُسْلِمِينَ وَالْمُسْلِمَاتِ.
+اللَّهُمَّ بَارِكْ فِي جَامِعَتِنَا، وَانْفَعْ بِهَا الْإِسْلَامَ وَالْمُسْلِمِينَ، وَاجْعَلْ طُلَّابَنَا وَأَسَاتِذَتَنَا قُدْوَةً فِي الْعِلْمِ وَالْعَمَلِ.
+رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ. عِبَادَ اللَّهِ، أَقِيمُوا الصَّلَاةَ.`,
+      fileUrl: "/documents/khutbah-sinergi-akhlak-berkemajuan.pdf",
+      fileName: "khutbah-sinergi-akhlak-berkemajuan.pdf",
+      createdAt: "2026-10-17T10:00:00.000Z",
+      isPublished: true,
+    },
+    {
+      id: "khutbah-takmir-02",
+      title: "Khutbah Jum'at: Memakmurkan Masjid Kampus dan Merawat Shalat Berjamaah",
+      slug: "memakmurkan-masjid-kampus-dan-merawat-shalat-berjamaah",
+      theme: "Ibadah & Taqwa",
+      source: "TAKMIR_MASJID",
+      author: "Drs. H. Dodi Afianto, M.Pd. (Takmir Pelaksana Masjid Kampus UMS)",
+      date: "10 Oktober 2026",
+      summary: "Tuntunan praktis mengenai keutamaan melangkahkan kaki ke masjid untuk shalat berjamaah, merapatkan shaf shalat, serta menjaga adab ketenangan di dalam rumah Allah.",
+      firstKhutbah: `إِنَّ الْحَمْدَ لِلَّهِ نَحْمَدُهُ وَنَسْتَعِينُهُ وَنَسْتَغْفِرُهُ، وَنَعُوذُ بِاللَّهِ مِنْ شُرُورِ أَنْفُسِنَا وَسَيِّئَاتِ أَعْمَالِنَا.
+
+أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ.
+اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ أَجْمَعِينَ.
+
+أَمَّا بَعْدُ، فَيَا عِبَادَ اللَّهِ، اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنْتُمْ مُسْلِمُونَ.
+
+Ma'asyiral Muslimin Jamaah Shalat Jumat yang Berbahagia,
+
+Kemakmuran sebuah masjid bukan dinilai dari kemegahan kubah dan menaranya, melainkan dari kepadatan saf-saf shalat berjamaah dan geliat majelis taklim di dalamnya. Allah Subhanahu wa Ta'ala berfirman dalam Surah At-Taubah ayat 18:
+إِنَّمَا يَعْمُرُ مَسَاجِدَ اللَّهِ مَنْ آمَنَ بِاللَّهِ وَالْيَوْمِ الْآخِرِ وَأَقَامَ الصَّلَاةَ وَآتَى الزَّكَاةَ وَلَمْ يَخْشَ إِلَّا اللَّهَ فَعَسَى أُولَئِكَ أَنْ يَكُونُوا مِنَ الْمُهْتَدِينَ.
+"Hanyalah yang memakmurkan masjid-masjid Allah ialah orang-orang yang beriman kepada Allah dan hari kemudian, serta tetap mendirikan shalat, menunaikan zakat dan tidak takut melainkan kepada Allah."
+
+Mari kita luangkan waktu di sela perkuliahan dan pekerjaan untuk senantiasa mendatangi panggilan adzan di masjid kampus.
+
+بَارَكَ اللَّهُ لِي وَلَكُمْ فِي الْقُرْآنِ الْعَظِيمِ، وَأَسْتَغْفِرُ اللَّهَ لِي وَلَكُمْ.`,
+      secondKhutbah: `الْحَمْدُ لِلَّهِ، وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِ اللَّهِ، وَعَلَى آلِهِ وَصَحْبِهِ وَمَنْ وَالَاهُ.
+
+أَمَّا بَعْدُ، فَيَا عِبَادَ اللَّهِ، اتَّقُوا اللَّهَ وَحَافِظُوا عَلَى الصَّلَوَاتِ وَالصَّلَاةِ الْوُسْطَى وَقُومُوا لِلَّهِ قَانِتِينَ.
+اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِ سَيِّدِنَا مُحَمَّدٍ.
+اللَّهُمَّ اغْفِرْ لِلْمُسْلِمِينَ وَالْمُسْلِمَاتِ، وَحَبِّبْ إِلَيْنَا الْإِيمَانَ وَزَيِّنْهُ فِي قُلُوبِنَا، وَكَرِّهْ إِلَيْنَا الْكُفْرَ وَالْفُسُوقَ وَالْعِصْيَانَ.
+رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ. عِبَادَ اللَّهِ، أَقِيمُوا الصَّلَاةَ.`,
+      fileUrl: "/documents/khutbah-memakmurkan-masjid.pdf",
+      fileName: "khutbah-memakmurkan-masjid.pdf",
+      createdAt: "2026-10-10T10:00:00.000Z",
+      isPublished: true,
+    },
+  ];
+}
+
 export function getDefaultPopupBanners(): PopupBanner[] {
   return [
     {
@@ -640,6 +826,7 @@ function getInitialData(): DatabaseSchema {
     documentsLocked: true,
     manualNews: getDefaultManualNews(),
     prayerAttendances: getDefaultPrayerAttendances(),
+    khutbahList: getDefaultKhutbahList(),
   };
 }
 
@@ -744,6 +931,9 @@ export function ensureDbDefaults(data: DatabaseSchema): DatabaseSchema {
   if (!Array.isArray(data.auditLogs)) data.auditLogs = [];
   if (!Array.isArray(data.fridayScheduleHistory) || data.fridayScheduleHistory.length === 0) {
     data.fridayScheduleHistory = getDefaultFridayScheduleHistory();
+  }
+  if (!Array.isArray(data.khutbahList) || data.khutbahList.length === 0) {
+    data.khutbahList = getDefaultKhutbahList();
   }
   return data;
 }

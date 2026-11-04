@@ -355,3 +355,23 @@ export interface ManualNewsItem {
   updatedAt?: string;
   isPublished?: boolean;
 }
+
+export interface KhutbahItem {
+  id: string;
+  title: string;
+  slug: string;
+  theme?: string;
+  source: "SUARA_MUHAMMADIYAH" | "TAKMIR_MASJID";
+  author: string;
+  date: string;
+  summary: string;
+  firstKhutbah: string;
+  secondKhutbah: string;
+  fullContent?: string;
+  fileUrl?: string;
+  fileName?: string;
+  sourceUrl?: string;
+  isPublished?: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}

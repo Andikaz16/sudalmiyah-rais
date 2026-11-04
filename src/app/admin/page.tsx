@@ -49,6 +49,7 @@ import {
   Lock,
   Unlock,
   ShieldAlert,
+  ScrollText,
 } from "lucide-react";
 import {
   Agenda,
@@ -66,6 +67,7 @@ import {
   ManualNewsItem,
   PrayerAttendance,
   PrayerName,
+  KhutbahItem,
 } from "@/lib/types";
 import { normalizeImageUrl } from "@/lib/utils";
 import { getHijriDate } from "@/lib/prayer-times";
@@ -114,6 +116,7 @@ const ADMIN_TABS = [
   { id: "POPUP_BANNER", label: "Pop-up Banner Beranda", shortLabel: "Pop-up Banner", icon: Sparkles },
   { id: "DOCUMENTS", label: "Pustaka & Dokumen", shortLabel: "Pustaka Dokumen", icon: BookOpen },
   { id: "BERITA_MASJID", label: "Warta & Berita Masjid", shortLabel: "Warta Berita", icon: Newspaper },
+  { id: "KHUTBAH", label: "Naskah Khutbah", shortLabel: "Khutbah", icon: ScrollText },
 ] as const;
 
 // Client-side image compressor: optimizes uploads for fast transfer & avoids serverless payload limits
@@ -181,7 +184,7 @@ async function compressImageForUpload(
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "ABSENSI_SHALAT" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID"
+    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "ABSENSI_SHALAT" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID" | "KHUTBAH"
   >("AGENDAS");
 
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -641,9 +644,27 @@ export default function AdminDashboardPage() {
     isPublished: true,
   });
 
+  // Khutbah Management State
+  const [khutbahList, setKhutbahList] = useState<KhutbahItem[]>([]);
+  const [loadingKhutbah, setLoadingKhutbah] = useState(false);
+  const [isKhutbahModalOpen, setIsKhutbahModalOpen] = useState(false);
+  const [editingKhutbahId, setEditingKhutbahId] = useState<string | null>(null);
+  const [savingKhutbah, setSavingKhutbah] = useState(false);
+  const [khutbahForm, setKhutbahForm] = useState({
+    title: "",
+    theme: "Khutbah Jumat",
+    author: "Takmir Masjid Kampus UMS",
+    date: "",
+    summary: "",
+    firstKhutbah: "",
+    secondKhutbah: "",
+    sourceUrl: "",
+    isPublished: true,
+  });
+
   const loadData = async () => {
     try {
-      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes, newsRes] = await Promise.all([
+      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes, newsRes, khutbahRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch(`/api/agendas?t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/friday-schedule"),
@@ -652,6 +673,7 @@ export default function AdminDashboardPage() {
         fetch(`/api/admin/documents?t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/admin/system-status"),
         fetch(`/api/admin/news?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/admin/khutbah?t=${Date.now()}`, { cache: "no-store" }),
       ]);
 
       if (statusRes.ok) {
@@ -750,6 +772,10 @@ export default function AdminDashboardPage() {
       if (newsRes.ok) {
         const newsJson = await newsRes.json();
         setManualNewsList(newsJson.news || []);
+      }
+      if (khutbahRes && khutbahRes.ok) {
+        const khutbahJson = await khutbahRes.json();
+        setKhutbahList(khutbahJson.khutbahs || []);
       }
     } catch (e) {
       console.error(e);
@@ -1999,6 +2025,164 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Khutbah Management Handlers
+  const loadKhutbahList = async () => {
+    setLoadingKhutbah(true);
+    try {
+      const res = await fetch(`/api/admin/khutbah?t=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setKhutbahList(data.khutbahs || []);
+      }
+    } catch (e) {
+      console.error("Error loading khutbah list:", e);
+    } finally {
+      setLoadingKhutbah(false);
+    }
+  };
+
+  const handleOpenAddKhutbah = () => {
+    setEditingKhutbahId(null);
+    setKhutbahForm({
+      title: "",
+      theme: "Khutbah Jumat",
+      author: "Takmir Masjid Kampus UMS",
+      date: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+      summary: "",
+      firstKhutbah: `إِنَّ الْحَمْدَ لِلَّهِ نَحْمَدُهُ وَنَسْتَعِينُهُ وَنَسْتَغْفِرُهُ، وَنَعُوذُ بِاللَّهِ مِنْ شُرُورِ أَنْفُسِنَا وَمِنْ سَيِّئَاتِ أَعْمَالِنَا، مَنْ يَهْدِهِ اللَّهُ فَلَا مُضِلَّ لَهُ، وَمَنْ يُضْلِلْ فَلَا هَادِيَ لَهُ.
+
+أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ سَيِّدَنَا وَنَبِيَّنَا مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ لَا نَبِيَّ بَعْدَهُ.
+
+اللَّهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ عَلَى نَبِيِّنَا مُحَمَّدٍ، وَعَلَى آلِهِ وَأَصْحَابِهِ وَمَنْ تَبِعَهُمْ بِإِحْسَانٍ إِلَى يَوْمِ الدِّينِ.
+
+أَمَّا بَعْدُ، فَيَا عِبَادَ اللَّهِ، أُوصِيكُمْ وَنَفْسِي بِتَقْوَى اللَّهِ الْعَظِيمِ، فَقَدْ فَازَ الْمُتَّقُونَ. قَالَ اللَّهُ تَعَالَى:
+يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنْتُمْ مُسْلِمُونَ.
+
+Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
+
+[Tuliskan uraian naskah khutbah pertama di sini...]
+
+بَارَكَ اللَّهُ لِي وَلَكُمْ فِي الْقُرْآنِ الْعَظِيمِ، وَنَفَعَنِي وَإِيَّاكُمْ بِمَا فِيهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيمِ. أَقُولُ قَوْلِي هَذَا وَأَسْتَغْفِرُ اللَّهَ الْعَظِيمَ لِي وَلَكُمْ وَلِسَائِرِ الْمُسْلِمِينَ مِنْ كُلِّ ذَنْبٍ، فَاسْتَغْفِرُوهُ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ.`,
+      secondKhutbah: `الْحَمْدُ لِلَّهِ حَمْدًا كَثِيرًا كَمَا أَمَرَ. أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ سَيِّدَنَا مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ.
+
+اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى سَيِّدَنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ أَجْمَعِينَ.
+
+أَمَّا بَعْدُ، فَيَا عِبَادَ اللَّهِ، اتَّقُوا اللَّهَ تَعَالَى فِيمَا أَمَرَ، وَانْتَهُوا عَمَّا نَهَى عَنْهُ وَزَجَرَ.
+
+اللَّهُمَّ اغْفِرْ لِلْمُسْلِمِينَ وَالْمُسْلِمَاتِ، وَالْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ، الْأَحْيَاءِ مِنْهُمْ وَالْأَمْوَاتِ.
+اللَّهُمَّ أَعِزَّ الْإِسْلَامَ وَالْمُسْلِمِينَ، وَأَصْلِحْ أَحْوَالَ الْمُسْلِمِينَ فِي كُلِّ مَكَانٍ.
+رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ.
+
+عِبَادَ اللَّهِ، إِنَّ اللَّهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ، فَاذْكُرُوا اللَّهَ الْعَظِيمَ يَذْكُرْكُمْ، وَاشْكُرُوهُ عَلَى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللَّهِ أَكْبَرُ.`,
+      sourceUrl: "",
+      isPublished: true,
+    });
+    setIsKhutbahModalOpen(true);
+  };
+
+  const handleOpenEditKhutbah = (item: KhutbahItem) => {
+    setEditingKhutbahId(item.id);
+    setKhutbahForm({
+      title: item.title,
+      theme: item.theme || "Khutbah Jumat",
+      author: item.author,
+      date: item.date,
+      summary: item.summary,
+      firstKhutbah: item.firstKhutbah,
+      secondKhutbah: item.secondKhutbah,
+      sourceUrl: item.sourceUrl || "",
+      isPublished: item.isPublished !== false,
+    });
+    setIsKhutbahModalOpen(true);
+  };
+
+  const handleSaveKhutbah = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!khutbahForm.title.trim()) {
+      alert("Judul khutbah wajib diisi.");
+      return;
+    }
+    if (!khutbahForm.firstKhutbah.trim() || !khutbahForm.secondKhutbah.trim()) {
+      alert("Naskah khutbah pertama dan kedua wajib diisi.");
+      return;
+    }
+
+    setSavingKhutbah(true);
+    setIsPublishingProcessing(editingKhutbahId ? "Memperbarui Naskah Khutbah" : "Menerbitkan Naskah Khutbah");
+
+    try {
+      const payload = {
+        title: khutbahForm.title.trim(),
+        theme: khutbahForm.theme.trim() || "Khutbah Jumat",
+        author: khutbahForm.author.trim() || "Takmir Masjid Kampus UMS",
+        date: khutbahForm.date.trim() || new Date().toLocaleDateString("id-ID"),
+        summary: khutbahForm.summary.trim(),
+        firstKhutbah: khutbahForm.firstKhutbah.trim(),
+        secondKhutbah: khutbahForm.secondKhutbah.trim(),
+        sourceUrl: khutbahForm.sourceUrl.trim() || undefined,
+        isPublished: khutbahForm.isPublished,
+      };
+
+      const res = await fetch("/api/admin/khutbah", {
+        method: editingKhutbahId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingKhutbahId ? { id: editingKhutbahId, ...payload } : payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menyimpan naskah khutbah.");
+
+      setIsKhutbahModalOpen(false);
+      triggerPublishNotification(
+        editingKhutbahId ? "Naskah Khutbah Diperbarui" : "Naskah Khutbah Diterbitkan",
+        `Naskah "${khutbahForm.title.slice(0, 45)}..." telah disimpan dan dapat dibaca di Portal Layanan Khutbah.`
+      );
+      await loadKhutbahList();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menyimpan naskah khutbah.");
+    } finally {
+      setSavingKhutbah(false);
+      setIsPublishingProcessing(null);
+    }
+  };
+
+  const handleDeleteKhutbah = async (id: string, title: string) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus naskah khutbah "${title}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/khutbah?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus naskah khutbah.");
+      triggerPublishNotification("Naskah Dihapus", `Naskah "${title.slice(0, 40)}..." telah dihapus.`);
+      await loadKhutbahList();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menghapus naskah khutbah.");
+    }
+  };
+
+  const handleTogglePublishKhutbah = async (item: KhutbahItem) => {
+    const nextStatus = item.isPublished === false ? true : false;
+    try {
+      const res = await fetch("/api/admin/khutbah", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...item, isPublished: nextStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gagal mengubah status publikasi.");
+      }
+      triggerPublishNotification(
+        nextStatus ? "Naskah Ditayangkan" : "Naskah Disembunyikan",
+        `Status naskah "${item.title.slice(0, 40)}..." telah diperbarui.`
+      );
+      await loadKhutbahList();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal mengubah status publikasi.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans pb-16">
       {/* Floating Processing Indicator */}
@@ -2219,13 +2403,15 @@ export default function AdminDashboardPage() {
           <div className="bg-white rounded-2xl border border-stone-200 p-3 shadow-xs">
             <div className="flex items-center justify-between mb-1.5 px-0.5">
               <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
-                Menu Admin (8 Menu):
+                Menu Admin (9 Menu):
               </span>
               <span className="text-[10px] font-semibold text-[#003B73]">
                 {activeTab === "FEEDBACK" && feedbackCounts.baru > 0
                   ? `${feedbackCounts.baru} Masukan Baru`
                   : activeTab === "BERITA_MASJID"
                   ? `${manualNewsList.length} Warta`
+                  : activeTab === "KHUTBAH"
+                  ? `${khutbahList.length} Khutbah`
                   : activeTab === "DOCUMENTS"
                   ? `${documents.length} Dokumen`
                   : activeTab === "REGISTRATIONS"
@@ -2307,6 +2493,11 @@ export default function AdminDashboardPage() {
                   {tab.id === "BERITA_MASJID" && manualNewsList.length > 0 && (
                     <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
                       {manualNewsList.length}
+                    </span>
+                  )}
+                  {tab.id === "KHUTBAH" && khutbahList.length > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
+                      {khutbahList.length}
                     </span>
                   )}
                 </button>
@@ -5284,6 +5475,161 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Tab 9: KHUTBAH */}
+        {activeTab === "KHUTBAH" && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-stone-200 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#B58A1E] flex items-center justify-center">
+                  <ScrollText className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-stone-900 font-serif">
+                    Kelola Naskah Khutbah Jum&apos;at
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Kelola materi khutbah dari Takmir Masjid Kampus UMS serta integrasi Suara Muhammadiyah untuk kemudahan para khatib bertugas di mimbar.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto w-full sm:w-auto">
+                <Link
+                  href="/layanan/khutbah"
+                  target="_blank"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full border border-stone-200 hover:bg-stone-50 text-stone-700 text-xs font-semibold transition-colors active:scale-95 cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Lihat Portal Khutbah</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={handleOpenAddKhutbah}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 active:scale-95 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah Naskah Khutbah</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Khutbah List */}
+            <div className="bg-white rounded-3xl border border-stone-200 shadow-xs p-6 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+                <h4 className="text-sm font-bold text-stone-900 font-serif">
+                  Daftar Naskah Khutbah ({khutbahList.length})
+                </h4>
+                <button
+                  type="button"
+                  onClick={loadKhutbahList}
+                  disabled={loadingKhutbah}
+                  className="inline-flex items-center gap-1 text-xs text-stone-500 hover:text-stone-800 font-medium cursor-pointer"
+                >
+                  <RotateCcw className={`w-3.5 h-3.5 ${loadingKhutbah ? "animate-spin" : ""}`} />
+                  <span>Segarkan</span>
+                </button>
+              </div>
+
+              {khutbahList.length === 0 ? (
+                <div className="py-12 text-center text-stone-400 space-y-2">
+                  <ScrollText className="w-10 h-10 mx-auto text-stone-300" />
+                  <p className="text-xs">Belum ada naskah khutbah yang tersimpan.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4">
+                  {khutbahList.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-5 rounded-2xl border border-stone-200 hover:border-stone-300 bg-stone-50/50 hover:bg-white transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    >
+                      <div className="flex-1 space-y-1.5 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                              item.source === "SUARA_MUHAMMADIYAH"
+                                ? "bg-[#800000] text-white"
+                                : "bg-[#003B73] text-white"
+                            }`}
+                          >
+                            {item.source === "SUARA_MUHAMMADIYAH" ? "Suara Muhammadiyah" : "Takmir Masjid UMS"}
+                          </span>
+                          {item.theme && (
+                            <span className="px-2 py-0.5 rounded bg-stone-200/80 text-stone-700 text-[10px] font-medium">
+                              {item.theme}
+                            </span>
+                          )}
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              item.isPublished !== false
+                                ? "bg-emerald-100 text-emerald-800"
+                                : "bg-stone-200 text-stone-600"
+                            }`}
+                          >
+                            {item.isPublished !== false ? "Tayang" : "Draf"}
+                          </span>
+                        </div>
+
+                        <h4 className="text-sm sm:text-base font-bold text-stone-900 font-serif leading-snug">
+                          {item.title}
+                        </h4>
+
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-500">
+                          <span className="flex items-center gap-1">
+                            <User className="w-3.5 h-3.5 text-[#B58A1E]" />
+                            {item.author}
+                          </span>
+                          <span className="flex items-center gap-1 font-mono text-[11px]">
+                            <Calendar className="w-3 h-3" />
+                            {item.date}
+                          </span>
+                        </div>
+
+                        <p className="text-xs text-stone-600 line-clamp-2 pt-1">
+                          {item.summary}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 self-end sm:flex-col sm:items-end sm:justify-center shrink-0">
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleTogglePublishKhutbah(item)}
+                            className={`p-2 rounded-xl border text-xs font-semibold transition-colors cursor-pointer active:scale-95 ${
+                              item.isPublished !== false
+                                ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                : "border-stone-200 bg-stone-100 text-stone-600 hover:bg-stone-200"
+                            }`}
+                            title={item.isPublished !== false ? "Sembunyikan Naskah" : "Tayangkan Naskah"}
+                          >
+                            {item.isPublished !== false ? <Check className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditKhutbah(item)}
+                            className="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors cursor-pointer active:scale-95"
+                            title="Edit naskah khutbah"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteKhutbah(item.id, item.title)}
+                            className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer active:scale-95"
+                            title="Hapus naskah khutbah"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Modal Responding to Feedback */}
@@ -6183,6 +6529,182 @@ export default function AdminDashboardPage() {
                   className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50 cursor-pointer"
                 >
                   {savingNews ? "Menyimpan..." : editingNewsId ? "Perbarui Warta" : "Terbitkan Warta"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Add / Edit Khutbah */}
+      {isKhutbahModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="relative w-full max-w-3xl bg-white border border-stone-200 rounded-3xl shadow-2xl p-5 sm:p-8 my-auto overflow-y-auto max-h-[92vh]">
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-200">
+              <div>
+                <h3 className="text-lg font-bold text-stone-900 font-serif">
+                  {editingKhutbahId ? "Edit Naskah Khutbah" : "Tambah Naskah Khutbah Baru"}
+                </h3>
+                <p className="text-xs text-stone-500">
+                  Naskah akan langsung tersimpan di basis data takmir dan dapat diakses publik oleh jamaah &amp; khatib.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsKhutbahModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center cursor-pointer transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveKhutbah} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Judul Khutbah <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={khutbahForm.title}
+                  onChange={(e) => setKhutbahForm({ ...khutbahForm, title: e.target.value })}
+                  placeholder="Contoh: Khutbah Jum'at: 5 Kezaliman yang Sering Dinormalkan di Era Digital"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-medium focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Tema Khutbah
+                  </label>
+                  <input
+                    type="text"
+                    value={khutbahForm.theme}
+                    onChange={(e) => setKhutbahForm({ ...khutbahForm, theme: e.target.value })}
+                    placeholder="Contoh: Akhlak &amp; Muamalah Digital"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Nama Khatib / Penulis <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={khutbahForm.author}
+                    onChange={(e) => setKhutbahForm({ ...khutbahForm, author: e.target.value })}
+                    placeholder="Contoh: Ustadz Dr. H. Syamsul Hidayat, M.Ag."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Tanggal / Edisi <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={khutbahForm.date}
+                    onChange={(e) => setKhutbahForm({ ...khutbahForm, date: e.target.value })}
+                    placeholder="Contoh: 7 November 2026"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Ringkasan Naskah <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={2}
+                  required
+                  value={khutbahForm.summary}
+                  onChange={(e) => setKhutbahForm({ ...khutbahForm, summary: e.target.value })}
+                  placeholder="Ringkasan poin-poin penting isi khutbah untuk panduan cepat para jamaah dan khatib..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-stone-700">
+                    Naskah Khutbah Pertama (Khutbatul Hajah &amp; Inti Materi) <span className="text-red-500">*</span>
+                  </label>
+                  <span className="text-[11px] text-stone-400">Termasuk mukadimah bahasa Arab</span>
+                </div>
+                <textarea
+                  rows={7}
+                  required
+                  value={khutbahForm.firstKhutbah}
+                  onChange={(e) => setKhutbahForm({ ...khutbahForm, firstKhutbah: e.target.value })}
+                  placeholder="Tuliskan naskah lengkap khutbah pertama..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-serif leading-relaxed focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-stone-700">
+                    Naskah Khutbah Kedua &amp; Doa <span className="text-red-500">*</span>
+                  </label>
+                  <span className="text-[11px] text-stone-400">Termasuk pujian, wasiat &amp; doa penutup</span>
+                </div>
+                <textarea
+                  rows={6}
+                  required
+                  value={khutbahForm.secondKhutbah}
+                  onChange={(e) => setKhutbahForm({ ...khutbahForm, secondKhutbah: e.target.value })}
+                  placeholder="Tuliskan naskah khutbah kedua dan doa..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs font-serif leading-relaxed focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Tautan Sumber Asli (Opsional)
+                </label>
+                <input
+                  type="url"
+                  value={khutbahForm.sourceUrl}
+                  onChange={(e) => setKhutbahForm({ ...khutbahForm, sourceUrl: e.target.value })}
+                  placeholder="Contoh: https://suaramuhammadiyah.id/read/khutbah-..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="khutbahIsPublished"
+                  checked={khutbahForm.isPublished}
+                  onChange={(e) => setKhutbahForm({ ...khutbahForm, isPublished: e.target.checked })}
+                  className="w-4 h-4 rounded text-[#003B73] focus:ring-[#003B73] border-stone-300 cursor-pointer"
+                />
+                <label htmlFor="khutbahIsPublished" className="text-xs font-semibold text-stone-800 cursor-pointer">
+                  Langsung tayangkan naskah khutbah ini di halaman publik Layanan Khutbah
+                </label>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex justify-end gap-3 pt-3 border-t border-stone-200">
+                <button
+                  type="button"
+                  onClick={() => setIsKhutbahModalOpen(false)}
+                  className="px-5 py-2.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingKhutbah}
+                  className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50 cursor-pointer"
+                >
+                  {savingKhutbah ? "Menyimpan..." : editingKhutbahId ? "Perbarui Naskah" : "Terbitkan Naskah"}
                 </button>
               </div>
             </form>

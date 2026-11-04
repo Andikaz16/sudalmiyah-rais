@@ -11,6 +11,8 @@ export interface TranslationDictionary {
     bookingFormDesc: string;
     downloadCenter: string;
     downloadCenterDesc: string;
+    khutbahCenter: string;
+    khutbahCenterDesc: string;
     digitalInfaq: string;
     mosqueAgenda: string;
     tagline: string;
@@ -194,6 +196,8 @@ export const translations: Record<Language, TranslationDictionary> = {
       bookingFormDesc: "Peminjaman ruang aula & inventaris proyektor masjid",
       downloadCenter: "Pusat Unduhan Dokumen",
       downloadCenterDesc: "E-Book HPT, PHIWM, Risalah Islam Berkemajuan, & panduan",
+      khutbahCenter: "Naskah Khutbah Jumat",
+      khutbahCenterDesc: "Kumpulan teks khutbah resmi Suara Muhammadiyah & Takmir",
       digitalInfaq: "Infaq Digital",
       mosqueAgenda: "Agenda Masjid",
       tagline: "Pusat Ibadah, Peradaban & Dakwah Berkemajuan",
@@ -435,6 +439,8 @@ export const translations: Record<Language, TranslationDictionary> = {
       bookingFormDesc: "Hall booking & mosque projector inventory",
       downloadCenter: "Document Download Center",
       downloadCenterDesc: "E-Books, HPT, PHIWM, Progressive Islam treatises, & guides",
+      khutbahCenter: "Friday Khutbah Manuscripts",
+      khutbahCenterDesc: "Curated Friday sermon texts from Suara Muhammadiyah & Takmir",
       digitalInfaq: "Digital Infaq",
       mosqueAgenda: "Mosque Agenda",
       tagline: "Center for Worship, Civilization & Progressive Da'wah",

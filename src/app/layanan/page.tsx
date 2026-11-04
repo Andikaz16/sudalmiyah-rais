@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -20,6 +21,8 @@ import {
   ExternalLink,
   Info,
   Users,
+  BookOpen,
+  Download,
 } from "lucide-react";
 import { FacilityBooking } from "@/lib/types";
 
@@ -157,6 +160,67 @@ export default function LayananPage() {
             <p className="text-xs sm:text-sm md:text-base text-stone-600 mt-3.5 leading-relaxed max-w-3xl mx-auto">
               Layanan permohonan peminjaman inventaris resmi takmir khusus <strong>Proyektor (LCD)</strong> dan <strong>Papan/Layar Proyektor (Tripod Screen)</strong> Masjid Kampus UMS (Masjid Hj. Sudalmiyah Rais Kampus 2 &amp; Masjid Fadhlurrahman Kampus 1). Fasilitas ini diperuntukkan bagi Ortom (IMM, HW, Tapak Suci), HMP, UKM, fakultas, dan sivitas akademika UMS untuk mendukung kelancaran kegiatan syiar Islam, kajian ilmiah, presentasi, rapat koordinasi, serta pelatihan kader persyarikatan.
             </p>
+          </div>
+        </section>
+
+        {/* Quick Nav Cards: Layanan Masjid */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Link
+              href="/layanan/khutbah"
+              className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200/90 shadow-sm hover:shadow-md hover:border-[#003B73] transition-all flex items-center gap-4 group"
+            >
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[#B58A1E] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-stone-900 group-hover:text-[#003B73] transition-colors truncate font-serif">
+                    Naskah Khutbah Jum&apos;at
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                    Baru
+                  </span>
+                </div>
+                <p className="text-xs text-stone-500 line-clamp-1 mt-0.5">
+                  Suara Muhammadiyah &amp; Takmir UMS
+                </p>
+              </div>
+            </Link>
+
+            <a
+              href="#form-peminjaman"
+              className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200/90 shadow-sm hover:shadow-md hover:border-[#003B73] transition-all flex items-center gap-4 group"
+            >
+              <div className="w-12 h-12 rounded-xl bg-[#003B73]/10 border border-[#003B73]/20 text-[#003B73] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Projector className="w-6 h-6" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-stone-900 group-hover:text-[#003B73] transition-colors truncate font-serif">
+                  Pinjam Proyektor &amp; Layar
+                </h3>
+                <p className="text-xs text-stone-500 line-clamp-1 mt-0.5">
+                  Permohonan inventaris sivitas &amp; ortom
+                </p>
+              </div>
+            </a>
+
+            <Link
+              href="/layanan/unduhan"
+              className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200/90 shadow-sm hover:shadow-md hover:border-[#003B73] transition-all flex items-center gap-4 group"
+            >
+              <div className="w-12 h-12 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Download className="w-6 h-6" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-stone-900 group-hover:text-[#003B73] transition-colors truncate font-serif">
+                  Pusat Berkas &amp; Unduhan
+                </h3>
+                <p className="text-xs text-stone-500 line-clamp-1 mt-0.5">
+                  Template surat izin, SK, &amp; dokumen
+                </p>
+              </div>
+            </Link>
           </div>
         </section>
 
