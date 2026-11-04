@@ -2,8 +2,6 @@ import { NextResponse, connection } from "next/server";
 import { getDbAsync } from "@/lib/db";
 import { KhutbahItem } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
-
 // In-memory cache for ultra-fast response and zero Vercel CPU drain
 interface KhutbahCacheState {
   items: KhutbahItem[];
