@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getDbAsync, saveDb, logSecurityEvent } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { ManualNewsItem } from "@/lib/types";
+import { invalidateNewsCache } from "@/app/api/news/route";
 
 const newsItemSchema = z.object({
   title: z.string().min(5, "Judul berita minimal 5 karakter").max(250),
@@ -95,6 +96,7 @@ export async function POST(request: NextRequest) {
 
     db.manualNews.unshift(newItem);
     await saveDb(db);
+    invalidateNewsCache();
 
     const clientIp = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -189,6 +191,7 @@ export async function PUT(request: NextRequest) {
 
     db.manualNews[index] = updatedItem;
     await saveDb(db);
+    invalidateNewsCache();
 
     const clientIp = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -243,6 +246,7 @@ export async function DELETE(request: NextRequest) {
 
   db.manualNews = db.manualNews.filter((n) => n.id !== id);
   await saveDb(db);
+  invalidateNewsCache();
 
   const clientIp = request.headers.get("x-forwarded-for") || "127.0.0.1";
   logSecurityEvent(

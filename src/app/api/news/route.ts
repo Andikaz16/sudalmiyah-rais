@@ -396,7 +396,7 @@ async function fetchUmsNews(): Promise<ApiNewsItem[]> {
   // Strategi A: WordPress REST API resmi
   try {
     const res = await fetch("https://news.ums.ac.id/id/wp-json/wp/v2/posts?_embed&per_page=6", {
-      cache: "no-store",
+      next: { revalidate: 900 },
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "application/json",
@@ -447,7 +447,7 @@ async function fetchUmsNews(): Promise<ApiNewsItem[]> {
   // Strategi B: RSS Feed Berita UMS
   try {
     const resRss = await fetch("https://news.ums.ac.id/id/feed/", {
-      cache: "no-store",
+      next: { revalidate: 900 },
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "text/xml, application/rss+xml, */*",
@@ -475,7 +475,7 @@ async function fetchLpcrNews(): Promise<ApiNewsItem[]> {
   // Strategi A: WordPress REST API resmi lpcr.or.id
   try {
     const res = await fetch("https://lpcr.or.id/wp-json/wp/v2/posts?_embed&per_page=6", {
-      cache: "no-store",
+      next: { revalidate: 900 },
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "application/json",
@@ -526,7 +526,7 @@ async function fetchLpcrNews(): Promise<ApiNewsItem[]> {
   // Strategi B: RSS Feed lpcr.or.id/feed
   try {
     const resRss = await fetch("https://lpcr.or.id/feed", {
-      cache: "no-store",
+      next: { revalidate: 900 },
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "text/xml, application/rss+xml, */*",
@@ -554,7 +554,7 @@ async function fetchMuhammadiyahSoloNews(): Promise<ApiNewsItem[]> {
   // Strategi A: WordPress REST API resmi muhammadiyahsolo.com
   try {
     const res = await fetch("https://muhammadiyahsolo.com/wp-json/wp/v2/posts?_embed&per_page=6", {
-      cache: "no-store",
+      next: { revalidate: 900 },
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "application/json",
@@ -605,7 +605,7 @@ async function fetchMuhammadiyahSoloNews(): Promise<ApiNewsItem[]> {
   // Strategi B: RSS Feed muhammadiyahsolo.com/feed
   try {
     const resRss = await fetch("https://muhammadiyahsolo.com/feed", {
-      cache: "no-store",
+      next: { revalidate: 900 },
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "text/xml, application/rss+xml, */*",
@@ -632,7 +632,7 @@ async function fetchLensamuNews(): Promise<ApiNewsItem[]> {
 
   try {
     const res = await fetch("https://muhammadiyah.or.id/wp-json/wp/v2/posts?_embed&per_page=3", {
-      cache: "no-store",
+      next: { revalidate: 900 },
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
       },
@@ -688,7 +688,7 @@ async function fetchSuaraMuhammadiyahNews(): Promise<ApiNewsItem[]> {
 
   try {
     const res = await fetch("https://suaramuhammadiyah.id", {
-      cache: "no-store",
+      next: { revalidate: 900 },
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
       },
@@ -758,7 +758,7 @@ async function checkYouTubeLiveStatus(videoId: string): Promise<boolean> {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
       },
       signal: AbortSignal.timeout(4000),
-      cache: "no-store",
+      next: { revalidate: 3600 },
     });
     if (!res.ok) return false;
     const text = await res.text();
@@ -773,8 +773,42 @@ async function checkYouTubeLiveStatus(videoId: string): Promise<boolean> {
   }
 }
 
+// In-Memory Cache untuk menghemat waktu CPU Vercel & meniadakan beban komputasi berulang
+interface NewsMemoryCache {
+  data: {
+    success: boolean;
+    updatedAt: string;
+    articles: ApiNewsItem[];
+  };
+  cachedAt: number;
+}
+
+let newsMemoryCache: NewsMemoryCache | null = null;
+const NEWS_CACHE_TTL_MS = 15 * 60 * 1000; // 15 menit (Serverless & Edge friendly)
+
+export function invalidateNewsCache() {
+  newsMemoryCache = null;
+}
+
 export async function GET(request: Request) {
   await connection();
+
+  const url = new URL(request.url);
+  const isForceRefresh = url.searchParams.get("refresh") === "1";
+  const now = Date.now();
+
+  // Jika cache memori masih valid dan tidak dipaksa refresh, langsung kembalikan dalam 0.1ms tanpa fetch eksternal
+  if (!isForceRefresh && newsMemoryCache && now - newsMemoryCache.cachedAt < NEWS_CACHE_TTL_MS) {
+    return NextResponse.json(newsMemoryCache.data, {
+      headers: {
+        "Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800",
+        "CDN-Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800",
+        "Vercel-CDN-Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800",
+        "X-News-Cache": "HIT",
+      },
+    });
+  }
+
   // Ambil berita manual dari basis data dan semua sumber berita eksternal secara paralel
   const [db, umsArticles, lpcrArticles, soloArticles, lensamuArticles, smArticles, isLive] = await Promise.all([
     getDbAsync(),
@@ -828,18 +862,25 @@ export async function GET(request: Request) {
     ...lensamuArticles,
   ];
 
-  return NextResponse.json(
-    {
-      success: true,
-      updatedAt: new Date().toISOString(),
-      articles: officialArticles,
+  const payload = {
+    success: true,
+    updatedAt: new Date().toISOString(),
+    articles: officialArticles,
+  };
+
+  // Simpan ke cache memori
+  newsMemoryCache = {
+    data: payload,
+    cachedAt: now,
+  };
+
+  return NextResponse.json(payload, {
+    headers: {
+      // Izinkan Vercel Edge CDN meng-cache respons selama 15 menit, dan melayani stale cache 30 menit
+      "Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800",
+      "CDN-Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800",
+      "Vercel-CDN-Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800",
+      "X-News-Cache": "MISS",
     },
-    {
-      headers: {
-        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    }
-  );
+  });
 }

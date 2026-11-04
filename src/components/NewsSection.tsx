@@ -305,7 +305,7 @@ export default function NewsSection() {
     const fetchLiveNews = async () => {
       // 1. Ambil dari API route internal yang mengagregasi warta manual + 3 portal
       try {
-        const res = await fetch("/api/news", { cache: "no-store" });
+        const res = await fetch("/api/news");
         if (res.ok) {
           const data = await res.json();
           if (isMounted && data.articles && Array.isArray(data.articles) && data.articles.length > 0) {
@@ -519,21 +519,12 @@ export default function NewsSection() {
     };
 
     fetchLiveNews();
-    const pollInterval = setInterval(fetchLiveNews, 60000);
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        fetchLiveNews();
-      }
-    };
-    window.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("focus", fetchLiveNews);
+    // Cek pembaruan berita setiap 15 menit agar efisien dan tidak memakan batas CPU Vercel
+    const pollInterval = setInterval(fetchLiveNews, 15 * 60 * 1000);
 
     return () => {
       isMounted = false;
       clearInterval(pollInterval);
-      window.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("focus", fetchLiveNews);
     };
   }, []);
 
