@@ -17,10 +17,14 @@ export function invalidateKhutbahCache() {
 
 function cleanHtml(raw: string): string {
   return raw
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&rsquo;/g, "'")
+    .replace(/&lsquo;/g, "'")
+    .replace(/&ldquo;/g, '"')
+    .replace(/&rdquo;/g, '"')
+    .replace(/&ndash;/g, "-")
+    .replace(/&mdash;/g, "-")
     .replace(/&#8211;/g, "-")
     .replace(/&#8212;/g, "-")
     .replace(/&#8216;/g, "'")
@@ -28,6 +32,10 @@ function cleanHtml(raw: string): string {
     .replace(/&#8220;/g, '"')
     .replace(/&#8221;/g, '"')
     .replace(/&#038;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ")
+    .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -36,7 +44,7 @@ async function scrapeSuaraMuhammadiyahKhutbah(): Promise<KhutbahItem[]> {
   const scraped: KhutbahItem[] = [];
 
   try {
-    const res = await fetch("https://suaramuhammadiyah.id/?s=khutbah+jumat", {
+    const res = await fetch("https://suaramuhammadiyah.id/category/khutbah", {
       next: { revalidate: 3600 },
       headers: {
         "User-Agent":
@@ -52,71 +60,126 @@ async function scrapeSuaraMuhammadiyahKhutbah(): Promise<KhutbahItem[]> {
 
     const html = await res.text();
 
-    // Regex to match articles on Suara Muhammadiyah search result
-    const linkRegex = /<a[^>]+href="(https:\/\/suaramuhammadiyah\.id\/read\/[^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+    // Match all /read/khutbah- links and titles
+    const cardRegex = /<a[^>]+href="([^"]*\/read\/khutbah-[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
     let m;
-    const seenUrls = new Set<string>();
+    const articleLinks: { link: string; rawTitle: string }[] = [];
+    const seen = new Set<string>();
 
-    while ((m = linkRegex.exec(html)) !== null && scraped.length < 6) {
-      const url = m[1];
-      const rawTitle = cleanHtml(m[2]);
+    while ((m = cardRegex.exec(html)) !== null && articleLinks.length < 6) {
+      const href = m[1];
+      const link = href.startsWith("http") ? href : `https://suaramuhammadiyah.id${href}`;
+      const cleanTitle = cleanHtml(m[2]);
 
-      // Filter only Khutbah articles
-      if (
-        !url.includes("/read/khutbah-") &&
-        !rawTitle.toLowerCase().includes("khutbah")
-      ) {
-        continue;
+      if (cleanTitle.length > 15 && !seen.has(link)) {
+        seen.add(link);
+        articleLinks.push({ link, rawTitle: cleanTitle });
       }
+    }
 
-      if (seenUrls.has(url) || rawTitle.length < 15) {
-        continue;
-      }
-      seenUrls.add(url);
+    // Fetch article full content in parallel
+    const fetchedArticles = await Promise.all(
+      articleLinks.map(async ({ link, rawTitle }) => {
+        try {
+          const aRes = await fetch(link, {
+            next: { revalidate: 3600 },
+            headers: {
+              "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+              Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            },
+            signal: AbortSignal.timeout(5000),
+          });
 
-      const slug = url.replace("https://suaramuhammadiyah.id/read/", "").replace(/\/$/, "");
-      const id = `sm-live-${slug.slice(0, 32)}`;
+          if (!aRes.ok) return null;
+          const aHtml = await aRes.text();
 
-      scraped.push({
-        id,
-        title: rawTitle.startsWith("Khutbah") ? rawTitle : `Khutbah Jum'at: ${rawTitle}`,
-        slug,
-        theme: "Inspirasi Dakwah Suara Muhammadiyah",
-        source: "SUARA_MUHAMMADIYAH",
-        author: "Redaksi Suara Muhammadiyah & Majelis Tarjih",
-        date: "Edisi Terbaru",
-        summary: `${rawTitle}. Naskah khutbah jumat berkemajuan resmi diterbitkan oleh majalah dan portal Suara Muhammadiyah.`,
-        firstKhutbah: `إِنَّ الْحَمْدَ لِلَّهِ نَحْمَدُهُ وَنَسْتَعِينُهُ وَنَسْتَغْفِرُهُ، وَنَعُوذُ بِاللَّهِ مِنْ شُرُورِ أَنْفُسِنَا وَمِنْ سَيِّئَاتِ أَعْمَالِنَا، مَنْ يَهْدِهِ اللَّهُ فَلَا مُضِلَّ لَهُ، وَمَنْ يُضْلِلْ فَلَا هَادِيَ لَهُ.
+          const authorMatch = aHtml.match(/Oleh[:\s]+([^<,\n\r]+)/i);
+          const author = authorMatch
+            ? cleanHtml(authorMatch[1].trim())
+            : "Redaksi Suara Muhammadiyah";
 
-أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ سَيِّدَنَا وَنَبِيَّنَا مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ لَا نَبِيَّ بَعْدَهُ.
+          const dateMatch = aHtml.match(
+            /(\d{1,2}\s+(?:Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember)\s+\d{4})/i
+          );
+          const date = dateMatch ? dateMatch[1].trim() : "Edisi Terbaru";
 
-اللَّهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ عَلَى نَبِيِّنَا مُحَمَّدٍ، وَعَلَى آلِهِ وَأَصْحَابِهِ وَمَنْ تَبِعَهُمْ بِإِحْسَانٍ إِلَى يَوْمِ الدِّينِ.
+          const pMatches = aHtml.match(/<p[^>]*>([\s\S]*?)<\/p>/gi) || [];
+          const validP = pMatches
+            .map((p) => cleanHtml(p))
+            .filter(
+              (p) =>
+                p.length > 25 &&
+                !p.includes("offline") &&
+                !p.includes("Portal Islam") &&
+                !p.includes("Unduh aplikasi")
+            );
 
-أَمَّا بَعْدُ، فَيَا عِبَادَ اللَّهِ، أُوصِيكُمْ وَنَفْسِي بِتَقْوَى اللَّهِ الْعَظِيمِ، فَقَدْ فَازَ الْمُتَّقُونَ. قَالَ اللَّهُ تَعَالَى:
-يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنْتُمْ مُسْلِمُونَ.
+          if (validP.length === 0) return null;
 
-Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
+          // Split Khutbah 1 and Khutbah 2
+          const k1: string[] = [];
+          const k2: string[] = [];
+          let isSecond = false;
 
-Naskah khutbah ini bersumber langsung dari penerbitan resmi Suara Muhammadiyah dengan judul "${rawTitle}". Jamaah dan khatib dapat mengakses ulasan mendalam serta mengunduh versi cetak melalui tautan portal resmi Suara Muhammadiyah.
+          for (let i = 0; i < validP.length; i++) {
+            const p = validP[i];
+            if (
+              i > 3 &&
+              (p.toLowerCase().includes("khutbah kedua") ||
+                p.includes("الْحَمْدُ") ||
+                p.includes("الحمد لله"))
+            ) {
+              isSecond = true;
+            }
+            if (isSecond) {
+              k2.push(p);
+            } else {
+              k1.push(p);
+            }
+          }
 
-Marilah senantiasa memperkokoh ketakwaan, menjaga ukhuwah islamiyah, dan menegakkan amal saleh dalam kehidupan bermasyarakat.
+          const summary =
+            validP
+              .filter((p) => !p.startsWith("Oleh:") && !p.startsWith("إِنَّ"))
+              .slice(0, 2)
+              .join(" ")
+              .slice(0, 260) || `${rawTitle}. Naskah khutbah resmi Suara Muhammadiyah.`;
 
-بَارَكَ اللَّهُ لِي وَلَكُمْ فِي الْقُرْآنِ الْعَظِيمِ، وَنَفَعَنِي وَإِيَّاكُمْ بِمَا فِيهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيمِ. أَقُولُ قَوْلِي هَذَا وَأَسْتَغْفِرُ اللَّهَ الْعَظِيمَ لِي وَلَكُمْ وَلِسَائِرِ الْمُسْلِمِينَ مِنْ كُلِّ ذَنْبٍ، فَاسْتَغْفِرُوهُ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ.`,
-        secondKhutbah: `الْحَمْدُ لِلَّهِ حَمْدًا كَثِيرًا كَمَا أَمَرَ. أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ.
+          const slug = link
+            .replace("https://suaramuhammadiyah.id/read/", "")
+            .replace(/\/$/, "");
+          const id = `sm-live-${slug.slice(0, 36)}`;
 
-اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ أَجْمَعِينَ.
+          const title = rawTitle.startsWith("Khutbah")
+            ? rawTitle
+            : `Khutbah Jum'at: ${rawTitle}`;
 
-أَمَّا بَعْدُ، فَيَا عِبَادَ اللَّهِ، اتَّقُوا اللَّهَ تَعَالَى فِيمَا أَمَرَ، وَانْتَهُوا عَمَّا نَهَى عَنْهُ وَزَجَرَ.
+          return {
+            id,
+            title,
+            slug,
+            theme: "Inspirasi Dakwah Suara Muhammadiyah",
+            source: "SUARA_MUHAMMADIYAH" as const,
+            author,
+            date,
+            summary: summary.endsWith(".") ? summary : `${summary}...`,
+            firstKhutbah: k1.join("\n\n"),
+            secondKhutbah:
+              k2.length > 0 ? k2.join("\n\n") : validP.slice(-6).join("\n\n"),
+            sourceUrl: link,
+            createdAt: new Date().toISOString(),
+            isPublished: true,
+          };
+        } catch (err) {
+          console.warn("Failed to scrape individual SM khutbah:", link, err);
+          return null;
+        }
+      })
+    );
 
-اللَّهُمَّ اغْفِرْ لِلْمُسْلِمِينَ وَالْمُسْلِمَاتِ، وَالْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ، الْأَحْيَاءِ مِنْهُمْ وَالْأَمْوَاتِ.
-اللَّهُمَّ أَعِزَّ الْإِسْلَامَ وَالْمُسْلِمِينَ، وَأَصْلِحْ أَحْوَالَ الْمُسْلِمِينَ فِي كُلِّ مَكَانٍ.
-رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ.
-
-عِبَادَ اللَّهِ، إِنَّ اللَّهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ، فَاذْكُرُوا اللَّهَ الْعَظِيمَ يَذْكُرْكُمْ، وَاشْكُرُوهُ عَلَى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللَّهِ أَكْبَرُ.`,
-        sourceUrl: url,
-        createdAt: new Date().toISOString(),
-        isPublished: true,
-      });
+    for (const item of fetchedArticles) {
+      if (item) scraped.push(item);
     }
   } catch (err) {
     console.warn("Notice: Suara Muhammadiyah khutbah scraper warning:", err);
