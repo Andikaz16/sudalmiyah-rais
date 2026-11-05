@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import {
   BookOpen,
-  Search,
   ExternalLink,
   Calendar,
   User,
@@ -15,23 +14,14 @@ import {
   Check,
   Printer,
   X,
-  Sparkles,
-  ArrowLeft,
-  Share2,
-  FileText,
-  Bookmark,
-  ChevronRight,
   ZoomIn,
   ZoomOut,
-  RefreshCw,
 } from "lucide-react";
 import { KhutbahItem } from "@/lib/types";
 
 export default function KhutbahPage() {
   const [khutbahs, setKhutbahs] = useState<KhutbahItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedSource, setSelectedSource] = useState<"ALL" | "SUARA_MUHAMMADIYAH" | "TAKMIR_MASJID">("ALL");
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const [activeKhutbah, setActiveKhutbah] = useState<KhutbahItem | null>(null);
   const [fontSizeLevel, setFontSizeLevel] = useState<number>(2); // 1 = sm, 2 = base, 3 = lg, 4 = xl, 5 = 2xl
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -57,20 +47,6 @@ export default function KhutbahPage() {
   useEffect(() => {
     fetchKhutbahs();
   }, []);
-
-  const filteredKhutbahs = useMemo(() => {
-    return khutbahs.filter((item) => {
-      const matchSource = selectedSource === "ALL" || item.source === selectedSource;
-      const q = searchQuery.toLowerCase().trim();
-      const matchSearch =
-        !q ||
-        item.title.toLowerCase().includes(q) ||
-        item.author.toLowerCase().includes(q) ||
-        (item.theme && item.theme.toLowerCase().includes(q)) ||
-        (item.summary && item.summary.toLowerCase().includes(q));
-      return matchSource && matchSearch;
-    });
-  }, [khutbahs, selectedSource, searchQuery]);
 
   const handleCopyText = (item: KhutbahItem) => {
     const fullText = `*${item.title}*\nOleh: ${item.author}\nSumber: ${
@@ -121,23 +97,6 @@ export default function KhutbahPage() {
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#B58A1E_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
 
           <div className="max-w-5xl mx-auto relative z-10">
-            <div className="flex items-center gap-2 mb-4">
-              <Link
-                href="/layanan"
-                className="inline-flex items-center gap-1.5 text-xs text-amber-200/90 hover:text-white transition-colors bg-white/10 hover:bg-white/15 px-3 py-1.5 rounded-full backdrop-blur-xs"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                Kembali ke Layanan
-              </Link>
-              <span className="text-white/40 text-xs">/</span>
-              <span className="text-xs text-white/70">Naskah Khutbah</span>
-            </div>
-
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-400/30 text-amber-300 text-xs font-semibold uppercase tracking-wider mb-3">
-              <BookOpen className="w-3.5 h-3.5" />
-              Layanan Penunjang Khatib
-            </div>
-
             <h1 className="text-2xl sm:text-4xl font-serif font-bold text-white tracking-tight mb-3">
               Pusat Naskah Khutbah Jum&apos;at
             </h1>
@@ -147,133 +106,28 @@ export default function KhutbahPage() {
               <strong className="text-white font-semibold">Takmir Masjid Kampus UMS</strong> untuk memudahkan para khatib
               dalam bertugas di mimbar Jum&apos;at.
             </p>
-
-            {/* Quick Stat Pill */}
-            <div className="flex flex-wrap items-center gap-3 mt-6 pt-6 border-t border-white/15 text-xs text-stone-200">
-              <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
-                <span>Format Khutbah Lengkap (1 & 2)</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg">
-                <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
-                <span>Mode Baca Mimbar dengan Skala Font</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg">
-                <span className="w-2 h-2 rounded-full bg-sky-400 inline-block" />
-                <span>Siap Cetak / Unduh PDF A4</span>
-              </div>
-            </div>
           </div>
         </section>
 
         {/* Content Container */}
         <section className="max-w-5xl mx-auto px-4 py-8 sm:py-12 print:hidden">
-          {/* Controls: Search and Filters */}
-          <div className="bg-white rounded-2xl p-4 sm:p-6 border border-stone-200/90 shadow-xs mb-8 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              {/* Search Bar */}
-              <div className="relative flex-1">
-                <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Cari tema, judul khutbah, atau nama khatib..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-hidden focus:border-[#003B73] focus:ring-2 focus:ring-[#003B73]/10 text-sm transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 text-xs font-semibold"
-                  >
-                    Hapus
-                  </button>
-                )}
-              </div>
-
-              {/* Refresh Button */}
-              <button
-                type="button"
-                onClick={fetchKhutbahs}
-                disabled={loading}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-stone-200 hover:bg-stone-50 text-stone-700 text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
-                title="Muat Ulang Naskah"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#003B73]" : ""}`} />
-                <span>Perbarui Data</span>
-              </button>
-            </div>
-
-            {/* Filter Tabs */}
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100">
-              <span className="text-xs font-semibold text-stone-400 uppercase tracking-wider mr-1">
-                Sumber Naskah:
-              </span>
-              <button
-                type="button"
-                onClick={() => setSelectedSource("ALL")}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  selectedSource === "ALL"
-                    ? "bg-[#003B73] text-white shadow-xs"
-                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-                }`}
-              >
-                Semua Sumber ({khutbahs.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedSource("SUARA_MUHAMMADIYAH")}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  selectedSource === "SUARA_MUHAMMADIYAH"
-                    ? "bg-[#800000] text-white shadow-xs"
-                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-                }`}
-              >
-                Suara Muhammadiyah ({khutbahs.filter((k) => k.source === "SUARA_MUHAMMADIYAH").length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedSource("TAKMIR_MASJID")}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  selectedSource === "TAKMIR_MASJID"
-                    ? "bg-[#003B73] text-white shadow-xs"
-                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-                }`}
-              >
-                Takmir Masjid UMS ({khutbahs.filter((k) => k.source === "TAKMIR_MASJID").length})
-              </button>
-            </div>
-          </div>
-
           {/* List or Loading State */}
           {loading ? (
             <div className="py-20 text-center space-y-3">
               <div className="w-10 h-10 border-4 border-stone-200 border-t-[#003B73] rounded-full animate-spin mx-auto" />
               <p className="text-sm font-medium text-stone-500">Memuat naskah khutbah resmi...</p>
             </div>
-          ) : filteredKhutbahs.length === 0 ? (
+          ) : khutbahs.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center border border-dashed border-stone-300 max-w-lg mx-auto">
               <BookOpen className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-              <h3 className="text-base font-bold text-stone-800 mb-1">Naskah Tidak Ditemukan</h3>
-              <p className="text-xs text-stone-500 leading-relaxed mb-4">
-                Tidak ada naskah khutbah yang cocok dengan kata kunci &ldquo;{searchQuery}&rdquo;. Silakan coba kata
-                kunci lain atau pilih filter sumber yang berbeda.
+              <h3 className="text-base font-bold text-stone-800 mb-1">Naskah Belum Tersedia</h3>
+              <p className="text-xs text-stone-500 leading-relaxed">
+                Belum ada naskah khutbah yang tersimpan saat ini.
               </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedSource("ALL");
-                }}
-                className="px-4 py-2 bg-[#003B73] text-white rounded-xl text-xs font-semibold hover:bg-[#002B54] transition-colors cursor-pointer"
-              >
-                Reset Pencarian
-              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {filteredKhutbahs.map((item) => (
+              {khutbahs.map((item) => (
                 <div
                   key={item.id}
                   className="bg-white rounded-2xl border border-stone-200/90 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group"
