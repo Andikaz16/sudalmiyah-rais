@@ -60,26 +60,61 @@ async function scrapeSuaraMuhammadiyahKhutbah(): Promise<KhutbahItem[]> {
 
     const html = await res.text();
 
-    // Match all /read/khutbah- links and titles
-    const cardRegex = /<a[^>]+href="([^"]*\/read\/khutbah-[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
-    let m;
-    const articleLinks: { link: string; rawTitle: string }[] = [];
+    // Match each <article> in the category feed to get exact article link and card timestamp
+    const articleBlockRegex = /<article[\s\S]*?<\/article>/gi;
+    const blocks = html.match(articleBlockRegex) || [];
+
+    const articleLinks: {
+      link: string;
+      rawTitle: string;
+      cardIso: string;
+      cardTitle: string;
+    }[] = [];
     const seen = new Set<string>();
 
-    while ((m = cardRegex.exec(html)) !== null && articleLinks.length < 6) {
-      const href = m[1];
-      const link = href.startsWith("http") ? href : `https://suaramuhammadiyah.id${href}`;
-      const cleanTitle = cleanHtml(m[2]);
+    for (const block of blocks) {
+      if (articleLinks.length >= 6) break;
 
-      if (cleanTitle.length > 15 && !seen.has(link)) {
-        seen.add(link);
-        articleLinks.push({ link, rawTitle: cleanTitle });
+      const hrefMatch = block.match(/href="([^"]*\/read\/khutbah-[^"]*)"/i);
+      if (!hrefMatch) continue;
+
+      const href = hrefMatch[1];
+      const link = href.startsWith("http") ? href : `https://suaramuhammadiyah.id${href}`;
+      if (seen.has(link)) continue;
+      seen.add(link);
+
+      const titleMatch =
+        block.match(/<h2[^>]*class="story__title"[^>]*><a[^>]+href="[^"]*"[^>]*>([\s\S]*?)<\/a><\/h2>/i) ||
+        block.match(/<a[^>]+href="[^"]*\/read\/khutbah-[^"]*"[^>]*>([\s\S]*?)<\/a>/i);
+      const rawTitle = titleMatch ? cleanHtml(titleMatch[1]) : "";
+      if (rawTitle.length < 10) continue;
+
+      const timeMatch = block.match(/<time[^>]+datetime="([^"]+)"[^>]*title="([^"]*)"[^>]*>([\s\S]*?)<\/time>/i);
+      const cardIso = timeMatch ? timeMatch[1].trim() : "";
+      const cardTitle = timeMatch ? cleanHtml(timeMatch[2]) : "";
+
+      articleLinks.push({ link, rawTitle, cardIso, cardTitle });
+    }
+
+    // Fallback if <article> tags were not matched directly
+    if (articleLinks.length === 0) {
+      const cardRegex = /<a[^>]+href="([^"]*\/read\/khutbah-[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
+      let m;
+      while ((m = cardRegex.exec(html)) !== null && articleLinks.length < 6) {
+        const href = m[1];
+        const link = href.startsWith("http") ? href : `https://suaramuhammadiyah.id${href}`;
+        const cleanTitle = cleanHtml(m[2]);
+
+        if (cleanTitle.length > 15 && !seen.has(link)) {
+          seen.add(link);
+          articleLinks.push({ link, rawTitle: cleanTitle, cardIso: "", cardTitle: "" });
+        }
       }
     }
 
     // Fetch article full content in parallel
     const fetchedArticles = await Promise.all(
-      articleLinks.map(async ({ link, rawTitle }) => {
+      articleLinks.map(async ({ link, rawTitle, cardIso, cardTitle }) => {
         try {
           const aRes = await fetch(link, {
             next: { revalidate: 3600 },
@@ -94,15 +129,46 @@ async function scrapeSuaraMuhammadiyahKhutbah(): Promise<KhutbahItem[]> {
           if (!aRes.ok) return null;
           const aHtml = await aRes.text();
 
+          // 1. Author
           const authorMatch = aHtml.match(/Oleh[:\s]+([^<,\n\r]+)/i);
           const author = authorMatch
             ? cleanHtml(authorMatch[1].trim())
             : "Redaksi Suara Muhammadiyah";
 
-          const dateMatch = aHtml.match(
-            /(\d{1,2}\s+(?:Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember)\s+\d{4})/i
-          );
-          const date = dateMatch ? dateMatch[1].trim() : "Edisi Terbaru";
+          // 2. Accurate Publication Date & Time from source
+          const metaMatch =
+            aHtml.match(/<meta[^>]+property="article:published_time"[^>]+content="([^"]+)"/i) ||
+            aHtml.match(/<meta[^>]+content="([^"]+)"[^>]+property="article:published_time"/i);
+          const publishedIso = metaMatch ? metaMatch[1].trim() : cardIso;
+
+          // Inside article page: <time datetime="...">Rabu, 4 November 2026 · 17:14 WIB</time>
+          const timeTagMatch = aHtml.match(/<time[^>]+datetime="([^"]*)"[^>]*>([\s\S]*?)<\/time>/i);
+          let dateText = "";
+          if (timeTagMatch) {
+            const innerTime = cleanHtml(timeTagMatch[2]);
+            if (innerTime && innerTime.length > 5) {
+              dateText = innerTime;
+            }
+          }
+          if (!dateText && cardTitle) {
+            dateText = cardTitle;
+          }
+          if (!dateText && publishedIso) {
+            try {
+              const d = new Date(publishedIso);
+              dateText = d.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              });
+            } catch {
+              dateText = "Edisi Terbaru";
+            }
+          }
+          if (!dateText) {
+            dateText = "Edisi Terbaru";
+          }
 
           const pMatches = aHtml.match(/<p[^>]*>([\s\S]*?)<\/p>/gi) || [];
           const validP = pMatches
@@ -162,13 +228,13 @@ async function scrapeSuaraMuhammadiyahKhutbah(): Promise<KhutbahItem[]> {
             theme: "Inspirasi Dakwah Suara Muhammadiyah",
             source: "SUARA_MUHAMMADIYAH" as const,
             author,
-            date,
+            date: dateText,
             summary: summary.endsWith(".") ? summary : `${summary}...`,
             firstKhutbah: k1.join("\n\n"),
             secondKhutbah:
               k2.length > 0 ? k2.join("\n\n") : validP.slice(-6).join("\n\n"),
             sourceUrl: link,
-            createdAt: new Date().toISOString(),
+            createdAt: publishedIso || new Date().toISOString(),
             isPublished: true,
           };
         } catch (err) {
@@ -210,9 +276,11 @@ export async function GET(request: Request) {
     if (!forceRefresh && memoryKhutbahCache && now - memoryKhutbahCache.cachedAt < KHUTBAH_CACHE_TTL_MS) {
       khutbahs = memoryKhutbahCache.items;
     } else {
-      // 1. Fetch DB khutbahs (Takmir Admin + Pre-seeded items)
+      // 1. Fetch DB khutbahs (Takmir Admin items, excluding stale dummy seeds)
       const db = await getDbAsync();
-      const dbKhutbahs = (db.khutbahList || []).filter((item) => item.isPublished !== false);
+      const dbKhutbahs = (db.khutbahList || []).filter(
+        (item) => item.isPublished !== false && item.id !== "khutbah-sm-01" && item.id !== "khutbah-sm-02"
+      );
 
       // 2. Fetch live khutbahs from Suara Muhammadiyah
       const scraped = await scrapeSuaraMuhammadiyahKhutbah();
