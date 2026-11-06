@@ -255,13 +255,8 @@ async function scrapeSuaraMuhammadiyahKhutbah(): Promise<KhutbahItem[]> {
 }
 
 export async function GET(request: Request) {
+  await connection();
   try {
-    try {
-      await connection();
-    } catch {
-      // In static / prerender contexts
-    }
-
     const { searchParams } = new URL(request.url);
     const idParam = searchParams.get("id");
     const slugParam = searchParams.get("slug");

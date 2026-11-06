@@ -19,6 +19,7 @@ import {
   PrayerAttendance,
   PrayerName,
   KhutbahItem,
+  InfaqHadith,
 } from "./types";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { getFirestoreDb, isFirebaseConfigured } from "./firebase";
@@ -43,6 +44,7 @@ export interface DatabaseSchema {
   manualNews?: ManualNewsItem[];
   prayerAttendances?: PrayerAttendance[];
   khutbahList?: KhutbahItem[];
+  infaqHadiths?: InfaqHadith[];
 }
 
 function getDbFilePath(): string {
@@ -463,6 +465,137 @@ export function getDefaultPrayerAttendances(): PrayerAttendance[] {
   return [];
 }
 
+export function getDefaultInfaqHadiths(): InfaqHadith[] {
+  return [
+    {
+      id: 1,
+      theme: "Keberkahan & Harta yang Bertumbuh",
+      themeEn: "Blessings & Growing Wealth",
+      arabic: "مَا نَقَصَتْ صَدَقَةٌ مِنْ مَالٍ، وَمَا زَادَ اللَّهُ عَبْدًا بِعَفْوٍ إِلَّا عِزًّا",
+      translation:
+        "Sedekah itu tidak akan pernah mengurangi harta. Dan tidaklah Allah menambah bagi seorang hamba yang pemaaf melainkan kemuliaan, serta tidaklah seseorang merendahkan hati karena Allah melainkan Dia akan meninggikan derajatnya.",
+      translationEn:
+        "Charity does not decrease wealth, no one forgives another except that Allah increases his honor, and no one humbles himself for the sake of Allah except that Allah raises his status.",
+      source: "HR. Muslim No. 2588",
+      fadhilah: "Infaq mendatangkan keberkahan harta berlipat dan ketenangan batin.",
+      fadhilahEn: "Infaq brings multiplied wealth blessings and inner serenity.",
+      isActive: true,
+      order: 1,
+    },
+    {
+      id: 2,
+      theme: "Doa Mustajab Malaikat Setiap Pagi",
+      themeEn: "Angels' Daily Answered Prayers",
+      arabic:
+        "مَا مِنْ يَوْمٍ يُصْبِحُ الْعِبَادُ فِيهِ إِلَّا مَلَكَانِ يَنْزِلَانِ، فَيَقُولُ أَحَدُهُمَا: اللَّهُمَّ أَعْطِ مُنْفِقًا خَلَفًا، وَيَقُولُ الْآخَرُ: اللَّهُمَّ أَعْطِ مُمْسِكًا تَلَفًا",
+      translation:
+        "Tiada suatu pagi pun saat seorang hamba bangun melainkan dua malaikat turun. Salah satunya berdoa: 'Ya Allah, berikanlah ganti keberkahan bagi orang yang berinfaq', sedangkan yang lain berkata: 'Ya Allah, berikanlah kebinasaan bagi orang yang menahan hartanya'.",
+      translationEn:
+        "Never does a day dawn upon the servants of Allah but two angels descend. One says: 'O Allah, give to the one who spends in charity a recompense', and the other says: 'O Allah, give to the one who withholds ruin'.",
+      source: "HR. Bukhari No. 1442 & Muslim No. 1010",
+      fadhilah: "Setiap infaq yang dikeluarkan didoakan langsung oleh para malaikat Allah.",
+      fadhilahEn: "Every spending in charity is directly prayed for by Allah's angels.",
+      isActive: true,
+      order: 2,
+    },
+    {
+      id: 3,
+      theme: "Pahala Berlipat Ganda 700 Kali",
+      themeEn: "700-Fold Multiplied Reward",
+      arabic:
+        "مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ فِي كُلِّ سُنبُلَةٍ مِّائَةُ حَبَّةٍ ۗ وَاللَّهُ يُضَاعِفُ لِمَن يَشَاءُ",
+      translation:
+        "Perumpamaan orang-orang yang menginfakkan hartanya di jalan Allah serupa dengan sebutir benih yang menumbuhkan tujuh butir, pada tiap-tiap butir ada seratus biji. Allah melipatgandakan pahala bagi siapa yang Dia kehendaki, dan Allah Maha Luas lagi Maha Mengetahui.",
+      translationEn:
+        "The example of those who spend their wealth in the cause of Allah is like a seed of grain that produces seven ears; in each ear is a hundred grains. And Allah multiplies for whom He wills, and Allah is all-Encompassing and Knowing.",
+      source: "QS. Al-Baqarah: 261",
+      fadhilah: "Pahala infaq dilipatgandakan hingga ratusan kali lipat tanpa batas.",
+      fadhilahEn: "The reward for infaq is multiplied up to hundreds of times without limit.",
+      isActive: true,
+      order: 3,
+    },
+    {
+      id: 4,
+      theme: "Naungan Sejuk di Hari Kiamat",
+      themeEn: "Cool Shade on the Day of Resurrection",
+      arabic:
+        "إِنَّ الصَّدَقَةَ لَتُطْفِئُ عَنْ أَهْلِهَا حَرَّ الْقُبُورِ، وَإِنَّمَا يَسْتَظِلُّ الْمُؤْمِنُ يَوْمَ الْقِيَامَةِ فِي ظِلِّ صَدَقَتِهِ",
+      translation:
+        "Sesungguhnya sedekah itu benar-benar memadamkan panasnya alam kubur bagi pelakunya, dan sungguh seorang mukmin pada hari kiamat kelak akan bernaung di bawah keteduhan naungan sedekahnya.",
+      translationEn:
+        "Indeed, charity extinguishes the heat of the grave for its people, and the believer will take shade on the Day of Resurrection beneath the shade of his charity.",
+      source: "HR. Ath-Thabrani & Al-Baihaqi (Shahih At-Targhib)",
+      fadhilah: "Sedekah menjadi perisai pelindung dari dahsyatnya panas terik hari kiamat.",
+      fadhilahEn: "Charity becomes a protective shield from the intense heat of the Day of Judgment.",
+      isActive: true,
+      order: 4,
+    },
+    {
+      id: 5,
+      theme: "Amal Jariyah yang Abadi Melintasi Zaman",
+      themeEn: "Eternal Continuous Charity Across Time",
+      arabic:
+        "إِذَا مَاتَ الْإِنْسَانُ انْقَطَعَ عَنْهُ عَمَلُهُ إِلَّا مِنْ ثَلَاثَةٍ: إِلَّا مِنْ صَدَقَةٍ جَارِيَةٍ، أَوْ عِلْمٍ يُنْتَفَعُ بِهِ، أَوْ وَلَدٍ صَالِحٍ يَدْعُو لَهُ",
+      translation:
+        "Apabila manusia meninggal dunia, maka terputuslah segala amal perbuatannya kecuali tiga perkara: sedekah jariyah, ilmu yang bermanfaat, dan anak shalih yang mendoakannya.",
+      translationEn:
+        "When a human being dies, their deeds come to an end except for three: continuous charity (sadaqah jariyah), beneficial knowledge, or a righteous child who prays for them.",
+      source: "HR. Muslim No. 1631",
+      fadhilah: "Pahala infaq untuk kemakmuran masjid mengalir selamanya melintasi alam kubur.",
+      fadhilahEn: "The reward of infaq for the prosperity of the mosque flows eternally even in the grave.",
+      isActive: true,
+      order: 5,
+    },
+    {
+      id: 6,
+      theme: "Pembersih Dosa & Penawar Kegelisahan",
+      themeEn: "Cleanser of Sins & Soother of Anxiety",
+      arabic: "وَالصَّدَقَةُ تُطْفِئُ الْخَطِيئَةَ كَمَا يُطْفِئُ الْمَاءُ النَّارَ",
+      translation:
+        "Dan sedekah itu dapat memadamkan dosa-dosa dan kesalahan sebagaimana air memadamkan bara api yang menyala.",
+      translationEn:
+        "And charity extinguishes sins just as water extinguishes fire.",
+      source: "HR. At-Tirmidzi No. 614 & Ibnu Majah No. 3973",
+      fadhilah: "Menghapuskan dosa-dosa kecil dan membentengi diri dari marabahaya.",
+      fadhilahEn: "Cleanses minor sins and shields the soul from tribulations.",
+      isActive: true,
+      order: 6,
+    },
+    {
+      id: 7,
+      theme: "Kemuliaan Tangan di Atas",
+      themeEn: "The Nobility of the Upper Hand",
+      arabic:
+        "الْيَدُ الْعُلْيَا خَيْرٌ مِنَ الْيَدِ السُّفْلَى، فَالْيَدُ الْعُلْيَا هِيَ الْمُنْفِقَةُ، وَالسُّفْلَى هِيَ السَّائِلَةُ",
+      translation:
+        "Tangan yang di atas lebih baik daripada tangan yang di bawah. Tangan yang di atas adalah tangan yang memberi (berinfaq), sedangkan tangan yang di bawah adalah yang meminta.",
+      translationEn:
+        "The upper hand is better than the lower hand. The upper hand is the one that gives (spends in charity), and the lower hand is the one that begs.",
+      source: "HR. Bukhari No. 1429 & Muslim No. 1033",
+      fadhilah: "Menjadi pribadi dermawan yang mulia di hadapan Allah dan sesama manusia.",
+      fadhilahEn: "Fosters a noble, generous character honored before Allah and fellow humanity.",
+      isActive: true,
+      order: 7,
+    },
+    {
+      id: 8,
+      theme: "Perlindungan Diri Walau Sebutir Kurma",
+      themeEn: "Self-Protection Even with Half a Date",
+      arabic:
+        "اتَّقُوا النَّارَ وَلَوْ بِشِقِّ تَمْرَةٍ، فَمَنْ لَمْ يَجِدْ فَبِكَلِمَةٍ طَيِّبَةٍ",
+      translation:
+        "Lindungilah diri kalian dari siksa api neraka walau hanya dengan menyedekahkan sebutir kurma. Jika tidak menemukannya, maka dengan bertutur kata yang baik.",
+      translationEn:
+        "Protect yourselves from the Fire even with half a date in charity. And whoever cannot find that, then with a good word.",
+      source: "HR. Bukhari No. 1417 & Muslim No. 1016",
+      fadhilah: "Sekecil apa pun nominal infaq yang disalurkan dengan ikhlas bernilai sangat agung di sisi-Nya.",
+      fadhilahEn: "No matter how small the charity given with sincerity, it holds immense value in the sight of Allah.",
+      isActive: true,
+      order: 8,
+    },
+  ];
+}
+
 function getInitialData(): DatabaseSchema {
   const officialAdminPasswordHash = bcrypt.hashSync("masjidpercontohan", 10);
   const adminPasswordHash = bcrypt.hashSync("AdminSudalmiyah2026!", 10);
@@ -718,6 +851,7 @@ function getInitialData(): DatabaseSchema {
     manualNews: getDefaultManualNews(),
     prayerAttendances: getDefaultPrayerAttendances(),
     khutbahList: getDefaultKhutbahList(),
+    infaqHadiths: getDefaultInfaqHadiths(),
   };
 }
 
@@ -825,6 +959,9 @@ export function ensureDbDefaults(data: DatabaseSchema): DatabaseSchema {
   }
   if (!Array.isArray(data.khutbahList) || data.khutbahList.length === 0) {
     data.khutbahList = getDefaultKhutbahList();
+  }
+  if (!Array.isArray(data.infaqHadiths) || data.infaqHadiths.length === 0) {
+    data.infaqHadiths = getDefaultInfaqHadiths();
   }
   return data;
 }

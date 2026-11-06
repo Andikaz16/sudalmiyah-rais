@@ -165,16 +165,39 @@ export const MARQUEE_QUOTES_EN = [
 export default function MutiaraHaditsSection() {
   const { language } = useLanguage();
   const isEn = language === "en";
+  const [hadiths, setHadiths] = useState<InfaqHadith[]>(INFAQ_HADITHS);
   const [currentHadithIndex, setCurrentHadithIndex] = useState(0);
   const [isHadithPaused, setIsHadithPaused] = useState(false);
 
-  const nextHadith = useCallback(() => {
-    setCurrentHadithIndex((prev) => (prev + 1) % INFAQ_HADITHS.length);
+  // Fetch active hadiths from database API, fallback to default static INFAQ_HADITHS
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/infaq-hadiths")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data && Array.isArray(data.hadiths) && data.hadiths.length > 0) {
+          setHadiths(data.hadiths);
+        }
+      })
+      .catch(() => {
+        // Fallback to static INFAQ_HADITHS on network error
+      });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  const totalHadiths = hadiths.length > 0 ? hadiths.length : INFAQ_HADITHS.length;
+  const safeIndex = currentHadithIndex < totalHadiths ? currentHadithIndex : 0;
+  const currentHadith = hadiths[safeIndex] || INFAQ_HADITHS[0];
+
+  const nextHadith = useCallback(() => {
+    setCurrentHadithIndex((prev) => (prev + 1) % (hadiths.length || 1));
+  }, [hadiths.length]);
+
   const prevHadith = useCallback(() => {
-    setCurrentHadithIndex((prev) => (prev - 1 + INFAQ_HADITHS.length) % INFAQ_HADITHS.length);
-  }, []);
+    setCurrentHadithIndex((prev) => (prev - 1 + (hadiths.length || 1)) % (hadiths.length || 1));
+  }, [hadiths.length]);
 
   useEffect(() => {
     if (isHadithPaused) return;
@@ -183,8 +206,6 @@ export default function MutiaraHaditsSection() {
     }, 6000);
     return () => clearInterval(interval);
   }, [isHadithPaused, nextHadith]);
-
-  const currentHadith = INFAQ_HADITHS[currentHadithIndex];
 
   // Share Modal State
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -232,8 +253,8 @@ ${footer}`;
   }, [isEn, language]);
 
   const handleOpenShare = (hadithIndex?: number) => {
-    const targetIdx = typeof hadithIndex === "number" ? hadithIndex : currentHadithIndex;
-    const targetHadith = INFAQ_HADITHS[targetIdx] || INFAQ_HADITHS[0];
+    const targetIdx = typeof hadithIndex === "number" ? hadithIndex : safeIndex;
+    const targetHadith = hadiths[targetIdx] || hadiths[0] || INFAQ_HADITHS[0];
     setSelectedHadithId(targetHadith.id);
     setCustomShareText(formatHadithShareText(targetHadith));
     setIsShareModalOpen(true);
@@ -242,12 +263,12 @@ ${footer}`;
 
   const handleHadithSelectChange = (newId: number) => {
     setSelectedHadithId(newId);
-    const targetHadith = INFAQ_HADITHS.find((h) => h.id === newId) || INFAQ_HADITHS[0];
+    const targetHadith = hadiths.find((h) => h.id === newId) || hadiths[0] || INFAQ_HADITHS[0];
     setCustomShareText(formatHadithShareText(targetHadith));
   };
 
   const handleResetText = () => {
-    const targetHadith = INFAQ_HADITHS.find((h) => h.id === selectedHadithId) || INFAQ_HADITHS[0];
+    const targetHadith = hadiths.find((h) => h.id === selectedHadithId) || hadiths[0] || INFAQ_HADITHS[0];
     setCustomShareText(formatHadithShareText(targetHadith));
   };
 
@@ -287,7 +308,7 @@ ${footer}`;
   };
 
   const getTargetHadith = () => {
-    return INFAQ_HADITHS.find((h) => h.id === selectedHadithId) || INFAQ_HADITHS[0];
+    return hadiths.find((h) => h.id === selectedHadithId) || hadiths[0] || INFAQ_HADITHS[0];
   };
 
   const handleDownloadPoster = async () => {
@@ -391,7 +412,7 @@ ${footer}`;
   const handleNativeShare = async () => {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        const targetHadith = INFAQ_HADITHS.find((h) => h.id === selectedHadithId) || INFAQ_HADITHS[0];
+        const targetHadith = hadiths.find((h) => h.id === selectedHadithId) || hadiths[0] || INFAQ_HADITHS[0];
         await navigator.share({
           title: isEn
             ? `Hadith Pearl: ${targetHadith.themeEn || targetHadith.theme}`
@@ -457,7 +478,7 @@ ${footer}`;
                 <span className="hidden sm:inline">{isEn ? "Share" : "Bagikan"}</span>
               </button>
               <span className="px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15">
-                {currentHadithIndex + 1} / {INFAQ_HADITHS.length}
+                {safeIndex + 1} / {totalHadiths}
               </span>
             </div>
           </div>
@@ -555,7 +576,7 @@ ${footer}`;
                 onChange={(e) => handleHadithSelectChange(Number(e.target.value))}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#003B73]/30 focus:border-[#003B73]"
               >
-                {INFAQ_HADITHS.map((h) => (
+                {hadiths.map((h) => (
                   <option key={h.id} value={h.id}>
                     #{h.id} - {isEn ? (h.themeEn || h.theme) : h.theme} ({h.source})
                   </option>

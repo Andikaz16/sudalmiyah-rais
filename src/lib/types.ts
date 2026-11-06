@@ -375,3 +375,19 @@ export interface KhutbahItem {
   createdAt: string;
   updatedAt?: string;
 }
+
+export interface InfaqHadith {
+  id: number;
+  theme: string;
+  themeEn?: string;
+  arabic: string;
+  translation: string;
+  translationEn?: string;
+  source: string;
+  fadhilah: string;
+  fadhilahEn?: string;
+  isActive?: boolean;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}

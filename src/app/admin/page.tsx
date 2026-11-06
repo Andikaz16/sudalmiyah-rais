@@ -50,6 +50,7 @@ import {
   Unlock,
   ShieldAlert,
   ScrollText,
+  Quote,
 } from "lucide-react";
 import {
   Agenda,
@@ -68,6 +69,7 @@ import {
   PrayerAttendance,
   PrayerName,
   KhutbahItem,
+  InfaqHadith,
 } from "@/lib/types";
 import { normalizeImageUrl } from "@/lib/utils";
 import { getHijriDate } from "@/lib/prayer-times";
@@ -117,6 +119,7 @@ const ADMIN_TABS = [
   { id: "DOCUMENTS", label: "Pustaka & Dokumen", shortLabel: "Pustaka Dokumen", icon: BookOpen },
   { id: "BERITA_MASJID", label: "Warta & Berita Masjid", shortLabel: "Warta Berita", icon: Newspaper },
   { id: "KHUTBAH", label: "Naskah Khutbah", shortLabel: "Khutbah", icon: ScrollText },
+  { id: "MUTIARA_HADITS", label: "Mutiara Hadits & Infaq", shortLabel: "Mutiara Hadits", icon: Quote },
 ] as const;
 
 // Client-side image compressor: optimizes uploads for fast transfer & avoids serverless payload limits
@@ -184,7 +187,7 @@ async function compressImageForUpload(
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "ABSENSI_SHALAT" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID" | "KHUTBAH"
+    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "ABSENSI_SHALAT" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID" | "KHUTBAH" | "MUTIARA_HADITS"
   >("AGENDAS");
 
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -662,9 +665,29 @@ export default function AdminDashboardPage() {
     isPublished: true,
   });
 
+  // Mutiara Hadits & Infaq Management State
+  const [hadithList, setHadithList] = useState<InfaqHadith[]>([]);
+  const [loadingHadith, setLoadingHadith] = useState(false);
+  const [isHadithModalOpen, setIsHadithModalOpen] = useState(false);
+  const [editingHadithId, setEditingHadithId] = useState<number | null>(null);
+  const [savingHadith, setSavingHadith] = useState(false);
+  const [hadithSearch, setHadithSearch] = useState("");
+  const [hadithForm, setHadithForm] = useState({
+    theme: "",
+    themeEn: "",
+    arabic: "",
+    translation: "",
+    translationEn: "",
+    source: "",
+    fadhilah: "",
+    fadhilahEn: "",
+    isActive: true,
+    order: 1,
+  });
+
   const loadData = async () => {
     try {
-      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes, newsRes, khutbahRes] = await Promise.all([
+      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes, newsRes, khutbahRes, hadithRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch(`/api/agendas?t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/friday-schedule"),
@@ -674,6 +697,7 @@ export default function AdminDashboardPage() {
         fetch("/api/admin/system-status"),
         fetch(`/api/admin/news?t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/admin/khutbah?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/admin/infaq-hadiths?t=${Date.now()}`, { cache: "no-store" }),
       ]);
 
       if (statusRes.ok) {
@@ -776,6 +800,10 @@ export default function AdminDashboardPage() {
       if (khutbahRes && khutbahRes.ok) {
         const khutbahJson = await khutbahRes.json();
         setKhutbahList(khutbahJson.khutbahs || []);
+      }
+      if (hadithRes && hadithRes.ok) {
+        const hadithJson = await hadithRes.json();
+        setHadithList(hadithJson.hadiths || []);
       }
     } catch (e) {
       console.error(e);
@@ -2183,6 +2211,181 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
     }
   };
 
+  // Mutiara Hadits & Infaq Management Handlers
+  const loadHadithList = async () => {
+    setLoadingHadith(true);
+    try {
+      const res = await fetch(`/api/admin/infaq-hadiths?t=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setHadithList(data.hadiths || []);
+      }
+    } catch (e) {
+      console.error("Error loading hadith list:", e);
+    } finally {
+      setLoadingHadith(false);
+    }
+  };
+
+  const handleOpenAddHadith = () => {
+    setEditingHadithId(null);
+    const maxOrder = hadithList.reduce((max, h) => Math.max(max, h.order ?? h.id ?? 0), 0);
+    setHadithForm({
+      theme: "",
+      themeEn: "",
+      arabic: "",
+      translation: "",
+      translationEn: "",
+      source: "",
+      fadhilah: "",
+      fadhilahEn: "",
+      isActive: true,
+      order: maxOrder + 1,
+    });
+    setIsHadithModalOpen(true);
+  };
+
+  const handleOpenEditHadith = (item: InfaqHadith) => {
+    setEditingHadithId(item.id);
+    setHadithForm({
+      theme: item.theme,
+      themeEn: item.themeEn || "",
+      arabic: item.arabic,
+      translation: item.translation,
+      translationEn: item.translationEn || "",
+      source: item.source,
+      fadhilah: item.fadhilah,
+      fadhilahEn: item.fadhilahEn || "",
+      isActive: item.isActive !== false,
+      order: item.order ?? item.id,
+    });
+    setIsHadithModalOpen(true);
+  };
+
+  const handleSaveHadith = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!hadithForm.theme.trim()) {
+      alert("Tema hadits wajib diisi.");
+      return;
+    }
+    if (!hadithForm.arabic.trim()) {
+      alert("Teks lafaz Arab wajib diisi.");
+      return;
+    }
+    if (!hadithForm.translation.trim()) {
+      alert("Terjemahan hadits wajib diisi.");
+      return;
+    }
+    if (!hadithForm.source.trim()) {
+      alert("Sumber riwayat / perawi hadits wajib diisi.");
+      return;
+    }
+    if (!hadithForm.fadhilah.trim()) {
+      alert("Fadhilah / keutamaan infaq wajib diisi.");
+      return;
+    }
+
+    setSavingHadith(true);
+    setIsPublishingProcessing(editingHadithId ? "Memperbarui Mutiara Hadits" : "Menyimpan Mutiara Hadits");
+
+    try {
+      const payload = {
+        theme: hadithForm.theme.trim(),
+        themeEn: hadithForm.themeEn.trim() || undefined,
+        arabic: hadithForm.arabic.trim(),
+        translation: hadithForm.translation.trim(),
+        translationEn: hadithForm.translationEn.trim() || undefined,
+        source: hadithForm.source.trim(),
+        fadhilah: hadithForm.fadhilah.trim(),
+        fadhilahEn: hadithForm.fadhilahEn.trim() || undefined,
+        isActive: hadithForm.isActive,
+        order: Number(hadithForm.order) || 1,
+      };
+
+      const res = await fetch("/api/admin/infaq-hadiths", {
+        method: editingHadithId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingHadithId ? { id: editingHadithId, ...payload } : payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menyimpan mutiara hadits.");
+
+      setIsHadithModalOpen(false);
+      triggerPublishNotification(
+        editingHadithId ? "Hadits Diperbarui" : "Hadits Diterbitkan",
+        `Mutiara hadits "${hadithForm.theme.slice(0, 40)}..." telah disimpan ke database.`
+      );
+      await loadHadithList();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menyimpan mutiara hadits.");
+    } finally {
+      setSavingHadith(false);
+      setIsPublishingProcessing(null);
+    }
+  };
+
+  const handleDeleteHadith = async (id: number, theme: string) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus mutiara hadits "${theme}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/infaq-hadiths?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus mutiara hadits.");
+      triggerPublishNotification("Hadits Dihapus", `Mutiara hadits "${theme.slice(0, 35)}..." telah dihapus.`);
+      await loadHadithList();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menghapus mutiara hadits.");
+    }
+  };
+
+  const handleToggleHadithActive = async (item: InfaqHadith) => {
+    const nextStatus = item.isActive === false ? true : false;
+    try {
+      const res = await fetch("/api/admin/infaq-hadiths", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...item, isActive: nextStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gagal mengubah status penayangan.");
+      }
+      triggerPublishNotification(
+        nextStatus ? "Hadits Ditayangkan" : "Hadits Disembunyikan",
+        `Status hadits "${item.theme.slice(0, 35)}..." telah diperbarui.`
+      );
+      await loadHadithList();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal mengubah status penayangan.");
+    }
+  };
+
+  const handleResetHadiths = async () => {
+    if (!confirm("Peringatan: Apakah Anda yakin ingin mereset seluruh mutiara hadits kembali ke 8 hadits standar bawaan? Perubahan kustom yang dibuat sebelumnya akan ditimpa.")) {
+      return;
+    }
+    setLoadingHadith(true);
+    try {
+      const res = await fetch("/api/admin/infaq-hadiths?reset=true", {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal mereset mutiara hadits.");
+      triggerPublishNotification("Hadits Direset", "Daftar hadits telah dikembalikan ke 8 hadits standar.");
+      if (data.hadiths) {
+        setHadithList(data.hadiths);
+      } else {
+        await loadHadithList();
+      }
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal mereset mutiara hadits.");
+    } finally {
+      setLoadingHadith(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans pb-16">
       {/* Floating Processing Indicator */}
@@ -2403,7 +2606,7 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
           <div className="bg-white rounded-2xl border border-stone-200 p-3 shadow-xs">
             <div className="flex items-center justify-between mb-1.5 px-0.5">
               <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
-                Menu Admin (9 Menu):
+                Menu Admin (11 Menu):
               </span>
               <span className="text-[10px] font-semibold text-[#003B73]">
                 {activeTab === "FEEDBACK" && feedbackCounts.baru > 0
@@ -2412,6 +2615,8 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                   ? `${manualNewsList.length} Warta`
                   : activeTab === "KHUTBAH"
                   ? `${khutbahList.length} Khutbah`
+                  : activeTab === "MUTIARA_HADITS"
+                  ? `${hadithList.length} Hadits`
                   : activeTab === "DOCUMENTS"
                   ? `${documents.length} Dokumen`
                   : activeTab === "REGISTRATIONS"
@@ -2498,6 +2703,11 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                   {tab.id === "KHUTBAH" && khutbahList.length > 0 && (
                     <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
                       {khutbahList.length}
+                    </span>
+                  )}
+                  {tab.id === "MUTIARA_HADITS" && hadithList.length > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
+                      {hadithList.length}
                     </span>
                   )}
                 </button>
@@ -5630,6 +5840,219 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
             </div>
           </div>
         )}
+
+        {/* Tab 11: MUTIARA HADITS */}
+        {activeTab === "MUTIARA_HADITS" && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Header Action Card */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-stone-200 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#B58A1E] flex items-center justify-center">
+                  <Quote className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-stone-900 font-serif">
+                    Kelola Mutiara Hadits & Keutamaan Infaq
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Atur konten hadits nabawi, ayat Al-Qur&apos;an, terjemahan, dan fadhilah infaq yang tampil di Beranda dan Halaman Donasi Infaq.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto w-full sm:w-auto">
+                <Link
+                  href="/donasi#mutiara-hadits"
+                  target="_blank"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full border border-stone-200 hover:bg-stone-50 text-stone-700 text-xs font-semibold transition-colors active:scale-95 cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Lihat di Web</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={handleResetHadiths}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-semibold transition-colors active:scale-95 cursor-pointer"
+                  title="Kembalikan daftar hadits ke 8 hadits standar bawaan"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset ke Standar</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleOpenAddHadith}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 active:scale-95 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah Hadits Baru</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Filter & Search Bar */}
+            <div className="bg-white rounded-3xl border border-stone-200 shadow-xs p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-sm font-bold text-stone-900 font-serif">
+                    Daftar Mutiara Hadits ({hadithList.length})
+                  </h4>
+                  <span className="text-[11px] text-stone-400">
+                    ({hadithList.filter((h) => h.isActive !== false).length} Tayang)
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="relative w-full sm:w-64">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                    <input
+                      type="text"
+                      value={hadithSearch}
+                      onChange={(e) => setHadithSearch(e.target.value)}
+                      placeholder="Cari tema, lafaz arab, sumber..."
+                      className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-stone-200 text-xs text-stone-800 bg-stone-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#003B73]"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={loadHadithList}
+                    disabled={loadingHadith}
+                    className="inline-flex items-center gap-1 text-xs text-stone-500 hover:text-stone-800 font-medium cursor-pointer shrink-0"
+                  >
+                    <RotateCcw className={`w-3.5 h-3.5 ${loadingHadith ? "animate-spin" : ""}`} />
+                    <span>Segarkan</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Hadith Items List */}
+              {(() => {
+                const filtered = hadithList.filter((h) => {
+                  if (!hadithSearch.trim()) return true;
+                  const q = hadithSearch.toLowerCase();
+                  return (
+                    h.theme?.toLowerCase().includes(q) ||
+                    h.themeEn?.toLowerCase().includes(q) ||
+                    h.arabic?.includes(hadithSearch.trim()) ||
+                    h.translation?.toLowerCase().includes(q) ||
+                    h.source?.toLowerCase().includes(q) ||
+                    h.fadhilah?.toLowerCase().includes(q)
+                  );
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="py-12 text-center text-stone-400 space-y-2">
+                      <Quote className="w-10 h-10 mx-auto text-stone-300" />
+                      <p className="text-xs">
+                        {hadithSearch.trim()
+                          ? "Tidak ditemukan hadits yang sesuai dengan pencarian."
+                          : "Belum ada hadits tersimpan."}
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-1 gap-4">
+                    {filtered.map((item, idx) => (
+                      <div
+                        key={item.id}
+                        className="p-5 rounded-2xl border border-stone-200 hover:border-stone-300 bg-stone-50/50 hover:bg-white transition-all flex flex-col md:flex-row md:items-start justify-between gap-4"
+                      >
+                        <div className="flex-1 space-y-2.5 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full bg-[#003B73] text-white text-[10px] font-bold">
+                              #{item.order ?? idx + 1}
+                            </span>
+                            <span
+                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                item.isActive !== false
+                                  ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                                  : "bg-stone-200 text-stone-600 border border-stone-300"
+                              }`}
+                            >
+                              {item.isActive !== false ? "Tayang di Slider" : "Disembunyikan"}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold">
+                              {item.source}
+                            </span>
+                          </div>
+
+                          <div>
+                            <h4 className="text-sm sm:text-base font-bold text-stone-900 font-serif">
+                              {item.theme}
+                            </h4>
+                            {item.themeEn && (
+                              <p className="text-xs text-stone-500 italic">
+                                &ldquo;{item.themeEn}&rdquo;
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Arabic Box */}
+                          <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-amber-200/60 text-right">
+                            <p lang="ar" dir="rtl" className="font-quran text-lg sm:text-xl text-[#002855] leading-loose">
+                              {item.arabic}
+                            </p>
+                          </div>
+
+                          {/* Translation & Fadhilah */}
+                          <div className="space-y-1 text-xs text-stone-700 leading-relaxed">
+                            <p className="italic text-stone-800">
+                              &ldquo;{item.translation}&rdquo;
+                            </p>
+                            {item.translationEn && (
+                              <p className="italic text-stone-500 text-[11px]">
+                                En: &ldquo;{item.translationEn}&rdquo;
+                              </p>
+                            )}
+                            <div className="pt-1 flex items-start gap-1.5 text-stone-600 font-medium text-[11px]">
+                              <span className="text-[#B58A1E] font-bold">Fadhilah:</span>
+                              <span>{item.fadhilah}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex md:flex-col items-center justify-end gap-1.5 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-stone-100">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleHadithActive(item)}
+                            className={`p-2 rounded-xl border text-xs font-semibold transition-colors cursor-pointer active:scale-95 ${
+                              item.isActive !== false
+                                ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                : "border-stone-200 bg-stone-100 text-stone-600 hover:bg-stone-200"
+                            }`}
+                            title={item.isActive !== false ? "Sembunyikan dari slider" : "Tayangkan di slider"}
+                          >
+                            {item.isActive !== false ? <Check className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditHadith(item)}
+                            className="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors cursor-pointer active:scale-95 border border-amber-200/50"
+                            title="Edit mutiara hadits"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteHadith(item.id, item.theme)}
+                            className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer active:scale-95 border border-red-200/50"
+                            title="Hapus mutiara hadits"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Modal Responding to Feedback */}
@@ -6705,6 +7128,194 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                   className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50 cursor-pointer"
                 >
                   {savingKhutbah ? "Menyimpan..." : editingKhutbahId ? "Perbarui Naskah" : "Terbitkan Naskah"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Add / Edit Mutiara Hadits */}
+      {isHadithModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="relative w-full max-w-3xl bg-white border border-stone-200 rounded-3xl shadow-2xl p-5 sm:p-8 my-auto overflow-y-auto max-h-[92vh]">
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-200">
+              <div>
+                <h3 className="text-lg font-bold text-stone-900 font-serif">
+                  {editingHadithId ? "Edit Mutiara Hadits & Infaq" : "Tambah Mutiara Hadits & Infaq Baru"}
+                </h3>
+                <p className="text-xs text-stone-500 mt-0.5">
+                  Teks ini akan otomatis ditayangkan di slider Beranda & Donasi serta dapat dibagikan jamaah ke WhatsApp dalam bentuk poster berlogo resmi UMS.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsHadithModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center cursor-pointer transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveHadith} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Tema Hadits (Bahasa Indonesia) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={hadithForm.theme}
+                    onChange={(e) => setHadithForm({ ...hadithForm, theme: e.target.value })}
+                    placeholder="Contoh: Keberkahan & Harta yang Bertumbuh"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Tema Hadits (English - Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    value={hadithForm.themeEn}
+                    onChange={(e) => setHadithForm({ ...hadithForm, themeEn: e.target.value })}
+                    placeholder="Contoh: Blessings & Growing Wealth"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Teks Lafaz Arab *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  dir="rtl"
+                  value={hadithForm.arabic}
+                  onChange={(e) => setHadithForm({ ...hadithForm, arabic: e.target.value })}
+                  placeholder="Tuliskan teks Arab berharakat di sini..."
+                  className="w-full p-3.5 rounded-xl bg-stone-50 focus:bg-white border border-stone-300 text-stone-900 font-quran text-lg leading-loose focus:ring-2 focus:ring-[#003B73] resize-y"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Terjemahan Bahasa Indonesia *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={hadithForm.translation}
+                  onChange={(e) => setHadithForm({ ...hadithForm, translation: e.target.value })}
+                  placeholder="Tuliskan terjemahan hadits dalam bahasa Indonesia..."
+                  className="w-full p-3 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs leading-relaxed focus:ring-2 focus:ring-[#003B73] resize-y"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Terjemahan Bahasa Inggris (English Translation - Opsional)
+                </label>
+                <textarea
+                  rows={2}
+                  value={hadithForm.translationEn}
+                  onChange={(e) => setHadithForm({ ...hadithForm, translationEn: e.target.value })}
+                  placeholder="Tuliskan terjemahan bahasa Inggris jika tersedia..."
+                  className="w-full p-3 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs leading-relaxed focus:ring-2 focus:ring-[#003B73] resize-y"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Sumber Perawi / Dalil *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={hadithForm.source}
+                    onChange={(e) => setHadithForm({ ...hadithForm, source: e.target.value })}
+                    placeholder="Contoh: HR. Muslim No. 2588 atau QS. Al-Baqarah: 261"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Urutan Tampilan (Nomor Urut Slider)
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={hadithForm.order}
+                    onChange={(e) => setHadithForm({ ...hadithForm, order: Number(e.target.value) || 1 })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Fadhilah / Hikmah Utama (Bahasa Indonesia) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={hadithForm.fadhilah}
+                    onChange={(e) => setHadithForm({ ...hadithForm, fadhilah: e.target.value })}
+                    placeholder="Contoh: Infaq mendatangkan keberkahan harta berlipat..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Fadhilah / Hikmah Utama (English - Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    value={hadithForm.fadhilahEn}
+                    onChange={(e) => setHadithForm({ ...hadithForm, fadhilahEn: e.target.value })}
+                    placeholder="Contoh: Infaq brings multiplied wealth blessings..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-[#003B73]"
+                  />
+                </div>
+              </div>
+
+              {/* Status Tayang Checkbox */}
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="hadithIsActive"
+                  checked={hadithForm.isActive}
+                  onChange={(e) => setHadithForm({ ...hadithForm, isActive: e.target.checked })}
+                  className="w-4 h-4 rounded text-[#003B73] focus:ring-[#003B73] border-stone-300"
+                />
+                <label htmlFor="hadithIsActive" className="text-xs font-semibold text-stone-800 cursor-pointer">
+                  Tayangkan mutiara hadits ini pada slider publik (Beranda & Donasi)
+                </label>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex justify-end gap-3 pt-3 border-t border-stone-200">
+                <button
+                  type="button"
+                  onClick={() => setIsHadithModalOpen(false)}
+                  className="px-5 py-2.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingHadith}
+                  className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50 cursor-pointer"
+                >
+                  {savingHadith ? "Menyimpan..." : editingHadithId ? "Perbarui Hadits" : "Simpan Hadits"}
                 </button>
               </div>
             </form>
