@@ -332,7 +332,15 @@ export async function GET(request: Request) {
     }
 
     if (slugParam) {
-      const found = khutbahs.find((k) => k.slug === slugParam);
+      const decoded = decodeURIComponent(slugParam).trim();
+      const found = khutbahs.find(
+        (k) =>
+          k.slug === slugParam ||
+          k.slug === decoded ||
+          k.id === slugParam ||
+          k.id === decoded ||
+          k.slug.toLowerCase() === decoded.toLowerCase()
+      );
       if (!found) {
         return NextResponse.json({ success: false, error: "Naskah khutbah tidak ditemukan." }, { status: 404 });
       }
