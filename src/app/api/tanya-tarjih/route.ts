@@ -31,7 +31,7 @@ ${topic.dalil}
 Rujukan Resmi:
 ${topic.source}
 
-Semoga penjelasan ini memberikan ketenangan dan kemudahan dalam beribadah. Jika membutuhkan pendalaman fatwa lebih lanjut, Anda juga dapat berkonsultasi langsung dengan Asatidz Takmir Masjid Sudalmiyah Rais Kampus 2 UMS atau menelusuri lema HPT di portal https://hpt.muhammadiyah.or.id.`;
+Semoga penjelasan ini memberikan ketenangan dan kemudahan dalam beribadah. Jika membutuhkan pendalaman fatwa lebih lanjut, Anda juga dapat berkonsultasi langsung dengan Asatidz Takmir Masjid Kampus UMS atau menelusuri lema HPT di portal https://hpt.muhammadiyah.or.id.`;
 }
 
 export async function POST(req: NextRequest) {
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
         const { GoogleGenAI } = await import("@google/genai");
         const ai = new GoogleGenAI({ apiKey });
 
-        const systemPrompt = `Anda adalah "ChatHPT - Asisten AI Tarjih Muhammadiyah" untuk Masjid Sudalmiyah Rais Kampus 2 Universitas Muhammadiyah Surakarta (UMS).
+        const systemPrompt = `Anda adalah "ChatHPT - Asisten AI Tarjih Muhammadiyah" untuk Masjid Kampus Universitas Muhammadiyah Surakarta (UMS).
 Tugas Anda adalah menjawab pertanyaan pengguna secara ramah, mendalam, ilmiah, dan solutif.
 
 Prinsip Menjawab:
@@ -181,7 +181,7 @@ Dalam tuntunan Majelis Tarjih & Tajdid Pimpinan Pusat Muhammadiyah, setiap perso
 Untuk menelusuri lema putusan fiqih secara lengkap dan terperinci:
 1. Anda dapat membaca rujukan resmi kitab Himpunan Putusan Tarjih (HPT) Jilid 1, 2, dan 3.
 2. Mengakses asisten daring lema Tarjih resmi PP Muhammadiyah di: https://hpt.muhammadiyah.or.id
-3. Berkonsultasi secara tatap muka dengan Asatidz dan Dewan Pembina Takmir di Masjid Kampus Sudalmiyah Rais UMS.
+3. Berkonsultasi secara tatap muka dengan Asatidz dan Dewan Pembina Takmir di Masjid Kampus UMS.
 
 Semoga Allah SWT senantiasa membimbing langkah kita dalam menuntut ilmu dan beramal shaleh.`;
 
@@ -195,7 +195,7 @@ Semoga Allah SWT senantiasa membimbing langkah kita dalam menuntut ilmu dan bera
     console.error("Error in tanya-tarjih route:", err);
     // Tetap kembalikan pesan santun dan solutif agar pengunjung tidak melihat pesan error teknis
     return NextResponse.json({
-      reply: `Assalamu'alaikum Warahmatullahi Wabarakatuh.\n\nTerima kasih telah mengajukan pertanyaan. Layanan asisten sedang melakukan sinkronisasi fatwa berkala.\n\nUntuk rujukan lengkap Himpunan Putusan Tarjih (HPT), Anda dapat menelusuri langsung di portal resmi https://hpt.muhammadiyah.or.id atau menghubungi Takmir Masjid Sudalmiyah Rais Kampus 2 UMS.`,
+      reply: `Assalamu'alaikum Warahmatullahi Wabarakatuh.\n\nTerima kasih telah mengajukan pertanyaan. Layanan asisten sedang melakukan sinkronisasi fatwa berkala.\n\nUntuk rujukan lengkap Himpunan Putusan Tarjih (HPT), Anda dapat menelusuri langsung di portal resmi https://hpt.muhammadiyah.or.id atau menghubungi Takmir Masjid Kampus UMS.`,
       source: "Majelis Tarjih & Tajdid PP Muhammadiyah",
       isAiGenerated: false,
     });

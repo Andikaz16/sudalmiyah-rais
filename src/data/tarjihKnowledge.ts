@@ -168,7 +168,7 @@ export const TARJIH_KNOWLEDGE_BASE: TarjihTopic[] = [
       "adzan jumatan",
     ],
     summary:
-      "Masjid Muhammadiyah (termasuk Masjid Sudalmiyah Rais UMS) mengamalkan adzan shalat Jumat sebanyak 1 kali, yaitu dikumandangkan tepat saat khatib telah menaiki mimbar.",
+      "Masjid Muhammadiyah (termasuk Masjid Kampus UMS) mengamalkan adzan shalat Jumat sebanyak 1 kali, yaitu dikumandangkan tepat saat khatib telah menaiki mimbar.",
     dalil:
       "Hadits Saib bin Yazid r.a.: 'Sesungguhnya seruan adzan pada hari Jumat pada masa Rasulullah SAW, Abu Bakar, dan Umar adalah ketika imam telah duduk di atas mimbar.' (HR. Bukhari no. 912).",
     putusanTarjih:

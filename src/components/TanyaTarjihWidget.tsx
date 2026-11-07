@@ -44,7 +44,7 @@ export default function TanyaTarjihWidget() {
     {
       id: "initial-welcome",
       sender: "ai",
-      text: "Assalamu'alaikum Warahmatullahi Wabarakatuh.\n\nSelamat datang di ChatHPT Masjid Sudalmiyah Rais Kampus 2 UMS. Saya siap membantu menjawab pertanyaan Anda seputar tata cara ibadah harian, fiqih shalat, adab, hisab KHGT, hingga fatwa persyarikatan berlandaskan Himpunan Putusan Tarjih (HPT) PP Muhammadiyah serta Al-Qur'an dan Sunnah shahihah.\n\nSilakan ketik pertanyaan Anda langsung di sini atau pilih topik populer di bawah.",
+      text: "Assalamu'alaikum Warahmatullahi Wabarakatuh.\n\nSelamat datang di ChatHPT Masjid Kampus UMS. Saya siap membantu menjawab pertanyaan Anda seputar tata cara ibadah harian, fiqih shalat, adab, hisab KHGT, hingga fatwa persyarikatan berlandaskan Himpunan Putusan Tarjih (HPT) PP Muhammadiyah serta Al-Qur'an dan Sunnah shahihah.\n\nSilakan ketik pertanyaan Anda langsung di sini atau pilih topik populer di bawah.",
       source: "Majelis Tarjih & Tajdid Pimpinan Pusat Muhammadiyah",
       timestamp: "Baru saja",
     },
