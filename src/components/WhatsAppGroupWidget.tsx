@@ -11,7 +11,7 @@ interface WhatsAppGroupWidgetProps {
 
 export default function WhatsAppGroupWidget({
   adminPhone = "628122684688",
-  adminName = "Bapak Dodi",
+  adminName = "Pengurus Masjid",
 }: WhatsAppGroupWidgetProps) {
   const { language } = useLanguage();
   const isEn = language === "en";
@@ -26,8 +26,8 @@ export default function WhatsAppGroupWidget({
     const nameText = applicantName.trim() || (isEn ? "Congregant" : "Jamaah");
 
     const message = isEn
-      ? `Assalamu'alaikum Warahmatullahi Wabarakatuh ${adminName}, my name is ${nameText} (${finalRole}). I would like to request permission to join the official UMS Campus Mosque Information WhatsApp Group. Thank you.`
-      : `Assalamu'alaikum Warahmatullahi Wabarakatuh ${adminName}, nama saya ${nameText} (${finalRole}). Saya bermaksud memohon izin untuk bergabung ke Grup Informasi Resmi Masjid Kampus UMS. Mohon perkenan dan verifikasinya. Terima kasih.`;
+      ? `Assalamu'alaikum Warahmatullahi Wabarakatuh Admin, my name is ${nameText} (${finalRole}). I would like to request permission to join the official UMS Campus Mosque Information WhatsApp Group. Thank you.`
+      : `Assalamu'alaikum Warahmatullahi Wabarakatuh Pengurus Takmir Masjid Kampus UMS, nama saya ${nameText} (${finalRole}). Saya bermaksud memohon izin untuk bergabung ke Grup Informasi Resmi Masjid Kampus UMS. Mohon perkenan dan verifikasinya. Terima kasih.`;
 
     const waUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
     window.open(waUrl, "_blank", "noopener,noreferrer");
@@ -96,7 +96,7 @@ export default function WhatsAppGroupWidget({
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-emerald-950 font-bold text-sm sm:text-base shadow-lg shadow-black/20 hover:shadow-xl transition-all active:scale-[0.98] cursor-pointer"
                 >
                   <MessageCircle className="w-5 h-5 fill-current" />
-                  <span>{isEn ? "Join WhatsApp Group" : "Gabung Grup Informasi"}</span>
+                  <span>{isEn ? "Join UMS Campus Mosque Group" : "Gabung Grup Masjid Kampus UMS"}</span>
                 </button>
               </div>
             </div>
@@ -145,8 +145,8 @@ export default function WhatsAppGroupWidget({
               </div>
               <p>
                 {isEn
-                  ? `In accordance with ${adminName}'s policy, every new member requires verification prior to approval to maintain group decorum and safety.`
-                  : `Sesuai arahan pengurus (${adminName}), setiap calon anggota wajib melalui proses verifikasi terlebih dahulu demi menjaga ketertiban, kenyamanan ibadah, dan keamanan grup dari nomor asing/promosi sembarangan.`}
+                  ? "In accordance with campus mosque management policy, every new member requires verification prior to approval to maintain group decorum and safety."
+                  : "Sesuai arahan pengurus takmir, setiap calon anggota wajib melalui proses verifikasi terlebih dahulu demi menjaga ketertiban, kenyamanan ibadah, dan keamanan grup dari nomor asing/promosi sembarangan."}
               </p>
             </div>
 
@@ -208,8 +208,8 @@ export default function WhatsAppGroupWidget({
                 <Send className="w-4 h-4" />
                 <span>
                   {isEn
-                    ? `Kirim Permohonan Izin ke ${adminName} (WhatsApp)`
-                    : `Kirim Permohonan Izin ke ${adminName} (WhatsApp)`}
+                    ? "Kirim Permohonan Izin (WhatsApp)"
+                    : "Kirim Permohonan Izin (WhatsApp)"}
                 </span>
               </button>
 
@@ -219,8 +219,8 @@ export default function WhatsAppGroupWidget({
                 </p>
                 <p>
                   {isEn
-                    ? `After you send the request message, ${adminName} will review your identity and provide the official group invitation link directly via private WhatsApp message. This ensures the group remains clean, secure, and private.`
-                    : `Setelah mengirim permohonan izin di atas, ${adminName} akan meninjau identitas Anda dan mengirimkan tautan grup secara langsung melalui pesan WhatsApp pribadi. Tautan grup tidak ditampilkan untuk publik agar terhindar dari spammer dan orang sembarangan.`}
+                    ? "After you send the request message, the campus mosque management will review your identity and provide the official group invitation link directly via private WhatsApp message. This ensures the group remains clean, secure, and private."
+                    : "Setelah mengirim permohonan izin di atas, pengurus takmir akan meninjau identitas Anda dan mengirimkan tautan grup secara langsung melalui pesan WhatsApp pribadi. Tautan grup tidak ditampilkan untuk publik agar terhindar dari spammer dan orang sembarangan."}
                 </p>
               </div>
             </div>

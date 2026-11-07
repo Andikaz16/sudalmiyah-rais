@@ -615,7 +615,7 @@ ${footer}`;
                   <span>{isEn ? "Share as Picture / Poster" : "Bagikan Berupa Gambar Poster Berlogo UMS"}</span>
                 </span>
                 <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-stone-200">
-                  {isEn ? "WA & Instagram Ready" : "Sesuai Permintaan Pak Dodi"}
+                  {isEn ? "WA & Instagram Ready" : "Format Siap Bagikan"}
                 </span>
               </div>
               <p className="text-[11px] text-stone-200 leading-relaxed">
