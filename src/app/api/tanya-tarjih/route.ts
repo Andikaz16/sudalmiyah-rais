@@ -163,22 +163,21 @@ Jika Anda memerlukan kajian atau konsultasi lebih mendalam, Anda dapat menghubun
       });
     }
 
-    // Jika pertanyaan di luar topik direktori offline dan AI Gemini belum aktif
+    // Jika pertanyaan di luar topik direktori offline
     const offlineNoticeReply = `Assalamu'alaikum Warahmatullahi Wabarakatuh.
 
 Terima kasih atas pertanyaan Anda: "${message}".
 
-Saat ini sistem asisten berjalan dalam mode direktori offline terbatas. Agar Tanya Tarjih AI dapat menjawab pertanyaan bebas apa saja secara cerdas dan mendalam persis seperti platform Google Gemini (termasuk hukum doa khatmil Qur'an, fatwa kontemporer, fiqih ibadah, dan konsultasi interaktif):
+Untuk konsultasi fatwa, hukum ibadah, dan kajian Islam Tarjih yang komprehensif, silakan akses platform resmi asisten kecerdasan buatan Majelis Tarjih & Tajdid PP Muhammadiyah:
 
-1. Sistem memerlukan Google Gemini API Key aktif (tersedia gratis).
-2. Dapatkan API Key di Google AI Studio (https://aistudio.google.com/).
-3. Masukkan kunci ke variabel lingkungan GEMINI_API_KEY pada file .env.local atau konfigurasi hosting server Anda.
+ChatHPT — Asisten AI Tarjih Muhammadiyah
+Portal Resmi: https://hpt.muhammadiyah.or.id
 
-Jika Anda membutuhkan jawaban atau fatwa Tarjih atas pertanyaan di atas secara langsung hari ini, silakan berkonsultasi dengan asatidz Takmir Masjid Sudalmiyah Rais Kampus 2 UMS di kantor sekretariat masjid.`;
+"Tidak akan kesulitan lagi bertanya ttg fatwa fatwa agama, khususnya fatwa fatwa Tarjih Muhammadiyah."`;
 
     return NextResponse.json({
       reply: offlineNoticeReply,
-      source: "Takmir Masjid Sudalmiyah Rais Kampus 2 UMS",
+      source: "ChatHPT — Majelis Tarjih & Tajdid PP Muhammadiyah (hpt.muhammadiyah.or.id)",
       isAiGenerated: false,
     });
   } catch (err: unknown) {

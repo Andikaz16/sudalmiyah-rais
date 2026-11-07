@@ -5,6 +5,7 @@ import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import MuhammadiyahCalendarWidget from "@/components/MuhammadiyahCalendarWidget";
 import AgendaSection from "@/components/AgendaSection";
 import MasjidMuSection from "@/components/MasjidMuSection";
+import ChatHPTSection from "@/components/ChatHPTSection";
 import FridayScheduleSection from "@/components/FridayScheduleSection";
 import MutiaraHaditsSection from "@/components/MutiaraHaditsSection";
 import NewsSection from "@/components/NewsSection";
@@ -43,6 +44,11 @@ export default function Home() {
         {/* Pilar & Keunggulan Masjid Percontohan AUM */}
         <AnimatedSection animation="fade-up" duration={700}>
           <MasjidMuSection />
+        </AnimatedSection>
+
+        {/* ChatHPT — Asisten AI Tarjih Muhammadiyah (Resmi PP Muhammadiyah) */}
+        <AnimatedSection animation="fade-up" duration={700}>
+          <ChatHPTSection />
         </AnimatedSection>
 
         {/* Agendas Section (Maksimal 3 pada beranda, lengkap di /agenda) */}
