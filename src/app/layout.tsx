@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Amiri } from "next/font/google";
-import TanyaTarjihWidget from "@/components/TanyaTarjihWidget";
 import { LanguageProvider } from "@/context/LanguageContext";
 import "./globals.css";
 
@@ -229,7 +228,6 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-[#FAF8F5] text-slate-800 font-sans selection:bg-[#C59B27] selection:text-white">
         <LanguageProvider>
           {children}
-          <TanyaTarjihWidget />
         </LanguageProvider>
       </body>
     </html>
