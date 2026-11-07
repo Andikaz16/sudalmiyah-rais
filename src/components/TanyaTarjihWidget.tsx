@@ -162,10 +162,10 @@ export default function TanyaTarjihWidget() {
             </div>
             <div className="flex flex-col text-left">
               <span className="leading-tight font-extrabold tracking-tight text-white text-xs sm:text-sm">
-                ChatHPT
+                Tanya Tarjih AI
               </span>
               <span className="text-[10px] text-amber-200/90 font-medium leading-tight">
-                Tanya Tarjih AI
+                ChatHPT • Konsultasi Ibadah
               </span>
             </div>
           </button>
