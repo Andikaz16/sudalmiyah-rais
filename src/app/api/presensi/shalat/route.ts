@@ -146,23 +146,39 @@ export async function POST(request: NextRequest) {
       lng: 110.7719,
     };
 
-    // Validasi lokasi Geolocation (Wajib dalam kawasan masjid / radius toleransi 500 meter)
-    let minDistance = calculateDistance(data.userLat, data.userLng, mosqueData.lat, mosqueData.lng);
+    // Validasi lokasi Geolocation spesifik terhadap masjid yang dipilih jamaah
+    const selectedDistance = calculateDistance(data.userLat, data.userLng, mosqueData.lat, mosqueData.lng);
 
-    // Cek juga ke masjid kampus lainnya jika jamaah berada di kompleks kampus UMS
+    // Cari masjid kampus yang secara fisik paling dekat dengan koordinat GPS user
+    let nearestKey = data.mosqueId;
+    let nearestMosque = mosqueData;
+    let nearestDistance = selectedDistance;
+
     for (const key of Object.keys(CAMPUS_MOSQUES)) {
       const other = CAMPUS_MOSQUES[key];
       const d = calculateDistance(data.userLat, data.userLng, other.lat, other.lng);
-      if (d < minDistance) {
-        minDistance = d;
+      if (d < nearestDistance) {
+        nearestDistance = d;
+        nearestKey = key;
+        nearestMosque = other;
       }
     }
 
-    const locationVerified = minDistance <= 550; // toleransi 550 meter mencakup seluruh aula & pelataran kampus
-    if (!locationVerified) {
+    const MAX_ALLOWED_DISTANCE_METERS = 250; // Radius toleransi presensi fisik di kawasan masjid kampus
+
+    if (selectedDistance > MAX_ALLOWED_DISTANCE_METERS) {
+      if (nearestDistance <= MAX_ALLOWED_DISTANCE_METERS && nearestKey !== data.mosqueId) {
+        return NextResponse.json(
+          {
+            error: `Lokasi GPS Anda terdeteksi berada di kawasan ${nearestMosque.name} (${Math.round(nearestDistance)} meter), bukan di ${mosqueData.name} (${Math.round(selectedDistance)} meter). Silakan pilih ${nearestMosque.name} sesuai lokasi fisik Anda saat ini.`,
+          },
+          { status: 400 }
+        );
+      }
+
       return NextResponse.json(
         {
-          error: `Posisi GPS Anda terdeteksi berjarak ${Math.round(minDistance)} meter dari kawasan Masjid UMS (melebihi toleransi batas kehadiran). Pastikan Anda berada langsung di lingkungan masjid kampus UMS saat presensi.`,
+          error: `Posisi GPS Anda terdeteksi berjarak ${Math.round(selectedDistance)} meter dari ${mosqueData.name} (melebihi batas toleransi radius presensi ${MAX_ALLOWED_DISTANCE_METERS} meter). Pastikan Anda berada langsung di lingkungan masjid kampus UMS saat presensi.`,
         },
         { status: 400 }
       );
@@ -228,7 +244,7 @@ export async function POST(request: NextRequest) {
       userLat: data.userLat,
       userLng: data.userLng,
       locationVerified: true,
-      distanceMeters: Math.round(minDistance),
+      distanceMeters: Math.round(selectedDistance),
     };
 
     db.prayerAttendances.unshift(newAttendance);

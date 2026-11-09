@@ -28,16 +28,32 @@ import { calculatePrayerTimes } from "@/lib/prayer-times";
 interface MosqueOption {
   id: string;
   name: string;
+  location: string;
+  lat: number;
+  lng: number;
 }
 
 const MOSQUES: MosqueOption[] = [
-  { id: "sudalmiyah", name: "Masjid Hj. Sudalmiyah Rais" },
-  { id: "fadhlurrahman", name: "Masjid Fadhlurrahman" },
-  { id: "mas-mansur", name: "Masjid KH. Mas Mansur" },
-  { id: "mahad-abu-bakar", name: "Masjid Ma'had Abu Bakar" },
-  { id: "munajat-shabran", name: "Masjid Al-Munajat" },
-  { id: "ar-razi", name: "Masjid Ar-Razi FKG" },
+  { id: "sudalmiyah", name: "Masjid Hj. Sudalmiyah Rais", location: "Kampus 2 UMS", lat: -7.5583, lng: 110.7719 },
+  { id: "fadhlurrahman", name: "Masjid Fadhlurrahman", location: "Kampus 1 UMS", lat: -7.5587, lng: 110.7766 },
+  { id: "mas-mansur", name: "Masjid KH. Mas Mansur", location: "Kampus 4 UMS (Pesma)", lat: -7.5558, lng: 110.7634 },
+  { id: "mahad-abu-bakar", name: "Masjid Ma'had Abu Bakar", location: "Kampus 2 UMS", lat: -7.5574, lng: 110.7712 },
+  { id: "munajat-shabran", name: "Masjid Al-Munajat", location: "Makamhaji (Pondok Shabran)", lat: -7.5681, lng: 110.7698 },
+  { id: "ar-razi", name: "Masjid Ar-Razi FKG", location: "Kampus 4 UMS (FKG)", lat: -7.5549, lng: 110.7645 },
 ];
+
+function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371e3;
+  const phi1 = (lat1 * Math.PI) / 180;
+  const phi2 = (lat2 * Math.PI) / 180;
+  const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+  const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+    Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
+}
 
 type PrayerKey = "SUBUH" | "DZUHUR" | "ASHAR" | "MAGHRIB" | "ISYA";
 
@@ -202,7 +218,18 @@ export default function ShalatPresensiPage() {
   const [userLat, setUserLat] = useState<number | undefined>(undefined);
   const [userLng, setUserLng] = useState<number | undefined>(undefined);
   const [locationState, setLocationState] = useState<"IDLE" | "CHECKING" | "LOCATED" | "DENIED">("IDLE");
-  const [locationDistance, setLocationDistance] = useState<number | null>(null);
+  const [detectedNearestMosque, setDetectedNearestMosque] = useState<{
+    id: string;
+    name: string;
+    campus: string;
+    distance: number;
+  } | null>(null);
+
+  const currentMosqueObj = MOSQUES.find((m) => m.id === selectedMosque) || MOSQUES[0];
+  const distanceToSelected =
+    userLat !== undefined && userLng !== undefined
+      ? calculateDistanceMeters(userLat, userLng, currentMosqueObj.lat, currentMosqueObj.lng)
+      : null;
 
   // Submit status
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -326,11 +353,40 @@ export default function ShalatPresensiPage() {
     setLocationState("CHECKING");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setUserLat(pos.coords.latitude);
-        setUserLng(pos.coords.longitude);
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        setUserLat(lat);
+        setUserLng(lng);
+
+        // Cari masjid kampus UMS terdekat dari koordinat fisik user
+        let nearest = MOSQUES[0];
+        let minD = calculateDistanceMeters(lat, lng, nearest.lat, nearest.lng);
+
+        for (const m of MOSQUES) {
+          const d = calculateDistanceMeters(lat, lng, m.lat, m.lng);
+          if (d < minD) {
+            minD = d;
+            nearest = m;
+          }
+        }
+
+        setDetectedNearestMosque({
+          id: nearest.id,
+          name: nearest.name,
+          campus: nearest.location,
+          distance: minD,
+        });
+
+        // Jika terdeteksi di dalam radius toleransi salah satu masjid kampus (<= 250m),
+        // otomatis arahkan pilihan masjid ke masjid fisik tersebut
+        if (minD <= 250) {
+          setSelectedMosque(nearest.id);
+        }
+
         setLocationState("LOCATED");
       },
-      () => {
+      (err) => {
+        console.error("GPS error:", err);
         setLocationState("DENIED");
       },
       { timeout: 12000, enableHighAccuracy: true }
@@ -377,8 +433,22 @@ export default function ShalatPresensiPage() {
       return;
     }
 
-    if (locationState !== "LOCATED" || userLat === undefined || userLng === undefined) {
-      alert("Verifikasi lokasi GPS di kawasan Masjid UMS wajib dilakukan. Silakan klik tombol 'Verifikasi Lokasi di Kawasan Masjid UMS' terlebih dahulu.");
+    if (locationState !== "LOCATED" || userLat === undefined || userLng === undefined || distanceToSelected === null) {
+      alert("Verifikasi lokasi GPS di kawasan Masjid UMS wajib dilakukan. Silakan klik tombol verifikasi lokasi GPS terlebih dahulu.");
+      return;
+    }
+
+    // Validasi ketat geofence (maksimal 250 meter dari masjid yang dipilih)
+    if (distanceToSelected > 250) {
+      if (detectedNearestMosque && detectedNearestMosque.distance <= 250 && detectedNearestMosque.id !== selectedMosque) {
+        setSubmitError(
+          `Lokasi GPS Anda terdeteksi berada di kawasan ${detectedNearestMosque.name} (${detectedNearestMosque.distance} meter), bukan di ${currentMosqueObj.name} (${distanceToSelected} meter). Silakan ganti pilihan masjid Anda ke ${detectedNearestMosque.name} sesuai lokasi fisik Anda saat ini.`
+        );
+      } else {
+        setSubmitError(
+          `Posisi GPS Anda terdeteksi berjarak ${distanceToSelected} meter dari ${currentMosqueObj.name} (melebihi batas toleransi kehadiran 250 meter). Presensi shalat berjamaah wajib dilakukan langsung di lingkungan masjid kampus UMS.`
+        );
+      }
       return;
     }
 
@@ -515,7 +585,9 @@ export default function ShalatPresensiPage() {
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>Verifikasi GPS</span>
                 </span>
-                <span className="font-semibold">Terverifikasi di Masjid Kampus</span>
+                <span className="font-semibold">
+                  Terverifikasi ({successRecord.distanceMeters !== undefined ? `${successRecord.distanceMeters}m dari masjid` : "Kawasan Masjid"})
+                </span>
               </div>
             </div>
 
@@ -527,6 +599,9 @@ export default function ShalatPresensiPage() {
                   setPhotoUrl("");
                   setPhotoPreview("");
                   setLocationState("IDLE");
+                  setDetectedNearestMosque(null);
+                  setUserLat(undefined);
+                  setUserLng(undefined);
                 }}
                 className="w-full py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white font-bold text-xs transition-colors shadow-sm cursor-pointer"
               >
@@ -662,7 +737,7 @@ export default function ShalatPresensiPage() {
                 >
                   {MOSQUES.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {m.name}
+                      {m.name} ({m.location})
                     </option>
                   ))}
                 </select>
@@ -820,7 +895,7 @@ export default function ShalatPresensiPage() {
               </div>
 
               {/* 6. Verifikasi Lokasi GPS (Wajib) */}
-              <div className="space-y-2 pt-2 border-t border-stone-200">
+              <div className="space-y-3 pt-2 border-t border-stone-200">
                 <div className="flex items-center justify-between">
                   <label className="block text-xs font-bold text-stone-800 uppercase tracking-wider">
                     6. Verifikasi Lokasi di Masjid UMS <span className="text-rose-600">*</span>
@@ -829,36 +904,109 @@ export default function ShalatPresensiPage() {
                     Wajib
                   </span>
                 </div>
-                <p className="text-[11px] text-stone-500">
-                  Sistem mewajibkan pencocokan koordinat GPS untuk memastikan Anda berada langsung di lingkungan masjid kampus UMS.
+                <p className="text-[11px] text-stone-500 leading-relaxed">
+                  Sistem mewajibkan pencocokan koordinat GPS secara akurat ke masjid yang Anda pilih (radius maksimal 250 meter) untuk memastikan kehadiran fisik di masjid.
                 </p>
 
-                {locationState === "LOCATED" ? (
-                  <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2.5">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Lokasi GPS Terverifikasi</div>
-                      <div className="text-[11px] text-emerald-700">
-                        Koordinat Anda berhasil divalidasi di kawasan masjid kampus UMS.
+                {locationState === "LOCATED" && distanceToSelected !== null ? (
+                  distanceToSelected <= 250 ? (
+                    /* Sesuai dan Terverifikasi */
+                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2.5">
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                          <div>
+                            <div className="font-bold text-emerald-950">
+                              Lokasi GPS Terverifikasi Sesuai
+                            </div>
+                            <div className="text-[11px] text-emerald-800 mt-0.5">
+                              Anda berada di <strong>{currentMosqueObj.name}</strong> ({currentMosqueObj.location}).
+                            </div>
+                            <div className="text-[10px] text-emerald-700 font-mono mt-1">
+                              Jarak fisik saat ini: {distanceToSelected} meter (Batas toleransi radius: 250m)
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleDetectLocation}
+                          title="Deteksi ulang lokasi"
+                          className="text-[11px] text-emerald-800 underline hover:text-emerald-950 shrink-0 font-medium cursor-pointer"
+                        >
+                          Cek Ulang
+                        </button>
                       </div>
                     </div>
-                  </div>
+                  ) : detectedNearestMosque && detectedNearestMosque.distance <= 250 && detectedNearestMosque.id !== selectedMosque ? (
+                    /* User berada di masjid UMS lain */
+                    <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-xs space-y-2.5">
+                      <div className="flex items-start gap-2.5">
+                        <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                        <div>
+                          <div className="font-bold text-amber-900">
+                            Lokasi Masjid Tidak Cocok
+                          </div>
+                          <p className="text-[11px] text-amber-800 mt-1 leading-relaxed">
+                            Anda memilih <strong>{currentMosqueObj.name}</strong> (jarak: {distanceToSelected} meter), namun GPS mendeteksi Anda sedang berada di kawasan <strong>{detectedNearestMosque.name}</strong> (jarak: {detectedNearestMosque.distance} meter).
+                          </p>
+                        </div>
+                      </div>
+                      <div className="pt-1 flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMosque(detectedNearestMosque.id)}
+                          className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs transition-colors shadow-sm cursor-pointer"
+                        >
+                          Ganti Pilihan ke {detectedNearestMosque.name}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleDetectLocation}
+                          className="px-3 py-2 rounded-xl bg-white border border-amber-300 text-amber-900 font-semibold text-xs hover:bg-amber-100 transition-colors cursor-pointer"
+                        >
+                          Cek Ulang GPS
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Di luar semua kawasan masjid */
+                    <div className="p-4 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-950 text-xs space-y-2.5">
+                      <div className="flex items-start gap-2.5">
+                        <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                        <div>
+                          <div className="font-bold text-rose-900">
+                            Di Luar Kawasan Masjid Kampus UMS
+                          </div>
+                          <p className="text-[11px] text-rose-800 mt-1 leading-relaxed">
+                            Posisi GPS Anda terdeteksi berjarak <strong>{distanceToSelected} meter</strong> dari {currentMosqueObj.name} (melebihi batas radius presensi 250 meter). Presensi shalat berjamaah wajib dilakukan secara langsung di lingkungan masjid kampus.
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleDetectLocation}
+                        className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-colors shadow-sm cursor-pointer"
+                      >
+                        Deteksi Ulang Koordinat GPS
+                      </button>
+                    </div>
+                  )
                 ) : (
                   <button
                     type="button"
                     onClick={handleDetectLocation}
                     disabled={locationState === "CHECKING"}
-                    className="w-full py-3 px-4 rounded-2xl bg-[#003B73]/5 hover:bg-[#003B73]/10 text-[#003B73] text-xs font-bold border-2 border-dashed border-[#003B73]/40 hover:border-[#003B73] flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    className="w-full py-3.5 px-4 rounded-2xl bg-[#003B73]/5 hover:bg-[#003B73]/10 text-[#003B73] text-xs font-bold border-2 border-dashed border-[#003B73]/40 hover:border-[#003B73] flex items-center justify-center gap-2 transition-all cursor-pointer"
                   >
                     <Navigation className={`w-4 h-4 text-[#003B73] ${locationState === "CHECKING" ? "animate-spin" : ""}`} />
-                    <span>{locationState === "CHECKING" ? "Mendeteksi Koordinat GPS..." : "Klik untuk Verifikasi Lokasi di Masjid UMS * (Wajib)"}</span>
+                    <span>{locationState === "CHECKING" ? "Mendeteksi Koordinat GPS dan Mencocokkan Masjid..." : "Klik untuk Verifikasi Lokasi di Masjid UMS * (Wajib)"}</span>
                   </button>
                 )}
 
                 {locationState === "DENIED" && (
                   <p className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-start gap-2">
                     <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                    <span>Izin akses lokasi (GPS) ditolak atau tidak aktif. Mohon izinkan browser HP Anda mengakses lokasi untuk melanjutkan absensi shalat.</span>
+                    <span>Izin akses lokasi (GPS) ditolak atau tidak aktif. Mohon izinkan browser HP Anda mengakses lokasi untuk melanjutkan absensi shalat berjamaah.</span>
                   </p>
                 )}
               </div>
