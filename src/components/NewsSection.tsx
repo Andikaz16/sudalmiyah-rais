@@ -519,12 +519,9 @@ export default function NewsSection() {
     };
 
     fetchLiveNews();
-    // Cek pembaruan berita setiap 15 menit agar efisien dan tidak memakan batas CPU Vercel
-    const pollInterval = setInterval(fetchLiveNews, 15 * 60 * 1000);
 
     return () => {
       isMounted = false;
-      clearInterval(pollInterval);
     };
   }, []);
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getDbAsync, saveDb, logSecurityEvent } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
@@ -97,6 +98,10 @@ export async function POST(request: NextRequest) {
     db.manualNews.unshift(newItem);
     await saveDb(db);
     invalidateNewsCache();
+    try {
+      revalidatePath("/api/news");
+      revalidatePath("/");
+    } catch {}
 
     const clientIp = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -192,6 +197,10 @@ export async function PUT(request: NextRequest) {
     db.manualNews[index] = updatedItem;
     await saveDb(db);
     invalidateNewsCache();
+    try {
+      revalidatePath("/api/news");
+      revalidatePath("/");
+    } catch {}
 
     const clientIp = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -247,6 +256,10 @@ export async function DELETE(request: NextRequest) {
   db.manualNews = db.manualNews.filter((n) => n.id !== id);
   await saveDb(db);
   invalidateNewsCache();
+  try {
+    revalidatePath("/api/news");
+    revalidatePath("/");
+  } catch {}
 
   const clientIp = request.headers.get("x-forwarded-for") || "127.0.0.1";
   logSecurityEvent(
