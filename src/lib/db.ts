@@ -20,6 +20,7 @@ import {
   PrayerName,
   KhutbahItem,
   InfaqHadith,
+  MosqueBankInfo,
 } from "./types";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { getFirestoreDb, isFirebaseConfigured } from "./firebase";
@@ -45,6 +46,7 @@ export interface DatabaseSchema {
   prayerAttendances?: PrayerAttendance[];
   khutbahList?: KhutbahItem[];
   infaqHadiths?: InfaqHadith[];
+  mosqueBankAccounts?: MosqueBankInfo[];
 }
 
 function getDbFilePath(): string {
@@ -238,6 +240,89 @@ export function getDefaultFridayScheduleHistory(): FridayOfficerSchedule[] {
       time: "11:40 WIB",
       notes: "Khutbah Jumat di Masjid Fadhlurrahman Kampus 1 UMS.",
       updatedAt: "2026-10-16T13:00:00Z",
+    },
+  ];
+}
+
+export function getDefaultMosqueBankAccounts(): MosqueBankInfo[] {
+  return [
+    {
+      mosqueId: "sudalmiyah",
+      mosqueName: "Masjid Hj. Sudalmiyah Rais",
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "6012275865",
+      accountHolder: "LAZ UMS Sudalmiyah Rais",
+      qrisImageUrl: "/images/qris-sudalmiyah.png",
+      qrisMerchantName: "LAZ UMS-MSJD SUDALMIYAH",
+      qrisNmid: "ID2024353816125",
+      notes: "Infaq & Sedekah Operasional serta Kemakmuran Masjid Hj. Sudalmiyah Rais Kampus 2 UMS",
+      isActive: true,
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      mosqueId: "fadhlurrahman",
+      mosqueName: "Masjid Fadhlurrahman",
+      bankName: "Bank Jateng Syariah",
+      accountNumber: "5023001890",
+      accountHolder: "Takmir Masjid Fadhlurrahman UMS",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "MASJID FADHLURRAHMAN UMS",
+      qrisNmid: "ID1020021189401",
+      notes: "Infaq Pembangunan, Kajian, & Kemakmuran Masjid Fadhlurrahman Kampus 1 UMS",
+      isActive: true,
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      mosqueId: "mas-mansur",
+      mosqueName: "Masjid KH. Mas Mansur",
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "7128904561",
+      accountHolder: "PESMA KH Mas Mansur UMS",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "MASJID KH MAS MANSUR PESMA",
+      qrisNmid: "ID1020021189402",
+      notes: "Infaq Pembinaan Santri Pesma & Kemakmuran Masjid KH. Mas Mansur Kampus 4 UMS",
+      isActive: true,
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      mosqueId: "mahad-abu-bakar",
+      mosqueName: "Masjid Ma'had Abu Bakar",
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "7098451230",
+      accountHolder: "Ma'had Abu Bakar Ash-Shiddiq UMS",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "MAHAD ABU BAKAR UMS",
+      qrisNmid: "ID1020021189403",
+      notes: "Infaq Dakwah Bahasa Arab, Studi Syariah, & Operasional Masjid Ma'had Abu Bakar",
+      isActive: true,
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      mosqueId: "munajat-shabran",
+      mosqueName: "Masjid Al-Munajat",
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "7034567891",
+      accountHolder: "Pondok Shabran UMS / Masjid Al-Munajat",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "MASJID AL-MUNAJAT SHABRAN",
+      qrisNmid: "ID1020021189404",
+      notes: "Infaq Perkaderan Ulama Tarjih & Operasional Masjid Al-Munajat Pondok Shabran",
+      isActive: true,
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      mosqueId: "ar-razi",
+      mosqueName: "Masjid Ar-Razi FKG",
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "7145678902",
+      accountHolder: "Masjid Ar-Razi FKG UMS",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "MASJID AR-RAZI FKG UMS",
+      qrisNmid: "ID1020021189405",
+      notes: "Infaq Integrasi Medis-Spiritualitas & Operasional Masjid Ar-Razi FKG Kampus 4 UMS",
+      isActive: true,
+      updatedAt: new Date().toISOString(),
     },
   ];
 }
@@ -852,6 +937,7 @@ function getInitialData(): DatabaseSchema {
     prayerAttendances: getDefaultPrayerAttendances(),
     khutbahList: getDefaultKhutbahList(),
     infaqHadiths: getDefaultInfaqHadiths(),
+    mosqueBankAccounts: getDefaultMosqueBankAccounts(),
   };
 }
 
@@ -896,6 +982,15 @@ export function ensureDbDefaults(data: DatabaseSchema): DatabaseSchema {
   }
   if (!data.qrisSettings) {
     data.qrisSettings = getInitialData().qrisSettings;
+  }
+  if (!data.mosqueBankAccounts || data.mosqueBankAccounts.length < 6) {
+    const defaults = getDefaultMosqueBankAccounts();
+    if (!data.mosqueBankAccounts || data.mosqueBankAccounts.length === 0) {
+      data.mosqueBankAccounts = defaults;
+    } else {
+      const existingMap = new Map(data.mosqueBankAccounts.map((b) => [b.mosqueId, b]));
+      data.mosqueBankAccounts = defaults.map((d) => existingMap.get(d.mosqueId) || d);
+    }
   }
   if (!data.feedbacks) {
     data.feedbacks = getInitialData().feedbacks || [];

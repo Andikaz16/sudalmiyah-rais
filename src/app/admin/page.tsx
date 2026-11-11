@@ -49,6 +49,8 @@ import {
   Lock,
   Unlock,
   ShieldAlert,
+  ShieldCheck,
+  Eye,
   ScrollText,
   Quote,
 } from "lucide-react";
@@ -70,6 +72,7 @@ import {
   PrayerName,
   KhutbahItem,
   InfaqHadith,
+  MosqueBankInfo,
 } from "@/lib/types";
 import { normalizeImageUrl } from "@/lib/utils";
 import { getHijriDate } from "@/lib/prayer-times";
@@ -112,6 +115,7 @@ const ADMIN_TABS = [
   { id: "AGENDAS", label: "Kelola Agenda & Kajian", shortLabel: "Agenda & Kajian", icon: Calendar },
   { id: "PETUGAS_JUMAT", label: "Petugas Shalat Jumat", shortLabel: "Petugas Jumat", icon: Clock },
   { id: "QRIS_INFAQ", label: "Kelola QRIS Infaq", shortLabel: "QRIS Infaq", icon: QrCode },
+  { id: "REKENING_MASJID", label: "Rekening & QRIS 6 Masjid", shortLabel: "Rekening 6 Masjid", icon: Coins },
   { id: "REGISTRATIONS", label: "Presensi Kehadiran Agenda", shortLabel: "Presensi Agenda", icon: Users },
   { id: "ABSENSI_SHALAT", label: "Absensi Shalat Berjamaah", shortLabel: "Absensi Shalat", icon: CheckCircle2 },
   { id: "FEEDBACK", label: "Kotak Saran & Aspirasi", shortLabel: "Kotak Saran", icon: MessageSquare },
@@ -187,7 +191,7 @@ async function compressImageForUpload(
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REGISTRATIONS" | "ABSENSI_SHALAT" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID" | "KHUTBAH" | "MUTIARA_HADITS"
+    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REKENING_MASJID" | "REGISTRATIONS" | "ABSENSI_SHALAT" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID" | "KHUTBAH" | "MUTIARA_HADITS"
   >("AGENDAS");
 
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -460,6 +464,14 @@ export default function AdminDashboardPage() {
   const [uploadingSecondaryQrisImage, setUploadingSecondaryQrisImage] = useState(false);
   const [qrisSaveSuccess, setQrisSaveSuccess] = useState(false);
 
+  // Rekening & QRIS 6 Masjid state
+  const [mosqueBankAccounts, setMosqueBankAccounts] = useState<MosqueBankInfo[]>([]);
+  const [selectedBankMosqueId, setSelectedBankMosqueId] = useState<string>("sudalmiyah");
+  const [savingBankInfo, setSavingBankInfo] = useState(false);
+  const [uploadingBankQris, setUploadingBankQris] = useState(false);
+  const [bankSaveSuccess, setBankSaveSuccess] = useState(false);
+  const activeBankMosqueMeta = ADMIN_MOSQUES.find((m) => m.id === selectedBankMosqueId) || ADMIN_MOSQUES[0];
+
   // Modal new agenda state
   const [isNewAgendaOpen, setIsNewAgendaOpen] = useState(false);
   const [newAgenda, setNewAgenda] = useState({
@@ -687,7 +699,7 @@ export default function AdminDashboardPage() {
 
   const loadData = async () => {
     try {
-      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes, newsRes, khutbahRes, hadithRes] = await Promise.all([
+      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes, newsRes, khutbahRes, hadithRes, bankRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch(`/api/agendas?t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/friday-schedule"),
@@ -698,6 +710,7 @@ export default function AdminDashboardPage() {
         fetch(`/api/admin/news?t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/admin/khutbah?t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/admin/infaq-hadiths?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/mosque-bank-accounts?t=${Date.now()}`, { cache: "no-store" }),
       ]);
 
       if (statusRes.ok) {
@@ -745,6 +758,12 @@ export default function AdminDashboardPage() {
       }
       if (qrisJson.success && qrisJson.qris) {
         setQrisSettings(qrisJson.qris);
+      }
+      if (bankRes && bankRes.ok) {
+        const bankJson = await bankRes.json();
+        if (bankJson.success && Array.isArray(bankJson.accounts)) {
+          setMosqueBankAccounts(bankJson.accounts);
+        }
       }
       if (popupRes.ok) {
         const popupJson = await popupRes.json();
@@ -1209,6 +1228,94 @@ export default function AdminDashboardPage() {
       alert(err.message || "Gagal menyimpan pengaturan QRIS.");
     } finally {
       setSavingQris(false);
+      setIsPublishingProcessing(null);
+    }
+  };
+
+  // Rekening & QRIS 6 Masjid Handlers
+  const activeBankInfo =
+    mosqueBankAccounts.find((b) => b.mosqueId === selectedBankMosqueId) || {
+      mosqueId: selectedBankMosqueId,
+      mosqueName: activeBankMosqueMeta.name,
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "",
+      accountHolder: "",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "",
+      qrisNmid: "",
+      notes: "",
+      isActive: true,
+      updatedAt: "",
+    };
+
+  const handleUpdateBankField = (field: keyof MosqueBankInfo, value: any) => {
+    setMosqueBankAccounts((prev) => {
+      const idx = prev.findIndex((b) => b.mosqueId === selectedBankMosqueId);
+      if (idx !== -1) {
+        const copy = [...prev];
+        copy[idx] = { ...copy[idx], [field]: value };
+        return copy;
+      }
+      return [...prev, { ...activeBankInfo, [field]: value }];
+    });
+  };
+
+  const handleBankQrisImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
+    setUploadingBankQris(true);
+    try {
+      const file = await compressImageForUpload(rawFile);
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "qris");
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal mengunggah gambar QRIS.");
+      handleUpdateBankField("qrisImageUrl", data.url);
+    } catch (err: any) {
+      alert(err.message || "Gagal mengunggah gambar QRIS.");
+    } finally {
+      setUploadingBankQris(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleSaveBankInfo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeBankInfo) return;
+    setSavingBankInfo(true);
+    setBankSaveSuccess(false);
+    setIsPublishingProcessing(`Menyimpan rekening & QRIS ${activeBankMosqueMeta.name}`);
+
+    try {
+      const res = await fetch("/api/mosque-bank-accounts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...activeBankInfo,
+          mosqueName: activeBankMosqueMeta.name,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menyimpan rekening & QRIS.");
+
+      if (Array.isArray(data.accounts)) {
+        setMosqueBankAccounts(data.accounts);
+      }
+      setBankSaveSuccess(true);
+      setTimeout(() => setBankSaveSuccess(false), 3000);
+      triggerPublishNotification(
+        "Pengaturan Rekening & QRIS Disimpan!",
+        `Nomor rekening dan QRIS untuk ${activeBankMosqueMeta.name} berhasil diperbarui dan langsung tayang di halaman Sejarah publik.`
+      );
+    } catch (err: any) {
+      alert(err.message || "Gagal menyimpan rekening & QRIS.");
+    } finally {
+      setSavingBankInfo(false);
       setIsPublishingProcessing(null);
     }
   };
@@ -3695,6 +3802,302 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                 Memuat data pengaturan QRIS...
               </div>
             )}
+          </div>
+        )}
+
+        {/* Tab: REKENING_MASJID (Pengelolaan No. Rekening & Gambar QRIS 6 Masjid Kampus) */}
+        {activeTab === "REKENING_MASJID" && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-lg font-bold text-stone-900 font-serif">
+                Kelola Nomor Rekening &amp; Gambar QRIS 6 Masjid Kampus UMS
+              </h2>
+              <p className="text-xs text-stone-500 mt-0.5">
+                Sesuaikan informasi bank penampung, nomor rekening, nama penerima, serta unggah berkas gambar QRIS resmi untuk masing-masing masjid kampus. Perubahan langsung tampil di halaman Sejarah Masjid publik.
+              </p>
+            </div>
+
+            {/* Mosque Selector Grid */}
+            <div className="bg-stone-50 p-4 rounded-3xl border border-stone-200/90 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-stone-700 uppercase tracking-wider">
+                  Pilih Masjid yang Dikelola:
+                </span>
+                <span className="text-[11px] font-semibold text-[#003B73]">
+                  Sedang Mengedit: <strong>{activeBankMosqueMeta.name}</strong> ({activeBankMosqueMeta.location})
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                {ADMIN_MOSQUES.map((m) => {
+                  const isSelected = m.id === selectedBankMosqueId;
+                  const item = mosqueBankAccounts.find((b) => b.mosqueId === m.id);
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setSelectedBankMosqueId(m.id)}
+                      className={`p-2.5 sm:p-3 rounded-2xl text-left border transition-all duration-200 flex flex-col justify-between active:scale-95 cursor-pointer ${
+                        isSelected
+                          ? "bg-[#003B73] text-white border-[#003B73] shadow-md shadow-[#003B73]/20 ring-2 ring-[#003B73]/20"
+                          : "bg-white text-stone-700 border-stone-200 hover:bg-stone-100 hover:border-stone-300"
+                      }`}
+                    >
+                      <div className="flex items-start gap-1.5 mb-1">
+                        <span
+                          className={`w-2 h-2 rounded-full shrink-0 mt-1 ${
+                            isSelected ? "bg-[#D4AF37]" : "bg-stone-300"
+                          }`}
+                        />
+                        <span className="text-[11px] sm:text-xs font-bold leading-snug line-clamp-2">
+                          {m.name}
+                        </span>
+                      </div>
+                      <div className="text-[9px] mt-1 font-mono opacity-80">
+                        {item?.bankName ? item.bankName.split("(")[0].trim() : "BSI"}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {bankSaveSuccess && (
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs font-semibold text-emerald-800 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Pengaturan nomor rekening dan QRIS untuk {activeBankMosqueMeta.name} berhasil disimpan dan langsung aktif di halaman Sejarah.</span>
+              </div>
+            )}
+
+            {/* Form & Live Preview Grid */}
+            <form onSubmit={handleSaveBankInfo} className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 shadow-sm">
+              {/* Form Input (Left: 7 cols) */}
+              <div className="lg:col-span-7 space-y-4">
+                <div className="pb-3 border-b border-stone-200 flex items-center justify-between">
+                  <h3 className="font-serif font-bold text-base text-stone-900">
+                    Formulir Rekening &amp; QRIS: {activeBankMosqueMeta.name}
+                  </h3>
+                  <span className="text-xs font-mono text-[#003B73] bg-[#003B73]/10 px-2.5 py-0.5 rounded-full font-bold">
+                    ID: {selectedBankMosqueId}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Nama Bank Penampung <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={activeBankInfo.bankName}
+                      onChange={(e) => handleUpdateBankField("bankName", e.target.value)}
+                      placeholder="Contoh: Bank Syariah Indonesia (BSI)"
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-900 text-xs font-semibold focus:outline-none focus:border-[#003B73]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Nomor Rekening <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={activeBankInfo.accountNumber}
+                      onChange={(e) => handleUpdateBankField("accountNumber", e.target.value)}
+                      placeholder="Contoh: 6012275865"
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-900 text-xs font-mono font-bold focus:outline-none focus:border-[#003B73]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Atas Nama Rekening (A/N) <span className="text-rose-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={activeBankInfo.accountHolder}
+                    onChange={(e) => handleUpdateBankField("accountHolder", e.target.value)}
+                    placeholder="Contoh: Takmir Masjid Fadhlurrahman UMS"
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-900 text-xs font-semibold focus:outline-none focus:border-[#003B73]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Nama Merchant QRIS (Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      value={activeBankInfo.qrisMerchantName || ""}
+                      onChange={(e) => handleUpdateBankField("qrisMerchantName", e.target.value)}
+                      placeholder="Contoh: MASJID FADHLURRAHMAN UMS"
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-900 text-xs focus:outline-none focus:border-[#003B73]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      NMID QRIS (Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      value={activeBankInfo.qrisNmid || ""}
+                      onChange={(e) => handleUpdateBankField("qrisNmid", e.target.value)}
+                      placeholder="Contoh: ID1020021189401"
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-900 text-xs font-mono focus:outline-none focus:border-[#003B73]"
+                    />
+                  </div>
+                </div>
+
+                {/* Upload QRIS Image */}
+                <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold text-stone-800">
+                      Unggah Berkas Gambar QRIS
+                    </label>
+                    <span className="text-[10px] text-stone-500 font-mono">JPG, PNG, WEBP</span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-3">
+                    <label className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold cursor-pointer transition-colors shadow-xs text-center inline-flex items-center justify-center gap-1.5 active:scale-95">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{uploadingBankQris ? "Mengompres & Mengunggah..." : "Pilih Berkas QRIS"}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={uploadingBankQris}
+                        onChange={handleBankQrisImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    <div className="flex-1 w-full sm:w-auto">
+                      <input
+                        type="text"
+                        value={activeBankInfo.qrisImageUrl}
+                        onChange={(e) => handleUpdateBankField("qrisImageUrl", e.target.value)}
+                        placeholder="Path berkas QRIS (contoh: /images/qris-sudalmiyah.png)"
+                        className="w-full px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-700 text-[11px] font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Catatan / Peruntukan Infaq (Tampil di Publik)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={activeBankInfo.notes || ""}
+                    onChange={(e) => handleUpdateBankField("notes", e.target.value)}
+                    placeholder="Contoh: Infaq operasional shalat rawatib, kajian mahasiswa, dan kemakmuran masjid..."
+                    className="w-full px-3 py-2 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-900 text-xs focus:outline-none focus:border-[#003B73]"
+                  />
+                </div>
+
+                <div className="pt-2 flex items-center justify-between">
+                  <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-stone-700">
+                    <input
+                      type="checkbox"
+                      checked={activeBankInfo.isActive}
+                      onChange={(e) => handleUpdateBankField("isActive", e.target.checked)}
+                      className="w-4 h-4 rounded text-[#003B73] focus:ring-[#003B73]"
+                    />
+                    <span>Aktifkan dan tampilkan rekening &amp; QRIS di halaman publik</span>
+                  </label>
+
+                  <button
+                    type="submit"
+                    disabled={savingBankInfo}
+                    className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50 cursor-pointer active:scale-95"
+                  >
+                    {savingBankInfo ? "Menyimpan Data..." : `Simpan Rekening ${activeBankMosqueMeta.name}`}
+                  </button>
+                </div>
+              </div>
+
+              {/* Live Preview (Right: 5 cols) */}
+              <div className="lg:col-span-5 bg-[#FAF8F5] border border-stone-200 rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-stone-200">
+                  <span className="text-[11px] font-bold text-stone-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5 text-[#B58A1E]" />
+                    <span>Pratinjau Tampilan di Halaman Sejarah:</span>
+                  </span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 font-bold">
+                    Live Preview
+                  </span>
+                </div>
+
+                <div className="bg-gradient-to-br from-stone-50 via-white to-amber-50/40 border border-stone-200/90 rounded-2xl p-4 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-stone-200">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold">
+                      <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                      <span>Infaq &amp; QRIS Resmi</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-stone-400">Kas Takmir</span>
+                  </div>
+
+                  <div className="text-center space-y-1.5">
+                    <div className="relative aspect-square w-32 mx-auto rounded-xl overflow-hidden border-2 border-amber-300/70 shadow-xs bg-white p-1.5">
+                      <Image
+                        src={activeBankInfo.qrisImageUrl || "/images/qris-bank-jateng.jpg"}
+                        alt="Pratinjau QRIS"
+                        fill
+                        unoptimized
+                        className="object-contain p-1"
+                      />
+                    </div>
+                    <div className="text-[10px] text-[#003B73] font-semibold">
+                      {activeBankInfo.qrisMerchantName || activeBankMosqueMeta.name}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t border-stone-200 text-left text-xs">
+                    <div>
+                      <div className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider">
+                        Bank Penampung:
+                      </div>
+                      <div className="font-bold text-stone-900 text-xs">
+                        {activeBankInfo.bankName || "Bank Syariah Indonesia (BSI)"}
+                      </div>
+                    </div>
+
+                    <div className="bg-white p-2.5 rounded-xl border border-stone-200 shadow-2xs">
+                      <div className="text-[10px] font-semibold text-stone-500 mb-0.5">
+                        Nomor Rekening:
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono font-bold text-xs text-[#003B73]">
+                          {activeBankInfo.accountNumber || "Belum diisi"}
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-stone-100 text-stone-600 font-semibold">
+                          Salin
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] font-semibold text-stone-500">
+                        Atas Nama Rekening:
+                      </div>
+                      <div className="text-[11px] font-semibold text-stone-800">
+                        {activeBankInfo.accountHolder || "Belum diisi"}
+                      </div>
+                    </div>
+
+                    {activeBankInfo.notes && (
+                      <p className="text-[10px] text-stone-500 italic pt-1">
+                        *{activeBankInfo.notes}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </form>
           </div>
         )}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -25,7 +25,11 @@ import {
   FileCheck,
   Eye,
   UserCheck,
+  QrCode,
+  Copy,
+  Check,
 } from "lucide-react";
+import { MosqueBankInfo } from "@/lib/types";
 
 interface MosqueHistory {
   id: string;
@@ -60,6 +64,113 @@ interface DocumentSK {
 
 export default function SejarahPage() {
   const [selectedDoc, setSelectedDoc] = useState<DocumentSK | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [activeQrisModal, setActiveQrisModal] = useState<MosqueBankInfo | null>(null);
+
+  const [bankAccounts, setBankAccounts] = useState<Record<string, MosqueBankInfo>>({
+    sudalmiyah: {
+      mosqueId: "sudalmiyah",
+      mosqueName: "Masjid Hj. Sudalmiyah Rais",
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "6012275865",
+      accountHolder: "LAZ UMS Sudalmiyah Rais",
+      qrisImageUrl: "/images/qris-sudalmiyah.png",
+      qrisMerchantName: "LAZ UMS-MSJD SUDALMIYAH",
+      qrisNmid: "ID2024353816125",
+      notes: "Infaq & Sedekah Operasional serta Kemakmuran Masjid Hj. Sudalmiyah Rais Kampus 2 UMS",
+      isActive: true,
+      updatedAt: "",
+    },
+    fadhlurrahman: {
+      mosqueId: "fadhlurrahman",
+      mosqueName: "Masjid Fadhlurrahman",
+      bankName: "Bank Jateng Syariah",
+      accountNumber: "5023001890",
+      accountHolder: "Takmir Masjid Fadhlurrahman UMS",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "MASJID FADHLURRAHMAN UMS",
+      qrisNmid: "ID1020021189401",
+      notes: "Infaq Pembangunan, Kajian, & Kemakmuran Masjid Fadhlurrahman Kampus 1 UMS",
+      isActive: true,
+      updatedAt: "",
+    },
+    "mas-mansur": {
+      mosqueId: "mas-mansur",
+      mosqueName: "Masjid KH. Mas Mansur",
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "7128904561",
+      accountHolder: "PESMA KH Mas Mansur UMS",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "MASJID KH MAS MANSUR PESMA",
+      qrisNmid: "ID1020021189402",
+      notes: "Infaq Pembinaan Santri Pesma & Kemakmuran Masjid KH. Mas Mansur Kampus 4 UMS",
+      isActive: true,
+      updatedAt: "",
+    },
+    "mahad-abu-bakar": {
+      mosqueId: "mahad-abu-bakar",
+      mosqueName: "Masjid Ma'had Abu Bakar",
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "7098451230",
+      accountHolder: "Ma'had Abu Bakar Ash-Shiddiq UMS",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "MAHAD ABU BAKAR UMS",
+      qrisNmid: "ID1020021189403",
+      notes: "Infaq Dakwah Bahasa Arab, Studi Syariah, & Operasional Masjid Ma'had Abu Bakar",
+      isActive: true,
+      updatedAt: "",
+    },
+    "munajat-shabran": {
+      mosqueId: "munajat-shabran",
+      mosqueName: "Masjid Al-Munajat",
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "7034567891",
+      accountHolder: "Pondok Shabran UMS / Masjid Al-Munajat",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "MASJID AL-MUNAJAT SHABRAN",
+      qrisNmid: "ID1020021189404",
+      notes: "Infaq Perkaderan Ulama Tarjih & Operasional Masjid Al-Munajat Pondok Shabran",
+      isActive: true,
+      updatedAt: "",
+    },
+    "ar-razi": {
+      mosqueId: "ar-razi",
+      mosqueName: "Masjid Ar-Razi FKG",
+      bankName: "Bank Syariah Indonesia (BSI)",
+      accountNumber: "7145678902",
+      accountHolder: "Masjid Ar-Razi FKG UMS",
+      qrisImageUrl: "/images/qris-bank-jateng.jpg",
+      qrisMerchantName: "MASJID AR-RAZI FKG UMS",
+      qrisNmid: "ID1020021189405",
+      notes: "Infaq Integrasi Medis-Spiritualitas & Operasional Masjid Ar-Razi FKG Kampus 4 UMS",
+      isActive: true,
+      updatedAt: "",
+    },
+  });
+
+  useEffect(() => {
+    fetch(`/api/mosque-bank-accounts?t=${Date.now()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.accounts)) {
+          const map: Record<string, MosqueBankInfo> = {};
+          data.accounts.forEach((acc: MosqueBankInfo) => {
+            map[acc.mosqueId] = acc;
+          });
+          setBankAccounts((prev) => ({ ...prev, ...map }));
+        }
+      })
+      .catch((err) => console.error("Error loading mosque bank accounts:", err));
+  }, []);
+
+  const handleCopyAccount = (id: string, num: string) => {
+    if (!navigator?.clipboard) return;
+    navigator.clipboard.writeText(num);
+    setCopiedId(id);
+    setTimeout(() => {
+      setCopiedId(null);
+    }, 2500);
+  };
 
   const documents: DocumentSK[] = [
     {
@@ -418,6 +529,87 @@ export default function SejarahPage() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Rekening & QRIS Resmi Masjid Hj. Sudalmiyah Rais */}
+                  <div className="mt-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-amber-50/60 via-white to-blue-50/40 border border-stone-200/90 shadow-xs">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4">
+                      {/* Left: QRIS thumbnail */}
+                      <div className="flex items-center gap-3.5 shrink-0">
+                        <div
+                          onClick={() => bankAccounts.sudalmiyah && setActiveQrisModal(bankAccounts.sudalmiyah)}
+                          className="relative aspect-square w-24 sm:w-28 rounded-xl overflow-hidden border-2 border-amber-400/80 shadow-xs bg-white p-1 cursor-pointer group/qris hover:scale-102 transition-transform"
+                          title="Klik untuk memperbesar QRIS Masjid Sudalmiyah Rais"
+                        >
+                          <Image
+                            src={bankAccounts.sudalmiyah?.qrisImageUrl || "/images/qris-sudalmiyah.png"}
+                            alt="QRIS Masjid Hj. Sudalmiyah Rais"
+                            fill
+                            unoptimized
+                            className="object-contain p-1"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/qris:opacity-100 flex items-center justify-center text-white text-[10px] font-bold transition-opacity">
+                            <Eye className="w-4 h-4 text-amber-300" />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold">
+                            <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                            <span>QRIS & Infaq Resmi</span>
+                          </span>
+                          <div className="text-xs font-bold text-stone-900">
+                            {bankAccounts.sudalmiyah?.qrisMerchantName || "LAZ UMS-MSJD SUDALMIYAH"}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => bankAccounts.sudalmiyah && setActiveQrisModal(bankAccounts.sudalmiyah)}
+                            className="text-[11px] text-[#003B73] hover:underline font-semibold inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <QrCode className="w-3.5 h-3.5" />
+                            <span>Pindai / Perbesar QRIS</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Right: Rekening Info */}
+                      <div className="flex-1 space-y-1.5 text-left w-full sm:w-auto">
+                        <div className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider flex items-center gap-1">
+                          <Building2 className="w-3 h-3 text-[#B58A1E]" />
+                          <span>Bank Penampung &amp; No. Rekening:</span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs font-bold text-stone-900">
+                            {bankAccounts.sudalmiyah?.bankName || "Bank Syariah Indonesia (BSI)"}
+                          </span>
+                          <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-lg border border-stone-200 shadow-2xs">
+                            <span className="font-mono font-bold text-xs sm:text-sm text-[#003B73]">
+                              {bankAccounts.sudalmiyah?.accountNumber || "6012275865"}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyAccount("sudalmiyah", bankAccounts.sudalmiyah?.accountNumber || "6012275865")}
+                              className={`p-1 rounded text-xs font-semibold transition-all cursor-pointer ${
+                                copiedId === "sudalmiyah"
+                                  ? "bg-emerald-600 text-white"
+                                  : "bg-stone-100 hover:bg-[#003B73] hover:text-white text-stone-700"
+                              }`}
+                              title="Salin Nomor Rekening"
+                            >
+                              {copiedId === "sudalmiyah" ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                            </button>
+                          </div>
+                          {copiedId === "sudalmiyah" && (
+                            <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>Tersalin!</span>
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-stone-600">
+                          Atas Nama: <strong>{bankAccounts.sudalmiyah?.accountHolder || "LAZ UMS Sudalmiyah Rais"}</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -588,81 +780,189 @@ export default function SejarahPage() {
             </div>
 
             <div className="space-y-8">
-              {otherMosques.map((mosque) => (
-                <div
-                  key={mosque.id}
-                  className="bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-                    {/* Gambar Masjid - Klik untuk membuka Google Maps */}
-                    <div className="lg:col-span-5">
-                      <a
-                        href={mosque.mapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group/img relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-sm border border-stone-200 block"
-                        title={`Buka lokasi ${mosque.name} di Google Maps`}
-                      >
-                        <Image
-                          src={mosque.image}
-                          alt={mosque.name}
-                          fill
-                          className="object-cover group-hover/img:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-3 left-3 bg-[#003B73]/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-md backdrop-blur-xs">
-                          {mosque.leadWord}
-                        </div>
-                        <div className="absolute bottom-3 right-3 bg-black/60 group-hover/img:bg-black/80 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg backdrop-blur-xs flex items-center gap-1.5 opacity-0 group-hover/img:opacity-100 transition-opacity">
-                          <MapPin className="w-3 h-3 text-[#FCD34D]" />
-                          <span>Buka Google Maps</span>
-                        </div>
-                      </a>
-                    </div>
-
-                    {/* Konten Sejarah */}
-                    <div className="lg:col-span-7 space-y-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200">
-                          {mosque.established}
-                        </span>
-                      </div>
-
-                      <div>
+              {otherMosques.map((mosque) => {
+                const bank = bankAccounts[mosque.id];
+                return (
+                  <div
+                    key={mosque.id}
+                    className="bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                      {/* 1. Foto Masjid - Klik untuk membuka Google Maps */}
+                      <div className="lg:col-span-4">
                         <a
                           href={mosque.mapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group/title inline-flex items-center gap-2 hover:text-[#003B73] transition-colors"
-                          title={`Buka peta lokasi ${mosque.name} di Google Maps`}
+                          className="group/img relative aspect-[16/11] w-full rounded-2xl overflow-hidden shadow-sm border border-stone-200 block"
+                          title={`Buka lokasi ${mosque.name} di Google Maps`}
                         >
-                          <h4 className="text-xl sm:text-2xl font-serif font-black text-stone-900 group-hover/title:text-[#003B73] transition-colors">
-                            {mosque.name}
-                          </h4>
-                          <ExternalLink className="w-4 h-4 text-stone-400 group-hover/title:text-[#003B73] transition-colors shrink-0" />
+                          <Image
+                            src={mosque.image}
+                            alt={mosque.name}
+                            fill
+                            className="object-cover group-hover/img:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute top-3 left-3 bg-[#003B73]/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-md backdrop-blur-xs">
+                            {mosque.leadWord}
+                          </div>
+                          <div className="absolute bottom-3 right-3 bg-black/60 group-hover/img:bg-black/80 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg backdrop-blur-xs flex items-center gap-1.5 opacity-0 group-hover/img:opacity-100 transition-opacity">
+                            <MapPin className="w-3 h-3 text-[#FCD34D]" />
+                            <span>Buka Google Maps</span>
+                          </div>
                         </a>
                       </div>
 
-                      <p className="text-xs sm:text-sm font-semibold text-[#003B73]">
-                        {mosque.tagline}
-                      </p>
-
-                      <p className="text-xs sm:text-sm text-stone-600 leading-relaxed text-justify">
-                        {mosque.historicalContext}
-                      </p>
-
-                      <div className="pt-2 text-xs text-stone-500 border-t border-stone-100 space-y-1">
-                        <div>
-                          <strong>Makna &amp; Inspirasi:</strong> {mosque.philosophicalMeaning}
+                      {/* 2. Konten Sejarah */}
+                      <div className="lg:col-span-5 space-y-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200">
+                            {mosque.established}
+                          </span>
                         </div>
+
                         <div>
-                          <strong>Fasilitas Umum:</strong>{" "}
-                          {mosque.facilities.join(" • ")}
+                          <a
+                            href={mosque.mapsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group/title inline-flex items-center gap-2 hover:text-[#003B73] transition-colors"
+                            title={`Buka peta lokasi ${mosque.name} di Google Maps`}
+                          >
+                            <h4 className="text-xl sm:text-2xl font-serif font-black text-stone-900 group-hover/title:text-[#003B73] transition-colors">
+                              {mosque.name}
+                            </h4>
+                            <ExternalLink className="w-4 h-4 text-stone-400 group-hover/title:text-[#003B73] transition-colors shrink-0" />
+                          </a>
+                        </div>
+
+                        <p className="text-xs sm:text-sm font-semibold text-[#003B73]">
+                          {mosque.tagline}
+                        </p>
+
+                        <p className="text-xs sm:text-sm text-stone-600 leading-relaxed text-justify">
+                          {mosque.historicalContext}
+                        </p>
+
+                        <div className="pt-2 text-xs text-stone-500 border-t border-stone-100 space-y-1">
+                          <div>
+                            <strong>Makna &amp; Inspirasi:</strong> {mosque.philosophicalMeaning}
+                          </div>
+                          <div>
+                            <strong>Fasilitas Umum:</strong>{" "}
+                            {mosque.facilities.join(" • ")}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 3. Kolom Kanan: Kotak No. Rekening & Gambar QRIS Resmi Masjid */}
+                      <div className="lg:col-span-3">
+                        <div className="bg-gradient-to-br from-stone-50 via-white to-amber-50/40 border border-stone-200/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-3.5">
+                          <div className="flex items-center justify-between pb-2 border-b border-stone-200">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold">
+                              <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                              <span>Infaq &amp; QRIS Resmi</span>
+                            </span>
+                            <span className="text-[10px] font-mono text-stone-400">Kas Takmir</span>
+                          </div>
+
+                          {/* Gambar QRIS Mini dengan Efek Hover & Klik Zoom */}
+                          <div className="text-center space-y-1.5">
+                            <div
+                              onClick={() => bank && setActiveQrisModal(bank)}
+                              className="relative aspect-square w-32 sm:w-36 mx-auto rounded-xl overflow-hidden border-2 border-amber-300/70 shadow-xs bg-white p-1.5 cursor-pointer group/qris hover:border-[#003B73] transition-all hover:scale-102"
+                              title="Klik untuk memperbesar kode QRIS"
+                            >
+                              <Image
+                                src={bank?.qrisImageUrl || "/images/qris-bank-jateng.jpg"}
+                                alt={`QRIS ${mosque.name}`}
+                                fill
+                                unoptimized
+                                className="object-contain p-1"
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/qris:opacity-100 flex flex-col items-center justify-center text-white text-[10px] font-bold gap-1 transition-opacity backdrop-blur-2xs">
+                                <Eye className="w-4 h-4 text-amber-300" />
+                                <span>Perbesar QRIS</span>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => bank && setActiveQrisModal(bank)}
+                              className="text-[10px] text-[#003B73] hover:underline font-semibold inline-flex items-center gap-1 cursor-pointer"
+                            >
+                              <QrCode className="w-3 h-3" />
+                              <span>Pindai / Perbesar QRIS</span>
+                            </button>
+                          </div>
+
+                          {/* Rincian Nomor Rekening */}
+                          <div className="space-y-2 pt-2 border-t border-stone-200 text-left">
+                            <div>
+                              <div className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider flex items-center gap-1">
+                                <Building2 className="w-3 h-3 text-[#B58A1E]" />
+                                <span>Bank Penampung:</span>
+                              </div>
+                              <div className="text-xs font-bold text-stone-900 leading-tight">
+                                {bank?.bankName || "Bank Syariah Indonesia (BSI)"}
+                              </div>
+                            </div>
+
+                            <div className="bg-white p-2.5 rounded-xl border border-stone-200 shadow-2xs">
+                              <div className="text-[10px] font-semibold text-stone-500 mb-0.5">
+                                Nomor Rekening:
+                              </div>
+                              <div className="flex items-center justify-between gap-1.5">
+                                <span className="font-mono font-bold text-xs sm:text-sm text-[#003B73] tracking-wide select-all">
+                                  {bank?.accountNumber || "-"}
+                                </span>
+                                {bank?.accountNumber && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopyAccount(mosque.id, bank.accountNumber)}
+                                    className={`p-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+                                      copiedId === mosque.id
+                                        ? "bg-emerald-600 text-white"
+                                        : "bg-stone-100 hover:bg-[#003B73] hover:text-white text-stone-700"
+                                    }`}
+                                    title="Salin Nomor Rekening"
+                                  >
+                                    {copiedId === mosque.id ? (
+                                      <Check className="w-3.5 h-3.5" />
+                                    ) : (
+                                      <Copy className="w-3.5 h-3.5" />
+                                    )}
+                                  </button>
+                                )}
+                              </div>
+                              {copiedId === mosque.id && (
+                                <div className="text-[10px] font-bold text-emerald-600 mt-1 flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3" />
+                                  <span>Nomor rekening tersalin ke papan klip!</span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div>
+                              <div className="text-[10px] font-semibold text-stone-500">
+                                Atas Nama Rekening:
+                              </div>
+                              <div className="text-[11px] font-semibold text-stone-800 leading-snug">
+                                {bank?.accountHolder || "Takmir Masjid UMS"}
+                              </div>
+                            </div>
+
+                            {bank?.notes && (
+                              <p className="text-[10px] text-stone-500 leading-relaxed italic pt-1">
+                                *{bank.notes}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
       </main>
@@ -768,6 +1068,96 @@ export default function SejarahPage() {
                 <Download className="w-4 h-4" />
                 <span>Unduh Berkas PDF</span>
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL PERBESAR KODE QRIS */}
+      {activeQrisModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl relative border border-stone-200 my-8 text-center space-y-4">
+            <button
+              onClick={() => setActiveQrisModal(null)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-colors cursor-pointer"
+              title="Tutup"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>QRIS Standar Nasional (ASPI)</span>
+              </span>
+              <h3 className="font-serif font-black text-stone-900 text-lg sm:text-xl mt-2 leading-tight">
+                {activeQrisModal.mosqueName}
+              </h3>
+              <p className="text-xs text-stone-500 mt-1">
+                Pindai dengan aplikasi m-Banking atau dompet digital (e-Wallet) apa pun
+              </p>
+            </div>
+
+            {/* Gambar QRIS Utama */}
+            <div className="relative aspect-square w-64 sm:w-72 mx-auto rounded-2xl overflow-hidden border-2 border-stone-300 shadow-md bg-white p-2 flex items-center justify-center">
+              <Image
+                src={activeQrisModal.qrisImageUrl || "/images/qris-bank-jateng.jpg"}
+                alt={`QRIS ${activeQrisModal.mosqueName}`}
+                fill
+                unoptimized
+                className="object-contain p-2"
+              />
+            </div>
+
+            {/* Detail Rekening & Merchant */}
+            <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border border-stone-200 text-left text-xs space-y-2">
+              {activeQrisModal.qrisMerchantName && (
+                <div className="flex justify-between items-center pb-1.5 border-b border-stone-200/80">
+                  <span className="text-stone-500">Merchant QRIS:</span>
+                  <strong className="text-stone-900">{activeQrisModal.qrisMerchantName}</strong>
+                </div>
+              )}
+              <div className="flex justify-between items-center pb-1.5 border-b border-stone-200/80">
+                <span className="text-stone-500">Bank:</span>
+                <strong className="text-stone-900">{activeQrisModal.bankName}</strong>
+              </div>
+              <div className="flex justify-between items-center pb-1.5 border-b border-stone-200/80">
+                <span className="text-stone-500">No. Rekening:</span>
+                <div className="flex items-center gap-1.5 font-mono font-bold text-[#003B73]">
+                  <span>{activeQrisModal.accountNumber}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyAccount(activeQrisModal.mosqueId, activeQrisModal.accountNumber)}
+                    className="p-1 rounded bg-white hover:bg-stone-200 text-stone-700 transition-colors cursor-pointer"
+                    title="Salin No. Rekening"
+                  >
+                    {copiedId === activeQrisModal.mosqueId ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                  </button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-stone-500">Atas Nama:</span>
+                <strong className="text-stone-900">{activeQrisModal.accountHolder}</strong>
+              </div>
+            </div>
+
+            {/* Tombol Unduh & Tutup */}
+            <div className="flex items-center gap-2.5 pt-1">
+              <a
+                href={activeQrisModal.qrisImageUrl}
+                download={`QRIS-${activeQrisModal.mosqueId}.jpg`}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+              >
+                <Download className="w-4 h-4" />
+                <span>Unduh Gambar QRIS</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setActiveQrisModal(null)}
+                className="px-5 py-3 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Tutup
+              </button>
             </div>
           </div>
         </div>

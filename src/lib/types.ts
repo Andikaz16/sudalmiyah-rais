@@ -287,6 +287,20 @@ export interface QrisSettings {
   updatedAt: string;
 }
 
+export interface MosqueBankInfo {
+  mosqueId: string;
+  mosqueName: string;
+  bankName: string;
+  accountNumber: string;
+  accountHolder: string;
+  qrisImageUrl: string;
+  qrisMerchantName?: string;
+  qrisNmid?: string;
+  notes?: string;
+  isActive: boolean;
+  updatedAt: string;
+}
+
 export type FeedbackCategory =
   | "IDARAH"
   | "IMARAH"
