@@ -23,6 +23,9 @@ import {
   Users,
   BookOpen,
   Download,
+  Building2,
+  Layers,
+  MapPin,
 } from "lucide-react";
 import { FacilityBooking } from "@/lib/types";
 
@@ -32,7 +35,8 @@ export default function LayananPage() {
     organization: "",
     applicantPhone: "",
     nim: "",
-    facilityName: "Paket Proyektor + Papan Layar (Screen)",
+    mosqueName: "Masjid Hj. Sudalmiyah Rais",
+    facilityName: "Ruang Shalat Utama / Hall Masjid",
     eventTitle: "",
     eventDate: "",
     startTime: "08:00",
@@ -48,6 +52,7 @@ export default function LayananPage() {
     organization: string;
     applicantPhone: string;
     nim: string;
+    mosqueName?: string;
     facilityName: string;
     eventTitle: string;
     eventDate: string;
@@ -88,7 +93,7 @@ export default function LayananPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Gagal mengajukan permohonan.");
 
-      setSuccess("Permohonan peminjaman berhasil diajukan dan sedang menunggu verifikasi/ACC dari Takmir Masjid Kampus UMS.");
+      setSuccess("Permohonan peminjaman ruang & fasilitas berhasil diajukan dan sedang menunggu verifikasi/ACC dari Takmir Masjid Kampus UMS.");
       setSubmittedData({ ...formData });
       fetchBookings();
       setFormData({
@@ -96,7 +101,8 @@ export default function LayananPage() {
         organization: "",
         applicantPhone: "",
         nim: "",
-        facilityName: "Paket Proyektor + Papan Layar (Screen)",
+        mosqueName: "Masjid Hj. Sudalmiyah Rais",
+        facilityName: "Ruang Shalat Utama / Hall Masjid",
         eventTitle: "",
         eventDate: "",
         startTime: "08:00",
@@ -125,6 +131,12 @@ export default function LayananPage() {
 
   const getBookingIcon = (facilityName: string) => {
     const lower = facilityName.toLowerCase();
+    if (lower.includes("ruang") || lower.includes("hall") || lower.includes("serambi")) {
+      return <Building2 className="w-4 h-4 text-[#003B73]" />;
+    }
+    if (lower.includes("paket")) {
+      return <Layers className="w-4 h-4 text-[#003B73]" />;
+    }
     if (lower.includes("layar") || lower.includes("papan") || lower.includes("screen")) {
       return <Presentation className="w-4 h-4 text-[#B58A1E]" />;
     }
@@ -151,14 +163,14 @@ export default function LayananPage() {
       <Navbar />
 
       <main className="flex-1 w-full">
-        {/* Header Banner - Khusus Peminjaman Proyektor & Screen */}
+        {/* Header Banner - Peminjaman Ruang Masjid & Fasilitas */}
         <section className="bg-white border-b border-stone-200/90 py-10 sm:py-14 text-center relative overflow-hidden">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <h1 className="text-3xl sm:text-5xl font-extrabold text-stone-900 tracking-tight font-serif leading-tight">
-              Peminjaman Proyektor &amp; <span className="text-[#003B73]">Layar Masjid</span>
+              Peminjaman Ruang Masjid &amp; <span className="text-[#003B73]">Fasilitas</span>
             </h1>
             <p className="text-xs sm:text-sm md:text-base text-stone-600 mt-3.5 leading-relaxed max-w-3xl mx-auto">
-              Layanan permohonan peminjaman inventaris resmi takmir khusus <strong>Proyektor (LCD)</strong> dan <strong>Papan/Layar Proyektor (Tripod Screen)</strong> Masjid Kampus UMS (Masjid Hj. Sudalmiyah Rais Kampus 2 &amp; Masjid Fadhlurrahman Kampus 1). Fasilitas ini diperuntukkan bagi Ortom (IMM, HW, Tapak Suci), HMP, UKM, fakultas, dan sivitas akademika UMS untuk mendukung kelancaran kegiatan syiar Islam, kajian ilmiah, presentasi, rapat koordinasi, serta pelatihan kader persyarikatan.
+              Layanan permohonan peminjaman ruang ibadah, hall serbaguna, serambi, serta inventaris resmi (proyektor &amp; layar) di seluruh jaringan 6 masjid kampus UMS. Fasilitas ini diperuntukkan bagi Ortom (IMM, HW, Tapak Suci), HMP, UKM, fakultas, dan segenap sivitas akademika UMS untuk menyelenggarakan kajian, syiar Islam, rapat koordinasi, pelatihan kader, serta pembinaan keumatan.
             </p>
           </div>
         </section>
@@ -193,14 +205,14 @@ export default function LayananPage() {
               className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200/90 shadow-sm hover:shadow-md hover:border-[#003B73] transition-all flex items-center gap-4 group"
             >
               <div className="w-12 h-12 rounded-xl bg-[#003B73]/10 border border-[#003B73]/20 text-[#003B73] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Projector className="w-6 h-6" />
+                <Building2 className="w-6 h-6" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-bold text-stone-900 group-hover:text-[#003B73] transition-colors truncate font-serif">
-                  Pinjam Proyektor &amp; Layar
+                  Pinjam Ruang &amp; Fasilitas
                 </h3>
                 <p className="text-xs text-stone-500 line-clamp-1 mt-0.5">
-                  Permohonan inventaris sivitas &amp; ortom
+                  Ruang 6 masjid kampus, hall, &amp; alat
                 </p>
               </div>
             </a>
@@ -234,10 +246,10 @@ export default function LayananPage() {
                   <div className="mb-5">
                     <h2 className="text-xl font-bold text-stone-900 flex items-center gap-2 font-serif">
                       <FileText className="w-5 h-5 text-[#B58A1E]" />
-                      <span>Formulir Permohonan Peminjaman Proyektor &amp; Layar</span>
+                      <span>Formulir Permohonan Peminjaman Ruang Masjid &amp; Fasilitas</span>
                     </h2>
                     <p className="text-xs text-stone-500 mt-1">
-                      Silakan isi data lengkap penanggung jawab acara dari sivitas akademika UMS.
+                      Silakan isi data lengkap penanggung jawab acara dan tentukan masjid serta ruang/fasilitas yang dibutuhkan.
                     </p>
                   </div>
 
@@ -250,7 +262,7 @@ export default function LayananPage() {
                             Permohonan Peminjaman Berhasil Diajukan!
                           </h4>
                           <p className="text-xs sm:text-sm text-emerald-800 leading-relaxed">
-                            Data permohonan Anda telah tercatat aman di sistem Takmir Masjid Kampus UMS. Sesuai alur resmi Masjid UMS, silakan kirimkan konfirmasi ke narahubung takmir (Aryawan untuk Masjid Sudalmiyah atau Mas Faris untuk Masjid Fadlurohman) agar pengajuan Anda segera diverifikasi dan di-ACC.
+                            Data permohonan Anda telah tercatat aman di sistem Takmir Masjid Kampus UMS. Sesuai alur resmi Masjid UMS, silakan kirimkan konfirmasi ke narahubung takmir agar pengajuan Anda segera diverifikasi dan di-ACC.
                           </p>
                         </div>
                       </div>
@@ -259,40 +271,42 @@ export default function LayananPage() {
                         <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
                           <a
                             href={`https://wa.me/6282181488897?text=${encodeURIComponent(
-                              `Assalamu'alaikum Mas Aryawan (Takmir Masjid Sudalmiyah), saya telah mengajukan permohonan peminjaman inventaris di Portal Resmi Masjid Kampus UMS:\n\n` +
+                              `Assalamu'alaikum Mas Aryawan (Takmir Masjid Kampus UMS), saya telah mengajukan permohonan peminjaman di Portal Resmi Masjid Kampus UMS:\n\n` +
                               `• Nama Penanggung Jawab: ${submittedData.applicantName}\n` +
                               `• NIM: ${submittedData.nim}\n` +
                               `• Lembaga / Ortom / UKM: ${submittedData.organization}\n` +
-                              `• Barang Inventaris: ${submittedData.facilityName}\n` +
+                              `• Pilihan Masjid: ${submittedData.mosqueName || "Masjid Hj. Sudalmiyah Rais"}\n` +
+                              `• Ruang / Fasilitas: ${submittedData.facilityName}\n` +
                               `• Nama Agenda: ${submittedData.eventTitle}\n` +
                               `• Tanggal: ${submittedData.eventDate} (${submittedData.startTime} - ${submittedData.endTime} WIB)\n\n` +
-                              `Mohon untuk dapat ditinjau dan di-ACC. Terima kasih. Jazakallahu khair.`
+                              `Mohon untuk dapat ditinjau dan diverifikasi/di-ACC. Terima kasih. Jazakallahu khair.`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
                           >
                             <MessageSquare className="w-4 h-4" />
-                            <span>Konfirmasi ke Aryawan (Masjid Sudalmiyah)</span>
+                            <span>Konfirmasi ke Takmir Sudalmiyah</span>
                           </a>
 
                           <a
                             href={`https://wa.me/6285848601435?text=${encodeURIComponent(
-                              `Assalamu'alaikum Mas Faris (Takmir Masjid Fadlurohman), saya telah mengajukan permohonan peminjaman inventaris di Portal Resmi Masjid Kampus UMS:\n\n` +
+                              `Assalamu'alaikum Mas Faris (Takmir Masjid Kampus UMS), saya telah mengajukan permohonan peminjaman di Portal Resmi Masjid Kampus UMS:\n\n` +
                               `• Nama Penanggung Jawab: ${submittedData.applicantName}\n` +
                               `• NIM: ${submittedData.nim}\n` +
                               `• Lembaga / Ortom / UKM: ${submittedData.organization}\n` +
-                              `• Barang Inventaris: ${submittedData.facilityName}\n` +
+                              `• Pilihan Masjid: ${submittedData.mosqueName || "Masjid Fadhlurrahman"}\n` +
+                              `• Ruang / Fasilitas: ${submittedData.facilityName}\n` +
                               `• Nama Agenda: ${submittedData.eventTitle}\n` +
                               `• Tanggal: ${submittedData.eventDate} (${submittedData.startTime} - ${submittedData.endTime} WIB)\n\n` +
-                              `Mohon untuk dapat ditinjau dan di-ACC. Terima kasih. Jazakallahu khair.`
+                              `Mohon untuk dapat ditinjau dan diverifikasi/di-ACC. Terima kasih. Jazakallahu khair.`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
                           >
                             <MessageSquare className="w-4 h-4" />
-                            <span>Konfirmasi ke Mas Faris (Masjid Fadlurohman)</span>
+                            <span>Konfirmasi ke Takmir Fadhlurrahman</span>
                           </a>
                         </div>
                       )}
@@ -365,34 +379,71 @@ export default function LayananPage() {
                       </div>
                     </div>
 
-                    {/* Pilihan Khusus Barang Inventaris Proyektor & Screen */}
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-700 mb-1">
-                        Barang Inventaris yang Dipinjam *
-                      </label>
-                      <select
-                        value={formData.facilityName}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            facilityName: e.target.value,
-                          })
-                        }
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
-                      >
-                        <option value="Paket Proyektor + Papan Layar (Screen)">
-                          Paket Proyektor (LCD) + Papan/Layar Proyektor (Tripod Screen)
-                        </option>
-                        <option value="Proyektor (LCD Projector)">
-                          Proyektor (LCD Projector Masjid)
-                        </option>
-                        <option value="Papan / Layar Proyektor (Tripod Screen)">
-                          Papan / Layar Proyektor (Tripod Screen Projector)
-                        </option>
-                      </select>
-                      <p className="text-[11px] text-stone-500 mt-1">
-                        * Layanan peminjaman saat ini dikhususkan untuk inventaris <strong>Proyektor (LCD)</strong> dan <strong>Papan / Layar Proyektor</strong> Masjid Kampus UMS.
-                      </p>
+                    {/* Pilihan Masjid Kampus & Pilihan Ruang / Fasilitas */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-stone-700 mb-1">
+                          Pilihan Masjid Kampus *
+                        </label>
+                        <select
+                          value={formData.mosqueName}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              mosqueName: e.target.value,
+                            })
+                          }
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
+                        >
+                          <option value="Masjid Hj. Sudalmiyah Rais">Masjid Hj. Sudalmiyah Rais</option>
+                          <option value="Masjid Fadhlurrahman">Masjid Fadhlurrahman</option>
+                          <option value="Masjid KH. Mas Mansur">Masjid KH. Mas Mansur</option>
+                          <option value="Masjid Ma'had Abu Bakar Ash-Shiddiq">Masjid Ma&apos;had Abu Bakar Ash-Shiddiq</option>
+                          <option value="Masjid Munajat Pondok Shabran">Masjid Munajat Pondok Shabran</option>
+                          <option value="Masjid Ar-Razi">Masjid Ar-Razi</option>
+                        </select>
+                        <p className="text-[11px] text-stone-500 mt-1">
+                          Pilih masjid yang ingin digunakan (tersedia di seluruh 6 masjid kampus).
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-stone-700 mb-1">
+                          Ruang / Fasilitas yang Dipinjam *
+                        </label>
+                        <select
+                          value={formData.facilityName}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              facilityName: e.target.value,
+                            })
+                          }
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
+                        >
+                          <option value="Ruang Shalat Utama / Hall Masjid">
+                            Ruang Shalat Utama / Hall Masjid
+                          </option>
+                          <option value="Serambi / Sayap Pembinaan Masjid">
+                            Serambi / Sayap Pembinaan Masjid
+                          </option>
+                          <option value="Paket Ruang Masjid + Proyektor & Layar">
+                            Paket Ruang Masjid + Proyektor &amp; Layar
+                          </option>
+                          <option value="Paket Proyektor (LCD) + Papan Layar (Screen)">
+                            Paket Proyektor (LCD) + Papan Layar (Screen)
+                          </option>
+                          <option value="Proyektor (LCD Projector Masjid)">
+                            Proyektor (LCD Projector Masjid)
+                          </option>
+                          <option value="Papan / Layar Proyektor (Tripod Screen)">
+                            Papan / Layar Proyektor (Tripod Screen)
+                          </option>
+                        </select>
+                        <p className="text-[11px] text-stone-500 mt-1">
+                          Pilihan ruang ibadah, serambi, paket gabungan, atau inventaris alat.
+                        </p>
+                      </div>
                     </div>
 
                     <div>
@@ -471,7 +522,7 @@ export default function LayananPage() {
                         disabled={loading}
                         className="w-full text-center px-6 py-3.5 rounded-full bg-[#003B73] hover:bg-[#002855] disabled:bg-stone-300 text-white font-bold text-sm shadow-md transition-colors cursor-pointer"
                       >
-                        {loading ? "Mengirim Permohonan..." : "Kirim Permohonan Peminjaman Proyektor & Layar"}
+                        {loading ? "Mengirim Permohonan..." : "Kirim Permohonan Peminjaman Ruang & Fasilitas"}
                       </button>
                     </div>
                   </form>
@@ -485,7 +536,7 @@ export default function LayananPage() {
               <div className="p-5 sm:p-6 rounded-3xl bg-[#FAF8F5] border border-stone-300/80 space-y-3 shadow-xs">
                 <h3 className="text-sm sm:text-base font-bold text-stone-900 flex items-center gap-2 font-serif">
                   <Info className="w-4 h-4 text-[#003B73]" />
-                  <span>Alur Peminjaman Proyektor &amp; Layar UMS</span>
+                  <span>Alur Peminjaman Ruang &amp; Fasilitas Masjid UMS</span>
                 </h3>
                 <div className="space-y-2.5 text-xs text-stone-700 leading-relaxed">
                   <div className="flex items-start gap-2.5">
@@ -508,7 +559,7 @@ export default function LayananPage() {
                     </span>
                     <div>
                       <strong className="text-stone-900 block">Isi Formulir &amp; Lampirkan Surat</strong>
-                      <span className="text-stone-600">Isi data sivitas UMS dan sertakan tautan surat permohonan resmi tertuju ke Takmir.</span>
+                      <span className="text-stone-600">Pilih masjid, tentukan ruang/fasilitas, isi data penanggung jawab, dan lampirkan tautan surat resmi.</span>
                     </div>
                   </div>
                   <div className="flex items-start gap-2.5">
@@ -517,36 +568,36 @@ export default function LayananPage() {
                     </span>
                     <div>
                       <strong className="text-stone-900 block">Konfirmasi Takmir untuk ACC</strong>
-                      <span className="text-stone-600">Hubungi narahubung Takmir via WhatsApp agar permohonan segera diproses dan di-ACC.</span>
+                      <span className="text-stone-600">Hubungi narahubung Takmir via WhatsApp agar permohonan segera diverifikasi dan disetujui.</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Ketentuan Peminjaman Proyektor & Layar */}
+              {/* Ketentuan Peminjaman Ruang & Fasilitas */}
               <div className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200 space-y-2.5 shadow-sm">
                 <h3 className="text-sm sm:text-base font-bold text-stone-900 flex items-center gap-2 font-serif">
                   <GraduationCap className="w-4 h-4 text-[#B58A1E]" />
-                  <span>Ketentuan Peminjaman Proyektor &amp; Layar</span>
+                  <span>Ketentuan Peminjaman Ruang &amp; Fasilitas</span>
                 </h3>
                 <ul className="space-y-1.5 text-xs text-stone-600 leading-relaxed list-disc list-inside">
                   <li>
-                    <strong>Inventaris yang Boleh Dipinjam:</strong> Khusus barang inventaris, Takmir hanya melayani peminjaman <strong>Proyektor (LCD)</strong> dan <strong>Papan/Layar Proyektor</strong>.
+                    <strong>Ruang &amp; Fasilitas:</strong> Melayani peminjaman ruang ibadah utama, serambi pembinaan, serta inventaris resmi (proyektor &amp; layar) di seluruh 6 masjid kampus UMS.
                   </li>
                   <li>
-                    <strong>Tanggung Jawab Alat:</strong> Wajib menjaga keutuhan dan kebersihan proyektor serta mengembalikan tepat waktu setelah acara selesai.
+                    <strong>Tanggung Jawab Bersama:</strong> Pemohon wajib menjaga keutuhan, kebersihan fasilitas, karpet ibadah, serta mengembalikan inventaris tepat waktu.
                   </li>
                   <li>
-                    <strong>Keselarasan AIK:</strong> Kegiatan wajib selaras dengan nilai Al-Islam &amp; Kemuhammadiyahan.
+                    <strong>Keselarasan AIK:</strong> Seluruh agenda kegiatan wajib selaras dengan prinsip Al-Islam &amp; Kemuhammadiyahan serta norma persyarikatan.
                   </li>
                   <li>
-                    <strong>Waktu Shalat Berjamaah:</strong> Seluruh aktivitas dihentikan 15 menit sebelum adzan shalat fardhu.
+                    <strong>Waktu Shalat Berjamaah:</strong> Seluruh aktivitas wajib dihentikan 15 menit sebelum adzan shalat fardhu untuk shalat berjamaah.
                   </li>
                   <li>
-                    <strong>Kebersihan Masjid:</strong> Menjaga kebersihan ruang ibadah, karpet, wudhu, dan toilet masjid.
+                    <strong>Kebersihan &amp; Kesucian:</strong> Menjaga kesucian ruang ibadah, kerapian serambi, serta kebersihan area wudhu dan toilet.
                   </li>
                   <li>
-                    <strong>Batas Pengajuan:</strong> Surat diajukan minimal 3 hari sebelum pelaksanaan kegiatan.
+                    <strong>Batas Pengajuan:</strong> Surat dan formulir diajukan paling lambat 3 hari sebelum waktu pelaksanaan acara.
                   </li>
                 </ul>
               </div>
@@ -559,14 +610,14 @@ export default function LayananPage() {
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-white">Narahubung Takmir (Konfirmasi &amp; ACC)</h4>
-                    <p className="text-xs text-stone-200">Layanan Peminjaman Inventaris Masjid Kampus UMS</p>
+                    <p className="text-xs text-stone-200">Layanan Peminjaman Ruang &amp; Fasilitas Masjid Kampus UMS</p>
                   </div>
                 </div>
                 <p className="text-[11px] text-stone-200 leading-relaxed">
-                  Hubungi narahubung takmir sesuai lokasi masjid setelah mengirim formulir untuk konfirmasi ketersediaan dan percepatan persetujuan (ACC):
+                  Hubungi narahubung takmir setelah mengirim formulir untuk konfirmasi ketersediaan dan percepatan persetujuan (ACC):
                 </p>
                 <div className="space-y-2.5 pt-1">
-                  {/* Kontak 1: Masjid Sudalmiyah */}
+                  {/* Kontak 1: Masjid Hj. Sudalmiyah Rais */}
                   <a
                     href="https://wa.me/6282181488897"
                     target="_blank"
@@ -578,14 +629,14 @@ export default function LayananPage() {
                         <MessageSquare className="w-3.5 h-3.5 text-white" />
                       </div>
                       <div>
-                        <span className="block text-[10px] text-emerald-100 font-normal uppercase tracking-wider">Masjid Sudalmiyah (Kampus 2)</span>
+                        <span className="block text-[10px] text-emerald-100 font-normal uppercase tracking-wider">Masjid Hj. Sudalmiyah Rais</span>
                         <span className="text-xs font-bold text-white">Aryawan (+62 821-8148-8897)</span>
                       </div>
                     </div>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white shrink-0 font-semibold">Hubungi</span>
                   </a>
 
-                  {/* Kontak 2: Masjid Fadlurohman */}
+                  {/* Kontak 2: Masjid Fadhlurrahman */}
                   <a
                     href="https://wa.me/6285848601435"
                     target="_blank"
@@ -597,7 +648,7 @@ export default function LayananPage() {
                         <MessageSquare className="w-3.5 h-3.5 text-white" />
                       </div>
                       <div>
-                        <span className="block text-[10px] text-emerald-100 font-normal uppercase tracking-wider">Masjid Fadlurohman (Kampus 1)</span>
+                        <span className="block text-[10px] text-emerald-100 font-normal uppercase tracking-wider">Masjid Fadhlurrahman</span>
                         <span className="text-xs font-bold text-white">Mas Faris (0858-4860-1435)</span>
                       </div>
                     </div>
@@ -620,10 +671,10 @@ export default function LayananPage() {
                   <span>Sinkronisasi Transparan &amp; Aman</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-serif">
-                  Jadwal Peminjaman Proyektor Terverifikasi
+                  Jadwal Peminjaman Ruang &amp; Fasilitas Terverifikasi
                 </h2>
                 <p className="text-xs sm:text-sm text-stone-600 mt-1 max-w-2xl">
-                  Pantau ketersediaan inventaris proyektor dan layar secara aman tanpa mengekspos isi surat permohonan atau privasi kontak pemohon.
+                  Pantau ketersediaan ruang dan fasilitas 6 masjid kampus secara transparan dan aman tanpa mengekspos isi surat permohonan atau privasi kontak pemohon.
                 </p>
               </div>
 
@@ -671,7 +722,7 @@ export default function LayananPage() {
                 <Calendar className="w-12 h-12 text-stone-300 mx-auto mb-3" />
                 <h4 className="text-sm font-bold text-stone-800">Belum Ada Jadwal Pada Kategori Ini</h4>
                 <p className="text-xs text-stone-500 mt-1">
-                  Seluruh tanggal masih terbuka untuk diajukan peminjaman proyektor atau layar.
+                  Seluruh tanggal masih terbuka untuk diajukan peminjaman ruang atau fasilitas masjid.
                 </p>
               </div>
             ) : (
@@ -682,15 +733,21 @@ export default function LayananPage() {
                     className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200 hover:border-[#003B73]/50 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
                   >
                     <div className="space-y-3">
-                      {/* Card Header: Facility Name + Status Badge */}
+                      {/* Card Header: Mosque + Facility Name + Status Badge */}
                       <div className="flex items-start justify-between gap-2.5">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
                           <div className="p-2 rounded-xl bg-stone-100 group-hover:bg-[#003B73]/10 transition-colors shrink-0">
                             {getBookingIcon(b.facilityName)}
                           </div>
-                          <span className="text-xs font-bold text-stone-900 line-clamp-1">
-                            {b.facilityName}
-                          </span>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1 text-[11px] font-bold text-[#003B73]">
+                              <MapPin className="w-3 h-3 text-[#B58A1E] shrink-0" />
+                              <span className="truncate">{b.mosqueName || "Masjid Hj. Sudalmiyah Rais"}</span>
+                            </div>
+                            <span className="text-xs font-semibold text-stone-900 line-clamp-1">
+                              {b.facilityName}
+                            </span>
+                          </div>
                         </div>
                         <span
                           className={`text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0 uppercase tracking-wider ${

@@ -9,6 +9,7 @@ const bookingSchema = z.object({
   organization: z.string().min(3).max(100),
   applicantPhone: z.string().min(10).max(16),
   nim: z.string().min(6).max(20),
+  mosqueName: z.string().max(100).optional().or(z.literal("")),
   facilityName: z.string().min(2).max(100),
   eventTitle: z.string().min(5).max(150),
   eventDate: z.string().min(10).max(10),
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
       organization: sanitizeString(data.organization),
       applicantPhone: sanitizeString(data.applicantPhone),
       nim: sanitizeString(data.nim).toUpperCase(),
+      mosqueName: data.mosqueName ? sanitizeString(data.mosqueName) : "Masjid Hj. Sudalmiyah Rais",
       facilityName: sanitizeString(data.facilityName),
       eventTitle: sanitizeString(data.eventTitle),
       eventDate: data.eventDate,
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest) {
       newBooking.nim,
       ip,
       "SUCCESS",
-      `Permohonan izin ruang: ${newBooking.facilityName} oleh ${newBooking.organization}`
+      `Permohonan izin ruang/fasilitas: ${newBooking.facilityName} (${newBooking.mosqueName || "Masjid Kampus"}) oleh ${newBooking.organization}`
     );
 
     return NextResponse.json(

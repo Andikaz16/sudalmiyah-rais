@@ -254,6 +254,7 @@ export interface FacilityBooking {
   organization: string;
   applicantPhone: string;
   nim: string;
+  mosqueName?: string;
   facilityName: string;
   eventTitle: string;
   eventDate: string;
