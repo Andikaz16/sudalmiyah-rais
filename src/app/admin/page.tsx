@@ -1244,6 +1244,7 @@ export default function AdminDashboardPage() {
       qrisMerchantName: "",
       qrisNmid: "",
       notes: "",
+      virtualBankUrl: "https://bsinet.bankbsi.co.id",
       isActive: true,
       updatedAt: "",
     };
@@ -3988,6 +3989,22 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
 
                 <div>
                   <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Tautan / URL Portal Bank Virtual (Internet Banking / Transfer)
+                  </label>
+                  <input
+                    type="url"
+                    value={activeBankInfo.virtualBankUrl || ""}
+                    onChange={(e) => handleUpdateBankField("virtualBankUrl", e.target.value)}
+                    placeholder="Contoh: https://bsinet.bankbsi.co.id atau https://ib.bankjateng.co.id"
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-900 text-xs font-mono focus:outline-none focus:border-[#003B73]"
+                  />
+                  <p className="text-[10px] text-stone-500 mt-1">
+                    Jika diisi, pengunjung halaman publik yang mengeklik nomor rekening akan langsung diarahkan ke portal bank virtual ini.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
                     Catatan / Peruntukan Infaq (Tampil di Publik)
                   </label>
                   <textarea
@@ -4062,6 +4079,13 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
 
                       <div className="text-xs text-stone-700">
                         a.n. <span className="font-semibold">{activeBankInfo.accountHolder || "Belum diisi"}</span>
+                      </div>
+
+                      <div className="pt-0.5">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#003B73]">
+                          <span>Bank Virtual Aktif</span>
+                          <ExternalLink className="w-3 h-3 text-[#003B73]" />
+                        </span>
                       </div>
 
                       {activeBankInfo.notes && (

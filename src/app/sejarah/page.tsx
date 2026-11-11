@@ -172,6 +172,26 @@ export default function SejarahPage() {
     }, 2500);
   };
 
+  const getVirtualBankUrl = (bank?: MosqueBankInfo) => {
+    if (bank?.virtualBankUrl && bank.virtualBankUrl.trim()) {
+      return bank.virtualBankUrl.trim();
+    }
+    const name = (bank?.bankName || "").toLowerCase();
+    if (name.includes("jateng")) {
+      return "https://ib.bankjateng.co.id";
+    }
+    if (name.includes("bsi") || name.includes("syariah indonesia")) {
+      return "https://bsinet.bankbsi.co.id";
+    }
+    if (name.includes("muamalat")) {
+      return "https://ib.muamalatbank.com";
+    }
+    if (name.includes("bca")) {
+      return "https://klikbca.com";
+    }
+    return "https://bsinet.bankbsi.co.id";
+  };
+
   const documents: DocumentSK[] = [
     {
       id: "sk-takmir-lpcr",
@@ -469,11 +489,11 @@ export default function SejarahPage() {
                   </div>
 
                   {/* Rekening & QRIS Resmi Masjid Hj. Sudalmiyah Rais (Di Kolom Kiri Bawah) */}
-                  <div className="pt-2 flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                    {/* Gambar QRIS */}
+                  <div className="pt-3 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                    {/* Gambar QRIS Diperbesar Proporsional */}
                     <div
                       onClick={() => bankAccounts.sudalmiyah && setActiveQrisModal(bankAccounts.sudalmiyah)}
-                      className="relative aspect-[385/544] w-28 sm:w-36 rounded-xl overflow-hidden bg-white shrink-0 cursor-pointer group/qris hover:opacity-95 transition-transform hover:scale-[1.02] shadow-xs"
+                      className="relative aspect-[385/544] w-44 sm:w-52 md:w-56 rounded-2xl overflow-hidden bg-white shrink-0 cursor-pointer group/qris hover:opacity-95 transition-all hover:scale-[1.02] shadow-sm"
                       title="Klik untuk memperbesar QRIS Masjid Sudalmiyah Rais"
                     >
                       <Image
@@ -483,26 +503,35 @@ export default function SejarahPage() {
                         unoptimized
                         className="object-contain"
                       />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/qris:opacity-100 flex items-center justify-center text-white text-[10px] font-semibold transition-opacity gap-1">
-                        <Eye className="w-3.5 h-3.5 text-amber-300" />
-                        <span>Perbesar</span>
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/qris:opacity-100 flex items-center justify-center text-white text-xs font-semibold transition-opacity gap-1.5">
+                        <Eye className="w-4 h-4 text-amber-300" />
+                        <span>Perbesar QRIS</span>
                       </div>
                     </div>
 
                     {/* Rincian Rekening */}
-                    <div className="flex-1 space-y-1 text-center sm:text-left">
+                    <div className="flex-1 space-y-1.5 text-center sm:text-left pt-1">
                       <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
                         {bankAccounts.sudalmiyah?.bankName || "Bank Syariah Indonesia"}
                       </div>
                       <div className="flex items-center justify-center sm:justify-start gap-2">
-                        <span className="font-mono font-black text-base text-[#003B73] select-all">
-                          {bankAccounts.sudalmiyah?.accountNumber || "6012275865"}
-                        </span>
+                        <a
+                          href={getVirtualBankUrl(bankAccounts.sudalmiyah)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group/bank inline-flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+                          title="Klik untuk langsung menuju Bank Virtual (Internet Banking)"
+                        >
+                          <span className="font-mono font-black text-lg sm:text-xl text-[#003B73] hover:underline underline-offset-4 select-all">
+                            {bankAccounts.sudalmiyah?.accountNumber || "6012275865"}
+                          </span>
+                          <ExternalLink className="w-4 h-4 text-stone-400 group-hover/bank:text-[#003B73] transition-colors" />
+                        </a>
                         {bankAccounts.sudalmiyah?.accountNumber && (
                           <button
                             type="button"
                             onClick={() => handleCopyAccount("sudalmiyah", bankAccounts.sudalmiyah?.accountNumber || "6012275865")}
-                            className="p-1 rounded text-stone-400 hover:text-[#003B73] transition-colors cursor-pointer"
+                            className="p-1.5 rounded-lg text-stone-400 hover:text-[#003B73] hover:bg-stone-100 transition-colors cursor-pointer"
                             title="Salin Nomor Rekening"
                           >
                             {copiedId === "sudalmiyah" ? (
@@ -515,11 +544,22 @@ export default function SejarahPage() {
                       </div>
                       {copiedId === "sudalmiyah" && (
                         <div className="text-[10px] font-bold text-emerald-600">
-                          Nomor rekening tersalin!
+                          Nomor rekening tersalin ke papan klip!
                         </div>
                       )}
                       <div className="text-xs text-stone-700">
                         a.n. <span className="font-semibold">{bankAccounts.sudalmiyah?.accountHolder || "LAZ UMS Sudalmiyah Rais"}</span>
+                      </div>
+                      <div className="pt-1">
+                        <a
+                          href={getVirtualBankUrl(bankAccounts.sudalmiyah)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#003B73] hover:underline"
+                        >
+                          <span>Buka Bank Virtual / e-Banking</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -835,7 +875,7 @@ export default function SejarahPage() {
                         {/* Gambar QRIS Diperbesar Proporsional */}
                         <div
                           onClick={() => bank && setActiveQrisModal(bank)}
-                          className="relative aspect-[385/544] w-48 sm:w-56 lg:w-full lg:max-w-[240px] rounded-2xl overflow-hidden bg-white cursor-pointer group/qris hover:opacity-95 transition-all hover:scale-[1.02] shadow-xs"
+                          className="relative aspect-[385/544] w-56 sm:w-64 lg:w-full lg:max-w-[270px] rounded-2xl overflow-hidden bg-white cursor-pointer group/qris hover:opacity-95 transition-all hover:scale-[1.02] shadow-sm"
                           title="Klik untuk memperbesar QRIS"
                         >
                           <Image
@@ -852,20 +892,29 @@ export default function SejarahPage() {
                         </div>
 
                         {/* Rincian Rekening */}
-                        <div className="space-y-1 w-full max-w-[240px] text-center sm:text-left">
+                        <div className="space-y-1.5 w-full max-w-[270px] text-center sm:text-left">
                           <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
                             {bank?.bankName || "Bank Penampung"}
                           </div>
 
-                          <div className="flex items-center justify-center sm:justify-start gap-1.5">
-                            <span className="font-mono font-black text-base sm:text-lg text-[#003B73] select-all">
-                              {bank?.accountNumber || "-"}
-                            </span>
+                          <div className="flex items-center justify-center sm:justify-start gap-2">
+                            <a
+                              href={getVirtualBankUrl(bank)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group/bank inline-flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+                              title="Klik untuk langsung menuju Bank Virtual (Internet Banking)"
+                            >
+                              <span className="font-mono font-black text-base sm:text-lg text-[#003B73] hover:underline underline-offset-4 select-all">
+                                {bank?.accountNumber || "-"}
+                              </span>
+                              <ExternalLink className="w-3.5 h-3.5 text-stone-400 group-hover/bank:text-[#003B73] transition-colors" />
+                            </a>
                             {bank?.accountNumber && (
                               <button
                                 type="button"
                                 onClick={() => handleCopyAccount(mosque.id, bank.accountNumber)}
-                                className="p-1 rounded text-stone-400 hover:text-[#003B73] transition-colors cursor-pointer"
+                                className="p-1 rounded text-stone-400 hover:text-[#003B73] hover:bg-stone-100 transition-colors cursor-pointer"
                                 title="Salin Nomor Rekening"
                               >
                                 {copiedId === mosque.id ? (
@@ -878,12 +927,24 @@ export default function SejarahPage() {
                           </div>
                           {copiedId === mosque.id && (
                             <div className="text-[10px] font-bold text-emerald-600">
-                              Nomor rekening tersalin!
+                              Nomor rekening tersalin ke papan klip!
                             </div>
                           )}
 
                           <div className="text-xs text-stone-700 leading-snug">
                             a.n. <span className="font-semibold">{bank?.accountHolder || "Takmir Masjid UMS"}</span>
+                          </div>
+
+                          <div className="pt-0.5">
+                            <a
+                              href={getVirtualBankUrl(bank)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#003B73] hover:underline"
+                            >
+                              <span>Buka Bank Virtual / e-Banking</span>
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
                           </div>
                         </div>
                       </div>
@@ -1027,13 +1088,13 @@ export default function SejarahPage() {
             </div>
 
             {/* Gambar QRIS Utama */}
-            <div className="relative aspect-square w-64 sm:w-72 mx-auto rounded-2xl overflow-hidden border-2 border-stone-300 shadow-md bg-white p-2 flex items-center justify-center">
+            <div className="relative aspect-[385/544] w-64 sm:w-72 mx-auto rounded-2xl overflow-hidden border border-stone-200 shadow-md bg-white p-2 flex items-center justify-center">
               <Image
                 src={activeQrisModal.qrisImageUrl || "/images/qris-bank-jateng.jpg"}
                 alt={`QRIS ${activeQrisModal.mosqueName}`}
                 fill
                 unoptimized
-                className="object-contain p-2"
+                className="object-contain p-1"
               />
             </div>
 
@@ -1051,8 +1112,17 @@ export default function SejarahPage() {
               </div>
               <div className="flex justify-between items-center pb-1.5 border-b border-stone-200/80">
                 <span className="text-stone-500">No. Rekening:</span>
-                <div className="flex items-center gap-1.5 font-mono font-bold text-[#003B73]">
-                  <span>{activeQrisModal.accountNumber}</span>
+                <div className="flex items-center gap-2 font-mono font-bold text-[#003B73]">
+                  <a
+                    href={getVirtualBankUrl(activeQrisModal)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline inline-flex items-center gap-1"
+                    title="Buka Bank Virtual"
+                  >
+                    <span>{activeQrisModal.accountNumber}</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-stone-400 hover:text-[#003B73]" />
+                  </a>
                   <button
                     type="button"
                     onClick={() => handleCopyAccount(activeQrisModal.mosqueId, activeQrisModal.accountNumber)}
@@ -1063,9 +1133,21 @@ export default function SejarahPage() {
                   </button>
                 </div>
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center pb-1.5 border-b border-stone-200/80">
                 <span className="text-stone-500">Atas Nama:</span>
                 <strong className="text-stone-900">{activeQrisModal.accountHolder}</strong>
+              </div>
+              <div className="flex justify-between items-center pt-0.5">
+                <span className="text-stone-500">Layanan Bank:</span>
+                <a
+                  href={getVirtualBankUrl(activeQrisModal)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-[#003B73] hover:underline inline-flex items-center gap-1"
+                >
+                  <span>Buka Bank Virtual / e-Banking</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
             </div>
 

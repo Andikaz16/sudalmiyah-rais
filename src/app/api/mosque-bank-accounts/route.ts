@@ -14,6 +14,7 @@ const updateMosqueBankSchema = z.object({
   qrisMerchantName: z.string().max(150).optional().default(""),
   qrisNmid: z.string().max(50).optional().default(""),
   notes: z.string().max(500).optional().default(""),
+  virtualBankUrl: z.string().max(300).optional().default(""),
   isActive: z.boolean().default(true),
 });
 
@@ -78,6 +79,7 @@ export async function PUT(request: NextRequest) {
       qrisMerchantName: data.qrisMerchantName ? sanitizeString(data.qrisMerchantName) : undefined,
       qrisNmid: data.qrisNmid ? sanitizeString(data.qrisNmid) : undefined,
       notes: data.notes ? sanitizeString(data.notes) : undefined,
+      virtualBankUrl: data.virtualBankUrl ? sanitizeString(data.virtualBankUrl) : undefined,
       isActive: data.isActive,
       updatedAt: new Date().toISOString(),
     };

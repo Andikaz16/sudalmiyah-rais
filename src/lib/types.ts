@@ -297,6 +297,7 @@ export interface MosqueBankInfo {
   qrisMerchantName?: string;
   qrisNmid?: string;
   notes?: string;
+  virtualBankUrl?: string;
   isActive: boolean;
   updatedAt: string;
 }
