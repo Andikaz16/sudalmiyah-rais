@@ -467,6 +467,62 @@ export default function SejarahPage() {
                       yang jasanya diabadikan sebagai nama masjid utama ini.
                     </p>
                   </div>
+
+                  {/* Rekening & QRIS Resmi Masjid Hj. Sudalmiyah Rais (Di Kolom Kiri Bawah) */}
+                  <div className="pt-2 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                    {/* Gambar QRIS */}
+                    <div
+                      onClick={() => bankAccounts.sudalmiyah && setActiveQrisModal(bankAccounts.sudalmiyah)}
+                      className="relative aspect-[385/544] w-28 sm:w-36 rounded-xl overflow-hidden bg-white shrink-0 cursor-pointer group/qris hover:opacity-95 transition-transform hover:scale-[1.02] shadow-xs"
+                      title="Klik untuk memperbesar QRIS Masjid Sudalmiyah Rais"
+                    >
+                      <Image
+                        src={bankAccounts.sudalmiyah?.qrisImageUrl || "/images/qris-sudalmiyah.png"}
+                        alt="QRIS Masjid Hj. Sudalmiyah Rais"
+                        fill
+                        unoptimized
+                        className="object-contain"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/qris:opacity-100 flex items-center justify-center text-white text-[10px] font-semibold transition-opacity gap-1">
+                        <Eye className="w-3.5 h-3.5 text-amber-300" />
+                        <span>Perbesar</span>
+                      </div>
+                    </div>
+
+                    {/* Rincian Rekening */}
+                    <div className="flex-1 space-y-1 text-center sm:text-left">
+                      <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                        {bankAccounts.sudalmiyah?.bankName || "Bank Syariah Indonesia"}
+                      </div>
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
+                        <span className="font-mono font-black text-base text-[#003B73] select-all">
+                          {bankAccounts.sudalmiyah?.accountNumber || "6012275865"}
+                        </span>
+                        {bankAccounts.sudalmiyah?.accountNumber && (
+                          <button
+                            type="button"
+                            onClick={() => handleCopyAccount("sudalmiyah", bankAccounts.sudalmiyah?.accountNumber || "6012275865")}
+                            className="p-1 rounded text-stone-400 hover:text-[#003B73] transition-colors cursor-pointer"
+                            title="Salin Nomor Rekening"
+                          >
+                            {copiedId === "sudalmiyah" ? (
+                              <Check className="w-4 h-4 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                      {copiedId === "sudalmiyah" && (
+                        <div className="text-[10px] font-bold text-emerald-600">
+                          Nomor rekening tersalin!
+                        </div>
+                      )}
+                      <div className="text-xs text-stone-700">
+                        a.n. <span className="font-semibold">{bankAccounts.sudalmiyah?.accountHolder || "LAZ UMS Sudalmiyah Rais"}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Deskripsi Sejarah Mendalam */}
@@ -527,62 +583,6 @@ export default function SejarahPage() {
                       <p className="text-[11px] text-stone-600 leading-snug">
                         Akses ramp kursi roda mandiri, toilet khusus disabilitas, serta kenyamanan bagi lansia dan anak.
                       </p>
-                    </div>
-                  </div>
-
-                  {/* Rekening & QRIS Resmi Masjid Hj. Sudalmiyah Rais (Tanpa Border) */}
-                  <div className="mt-4 pt-4 border-t border-stone-200/60 flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                    {/* Gambar QRIS */}
-                    <div
-                      onClick={() => bankAccounts.sudalmiyah && setActiveQrisModal(bankAccounts.sudalmiyah)}
-                      className="relative aspect-[385/544] w-28 sm:w-36 rounded-xl overflow-hidden bg-white shrink-0 cursor-pointer group/qris hover:opacity-95 transition-transform hover:scale-[1.02] shadow-xs"
-                      title="Klik untuk memperbesar QRIS Masjid Sudalmiyah Rais"
-                    >
-                      <Image
-                        src={bankAccounts.sudalmiyah?.qrisImageUrl || "/images/qris-sudalmiyah.png"}
-                        alt="QRIS Masjid Hj. Sudalmiyah Rais"
-                        fill
-                        unoptimized
-                        className="object-contain"
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/qris:opacity-100 flex items-center justify-center text-white text-[10px] font-semibold transition-opacity gap-1">
-                        <Eye className="w-3.5 h-3.5 text-amber-300" />
-                        <span>Perbesar</span>
-                      </div>
-                    </div>
-
-                    {/* Rincian Rekening */}
-                    <div className="flex-1 space-y-1 text-center sm:text-left">
-                      <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
-                        {bankAccounts.sudalmiyah?.bankName || "Bank Syariah Indonesia"}
-                      </div>
-                      <div className="flex items-center justify-center sm:justify-start gap-2">
-                        <span className="font-mono font-black text-base text-[#003B73] select-all">
-                          {bankAccounts.sudalmiyah?.accountNumber || "6012275865"}
-                        </span>
-                        {bankAccounts.sudalmiyah?.accountNumber && (
-                          <button
-                            type="button"
-                            onClick={() => handleCopyAccount("sudalmiyah", bankAccounts.sudalmiyah?.accountNumber || "6012275865")}
-                            className="p-1 rounded text-stone-400 hover:text-[#003B73] transition-colors cursor-pointer"
-                            title="Salin Nomor Rekening"
-                          >
-                            {copiedId === "sudalmiyah" ? (
-                              <Check className="w-4 h-4 text-emerald-600" />
-                            ) : (
-                              <Copy className="w-4 h-4" />
-                            )}
-                          </button>
-                        )}
-                      </div>
-                      {copiedId === "sudalmiyah" && (
-                        <div className="text-[10px] font-bold text-emerald-600">
-                          Nomor rekening tersalin!
-                        </div>
-                      )}
-                      <div className="text-xs text-stone-700">
-                        a.n. <span className="font-semibold">{bankAccounts.sudalmiyah?.accountHolder || "LAZ UMS Sudalmiyah Rais"}</span>
-                      </div>
                     </div>
                   </div>
                 </div>
