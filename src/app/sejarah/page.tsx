@@ -625,6 +625,72 @@ export default function SejarahPage() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Fasilitas Terpadu & Layanan Idarah Masjid Sudalmiyah (Mengisi Ruang Bawah) */}
+                  <div className="pt-3 border-t border-stone-200/80 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-serif font-bold text-stone-900 text-sm sm:text-base flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-[#B58A1E]" />
+                        <span>Fasilitas Terpadu &amp; Layanan Idarah Masjid</span>
+                      </h4>
+                      <span className="text-[10px] font-mono font-bold text-[#003B73] bg-[#003B73]/10 px-2.5 py-0.5 rounded-full">
+                        Standar Idarah Unggul
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="bg-[#FAF8F5] p-3 rounded-xl border border-stone-200/80 space-y-1">
+                        <strong className="text-stone-900 block text-xs">Kapasitas 4.000+ Jamaah &amp; Hall Serbaguna</strong>
+                        <p className="text-[11px] text-stone-600 leading-relaxed">
+                          Ruang shalat bertingkat berpendingin udara alami, hall utama untuk shalat rawatib &amp; Jumat, serta sayap pembinaan mahasiswa.
+                        </p>
+                      </div>
+
+                      <div className="bg-[#FAF8F5] p-3 rounded-xl border border-stone-200/80 space-y-1">
+                        <strong className="text-stone-900 block text-xs">Aksesibilitas Difabel &amp; Lansia Mandiri</strong>
+                        <p className="text-[11px] text-stone-600 leading-relaxed">
+                          Jalur ramp landai mandiri, fasilitas wudhu dan toilet duduk khusus disabilitas, serta ruang transit prioritas lansia.
+                        </p>
+                      </div>
+
+                      <div className="bg-[#FAF8F5] p-3 rounded-xl border border-stone-200/80 space-y-1">
+                        <strong className="text-stone-900 block text-xs">Daur Ulang Air Wudhu &amp; Ruang Hijau</strong>
+                        <p className="text-[11px] text-stone-600 leading-relaxed">
+                          Instalasi filtrasi daur ulang air wudhu terpadu untuk pengairan taman kampus dan konservasi sumber daya air berkelanjutan.
+                        </p>
+                      </div>
+
+                      <div className="bg-[#FAF8F5] p-3 rounded-xl border border-stone-200/80 space-y-1">
+                        <strong className="text-stone-900 block text-xs">Layanan Keumatan &amp; Kantor Takmir Aktif</strong>
+                        <p className="text-[11px] text-stone-600 leading-relaxed">
+                          Sekretariat harian takmir, penyaluran infaq resmi LAZ UMS, presensi shalat digital, dan pusat pengkaderan ortom Muhammadiyah.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+                      <span className="text-stone-500 text-[11px]">
+                        Lokasi: Sayap Barat Gedung Induk Siti Walidah Kampus 2 UMS
+                      </span>
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href="/ibadah/presensi"
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#003B73] hover:underline"
+                        >
+                          <span>Presensi Shalat</span>
+                          <ChevronRight className="w-3 h-3" />
+                        </Link>
+                        <span className="text-stone-300">•</span>
+                        <Link
+                          href="/agenda"
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#003B73] hover:underline"
+                        >
+                          <span>Jadwal Agenda</span>
+                          <ChevronRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -802,9 +868,9 @@ export default function SejarahPage() {
                     key={mosque.id}
                     className="bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow"
                   >
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-                      {/* 1. Foto Masjid - Klik untuk membuka Google Maps */}
-                      <div className="lg:col-span-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+                      {/* 1. Foto Masjid & Info Fasilitas Ringkas */}
+                      <div className="lg:col-span-4 flex flex-col justify-between space-y-3">
                         <a
                           href={mosque.mapsUrl}
                           target="_blank"
@@ -826,52 +892,61 @@ export default function SejarahPage() {
                             <span>Buka Google Maps</span>
                           </div>
                         </a>
+
+                        {/* Makna Filosofis & Fasilitas (Mengisi Kolom Kiri Bawah) */}
+                        <div className="bg-[#FAF8F5] p-3 rounded-2xl border border-stone-200/80 text-xs space-y-1.5 flex-1 flex flex-col justify-center">
+                          <div>
+                            <strong className="text-stone-800 font-semibold block text-[11px] text-[#003B73]">Makna &amp; Inspirasi:</strong>
+                            <p className="text-stone-600 text-[11px] leading-relaxed">{mosque.philosophicalMeaning}</p>
+                          </div>
+                          <div className="pt-1 border-t border-stone-200/60">
+                            <strong className="text-stone-800 font-semibold block text-[11px] text-[#003B73]">Fasilitas Umum:</strong>
+                            <p className="text-stone-600 text-[11px] leading-relaxed">{mosque.facilities.join(" • ")}</p>
+                          </div>
+                        </div>
                       </div>
 
                       {/* 2. Konten Sejarah */}
-                      <div className="lg:col-span-5 space-y-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200">
-                            {mosque.established}
-                          </span>
+                      <div className="lg:col-span-5 flex flex-col justify-between space-y-3">
+                        <div className="space-y-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200">
+                              {mosque.established}
+                            </span>
+                          </div>
+
+                          <div>
+                            <a
+                              href={mosque.mapsUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group/title inline-flex items-center gap-2 hover:text-[#003B73] transition-colors"
+                              title={`Buka peta lokasi ${mosque.name} di Google Maps`}
+                            >
+                              <h4 className="text-xl sm:text-2xl font-serif font-black text-stone-900 group-hover/title:text-[#003B73] transition-colors">
+                                {mosque.name}
+                              </h4>
+                              <ExternalLink className="w-4 h-4 text-stone-400 group-hover/title:text-[#003B73] transition-colors shrink-0" />
+                            </a>
+                          </div>
+
+                          <p className="text-xs sm:text-sm font-semibold text-[#003B73]">
+                            {mosque.tagline}
+                          </p>
+
+                          <p className="text-xs sm:text-sm text-stone-600 leading-relaxed text-justify">
+                            {mosque.historicalContext}
+                          </p>
                         </div>
 
-                        <div>
-                          <a
-                            href={mosque.mapsUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group/title inline-flex items-center gap-2 hover:text-[#003B73] transition-colors"
-                            title={`Buka peta lokasi ${mosque.name} di Google Maps`}
-                          >
-                            <h4 className="text-xl sm:text-2xl font-serif font-black text-stone-900 group-hover/title:text-[#003B73] transition-colors">
-                              {mosque.name}
-                            </h4>
-                            <ExternalLink className="w-4 h-4 text-stone-400 group-hover/title:text-[#003B73] transition-colors shrink-0" />
-                          </a>
-                        </div>
-
-                        <p className="text-xs sm:text-sm font-semibold text-[#003B73]">
-                          {mosque.tagline}
-                        </p>
-
-                        <p className="text-xs sm:text-sm text-stone-600 leading-relaxed text-justify">
-                          {mosque.historicalContext}
-                        </p>
-
-                        <div className="pt-2 text-xs text-stone-500 border-t border-stone-100 space-y-1">
-                          <div>
-                            <strong>Makna &amp; Inspirasi:</strong> {mosque.philosophicalMeaning}
-                          </div>
-                          <div>
-                            <strong>Fasilitas Umum:</strong>{" "}
-                            {mosque.facilities.join(" • ")}
-                          </div>
+                        <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+                          <span>Tokoh Perintis / Penggagas:</span>
+                          <strong className="text-stone-800 text-right max-w-[220px] truncate">{mosque.keyFigures}</strong>
                         </div>
                       </div>
 
                       {/* 3. Kolom Kanan: Gambar QRIS & No. Rekening (Tanpa Border) */}
-                      <div className="lg:col-span-3 flex flex-col items-center sm:items-start text-center sm:text-left space-y-3 pt-1 lg:pt-0">
+                      <div className="lg:col-span-3 flex flex-col justify-between items-center sm:items-start text-center sm:text-left space-y-3 pt-1 lg:pt-0">
                         {/* Gambar QRIS Diperbesar Proporsional */}
                         <div
                           onClick={() => bank && setActiveQrisModal(bank)}
@@ -946,6 +1021,12 @@ export default function SejarahPage() {
                               <ExternalLink className="w-3.5 h-3.5" />
                             </a>
                           </div>
+
+                          {bank?.notes && (
+                            <p className="text-[10px] text-stone-500 italic pt-1 leading-relaxed">
+                              *{bank.notes}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
