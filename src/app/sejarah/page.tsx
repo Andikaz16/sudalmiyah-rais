@@ -490,12 +490,12 @@ export default function SejarahPage() {
                     </div>
                   </div>
 
-                  {/* Rekening & QRIS Resmi Masjid Hj. Sudalmiyah Rais (Gambar Diperbesar Proporsional Sejajar Sisi Kanan) */}
-                  <div className="pt-2 flex flex-col items-center sm:items-start text-center sm:text-left space-y-2.5">
-                    {/* Gambar QRIS Diperbesar Proporsional Sejajar */}
+                  {/* Rekening & QRIS Resmi Masjid Hj. Sudalmiyah Rais (Posisi Tengah & Ukuran Pas Proporsional) */}
+                  <div className="pt-2 flex flex-col items-center text-center mx-auto space-y-2.5 w-full">
+                    {/* Gambar QRIS Diperbesar Pas & di Tengah */}
                     <div
                       onClick={() => bankAccounts.sudalmiyah && setActiveQrisModal(bankAccounts.sudalmiyah)}
-                      className="relative aspect-[385/544] w-48 sm:w-52 lg:w-56 max-w-[230px] rounded-2xl overflow-hidden bg-white cursor-pointer group/qris hover:opacity-95 transition-all hover:scale-[1.02] shadow-sm"
+                      className="relative aspect-[385/544] w-56 sm:w-64 max-w-[270px] rounded-2xl overflow-hidden bg-white cursor-pointer group/qris hover:opacity-95 transition-all hover:scale-[1.02] shadow-sm mx-auto"
                       title="Klik untuk memperbesar QRIS Masjid Sudalmiyah Rais"
                     >
                       <Image
@@ -511,13 +511,13 @@ export default function SejarahPage() {
                       </div>
                     </div>
 
-                    {/* Rincian Rekening di Bawah Gambar */}
-                    <div className="space-y-1 w-full max-w-[230px] text-center sm:text-left">
+                    {/* Rincian Rekening di Bawah Gambar (Rata Tengah Seimbang) */}
+                    <div className="space-y-1 w-full max-w-[270px] text-center flex flex-col items-center">
                       <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
                         {bankAccounts.sudalmiyah?.bankName || "Bank Syariah Indonesia"}
                       </div>
 
-                      <div className="flex items-center justify-center sm:justify-start gap-2">
+                      <div className="flex items-center justify-center gap-2">
                         <a
                           href={getVirtualBankUrl(bankAccounts.sudalmiyah)}
                           target="_blank"
@@ -570,7 +570,7 @@ export default function SejarahPage() {
                       </div>
 
                       {bankAccounts.sudalmiyah?.notes && (
-                        <p className="text-[10px] text-stone-500 italic pt-0.5 leading-relaxed">
+                        <p className="text-[10px] text-stone-500 italic pt-0.5 leading-relaxed text-center">
                           *{bankAccounts.sudalmiyah.notes}
                         </p>
                       )}
