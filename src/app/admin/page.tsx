@@ -4033,9 +4033,9 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                 </div>
 
                 <div className="bg-white rounded-2xl p-5 space-y-3">
-                  <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-2.5">
+                  <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-3">
                     {/* Gambar QRIS */}
-                    <div className="relative aspect-square w-32 sm:w-36 rounded-xl overflow-hidden bg-white">
+                    <div className="relative aspect-[385/544] w-48 sm:w-56 rounded-2xl overflow-hidden bg-white shadow-xs">
                       <Image
                         src={activeBankInfo.qrisImageUrl || "/images/qris-bank-jateng.jpg"}
                         alt="Pratinjau QRIS"
@@ -4046,13 +4046,13 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                     </div>
 
                     {/* Rincian Rekening */}
-                    <div className="space-y-1 w-full text-center sm:text-left">
+                    <div className="space-y-1 w-full max-w-[240px] text-center sm:text-left">
                       <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
                         {activeBankInfo.bankName || "Bank Penampung"}
                       </div>
 
                       <div className="flex items-center justify-center sm:justify-start gap-1.5">
-                        <span className="font-mono font-bold text-sm sm:text-base text-[#003B73]">
+                        <span className="font-mono font-black text-base sm:text-lg text-[#003B73]">
                           {activeBankInfo.accountNumber || "Belum diisi"}
                         </span>
                         <span className="text-[10px] text-stone-400 font-mono">

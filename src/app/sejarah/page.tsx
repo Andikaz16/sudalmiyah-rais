@@ -535,7 +535,7 @@ export default function SejarahPage() {
                     {/* Gambar QRIS */}
                     <div
                       onClick={() => bankAccounts.sudalmiyah && setActiveQrisModal(bankAccounts.sudalmiyah)}
-                      className="relative aspect-square w-24 sm:w-28 rounded-xl overflow-hidden bg-white shrink-0 cursor-pointer group/qris hover:opacity-95 transition-transform hover:scale-[1.02]"
+                      className="relative aspect-[385/544] w-28 sm:w-36 rounded-xl overflow-hidden bg-white shrink-0 cursor-pointer group/qris hover:opacity-95 transition-transform hover:scale-[1.02] shadow-xs"
                       title="Klik untuk memperbesar QRIS Masjid Sudalmiyah Rais"
                     >
                       <Image
@@ -831,11 +831,11 @@ export default function SejarahPage() {
                       </div>
 
                       {/* 3. Kolom Kanan: Gambar QRIS & No. Rekening (Tanpa Border) */}
-                      <div className="lg:col-span-3 flex flex-col items-center sm:items-start text-center sm:text-left space-y-2.5 pt-1 lg:pt-0">
-                        {/* Gambar QRIS */}
+                      <div className="lg:col-span-3 flex flex-col items-center sm:items-start text-center sm:text-left space-y-3 pt-1 lg:pt-0">
+                        {/* Gambar QRIS Diperbesar Proporsional */}
                         <div
                           onClick={() => bank && setActiveQrisModal(bank)}
-                          className="relative aspect-square w-32 sm:w-36 rounded-xl overflow-hidden bg-white cursor-pointer group/qris hover:opacity-95 transition-transform hover:scale-[1.02]"
+                          className="relative aspect-[385/544] w-48 sm:w-56 lg:w-full lg:max-w-[240px] rounded-2xl overflow-hidden bg-white cursor-pointer group/qris hover:opacity-95 transition-all hover:scale-[1.02] shadow-xs"
                           title="Klik untuk memperbesar QRIS"
                         >
                           <Image
@@ -845,20 +845,20 @@ export default function SejarahPage() {
                             unoptimized
                             className="object-contain"
                           />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/qris:opacity-100 flex items-center justify-center text-white text-[10px] font-semibold transition-opacity gap-1">
-                            <Eye className="w-3.5 h-3.5 text-amber-300" />
-                            <span>Perbesar</span>
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/qris:opacity-100 flex items-center justify-center text-white text-xs font-semibold transition-opacity gap-1.5">
+                            <Eye className="w-4 h-4 text-amber-300" />
+                            <span>Perbesar QRIS</span>
                           </div>
                         </div>
 
                         {/* Rincian Rekening */}
-                        <div className="space-y-1 w-full text-center sm:text-left">
+                        <div className="space-y-1 w-full max-w-[240px] text-center sm:text-left">
                           <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
                             {bank?.bankName || "Bank Penampung"}
                           </div>
 
                           <div className="flex items-center justify-center sm:justify-start gap-1.5">
-                            <span className="font-mono font-black text-sm sm:text-base text-[#003B73] select-all">
+                            <span className="font-mono font-black text-base sm:text-lg text-[#003B73] select-all">
                               {bank?.accountNumber || "-"}
                             </span>
                             {bank?.accountNumber && (
@@ -869,9 +869,9 @@ export default function SejarahPage() {
                                 title="Salin Nomor Rekening"
                               >
                                 {copiedId === mosque.id ? (
-                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                  <Check className="w-4 h-4 text-emerald-600" />
                                 ) : (
-                                  <Copy className="w-3.5 h-3.5" />
+                                  <Copy className="w-4 h-4" />
                                 )}
                               </button>
                             )}
@@ -882,7 +882,7 @@ export default function SejarahPage() {
                             </div>
                           )}
 
-                          <div className="text-xs text-stone-700">
+                          <div className="text-xs text-stone-700 leading-snug">
                             a.n. <span className="font-semibold">{bank?.accountHolder || "Takmir Masjid UMS"}</span>
                           </div>
                         </div>
