@@ -444,56 +444,58 @@ export default function SejarahPage() {
               </div>
 
               {/* Grid: Foto Utama & Profil Singkat */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8 items-stretch">
                 {/* Visual Image */}
-                <div className="lg:col-span-5 flex flex-col gap-4">
-                  <a
-                    href="https://www.google.com/maps/search/?api=1&query=Masjid+Hj.+Sudalmiyah+Rais+UMS"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group/img relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-md border border-stone-200 block"
-                    title="Buka lokasi Masjid Hj. Sudalmiyah Rais di Google Maps"
-                  >
-                    <Image
-                      src="/images/masjid-sudalmiyah.jpg"
-                      alt="Masjid Hj. Sudalmiyah Rais UMS"
-                      fill
-                      className="object-cover group-hover/img:scale-105 transition-transform duration-500"
-                      priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
-                      <div className="text-white text-xs">
-                        <span className="font-bold text-[#FCD34D] block text-sm">Masjid Kampus 2 UMS</span>
-                        Kapasitas 4.000+ Jamaah dengan Fasilitas Hall & Sayap Pembinaan
+                <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-4">
+                  <div className="space-y-4">
+                    <a
+                      href="https://www.google.com/maps/search/?api=1&query=Masjid+Hj.+Sudalmiyah+Rais+UMS"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/img relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-md border border-stone-200 block"
+                      title="Buka lokasi Masjid Hj. Sudalmiyah Rais di Google Maps"
+                    >
+                      <Image
+                        src="/images/masjid-sudalmiyah.jpg"
+                        alt="Masjid Hj. Sudalmiyah Rais UMS"
+                        fill
+                        className="object-cover group-hover/img:scale-105 transition-transform duration-500"
+                        priority
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
+                        <div className="text-white text-xs">
+                          <span className="font-bold text-[#FCD34D] block text-sm">Masjid Kampus 2 UMS</span>
+                          Kapasitas 4.000+ Jamaah dengan Fasilitas Hall & Sayap Pembinaan
+                        </div>
                       </div>
-                    </div>
-                    <div className="absolute top-3 right-3 bg-black/60 group-hover/img:bg-black/80 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg backdrop-blur-xs flex items-center gap-1.5 opacity-0 group-hover/img:opacity-100 transition-opacity">
-                      <MapPin className="w-3 h-3 text-[#FCD34D]" />
-                      <span>Buka Google Maps</span>
-                    </div>
-                  </a>
+                      <div className="absolute top-3 right-3 bg-black/60 group-hover/img:bg-black/80 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg backdrop-blur-xs flex items-center gap-1.5 opacity-0 group-hover/img:opacity-100 transition-opacity">
+                        <MapPin className="w-3 h-3 text-[#FCD34D]" />
+                        <span>Buka Google Maps</span>
+                      </div>
+                    </a>
 
-                  {/* Highlight Box Profil Tokoh */}
-                  <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl p-5">
-                    <h4 className="font-serif font-bold text-stone-900 text-sm sm:text-base flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#B58A1E]" />
-                      <span>Sosok Hj. Sudalmiyah Suhud Rais</span>
-                    </h4>
-                    <p className="text-xs text-stone-600 mt-2 leading-relaxed">
-                      Secara historis, nama masjid ini diabadikan dari figur perintis berdirinya UMS, yaitu 
-                      <strong> Hj. Sudalmiyah Suhud Rais</strong> (istri dari Bapak Suhud Rais, aktivis Muhammadiyah Surakarta, 
-                      serta ibunda dari tokoh nasional Prof. Dr. M. Amien Rais, M.A. dan Drs. H. A. Dahlan Rais, M.Hum.). 
-                      Beliau adalah muballighah &lsquo;Aisyiyah yang gigih, pendidik berintegritas tinggi, dan teladan keikhlasan dakwah 
-                      yang jasanya diabadikan sebagai nama masjid utama ini.
-                    </p>
+                    {/* Highlight Box Profil Tokoh */}
+                    <div className="bg-[#FAF8F5] border border-stone-200 rounded-2xl p-4 sm:p-5">
+                      <h4 className="font-serif font-bold text-stone-900 text-sm sm:text-base flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-[#B58A1E]" />
+                        <span>Sosok Hj. Sudalmiyah Suhud Rais</span>
+                      </h4>
+                      <p className="text-xs text-stone-600 mt-2 leading-relaxed">
+                        Secara historis, nama masjid ini diabadikan dari figur perintis berdirinya UMS, yaitu 
+                        <strong> Hj. Sudalmiyah Suhud Rais</strong> (istri dari Bapak Suhud Rais, aktivis Muhammadiyah Surakarta, 
+                        serta ibunda dari tokoh nasional Prof. Dr. M. Amien Rais, M.A. dan Drs. H. A. Dahlan Rais, M.Hum.). 
+                        Beliau adalah muballighah &lsquo;Aisyiyah yang gigih, pendidik berintegritas tinggi, dan teladan keikhlasan dakwah 
+                        yang jasanya diabadikan sebagai nama masjid utama ini.
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Rekening & QRIS Resmi Masjid Hj. Sudalmiyah Rais (Gambar Diperbesar & No. Rekening di Bawahnya) */}
-                  <div className="pt-3 flex flex-col items-center sm:items-start text-center sm:text-left space-y-3">
-                    {/* Gambar QRIS Diperbesar Penuh */}
+                  {/* Rekening & QRIS Resmi Masjid Hj. Sudalmiyah Rais (Gambar Diperbesar Proporsional Sejajar Sisi Kanan) */}
+                  <div className="pt-2 flex flex-col items-center sm:items-start text-center sm:text-left space-y-2.5">
+                    {/* Gambar QRIS Diperbesar Proporsional Sejajar */}
                     <div
                       onClick={() => bankAccounts.sudalmiyah && setActiveQrisModal(bankAccounts.sudalmiyah)}
-                      className="relative aspect-[385/544] w-56 sm:w-64 md:w-72 lg:w-full lg:max-w-[320px] rounded-2xl overflow-hidden bg-white cursor-pointer group/qris hover:opacity-95 transition-all hover:scale-[1.02] shadow-sm"
+                      className="relative aspect-[385/544] w-48 sm:w-52 lg:w-56 max-w-[230px] rounded-2xl overflow-hidden bg-white cursor-pointer group/qris hover:opacity-95 transition-all hover:scale-[1.02] shadow-sm"
                       title="Klik untuk memperbesar QRIS Masjid Sudalmiyah Rais"
                     >
                       <Image
@@ -510,7 +512,7 @@ export default function SejarahPage() {
                     </div>
 
                     {/* Rincian Rekening di Bawah Gambar */}
-                    <div className="space-y-1.5 w-full max-w-[320px] text-center sm:text-left">
+                    <div className="space-y-1 w-full max-w-[230px] text-center sm:text-left">
                       <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
                         {bankAccounts.sudalmiyah?.bankName || "Bank Syariah Indonesia"}
                       </div>
@@ -523,7 +525,7 @@ export default function SejarahPage() {
                           className="group/bank inline-flex items-center gap-1.5 hover:opacity-80 transition-opacity"
                           title="Klik untuk langsung menuju Bank Virtual (Internet Banking)"
                         >
-                          <span className="font-mono font-black text-lg sm:text-xl text-[#003B73] hover:underline underline-offset-4 select-all">
+                          <span className="font-mono font-black text-lg text-[#003B73] hover:underline underline-offset-4 select-all">
                             {bankAccounts.sudalmiyah?.accountNumber || "6012275865"}
                           </span>
                           <ExternalLink className="w-4 h-4 text-stone-400 group-hover/bank:text-[#003B73] transition-colors" />
@@ -533,7 +535,7 @@ export default function SejarahPage() {
                           <button
                             type="button"
                             onClick={() => handleCopyAccount("sudalmiyah", bankAccounts.sudalmiyah?.accountNumber || "6012275865")}
-                            className="p-1.5 rounded-lg text-stone-400 hover:text-[#003B73] hover:bg-stone-100 transition-colors cursor-pointer"
+                            className="p-1 rounded-lg text-stone-400 hover:text-[#003B73] hover:bg-stone-100 transition-colors cursor-pointer"
                             title="Salin Nomor Rekening"
                           >
                             {copiedId === "sudalmiyah" ? (
@@ -551,7 +553,7 @@ export default function SejarahPage() {
                         </div>
                       )}
 
-                      <div className="text-xs text-stone-700">
+                      <div className="text-xs text-stone-700 leading-snug">
                         a.n. <span className="font-semibold">{bankAccounts.sudalmiyah?.accountHolder || "LAZ UMS Sudalmiyah Rais"}</span>
                       </div>
 
@@ -568,7 +570,7 @@ export default function SejarahPage() {
                       </div>
 
                       {bankAccounts.sudalmiyah?.notes && (
-                        <p className="text-[10px] text-stone-500 italic pt-1 leading-relaxed">
+                        <p className="text-[10px] text-stone-500 italic pt-0.5 leading-relaxed">
                           *{bankAccounts.sudalmiyah.notes}
                         </p>
                       )}
@@ -577,129 +579,156 @@ export default function SejarahPage() {
                 </div>
 
                 {/* Deskripsi Sejarah Mendalam */}
-                <div className="lg:col-span-7 space-y-5 text-stone-700 text-sm sm:text-base leading-relaxed">
-                  <div>
-                    <h3 className="font-serif font-bold text-stone-900 text-lg sm:text-xl text-[#003B73]">
-                      Latar Belakang & Tonggak Pendirian
-                    </h3>
-                    <p className="mt-2">
-                      Nama <strong>Hj. Sudalmiyah Suhud Rais</strong> memiliki kedudukan yang sangat istimewa dalam sejarah 
-                      Universitas Muhammadiyah Surakarta. Pada 18 September 1958, beliau tercatat sebagai salah satu dari lima 
-                      tokoh perintis utama yang mendirikan IKIP Muhammadiyah Cabang Surakarta—yang kini telah bertransformasi 
-                      menjadi universitas unggulan berkelas dunia (UMS).
-                    </p>
-                    <p className="mt-2">
-                      Dalam penamaan resmi dan administrasi persyarikatan (sebagaimana tertuang dalam SK LPCR-PM PP Muhammadiyah), 
-                      nama masjid umumnya diringkas menjadi <strong>Masjid Hj. Sudalmiyah Rais</strong> agar ringkas dan selaras 
-                      dengan identitas keluarga besar Rais. Namun secara silsilah dan catatan sejarah pendiri kampus, nama lengkap 
-                      beliau adalah <strong>Hj. Sudalmiyah Suhud Rais</strong>.
-                    </p>
-                  </div>
+                <div className="lg:col-span-7 flex flex-col justify-between h-full space-y-4 text-stone-700 text-sm sm:text-base leading-relaxed">
+                  <div className="space-y-4">
+                    {/* Slogan / Tagline */}
+                    <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 text-xs text-amber-950 font-semibold flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#B58A1E] shrink-0" />
+                      <span>{bankAccounts.sudalmiyah?.tagline || "Masjid Utama Kampus 2 UMS & Episentrum Pergerakan Kader Persyarikatan"}</span>
+                    </div>
 
-                  <div className="pt-2">
-                    <h3 className="font-serif font-bold text-stone-900 text-lg sm:text-xl text-[#003B73]">
-                      Mandat Resmi Masjid Percontohan Amal Usaha Muhammadiyah (AUM)
-                    </h3>
-                    <p className="mt-2">
-                      Melalui <strong>Surat Keputusan LPCR-PM Pimpinan Pusat Muhammadiyah No. 198/KEP/I.15/A/2026</strong>, 
-                      Masjid Hj. Sudalmiyah Rais ditetapkan secara resmi sebagai <strong>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</strong>. 
-                      Tata kelola masjid dijalankan secara profesional dengan pembagian kepengurusan yang mencakup Dewan Penasihat, 
-                      Badan Pembina Masjid (BPM) yang dipimpin oleh <strong>Dr. Muchamad Iksan, S.H., M.H</strong>, serta Badan Pelaksana 
-                      Harian (Eksekutif) Masjid yang dipimpin oleh <strong>Dodi Afianto, S.Ag., M.Pd.I</strong> selaku Direktur.
-                    </p>
-                  </div>
+                    <div>
+                      <h3 className="font-serif font-bold text-stone-900 text-lg sm:text-xl text-[#003B73]">
+                        Latar Belakang &amp; Tonggak Pendirian
+                      </h3>
+                      <div className="mt-2 text-xs sm:text-sm text-stone-600 leading-relaxed space-y-2 text-justify">
+                        <p>
+                          Nama <strong>Hj. Sudalmiyah Suhud Rais</strong> memiliki kedudukan yang sangat istimewa dalam sejarah 
+                          Universitas Muhammadiyah Surakarta. Pada 18 September 1958, beliau tercatat sebagai salah satu dari lima 
+                          tokoh perintis utama yang mendirikan IKIP Muhammadiyah Cabang Surakarta—yang kini telah bertransformasi 
+                          menjadi universitas unggulan berkelas dunia (UMS).
+                        </p>
+                        <p>
+                          Dalam penamaan resmi dan administrasi persyarikatan (sebagaimana tertuang dalam SK LPCR-PM PP Muhammadiyah), 
+                          nama masjid umumnya diringkas menjadi <strong>Masjid Hj. Sudalmiyah Rais</strong> agar ringkas dan selaras 
+                          dengan identitas keluarga besar Rais. Namun secara silsilah dan catatan sejarah pendiri kampus, nama lengkap 
+                          beliau adalah <strong>Hj. Sudalmiyah Suhud Rais</strong>.
+                        </p>
+                        <p>
+                          Masjid ini didesain sebagai episentrum peribadatan dan pengkaderan yang menyatu harmonis dengan kompleks Gedung Induk Siti Walidah. Arsitektur megahnya mengintegrasikan nilai-nilai spiritual Islam dengan fungsionalitas kampus modern, menjadikannya rujukan percontohan tata kelola tempat ibadah universitas.
+                        </p>
+                      </div>
+                    </div>
 
-                  {/* 3 Karakteristik Masjid Sudalmiyah */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                    <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200">
-                      <span className="text-xs font-bold text-[#003B73] block mb-1">
-                        Ramah Aktivis
-                      </span>
-                      <p className="text-[11px] text-stone-600 leading-snug">
-                        Menjadi markas dakwah terbuka bagi kader persyarikatan, IMM, Tapak Suci, HW, ORMAWA, UKM, dan pembinaan AIK.
+                    <div className="pt-1">
+                      <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg text-[#003B73]">
+                        Mandat Resmi Masjid Percontohan Amal Usaha Muhammadiyah (AUM)
+                      </h3>
+                      <p className="mt-1 text-xs sm:text-sm text-stone-600 leading-relaxed text-justify">
+                        Melalui <strong>Surat Keputusan LPCR-PM Pimpinan Pusat Muhammadiyah No. 198/KEP/I.15/A/2026</strong>, 
+                        Masjid Hj. Sudalmiyah Rais ditetapkan secara resmi sebagai <strong>Masjid Percontohan Amal Usaha Muhammadiyah (AUM)</strong>. 
+                        Tata kelola masjid dijalankan secara profesional dengan pembagian kepengurusan yang mencakup Dewan Penasihat, 
+                        Badan Pembina Masjid (BPM) yang dipimpin oleh <strong>Dr. Muchamad Iksan, S.H., M.H</strong>, serta Badan Pelaksana 
+                        Harian (Eksekutif) Masjid yang dipimpin oleh <strong>Dodi Afianto, S.Ag., M.Pd.I</strong> selaku Direktur.
                       </p>
                     </div>
-                    <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
-                      <span className="text-xs font-bold text-emerald-800 block mb-1">
-                        Eco-Mosque
-                      </span>
-                      <p className="text-[11px] text-stone-600 leading-snug">
-                        Pencahayaan alami hemat energi, daur ulang air wudhu berkelanjutan, serta ruang hijau asri.
-                      </p>
+
+                    {/* 3 Karakteristik Masjid Sudalmiyah */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                      <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200">
+                        <span className="text-xs font-bold text-[#003B73] block mb-1">
+                          Ramah Aktivis
+                        </span>
+                        <p className="text-[11px] text-stone-600 leading-snug">
+                          Markas dakwah terbuka bagi kader persyarikatan, IMM, Tapak Suci, HW, ORMAWA, UKM, dan AIK.
+                        </p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                        <span className="text-xs font-bold text-emerald-800 block mb-1">
+                          Eco-Mosque
+                        </span>
+                        <p className="text-[11px] text-stone-600 leading-snug">
+                          Pencahayaan alami hemat energi, daur ulang air wudhu berkelanjutan, serta ruang hijau asri.
+                        </p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200">
+                        <span className="text-xs font-bold text-amber-900 block mb-1">
+                          Inklusif Difabel
+                        </span>
+                        <p className="text-[11px] text-stone-600 leading-snug">
+                          Akses ramp kursi roda mandiri, toilet khusus disabilitas, serta kenyamanan bagi lansia dan anak.
+                        </p>
+                      </div>
                     </div>
-                    <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
-                      <span className="text-xs font-bold text-amber-900 block mb-1">
-                        Inklusif Difabel
-                      </span>
-                      <p className="text-[11px] text-stone-600 leading-snug">
-                        Akses ramp kursi roda mandiri, toilet khusus disabilitas, serta kenyamanan bagi lansia dan anak.
-                      </p>
+
+                    {/* Fasilitas Terpadu & Layanan Idarah Masjid Sudalmiyah (Mengisi Ruang Bawah) */}
+                    <div className="pt-2 border-t border-stone-200/80 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-serif font-bold text-stone-900 text-sm sm:text-base flex items-center gap-2">
+                          <Building2 className="w-4 h-4 text-[#B58A1E]" />
+                          <span>Fasilitas Terpadu &amp; Layanan Idarah Masjid</span>
+                        </h4>
+                        <span className="text-[10px] font-mono font-bold text-[#003B73] bg-[#003B73]/10 px-2.5 py-0.5 rounded-full">
+                          Standar Idarah Unggul
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                        <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-stone-200/80 space-y-1">
+                          <strong className="text-stone-900 block text-xs">Kapasitas 4.000+ Jamaah &amp; Hall Serbaguna</strong>
+                          <p className="text-[11px] text-stone-600 leading-relaxed">
+                            Ruang shalat bertingkat berpendingin udara alami, hall utama untuk shalat rawatib &amp; Jumat, serta sayap pembinaan mahasiswa.
+                          </p>
+                        </div>
+
+                        <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-stone-200/80 space-y-1">
+                          <strong className="text-stone-900 block text-xs">Aksesibilitas Difabel &amp; Lansia Mandiri</strong>
+                          <p className="text-[11px] text-stone-600 leading-relaxed">
+                            Jalur ramp landai mandiri, fasilitas wudhu dan toilet duduk khusus disabilitas, serta ruang transit prioritas lansia.
+                          </p>
+                        </div>
+
+                        <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-stone-200/80 space-y-1">
+                          <strong className="text-stone-900 block text-xs">Daur Ulang Air Wudhu &amp; Ruang Hijau</strong>
+                          <p className="text-[11px] text-stone-600 leading-relaxed">
+                            Instalasi filtrasi daur ulang air wudhu terpadu untuk pengairan taman kampus dan konservasi sumber daya air berkelanjutan.
+                          </p>
+                        </div>
+
+                        <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-stone-200/80 space-y-1">
+                          <strong className="text-stone-900 block text-xs">Layanan Keumatan &amp; Kantor Takmir Aktif</strong>
+                          <p className="text-[11px] text-stone-600 leading-relaxed">
+                            Sekretariat harian takmir, penyaluran infaq resmi LAZ UMS, presensi shalat digital, dan pusat pengkaderan ortom Muhammadiyah.
+                          </p>
+                        </div>
+
+                        <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-stone-200/80 space-y-1">
+                          <strong className="text-stone-900 block text-xs">Pusat Pembinaan AIK &amp; Halaqah Al-Qur&apos;an</strong>
+                          <p className="text-[11px] text-stone-600 leading-relaxed">
+                            Halaqah kajian intensif, tahsin dan tahfidz bagi mahasiswa serta sivitas akademika dalam iklim keislaman yang mencerahkan.
+                          </p>
+                        </div>
+
+                        <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-stone-200/80 space-y-1">
+                          <strong className="text-stone-900 block text-xs">Penyaluran ZISWAF Terpadu LAZ UMS</strong>
+                          <p className="text-[11px] text-stone-600 leading-relaxed">
+                            Pengelolaan infaq, sedekah, dan zakat secara amanah dan akuntabel untuk beasiswa mahasiswa dhuafa dan kemakmuran masjid.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Fasilitas Terpadu & Layanan Idarah Masjid Sudalmiyah (Mengisi Ruang Bawah) */}
-                  <div className="pt-3 border-t border-stone-200/80 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-serif font-bold text-stone-900 text-sm sm:text-base flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-[#B58A1E]" />
-                        <span>Fasilitas Terpadu &amp; Layanan Idarah Masjid</span>
-                      </h4>
-                      <span className="text-[10px] font-mono font-bold text-[#003B73] bg-[#003B73]/10 px-2.5 py-0.5 rounded-full">
-                        Standar Idarah Unggul
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div className="bg-[#FAF8F5] p-3 rounded-xl border border-stone-200/80 space-y-1">
-                        <strong className="text-stone-900 block text-xs">Kapasitas 4.000+ Jamaah &amp; Hall Serbaguna</strong>
-                        <p className="text-[11px] text-stone-600 leading-relaxed">
-                          Ruang shalat bertingkat berpendingin udara alami, hall utama untuk shalat rawatib &amp; Jumat, serta sayap pembinaan mahasiswa.
-                        </p>
-                      </div>
-
-                      <div className="bg-[#FAF8F5] p-3 rounded-xl border border-stone-200/80 space-y-1">
-                        <strong className="text-stone-900 block text-xs">Aksesibilitas Difabel &amp; Lansia Mandiri</strong>
-                        <p className="text-[11px] text-stone-600 leading-relaxed">
-                          Jalur ramp landai mandiri, fasilitas wudhu dan toilet duduk khusus disabilitas, serta ruang transit prioritas lansia.
-                        </p>
-                      </div>
-
-                      <div className="bg-[#FAF8F5] p-3 rounded-xl border border-stone-200/80 space-y-1">
-                        <strong className="text-stone-900 block text-xs">Daur Ulang Air Wudhu &amp; Ruang Hijau</strong>
-                        <p className="text-[11px] text-stone-600 leading-relaxed">
-                          Instalasi filtrasi daur ulang air wudhu terpadu untuk pengairan taman kampus dan konservasi sumber daya air berkelanjutan.
-                        </p>
-                      </div>
-
-                      <div className="bg-[#FAF8F5] p-3 rounded-xl border border-stone-200/80 space-y-1">
-                        <strong className="text-stone-900 block text-xs">Layanan Keumatan &amp; Kantor Takmir Aktif</strong>
-                        <p className="text-[11px] text-stone-600 leading-relaxed">
-                          Sekretariat harian takmir, penyaluran infaq resmi LAZ UMS, presensi shalat digital, dan pusat pengkaderan ortom Muhammadiyah.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
-                      <span className="text-stone-500 text-[11px]">
-                        Lokasi: Sayap Barat Gedung Induk Siti Walidah Kampus 2 UMS
-                      </span>
-                      <div className="flex items-center gap-3">
-                        <Link
-                          href="/ibadah/presensi"
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#003B73] hover:underline"
-                        >
-                          <span>Presensi Shalat</span>
-                          <ChevronRight className="w-3 h-3" />
-                        </Link>
-                        <span className="text-stone-300">•</span>
-                        <Link
-                          href="/agenda"
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#003B73] hover:underline"
-                        >
-                          <span>Jadwal Agenda</span>
-                          <ChevronRight className="w-3 h-3" />
-                        </Link>
-                      </div>
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-stone-100 text-xs">
+                    <span className="text-stone-500 text-[11px]">
+                      Lokasi: Sayap Barat Gedung Induk Siti Walidah Kampus 2 UMS
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href="/ibadah/presensi"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#003B73] hover:underline"
+                      >
+                        <span>Presensi Shalat</span>
+                        <ChevronRight className="w-3 h-3" />
+                      </Link>
+                      <span className="text-stone-300">•</span>
+                      <Link
+                        href="/agenda"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#003B73] hover:underline"
+                      >
+                        <span>Jadwal Agenda</span>
+                        <ChevronRight className="w-3 h-3" />
+                      </Link>
                     </div>
                   </div>
                 </div>
