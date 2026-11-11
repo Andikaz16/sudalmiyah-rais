@@ -634,7 +634,9 @@
       "notes": "Infaq & Sedekah Operasional serta Kemakmuran Masjid Hj. Sudalmiyah Rais Kampus 2 UMS",
       "isActive": true,
       "updatedAt": "2026-11-11T08:00:00.000Z",
-      "virtualBankUrl": "https://bsinet.bankbsi.co.id"
+      "virtualBankUrl": "https://bsinet.bankbsi.co.id",
+      "description": "Masjid Hj. Sudalmiyah Rais merupakan masjid utama dan episentrum dakwah Universitas Muhammadiyah Surakarta di Kampus 2 Pabelan. Diresmikan sebagai Masjid Percontohan Amal Usaha Muhammadiyah (AUM), masjid ini memadukan kemegahan arsitektur islami modern dengan tata kelola profesional berstandar nasional.\n\nDengan kapasitas lebih dari 4.000 jamaah, masjid ini aktif menyelenggarakan shalat rawatib berjamaah, khutbah Jumat, tabligh akbar, kajian intensif tarjih, serta pembinaan kader persyarikatan dan ortom Muhammadiyah.",
+      "tagline": "Masjid Utama & Pusat Percontohan Idarah LPCR-PM PP Muhammadiyah"
     },
     {
       "mosqueId": "fadhlurrahman",
@@ -648,7 +650,9 @@
       "notes": "Infaq Pembangunan, Kajian, & Kemakmuran Masjid Fadhlurrahman Kampus 1 UMS",
       "isActive": true,
       "updatedAt": "2026-11-11T08:00:00.000Z",
-      "virtualBankUrl": "https://ib.bankjateng.co.id"
+      "virtualBankUrl": "https://ib.bankjateng.co.id",
+      "description": "Masjid Fadhlurrahman merupakan rumah ibadah pertama yang didirikan di area kampus Universitas Muhammadiyah Surakarta. Berdiri sejak era awal perintisan dan konsolidasi kampus di Pabelan pada tahun 1981, masjid bersejarah ini menjadi saksi bisu pembinaan angkatan-angkatan awal sarjana dan kader Muhammadiyah yang kini berkiprah luas di seluruh penjuru tanah air.\n\nSebagai episentrum spiritualitas Kampus 1, Masjid Fadhlurrahman senantiasa memelihara tradisi keilmuan dan halaqah Al-Islam Kemuhammadiyahan (AIK). Setiap harinya, masjid ini ramai makmur dengan shalat rawatib berjamaah sivitas akademika FKIP, FH, dan Fakultas Geografi, kajian intensif keislaman, serta pembinaan tilawah dan tahsin mahasiswa.",
+      "tagline": "Masjid Pertama & Tonggak Sejarah Al-Islam Kemuhammadiyahan UMS"
     },
     {
       "mosqueId": "mas-mansur",
@@ -662,7 +666,9 @@
       "notes": "Infaq Pembinaan Santri Pesma & Kemakmuran Masjid KH. Mas Mansur Kampus 4 UMS",
       "isActive": true,
       "updatedAt": "2026-11-11T08:00:00.000Z",
-      "virtualBankUrl": "https://bsinet.bankbsi.co.id"
+      "virtualBankUrl": "https://bsinet.bankbsi.co.id",
+      "description": "Didirikan menyatu dengan kompleks asrama Pesantren Mahasiswa (PESMA) KH. Mas Mansur di Kampus 4 UMS. Masjid ini difungsikan secara khusus sebagai kawah candradimuka bagi para mahasiswa penerima beasiswa unggulan, kader persyarikatan berprestasi, santri tahfidz, serta mahasiswa internasional dari berbagai belahan dunia.\n\nKehidupan ruhani di masjid ini berdenyut aktif 24 jam dengan lantunan halaqah tahfidzul Qur'an, kajian kitab turots, serta kultum dwi-bahasa (Arab dan Inggris) ba'da shalat maktubah. Masjid ini menjadi simbol integrasi antara kedisiplinan hidup pesantren modern dan keunggulan akademik perguruan tinggi bertaraf internasional.",
+      "tagline": "Sentra Pembinaan Mahasiswa Interdisipliner & Internasional"
     },
     {
       "mosqueId": "mahad-abu-bakar",
@@ -676,7 +682,9 @@
       "notes": "Infaq Dakwah Bahasa Arab, Studi Syariah, & Operasional Masjid Ma'had Abu Bakar",
       "isActive": true,
       "updatedAt": "2026-11-11T08:00:00.000Z",
-      "virtualBankUrl": "https://bsinet.bankbsi.co.id"
+      "virtualBankUrl": "https://bsinet.bankbsi.co.id",
+      "description": "Bermula dari inisiasi kerja sama keilmuan internasional dalam wadah Ma'had Abu Bakar Ash-Shiddiq UMS untuk pengajaran intensif bahasa Arab dan dirasat Islamiyah. Masjid ini berperan sebagai laboratorium hidup bagi para penuntut ilmu yang berikrar mendalami bahasa Arab sebagai kunci utama memahami wahyu Al-Qur'an, hadits Nabi, dan khazanah literatur turots para ulama salafus shalih.\n\nDalam perjalanannya, Ma'had Abu Bakar telah melahirkan ribuan asatidz, mubaligh, dan penerjemah yang menguasai kaidah syariat dan kefasihan lisan Arab. Setiap sudut masjid difungsikan untuk muhadharah, khutbah latihan, qira'atul kutub, serta pembinaan adab thalabul ilmi yang berakar kuat pada nilai-nilai sunnah shahihah.",
+      "tagline": "Pusat Dirasat Islamiyah & Penguatan Bahasa Arab (AUM UMS)"
     },
     {
       "mosqueId": "munajat-shabran",
@@ -690,7 +698,9 @@
       "notes": "Infaq Perkaderan Ulama Tarjih & Operasional Masjid Al-Munajat Pondok Shabran",
       "isActive": true,
       "updatedAt": "2026-11-11T08:00:00.000Z",
-      "virtualBankUrl": "https://bsinet.bankbsi.co.id"
+      "virtualBankUrl": "https://bsinet.bankbsi.co.id",
+      "description": "Pondok Pesantren Mahasiswa H. Ahmad Dahlan (Shabran) didirikan atas wasiat mulia dan wakaf keluarga besar H. Ahmad Dahlan dan Hj. Nuriyah Shabran untuk mencetak kader intelek-ulama dan ulama-intelek persyarikatan. Masjid Al-Munajat menjadi sentra pembentukan spiritualitas dan ideologi bagi para mahasiswa utusan Pimpinan Wilayah Muhammadiyah (PWM) dari 38 provinsi se-Indonesia.\n\nDi masjid bersejarah ini, para kader ditempa melalui rutinitas qiyamul lail berjamaah, munajat tahajud, kajian mendalam Kitab Himpunan Putusan Tarjih (HPT), dan diskursus pemikiran tajdid Islam berkemajuan. Dari mihrab Masjid Al-Munajat inilah lahir para dai tangguh yang kini berdakwah membimbing umat di daerah 3T dan pusat-pusat peradaban nusantara.",
+      "tagline": "Kawah Candradimuka Intelek Ulama & Ulama Intelek Persyarikatan"
     },
     {
       "mosqueId": "ar-razi",
@@ -704,7 +714,9 @@
       "notes": "Infaq Integrasi Medis-Spiritualitas & Operasional Masjid Ar-Razi FKG Kampus 4 UMS",
       "isActive": true,
       "updatedAt": "2026-11-11T08:00:00.000Z",
-      "virtualBankUrl": "https://bsinet.bankbsi.co.id"
+      "virtualBankUrl": "https://bsinet.bankbsi.co.id",
+      "description": "Berdiri megah di kawasan Fakultas Kedokteran Gigi (FKG) dan Rumah Sakit Gigi dan Mulut (RSGM) Soelastri UMS Kampus 4. Masjid ini didirikan sebagai sarana vital integrasi antara sains kedokteran modern, bioetika klinis, dan keluhuran spiritualitas islami bagi para calon dokter gigi dan tenaga medis Muhammadiyah.\n\nMengabadikan nama Abu Bakar Muhammad bin Zakariya ar-Razi—ilmuwan polimatik dan peletak dasar kedokteran eksperimental Islam—masjid ini menjadi tempat hening untuk berdoa, bertafakur, dan memohon kelancaran sebelum para mahasiswa menjalani ujian klinis serta praktik penanganan pasien. Menanamkan prinsip bahwa setiap keahlian medis adalah wasilah ibadah demi kemaslahatan umat.",
+      "tagline": "Integrasi Nilai Kedokteran, Sains, & Spiritualitas Tenaga Medis"
     }
   ]
 }

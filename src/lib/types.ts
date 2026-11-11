@@ -298,6 +298,8 @@ export interface MosqueBankInfo {
   qrisNmid?: string;
   notes?: string;
   virtualBankUrl?: string;
+  description?: string;
+  tagline?: string;
   isActive: boolean;
   updatedAt: string;
 }

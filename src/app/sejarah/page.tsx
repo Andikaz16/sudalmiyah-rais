@@ -273,7 +273,7 @@ export default function SejarahPage() {
       leadWord: "Ghirah Berislam",
       tagline: "Masjid Pertama & Tonggak Sejarah Al-Islam Kemuhammadiyahan UMS",
       historicalContext:
-        "Masjid Fadhlurrahman merupakan rumah ibadah pertama yang didirikan di area kampus Universitas Muhammadiyah Surakarta. Berdiri sejak era awal pemindahan dan konsolidasi kampus di Pabelan, masjid ini menjadi saksi bisu pembinaan angkatan-angkatan awal sarjana dan kader Muhammadiyah. Masjid ini senantiasa mempertahankan nilai historis sebagai episentrum kajian keislaman dasar dan shalat berjamaah sivitas akademika Fakultas Keguruan dan Ilmu Pendidikan (FKIP) serta fakultas di Kampus 1.",
+        "Masjid Fadhlurrahman merupakan rumah ibadah pertama yang didirikan di area kampus Universitas Muhammadiyah Surakarta. Berdiri sejak era awal perintisan dan konsolidasi kampus di Pabelan pada tahun 1981, masjid bersejarah ini menjadi saksi bisu pembinaan angkatan-angkatan awal sarjana dan kader Muhammadiyah yang kini berkiprah luas di seluruh penjuru tanah air.\n\nSebagai episentrum spiritualitas Kampus 1, Masjid Fadhlurrahman senantiasa memelihara tradisi keilmuan dan halaqah Al-Islam Kemuhammadiyahan (AIK). Setiap harinya, masjid ini ramai makmur dengan shalat rawatib berjamaah sivitas akademika FKIP, FH, dan Fakultas Geografi, kajian intensif keislaman, serta pembinaan tilawah dan tahsin mahasiswa.",
       keyFigures: "Para tokoh pendiri UMS dan dewan guru besar perintis universitas",
       facilities: ["Ruang Shalat Utama", "Serambi Kajian"],
       philosophicalMeaning:
@@ -289,7 +289,7 @@ export default function SejarahPage() {
       leadWord: "Kesejukan Ruhani",
       tagline: "Sentra Pembinaan Mahasiswa Interdisipliner & Internasional",
       historicalContext:
-        "Didirikan menyatu dengan asrama Pesantren Mahasiswa (PESMA) KH. Mas Mansur. Masjid ini difungsikan khusus sebagai kawah candradimuka bagi para mahasiswa penerima beasiswa unggulan, santri berprestasi, dan mahasiswa internasional. Setiap hari masjid ini aktif dengan lantunan halaqah tahfidz Al-Qur'an, kultum bahasa Arab dan Inggris, serta kajian pemikiran Islam kontemporer.",
+        "Didirikan menyatu dengan kompleks asrama Pesantren Mahasiswa (PESMA) KH. Mas Mansur di Kampus 4 UMS. Masjid ini difungsikan secara khusus sebagai kawah candradimuka bagi para mahasiswa penerima beasiswa unggulan, kader persyarikatan berprestasi, santri tahfidz, serta mahasiswa internasional dari berbagai belahan dunia.\n\nKehidupan ruhani di masjid ini berdenyut aktif 24 jam dengan lantunan halaqah tahfidzul Qur'an, kajian kitab turots, serta kultum dwi-bahasa (Arab dan Inggris) ba'da shalat maktubah. Masjid ini menjadi simbol integrasi antara kedisiplinan hidup pesantren modern dan keunggulan akademik perguruan tinggi bertaraf internasional.",
       keyFigures: "KH. Mas Mansur (Pahlawan Nasional & Ketua PB Muhammadiyah 1937-1942)",
       facilities: [
         "Ruang Shalat 2 Lantai",
@@ -312,7 +312,7 @@ export default function SejarahPage() {
       leadWord: "Keluhuran Ilmu & Adab",
       tagline: "Pusat Dirasat Islamiyah & Penguatan Bahasa Arab (AUM UMS)",
       historicalContext:
-        "Bermula dari kerja sama keilmuan internasional dalam wadah Ma'had Abu Bakar Ash-Shiddiq UMS untuk pengajaran bahasa Arab dan studi syariah. Masjid ini menjadi laboratorium hidup bagi para penuntut ilmu yang berikrar memelihara bahasa Arab sebagai bahasa Al-Qur'an dan khazanah literatur turots Islam. Kini, Ma'had Abu Bakar telah berkembang kokoh menjadi salah satu AUM unggulan di bawah naungan UMS.",
+        "Bermula dari inisiasi kerja sama keilmuan internasional dalam wadah Ma'had Abu Bakar Ash-Shiddiq UMS untuk pengajaran intensif bahasa Arab dan dirasat Islamiyah. Masjid ini berperan sebagai laboratorium hidup bagi para penuntut ilmu yang berikrar mendalami bahasa Arab sebagai kunci utama memahami wahyu Al-Qur'an, hadits Nabi, dan khazanah literatur turots para ulama salafus shalih.\n\nDalam perjalanannya, Ma'had Abu Bakar telah melahirkan ribuan asatidz, mubaligh, dan penerjemah yang menguasai kaidah syariat dan kefasihan lisan Arab. Setiap sudut masjid difungsikan untuk muhadharah, khutbah latihan, qira'atul kutub, serta pembinaan adab thalabul ilmi yang berakar kuat pada nilai-nilai sunnah shahihah.",
       keyFigures: "Sahabat Abu Bakar Ash-Shiddiq RA & Asatidzah Ma'had",
       facilities: ["Masjid", "Kelas", "Perpustakaan", "Parkir"],
       philosophicalMeaning:
@@ -328,7 +328,7 @@ export default function SejarahPage() {
       leadWord: "Pusat Perkaderan",
       tagline: "Kawah Candradimuka Intelek Ulama & Ulama Intelek Persyarikatan",
       historicalContext:
-        "Pondok Shabran didirikan atas wasiat dan wakaf keluarga H. Ahmad Dahlan dan H. Nuriyah Shabran untuk mencetak kader ulama tarjih Muhammadiyah. Masjid Al-Munajat Pondok Shabran menjadi pusat peribadatan malam, qiyamul lail berjamaah, munajat, serta gemblengan ideologis kader-kader utusan Pimpinan Wilayah Muhammadiyah (PWM) dari 38 provinsi di Indonesia yang kelak diterjunkan berdakwah ke pelosok nusantara.",
+        "Pondok Pesantren Mahasiswa H. Ahmad Dahlan (Shabran) didirikan atas wasiat mulia dan wakaf keluarga besar H. Ahmad Dahlan dan Hj. Nuriyah Shabran untuk mencetak kader intelek-ulama dan ulama-intelek persyarikatan. Masjid Al-Munajat menjadi sentra pembentukan spiritualitas dan ideologi bagi para mahasiswa utusan Pimpinan Wilayah Muhammadiyah (PWM) dari 38 provinsi se-Indonesia.\n\nDi masjid bersejarah ini, para kader ditempa melalui rutinitas qiyamul lail berjamaah, munajat tahajud, kajian mendalam Kitab Himpunan Putusan Tarjih (HPT), dan diskursus pemikiran tajdid Islam berkemajuan. Dari mihrab Masjid Al-Munajat inilah lahir para dai tangguh yang kini berdakwah membimbing umat di daerah 3T dan pusat-pusat peradaban nusantara.",
       keyFigures: "Keluarga Pewakaf Hj. Nuriyah Shabran & Pimpinan PP Muhammadiyah",
       facilities: [
         "Dukuh: Asrama Putra & Putri",
@@ -347,7 +347,7 @@ export default function SejarahPage() {
       leadWord: "Integrasi Keislaman & Keilmuan",
       tagline: "Integrasi Nilai Kedokteran, Sains, & Spiritualitas Tenaga Medis",
       historicalContext:
-        "Hadir di lingkungan Fakultas Kedokteran Gigi dan Rumah Sakit Gigi dan Mulut (RSGM) UMS. Masjid ini dibangun sebagai sarana pembentukan etika dan spiritualitas dokter gigi muslim yang berjiwa pengabdi. Suasana hening dan bersih mendukung para calon dokter untuk merefleksikan sumpah profesi dan nilai-nilai kemanusiaan dalam bingkai ibadah lillahi ta'ala.",
+        "Berdiri megah di kawasan Fakultas Kedokteran Gigi (FKG) dan Rumah Sakit Gigi dan Mulut (RSGM) Soelastri UMS Kampus 4. Masjid ini didirikan sebagai sarana vital integrasi antara sains kedokteran modern, bioetika klinis, dan keluhuran spiritualitas islami bagi para calon dokter gigi dan tenaga medis Muhammadiyah.\n\nMengabadikan nama Abu Bakar Muhammad bin Zakariya ar-Razi—ilmuwan polimatik dan peletak dasar kedokteran eksperimental Islam—masjid ini menjadi tempat hening untuk berdoa, bertafakur, dan memohon kelancaran sebelum para mahasiswa menjalani ujian klinis serta praktik penanganan pasien. Menanamkan prinsip bahwa setiap keahlian medis adalah wasilah ibadah demi kemaslahatan umat.",
       keyFigures: "Abu Bakar Muhammad bin Zakariya al-Razi (865–925 M)",
       facilities: [
         "Gedung",
@@ -942,12 +942,14 @@ export default function SejarahPage() {
                           </div>
 
                           <p className="text-xs sm:text-sm font-semibold text-[#003B73]">
-                            {mosque.tagline}
+                            {bank?.tagline || mosque.tagline}
                           </p>
 
-                          <p className="text-xs sm:text-sm text-stone-600 leading-relaxed text-justify">
-                            {mosque.historicalContext}
-                          </p>
+                          <div className="text-xs sm:text-sm text-stone-600 leading-relaxed text-justify space-y-2.5">
+                            {(bank?.description || mosque.historicalContext).split("\n\n").map((para, pIdx) => (
+                              <p key={pIdx}>{para}</p>
+                            ))}
+                          </div>
                         </div>
 
                         <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">

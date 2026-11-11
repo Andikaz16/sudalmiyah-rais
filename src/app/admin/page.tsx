@@ -1245,6 +1245,8 @@ export default function AdminDashboardPage() {
       qrisNmid: "",
       notes: "",
       virtualBankUrl: "https://bsinet.bankbsi.co.id",
+      tagline: "",
+      description: "",
       isActive: true,
       updatedAt: "",
     };
@@ -4005,6 +4007,35 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
 
                 <div>
                   <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Slogan / Tagline Masjid
+                  </label>
+                  <input
+                    type="text"
+                    value={activeBankInfo.tagline || ""}
+                    onChange={(e) => handleUpdateBankField("tagline", e.target.value)}
+                    placeholder="Contoh: Masjid Pertama &amp; Tonggak Sejarah Al-Islam Kemuhammadiyahan UMS"
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-900 text-xs font-semibold focus:outline-none focus:border-[#003B73]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Deskripsi &amp; Narasi Sejarah Masjid (Tampil Penuh di Halaman Publik)
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={activeBankInfo.description || ""}
+                    onChange={(e) => handleUpdateBankField("description", e.target.value)}
+                    placeholder="Tuliskan narasi sejarah pendirian, peran, dan kegiatan masjid. Gunakan baris kosong untuk memisahkan paragraf agar tampilan padat dan rapi."
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#FAF8F5] border border-stone-300 text-stone-900 text-xs leading-relaxed focus:outline-none focus:border-[#003B73]"
+                  />
+                  <p className="text-[10px] text-stone-500 mt-1">
+                    Teks deskripsi ini akan mengisi penuh kolom tengah di halaman Sejarah Masjid publik agar tidak ada ruang kosong.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
                     Catatan / Peruntukan Infaq (Tampil di Publik)
                   </label>
                   <textarea
@@ -4092,6 +4123,20 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                         <p className="text-[10px] text-stone-500 italic pt-1">
                           *{activeBankInfo.notes}
                         </p>
+                      )}
+
+                      {activeBankInfo.tagline && (
+                        <div className="pt-2 border-t border-stone-100 text-left">
+                          <span className="text-[10px] text-stone-500 uppercase tracking-wider block font-semibold">Slogan:</span>
+                          <p className="text-xs font-semibold text-[#003B73]">{activeBankInfo.tagline}</p>
+                        </div>
+                      )}
+
+                      {activeBankInfo.description && (
+                        <div className="text-left">
+                          <span className="text-[10px] text-stone-500 uppercase tracking-wider block font-semibold">Pratinjau Deskripsi Sejarah:</span>
+                          <p className="text-[11px] text-stone-600 line-clamp-3 leading-relaxed">{activeBankInfo.description}</p>
+                        </div>
                       )}
                     </div>
                   </div>
