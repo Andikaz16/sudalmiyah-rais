@@ -4032,68 +4032,44 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                   </span>
                 </div>
 
-                <div className="bg-gradient-to-br from-stone-50 via-white to-amber-50/40 border border-stone-200/90 rounded-2xl p-4 shadow-xs space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-stone-200">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold">
-                      <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                      <span>Infaq &amp; QRIS Resmi</span>
-                    </span>
-                    <span className="text-[10px] font-mono text-stone-400">Kas Takmir</span>
-                  </div>
-
-                  <div className="text-center space-y-1.5">
-                    <div className="relative aspect-square w-32 mx-auto rounded-xl overflow-hidden border-2 border-amber-300/70 shadow-xs bg-white p-1.5">
+                <div className="bg-white rounded-2xl p-5 space-y-3">
+                  <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-2.5">
+                    {/* Gambar QRIS */}
+                    <div className="relative aspect-square w-32 sm:w-36 rounded-xl overflow-hidden bg-white">
                       <Image
                         src={activeBankInfo.qrisImageUrl || "/images/qris-bank-jateng.jpg"}
                         alt="Pratinjau QRIS"
                         fill
                         unoptimized
-                        className="object-contain p-1"
+                        className="object-contain"
                       />
                     </div>
-                    <div className="text-[10px] text-[#003B73] font-semibold">
-                      {activeBankInfo.qrisMerchantName || activeBankMosqueMeta.name}
-                    </div>
-                  </div>
 
-                  <div className="space-y-2 pt-2 border-t border-stone-200 text-left text-xs">
-                    <div>
-                      <div className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider">
-                        Bank Penampung:
+                    {/* Rincian Rekening */}
+                    <div className="space-y-1 w-full text-center sm:text-left">
+                      <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                        {activeBankInfo.bankName || "Bank Penampung"}
                       </div>
-                      <div className="font-bold text-stone-900 text-xs">
-                        {activeBankInfo.bankName || "Bank Syariah Indonesia (BSI)"}
-                      </div>
-                    </div>
 
-                    <div className="bg-white p-2.5 rounded-xl border border-stone-200 shadow-2xs">
-                      <div className="text-[10px] font-semibold text-stone-500 mb-0.5">
-                        Nomor Rekening:
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono font-bold text-xs text-[#003B73]">
+                      <div className="flex items-center justify-center sm:justify-start gap-1.5">
+                        <span className="font-mono font-bold text-sm sm:text-base text-[#003B73]">
                           {activeBankInfo.accountNumber || "Belum diisi"}
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-stone-100 text-stone-600 font-semibold">
-                          Salin
+                        <span className="text-[10px] text-stone-400 font-mono">
+                          (Salin)
                         </span>
                       </div>
-                    </div>
 
-                    <div>
-                      <div className="text-[10px] font-semibold text-stone-500">
-                        Atas Nama Rekening:
+                      <div className="text-xs text-stone-700">
+                        a.n. <span className="font-semibold">{activeBankInfo.accountHolder || "Belum diisi"}</span>
                       </div>
-                      <div className="text-[11px] font-semibold text-stone-800">
-                        {activeBankInfo.accountHolder || "Belum diisi"}
-                      </div>
-                    </div>
 
-                    {activeBankInfo.notes && (
-                      <p className="text-[10px] text-stone-500 italic pt-1">
-                        *{activeBankInfo.notes}
-                      </p>
-                    )}
+                      {activeBankInfo.notes && (
+                        <p className="text-[10px] text-stone-500 italic pt-1">
+                          *{activeBankInfo.notes}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
