@@ -34,6 +34,86 @@ const QUICK_PROMPTS = [
   "Bagaimana shalat tahiyyatul masjid saat khatib sedang khutbah?",
 ];
 
+function renderInlineStyles(str: string): React.ReactNode {
+  const parts = str.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <strong key={i} className="font-bold text-stone-900">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return (
+        <em key={i} className="italic text-stone-700">
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+    return part;
+  });
+}
+
+function renderMessageContent(text: string) {
+  if (!text) return null;
+  const lines = text.split("\n");
+
+  return (
+    <div className="space-y-1.5 font-sans leading-relaxed">
+      {lines.map((line, idx) => {
+        const trimmed = line.trim();
+
+        if (!trimmed) {
+          return <div key={idx} className="h-1.5" />;
+        }
+
+        if (trimmed.startsWith("### ")) {
+          return (
+            <h5 key={idx} className="font-bold text-stone-900 text-xs sm:text-sm mt-2 pt-1 border-t border-stone-100">
+              {renderInlineStyles(trimmed.slice(4))}
+            </h5>
+          );
+        }
+
+        if (trimmed.startsWith("## ")) {
+          return (
+            <h4 key={idx} className="font-bold text-stone-900 text-xs sm:text-sm mt-2.5 pt-1 border-t border-stone-100">
+              {renderInlineStyles(trimmed.slice(3))}
+            </h4>
+          );
+        }
+
+        if (trimmed.startsWith("> ")) {
+          return (
+            <blockquote
+              key={idx}
+              className="border-l-2 border-[#003B73] pl-3 py-1 my-1.5 italic text-stone-700 bg-stone-50/70 rounded-r-lg text-xs"
+            >
+              {renderInlineStyles(trimmed.slice(2))}
+            </blockquote>
+          );
+        }
+
+        const isArabic = /[\u0600-\u06FF]/.test(trimmed) && trimmed.length > 8;
+        if (isArabic) {
+          return (
+            <p key={idx} dir="rtl" className="font-serif text-sm sm:text-base text-stone-900 leading-loose py-1 text-right">
+              {trimmed}
+            </p>
+          );
+        }
+
+        return (
+          <p key={idx} className="text-xs sm:text-[13px] text-stone-800">
+            {renderInlineStyles(trimmed)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function TanyaTarjihWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -260,7 +340,11 @@ export default function TanyaTarjihWidget() {
                       : "bg-white text-stone-800 border border-stone-200/90 rounded-tl-xs"
                   }`}
                 >
-                  <p className="whitespace-pre-wrap font-sans">{msg.text}</p>
+                  {msg.sender === "user" ? (
+                    <p className="whitespace-pre-wrap font-sans">{msg.text}</p>
+                  ) : (
+                    renderMessageContent(msg.text)
+                  )}
 
                   {/* AI Metadata & Actions */}
                   {msg.sender === "ai" && (
