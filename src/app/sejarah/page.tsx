@@ -488,12 +488,12 @@ export default function SejarahPage() {
                     </p>
                   </div>
 
-                  {/* Rekening & QRIS Resmi Masjid Hj. Sudalmiyah Rais (Di Kolom Kiri Bawah) */}
-                  <div className="pt-3 flex flex-col sm:flex-row items-center sm:items-start gap-5">
-                    {/* Gambar QRIS Diperbesar Proporsional */}
+                  {/* Rekening & QRIS Resmi Masjid Hj. Sudalmiyah Rais (Gambar Diperbesar & No. Rekening di Bawahnya) */}
+                  <div className="pt-3 flex flex-col items-center sm:items-start text-center sm:text-left space-y-3">
+                    {/* Gambar QRIS Diperbesar Penuh */}
                     <div
                       onClick={() => bankAccounts.sudalmiyah && setActiveQrisModal(bankAccounts.sudalmiyah)}
-                      className="relative aspect-[385/544] w-44 sm:w-52 md:w-56 rounded-2xl overflow-hidden bg-white shrink-0 cursor-pointer group/qris hover:opacity-95 transition-all hover:scale-[1.02] shadow-sm"
+                      className="relative aspect-[385/544] w-56 sm:w-64 md:w-72 lg:w-full lg:max-w-[320px] rounded-2xl overflow-hidden bg-white cursor-pointer group/qris hover:opacity-95 transition-all hover:scale-[1.02] shadow-sm"
                       title="Klik untuk memperbesar QRIS Masjid Sudalmiyah Rais"
                     >
                       <Image
@@ -509,11 +509,12 @@ export default function SejarahPage() {
                       </div>
                     </div>
 
-                    {/* Rincian Rekening */}
-                    <div className="flex-1 space-y-1.5 text-center sm:text-left pt-1">
+                    {/* Rincian Rekening di Bawah Gambar */}
+                    <div className="space-y-1.5 w-full max-w-[320px] text-center sm:text-left">
                       <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
                         {bankAccounts.sudalmiyah?.bankName || "Bank Syariah Indonesia"}
                       </div>
+
                       <div className="flex items-center justify-center sm:justify-start gap-2">
                         <a
                           href={getVirtualBankUrl(bankAccounts.sudalmiyah)}
@@ -527,6 +528,7 @@ export default function SejarahPage() {
                           </span>
                           <ExternalLink className="w-4 h-4 text-stone-400 group-hover/bank:text-[#003B73] transition-colors" />
                         </a>
+
                         {bankAccounts.sudalmiyah?.accountNumber && (
                           <button
                             type="button"
@@ -542,15 +544,18 @@ export default function SejarahPage() {
                           </button>
                         )}
                       </div>
+
                       {copiedId === "sudalmiyah" && (
                         <div className="text-[10px] font-bold text-emerald-600">
                           Nomor rekening tersalin ke papan klip!
                         </div>
                       )}
+
                       <div className="text-xs text-stone-700">
                         a.n. <span className="font-semibold">{bankAccounts.sudalmiyah?.accountHolder || "LAZ UMS Sudalmiyah Rais"}</span>
                       </div>
-                      <div className="pt-1">
+
+                      <div className="pt-0.5">
                         <a
                           href={getVirtualBankUrl(bankAccounts.sudalmiyah)}
                           target="_blank"
@@ -561,6 +566,12 @@ export default function SejarahPage() {
                           <ExternalLink className="w-3.5 h-3.5" />
                         </a>
                       </div>
+
+                      {bankAccounts.sudalmiyah?.notes && (
+                        <p className="text-[10px] text-stone-500 italic pt-1 leading-relaxed">
+                          *{bankAccounts.sudalmiyah.notes}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
