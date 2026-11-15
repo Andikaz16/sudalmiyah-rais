@@ -54,6 +54,7 @@ import {
   ScrollText,
   Quote,
 } from "lucide-react";
+import { syncFridayHijriDate } from "@/lib/prayer-times";
 import {
   Agenda,
   FridayOfficerSchedule,
@@ -733,10 +734,11 @@ export default function AdminDashboardPage() {
       setRegistrations(statsJson.registrations || statsJson.recentRegistrations || []);
       setPrayerAttendances(statsJson.prayerAttendances || []);
       if (fridayJson.success) {
+        const now = new Date();
         if (Array.isArray(fridayJson.schedules) && fridayJson.schedules.length > 0) {
           const sanitizedSchedules = fridayJson.schedules.map((s: FridayOfficerSchedule) => ({
             ...s,
-            hijriDate: s.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H",
+            hijriDate: syncFridayHijriDate(s.date, s.hijriDate, "id", now),
           }));
           setFridaySchedules(sanitizedSchedules);
           const current =
@@ -747,13 +749,17 @@ export default function AdminDashboardPage() {
         } else if (fridayJson.schedule) {
           const sanitizedCurrent = {
             ...fridayJson.schedule,
-            hijriDate: fridayJson.schedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H",
+            hijriDate: syncFridayHijriDate(fridayJson.schedule.date, fridayJson.schedule.hijriDate, "id", now),
           };
           setFridaySchedule(sanitizedCurrent);
           setFridaySchedules([sanitizedCurrent]);
         }
         if (fridayJson.history && Array.isArray(fridayJson.history)) {
-          setFridayHistory(fridayJson.history);
+          const sanitizedHistory = fridayJson.history.map((h: FridayOfficerSchedule) => ({
+            ...h,
+            hijriDate: syncFridayHijriDate(h.date, h.hijriDate, "id", now),
+          }));
+          setFridayHistory(sanitizedHistory);
         }
       }
       if (qrisJson.success && qrisJson.qris) {

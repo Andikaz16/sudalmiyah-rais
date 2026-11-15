@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import { z } from "zod";
 import { getDb, getDbAsync, logSecurityEvent, saveDb, saveDbFields } from "@/lib/db";
+import { syncFridayHijriDate } from "@/lib/prayer-times";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { FridayOfficerSchedule } from "@/lib/types";
 
@@ -32,33 +33,36 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const mosqueId = searchParams.get("mosqueId");
 
+  const now = new Date();
   let schedules = db.fridaySchedules || [];
-  let changed = false;
 
-  if (db.fridaySchedule && db.fridaySchedule.hijriDate?.includes("Rabiul Akhir")) {
-    db.fridaySchedule.hijriDate = db.fridaySchedule.hijriDate.replace(/Rabiul Akhir/gi, "Jumadilawal");
+  if (db.fridaySchedule) {
+    db.fridaySchedule = {
+      ...db.fridaySchedule,
+      hijriDate: syncFridayHijriDate(db.fridaySchedule.date, db.fridaySchedule.hijriDate, "id", now),
+    };
   }
 
-  schedules = schedules.map((s) => {
-    if (s.hijriDate?.includes("Rabiul Akhir")) {
-      return {
-        ...s,
-        hijriDate: s.hijriDate.replace(/Rabiul Akhir/gi, "Jumadilawal"),
-      };
-    }
-    return s;
-  });
+  schedules = schedules.map((s) => ({
+    ...s,
+    hijriDate: syncFridayHijriDate(s.date, s.hijriDate, "id", now),
+  }));
+
+  const history = (db.fridayScheduleHistory || []).map((h) => ({
+    ...h,
+    hijriDate: syncFridayHijriDate(h.date, h.hijriDate, "id", now),
+  }));
 
   const activeSchedule = mosqueId
     ? schedules.find((s) => (s.mosqueId || s.id) === mosqueId) || db.fridaySchedule
     : db.fridaySchedule || schedules[0];
 
-    return NextResponse.json(
+  return NextResponse.json(
     {
       success: true,
       schedule: activeSchedule,
       schedules: schedules,
-      history: db.fridayScheduleHistory || [],
+      history,
     },
     {
       headers: {

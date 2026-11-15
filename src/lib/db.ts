@@ -24,6 +24,7 @@ import {
 } from "./types";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { getFirestoreDb, isFirebaseConfigured } from "./firebase";
+import { syncFridayHijriDate } from "./prayer-times";
 
 export interface DatabaseSchema {
   users: User[];
@@ -73,10 +74,7 @@ function ensureDbDirectory(targetFilePath: string) {
 }
 
 export function getDefaultFridaySchedules(primary?: FridayOfficerSchedule): FridayOfficerSchedule[] {
-  const getSafeHijri = (val?: string) => {
-    if (val && !val.includes("Rabiul Akhir")) return val;
-    return "5 Jumadilawal 1448 H";
-  };
+  const getSafeHijri = (val?: string) => syncFridayHijriDate(primary?.date || "Jumat Pekan Ini", val, "id");
 
   const sudalmiyah: FridayOfficerSchedule = {
     id: primary?.id || "fri-sudalmiyah",
@@ -209,7 +207,7 @@ export function getDefaultFridayScheduleHistory(): FridayOfficerSchedule[] {
       mosqueName: "Masjid Hj. Sudalmiyah Rais",
       mosqueLocation: "Kampus 2 UMS",
       date: "Jumat, 16 Oktober 2026",
-      hijriDate: "4 Jumadilawal 1448 H",
+      hijriDate: "5 Jumadilawal 1448 H",
       khatibName: "Prof. Muhammad Da'i",
       khatibTitle: "Guru Besar Farmasi UMS / Wakil Rektor",
       khatibPhotoUrl: "",
@@ -228,7 +226,7 @@ export function getDefaultFridayScheduleHistory(): FridayOfficerSchedule[] {
       mosqueName: "Masjid Fadhlurrahman",
       mosqueLocation: "Kampus 1 UMS",
       date: "Jumat, 16 Oktober 2026",
-      hijriDate: "4 Jumadilawal 1448 H",
+      hijriDate: "5 Jumadilawal 1448 H",
       khatibName: "Dr. Muh. Nur Rochim Maksum",
       khatibTitle: "Dosen & Dai Majelis Tabligh Muhammadiyah",
       khatibPhotoUrl: "",

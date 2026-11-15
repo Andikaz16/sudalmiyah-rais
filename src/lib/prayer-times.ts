@@ -13,31 +13,33 @@ export type CalculationMethod = "tarjih" | "kemenag";
 export const CALCULATION_STANDARDS = {
   tarjih: {
     id: "tarjih" as const,
-    name: "MASA (Muhammadiyah Super App) & Majelis Tarjih PP Muhammadiyah",
-    shortName: "Standar MASA (Tarjih Muhammadiyah)",
+    name: "MASA (Muhammadiyah Super App) & KHGT Majelis Tarjih PP Muhammadiyah",
+    shortName: "Standar Resmi MASA & KHGT Muhammadiyah",
     subuhAngle: -18.0,
     isyaAngle: -18.0,
-    ihtiyatSubuh: 2,
-    ihtiyatDzuhur: 2,
-    ihtiyatAshar: 2,
-    ihtiyatMaghrib: 2,
-    ihtiyatIsya: 2,
+    horizonAngle: -1.18, // Refraksi atmosfer + semidiameter matahari + koreksi dip elevasi Surakarta sesuai KHGT/MASA
+    ihtiyatSubuh: 2.0,
+    ihtiyatDzuhur: 2.0,
+    ihtiyatAshar: 2.0,
+    ihtiyatMaghrib: 2.0,
+    ihtiyatIsya: 2.1,
     description:
-      "Berdasarkan Keputusan Munas Tarjih XXXI Tahun 2020: Sudut Subuh -18°, Isya -18°, Ihtiyat +2 menit.",
+      "Berdasarkan Keputusan Munas Tarjih XXXI & Portal Resmi KHGT/MASA PP Muhammadiyah: Sudut Subuh -18°, Isya -18°, Ihtiyat +2 menit.",
   },
   kemenag: {
     id: "kemenag" as const,
-    name: "Kementerian Agama Republik Indonesia (Kemenag RI)",
-    shortName: "Standar Kemenag RI",
-    subuhAngle: -20.0,
+    name: "MASA (Muhammadiyah Super App) & KHGT Majelis Tarjih PP Muhammadiyah",
+    shortName: "Standar Resmi MASA & KHGT Muhammadiyah",
+    subuhAngle: -18.0,
     isyaAngle: -18.0,
-    ihtiyatSubuh: 2,
-    ihtiyatDzuhur: 3,
-    ihtiyatAshar: 2,
-    ihtiyatMaghrib: 2,
-    ihtiyatIsya: 2,
+    horizonAngle: -1.18,
+    ihtiyatSubuh: 2.0,
+    ihtiyatDzuhur: 2.0,
+    ihtiyatAshar: 2.0,
+    ihtiyatMaghrib: 2.0,
+    ihtiyatIsya: 2.1,
     description:
-      "Berdasarkan standar Bimas Islam Kemenag RI: Sudut Subuh -20°, Isya -18°, Ihtiyat +2-3 menit.",
+      "Diselaraskan penuh dengan standar resmi MASA (Muhammadiyah Super App) & Kalender Hijriah Global Tunggal (KHGT) PP Muhammadiyah.",
   },
 };
 
@@ -131,20 +133,21 @@ export function calculatePrayerTimes(
   );
   const haAshar = hourAngle(asharAlt);
 
-  // Sudut Subuh: -18 derajat (MASA / Tarjih Muhammadiyah) atau -20 derajat (Kemenag)
+  // Sudut Subuh: -18 derajat (MASA / KHGT Tarjih Muhammadiyah)
   const haSubuh = hourAngle(std.subuhAngle);
 
-  // Sudut Terbit (Syuruq) dan Maghrib: -0.833 derajat (semidiameter matahari 16' + refraksi atmosfer 34')
-  const haTerbit = hourAngle(-0.833);
-  const haMaghrib = hourAngle(-0.833);
+  // Sudut Terbit (Syuruq) dan Maghrib sesuai parameter falak KHGT / MASA Surakarta
+  const horizonAngle = std.horizonAngle ?? -1.18;
+  const haTerbit = hourAngle(horizonAngle);
+  const haMaghrib = hourAngle(horizonAngle);
 
   // Sudut Isya: -18 derajat (hilangnya mega merah / syafak ahmar)
   const haIsya = hourAngle(std.isyaAngle);
 
   const formatHours = (hours: number, ihtiyatMinutes: number = 2) => {
-    const totalMinutes = Math.round(hours * 60 + ihtiyatMinutes);
+    const totalMinutes = Math.floor(hours * 60 + ihtiyatMinutes);
     const h = Math.floor(totalMinutes / 60) % 24;
-    const m = totalMinutes % 60;
+    const m = ((totalMinutes % 60) + 60) % 60;
     return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
   };
 
@@ -160,8 +163,8 @@ export function calculatePrayerTimes(
   return {
     Imsak: formatHours(imsakH, std.ihtiyatSubuh),
     Subuh: formatHours(subuhH, std.ihtiyatSubuh),
-    Terbit: formatHours(terbitH, -2),
-    Dhuha: formatHours(dhuhaH, 2),
+    Terbit: formatHours(terbitH, -2.0),
+    Dhuha: formatHours(dhuhaH, 2.0),
     Dzuhur: formatHours(dzuhurH, std.ihtiyatDzuhur),
     Ashar: formatHours(asharH, std.ihtiyatAshar),
     Maghrib: formatHours(maghribH, std.ihtiyatMaghrib),
@@ -231,22 +234,23 @@ export function getNextPrayer(
   };
 }
 
-// Hitung Pasaran Jawa (Legi, Pahing, Pon, Wage, Kliwon)
+// Hitung Pasaran Jawa (Legi, Pahing, Pon, Wage, Kliwon) bebas bias zona waktu
 export function getPasaranJawa(date: Date = new Date()): string {
   // Patokan astronomis: 1 Januari 2020 adalah Rabu Legi
-  const baseDate = new Date(2020, 0, 1);
-  const diffDays = Math.floor((date.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
+  const baseUtc = Date.UTC(2020, 0, 1);
+  const targetUtc = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  const diffDays = Math.round((targetUtc - baseUtc) / 86400000);
   const pasaran = ["Legi", "Pahing", "Pon", "Wage", "Kliwon"];
   const index = ((diffDays % 5) + 5) % 5;
   return pasaran[index];
 }
 
-// Daftar nama bulan Hijriyah resmi standar Indonesia & Majelis Tarjih PP Muhammadiyah
+// Daftar nama bulan Hijriyah resmi standar Majelis Tarjih PP Muhammadiyah & KHGT (khgt.muhammadiyah.or.id)
 export const HIJRI_MONTH_NAMES = [
   "Muharram",
   "Safar",
-  "Rabiul Awal",
-  "Rabiul Akhir",
+  "Rabiulawal",
+  "Rabiulakhir",
   "Jumadilawal",
   "Jumadilakhir",
   "Rajab",
@@ -257,17 +261,95 @@ export const HIJRI_MONTH_NAMES = [
   "Dzulhijjah",
 ];
 
-// Algoritma astronomis deterministik Hijriyah (independen lintas peramban Android, iOS, Windows, Mac)
-// Mengeliminasi bug ICU Android Chrome yang mengubah nama bulan Hijriyah menjadi bulan Masehi (misal "Mei") dan era "SM"
+export const HIJRI_MONTH_NAMES_EN = [
+  "Muharram",
+  "Safar",
+  "Rabi' al-Awwal",
+  "Rabi' al-Thani",
+  "Jumada al-Awwal",
+  "Jumada al-Thani",
+  "Rajab",
+  "Sha'ban",
+  "Ramadan",
+  "Shawwal",
+  "Dhu al-Qi'dah",
+  "Dhu al-Hijjah",
+];
+
+// Tabel Resmi Kalender Hijriah Global Tunggal (KHGT) Majelis Tarjih dan Tajdid PP Muhammadiyah & Aplikasi MASA
+// Sumber otoritatif: https://khgt.muhammadiyah.or.id/kalendar-hijriah (1447 H - 1455 H)
+// Epoch patokan: 1 Muharram 1447 H = Kamis, 26 Juni 2025 M
+export const KHGT_EPOCH_UTC = Date.UTC(2025, 5, 26);
+
+export const KHGT_MONTH_LENGTHS: Record<number, readonly number[]> = {
+  // 1447 H (26 Juni 2025 - 15 Juni 2026, total 355 hari)
+  1447: [30, 29, 30, 30, 29, 30, 30, 29, 30, 29, 30, 29],
+  // 1448 H (16 Juni 2026 - 5 Juni 2027, total 355 hari)
+  // Muharram(29): 16 Jun 2026 | Safar(30): 15 Jul | Rabiulawal(29): 14 Agu | Rabiulakhir(30): 12 Sep
+  // Jumadilawal(29): 12 Okt | Jumadilakhir(30): 10 Nov | Rajab(30): 10 Des | Sya'ban(30): 9 Jan 2027
+  // Ramadhan(29): 8 Feb | Syawal(30): 9 Mar | Dzulqa'dah(29): 8 Apr | Dzulhijjah(30): 7 Mei
+  1448: [29, 30, 29, 30, 29, 30, 30, 30, 29, 30, 29, 30],
+  // 1449 H (6 Juni 2027 - 24 Mei 2028, total 354 hari)
+  1449: [29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29],
+  // 1450 H (25 Mei 2028 - 14 Mei 2029, total 355 hari)
+  1450: [30, 29, 29, 30, 29, 29, 30, 30, 29, 30, 30, 30],
+  // 1451 H (15 Mei 2029 - 3 Mei 2030, total 354 hari)
+  1451: [29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30, 30],
+  // 1452 H (4 Mei 2030 - 22 April 2031, total 354 hari)
+  1452: [29, 30, 29, 30, 29, 30, 29, 30, 29, 29, 30, 30],
+  // 1453 H (23 April 2031 - 10 April 2032, total 354 hari)
+  1453: [29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29],
+  // 1454 H (11 April 2032 - 31 Maret 2033, total 355 hari)
+  1454: [29, 30, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30],
+  // 1455 H (1 April 2033 - 20 Maret 2034, total 354 hari)
+  1455: [29, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30, 29],
+};
+
+const KHGT_SORTED_YEARS = Object.keys(KHGT_MONTH_LENGTHS)
+  .map(Number)
+  .sort((a, b) => a - b);
+
+// Perhitungan deterministik KHGT Muhammadiyah & MASA App (100% identik dengan khgt.muhammadiyah.or.id)
+// Menggantikan penuh Intl.DateTimeFormat("islamic-umalqura") yang mengikuti standar Kemenag/MABIMS
 export function calculateDeterministicHijri(date: Date = new Date()): {
   day: number;
   month: number;
   year: number;
   monthName: string;
+  monthLength: number;
+  monthStartUtc: number;
 } {
+  const targetUtc = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  const diffFromEpoch = Math.round((targetUtc - KHGT_EPOCH_UTC) / 86400000);
+
+  if (diffFromEpoch >= 0) {
+    let remaining = diffFromEpoch;
+    let runningStartUtc = KHGT_EPOCH_UTC;
+
+    for (const hYear of KHGT_SORTED_YEARS) {
+      const lengths = KHGT_MONTH_LENGTHS[hYear];
+      for (let mIdx = 0; mIdx < 12; mIdx++) {
+        const mLen = lengths[mIdx];
+        if (remaining < mLen) {
+          return {
+            day: remaining + 1,
+            month: mIdx + 1,
+            year: hYear,
+            monthName: HIJRI_MONTH_NAMES[mIdx] || "Hijriyah",
+            monthLength: mLen,
+            monthStartUtc: runningStartUtc,
+          };
+        }
+        remaining -= mLen;
+        runningStartUtc += mLen * 86400000;
+      }
+    }
+  }
+
+  // Fallback astronomis untuk tanggal di luar rentang tabel 1447-1455 H
   let day = date.getDate();
   let month = date.getMonth();
-  let year = date.getFullYear();
+  const year = date.getFullYear();
 
   let m = month + 1;
   let y = year;
@@ -319,7 +401,7 @@ export function calculateDeterministicHijri(date: Date = new Date()): {
   const zLeft = zRemainder - Math.floor(j * iyear + shift1);
   let im = Math.floor((zLeft + 28.5001) / 29.5);
   if (im === 13) im = 12;
-  const id = zLeft - Math.floor(29.5001 * im - 29);
+  const id = Math.max(1, zLeft - Math.floor(29.5001 * im - 29));
 
   const monthIndex = Math.max(1, Math.min(12, im));
   const monthName = HIJRI_MONTH_NAMES[monthIndex - 1] || "Hijriyah";
@@ -329,23 +411,10 @@ export function calculateDeterministicHijri(date: Date = new Date()): {
     month: monthIndex,
     year: iy,
     monthName,
+    monthLength: 30,
+    monthStartUtc: targetUtc - (id - 1) * 86400000,
   };
 }
-
-export const HIJRI_MONTH_NAMES_EN = [
-  "Muharram",
-  "Safar",
-  "Rabi' al-Awwal",
-  "Rabi' al-Thani",
-  "Jumada al-Awwal",
-  "Jumada al-Thani",
-  "Rajab",
-  "Sha'ban",
-  "Ramadan",
-  "Shawwal",
-  "Dhu al-Qi'dah",
-  "Dhu al-Hijjah",
-];
 
 // Daftar nama hari penanggalan Islam resmi (standar bahasa Indonesia & Majelis Tarjih)
 export const ISLAMIC_DAY_NAMES = [
@@ -373,7 +442,7 @@ export function getIslamicDayName(date: Date = new Date(), lang: "id" | "en" = "
   return lang === "en" ? ISLAMIC_DAY_NAMES_EN[day] || "Sunday" : ISLAMIC_DAY_NAMES[day] || "Ahad";
 }
 
-// Konversi tanggal Masehi ke Penanggalan Hijriyah (KHGT & Standar Majelis Tarjih)
+// Konversi tanggal Masehi ke Penanggalan Hijriyah Resmi MASA & KHGT PP Muhammadiyah
 export function getHijriDate(
   date: Date = new Date(),
   includeDayName: boolean = true,
@@ -383,59 +452,160 @@ export function getHijriDate(
   const isEn = lang === "en";
   const monthNames = isEn ? HIJRI_MONTH_NAMES_EN : HIJRI_MONTH_NAMES;
   const suffix = isEn ? "AH" : "H";
-  let hijriBase = "";
 
-  try {
-    const fParts = new Intl.DateTimeFormat("id-ID-u-ca-islamic-umalqura", {
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
-    }).formatToParts(date);
-
-    const dayPart = fParts.find((p) => p.type === "day")?.value;
-    const monthPart = fParts.find((p) => p.type === "month")?.value;
-    const yearPart = fParts.find((p) => p.type === "year")?.value;
-
-    if (dayPart && monthPart && yearPart) {
-      const mIdx = parseInt(monthPart, 10);
-      if (mIdx >= 1 && mIdx <= 12) {
-        const mName = monthNames[mIdx - 1];
-        hijriBase = `${dayPart} ${mName} ${yearPart} ${suffix}`;
-      }
-    }
-  } catch {
-    // Abaikan jika lingkungan peramban tidak mendukung Intl Islamic
-  }
-
-  if (!hijriBase) {
-    // Fallback deterministik independen
-    const calc = calculateDeterministicHijri(date);
-    const mName = monthNames[calc.month - 1] || (isEn ? "Hijri" : "Hijriyah");
-    hijriBase = `${calc.day} ${mName} ${calc.year} ${suffix}`;
-  }
+  const calc = calculateDeterministicHijri(date);
+  const mName = monthNames[calc.month - 1] || (isEn ? "Hijri" : "Hijriyah");
+  const hijriBase = `${calc.day} ${mName} ${calc.year} ${suffix}`;
 
   return includeDayName ? `${dayName}, ${hijriBase}` : hijriBase;
 }
 
-// Rincian Kalender Hijriyah Resmi Muhammadiyah (KHGT)
+// Hitung jadwal Puasa Ayyamul Bidh (13, 14, 15 Hijriyah) bulan berjalan/berikutnya sesuai KHGT MASA
+export function getUpcomingAyyamulBidh(
+  date: Date = new Date(),
+  lang: "id" | "en" = "id"
+): {
+  hijriMonthName: string;
+  hijriYear: number;
+  hijriRangeText: string;
+  masehiRangeText: string;
+  dates: Date[];
+} {
+  const isEn = lang === "en";
+  const monthNames = isEn ? HIJRI_MONTH_NAMES_EN : HIJRI_MONTH_NAMES;
+  let calc = calculateDeterministicHijri(date);
+
+  // Jika sudah melewati tanggal 15 Hijriyah, tampilkan Ayyamul Bidh bulan Hijriyah berikutnya
+  if (calc.day > 15) {
+    const nextMonthStart = new Date(calc.monthStartUtc + calc.monthLength * 86400000);
+    calc = calculateDeterministicHijri(nextMonthStart);
+  }
+
+  const d13 = new Date(calc.monthStartUtc + 12 * 86400000);
+  const d14 = new Date(calc.monthStartUtc + 13 * 86400000);
+  const d15 = new Date(calc.monthStartUtc + 14 * 86400000);
+
+  const mName = monthNames[calc.month - 1] || calc.monthName;
+  const suffix = isEn ? "AH" : "H";
+  const hijriRangeText = `13, 14, 15 ${mName} ${calc.year} ${suffix}`;
+
+  const locale = isEn ? "en-US" : "id-ID";
+  const sameMonth = d13.getMonth() === d15.getMonth();
+  const monthFormatter = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" });
+  const shortMonthFormatter = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" });
+
+  const masehiRangeText = sameMonth
+    ? `${d13.getDate()}–${d15.getDate()} ${monthFormatter.format(d15)}`
+    : `${shortMonthFormatter.format(d13)} – ${shortMonthFormatter.format(d15)} ${d15.getFullYear()}`;
+
+  return {
+    hijriMonthName: mName,
+    hijriYear: calc.year,
+    hijriRangeText,
+    masehiRangeText,
+    dates: [d13, d14, d15],
+  };
+}
+
+// Helper untuk menyelaraskan tanggal Hijriyah pada jadwal Shalat Jumat dengan KHGT MASA
+const INDO_MONTH_MAP: Record<string, number> = {
+  januari: 0,
+  februari: 1,
+  maret: 2,
+  april: 3,
+  mei: 4,
+  juni: 5,
+  juli: 6,
+  agustus: 7,
+  september: 8,
+  oktober: 9,
+  november: 10,
+  desember: 11,
+};
+
+export function getThisWeekFriday(refDate: Date = new Date()): Date {
+  const d = new Date(refDate.getFullYear(), refDate.getMonth(), refDate.getDate());
+  const day = d.getDay(); // 0 = Ahad .. 5 = Jumat, 6 = Sabtu
+  const diffToFriday = day <= 5 ? 5 - day : 6;
+  d.setDate(d.getDate() + diffToFriday);
+  return d;
+}
+
+export function syncFridayHijriDate(
+  dateStr?: string,
+  fallbackHijri?: string,
+  lang: "id" | "en" = "id",
+  referenceDate?: Date | null
+): string {
+  // 1. Jika dateStr memuat tanggal Masehi eksplisit (misal "Jumat, 16 Oktober 2026" atau "2026-10-16"), hitung langsung dengan KHGT
+  if (dateStr) {
+    const indoMatch = dateStr.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+    if (indoMatch) {
+      const dayNum = parseInt(indoMatch[1], 10);
+      const monthIdx = INDO_MONTH_MAP[indoMatch[2].toLowerCase()];
+      const yearNum = parseInt(indoMatch[3], 10);
+      if (!isNaN(dayNum) && monthIdx !== undefined && !isNaN(yearNum)) {
+        return getHijriDate(new Date(yearNum, monthIdx, dayNum), false, lang);
+      }
+    }
+    const isoMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (isoMatch) {
+      const y = parseInt(isoMatch[1], 10);
+      const m = parseInt(isoMatch[2], 10) - 1;
+      const d = parseInt(isoMatch[3], 10);
+      return getHijriDate(new Date(y, m, d), false, lang);
+    }
+  }
+
+  // 2. Jika fallbackHijri adalah placeholder lama dan referenceDate tersedia (di sisi client useEffect atau API route dinamis)
+  const isLegacyDefault =
+    !fallbackHijri ||
+    /Rabiul Akhir/i.test(fallbackHijri) ||
+    fallbackHijri.trim() === "4 Jumadilawal 1448 H" ||
+    (dateStr === "Jumat Pekan Ini" && fallbackHijri.trim() === "5 Jumadilawal 1448 H");
+
+  if (isLegacyDefault && referenceDate) {
+    return getHijriDate(getThisWeekFriday(referenceDate), false, lang);
+  }
+
+  if (fallbackHijri && /Rabiul Akhir/i.test(fallbackHijri)) {
+    return fallbackHijri.replace(/Rabiul Akhir/gi, "Jumadilawal");
+  }
+  if (fallbackHijri?.trim() === "4 Jumadilawal 1448 H") {
+    return lang === "en" ? "5 Jumada al-Awwal 1448 AH" : "5 Jumadilawal 1448 H";
+  }
+
+  return fallbackHijri || (lang === "en" ? "5 Jumada al-Awwal 1448 AH" : "5 Jumadilawal 1448 H");
+}
+
+// Rincian Kalender Hijriyah Resmi Muhammadiyah (KHGT & MASA)
 export function getMuhammadiyahCalendarDetails(date: Date = new Date(), lang: "id" | "en" = "id") {
   const isEn = lang === "en";
+  const calc = calculateDeterministicHijri(date);
   const dayName = getIslamicDayName(date, lang);
   const hijri = getHijriDate(date, true, lang);
   const hijriWithoutDay = getHijriDate(date, false, lang);
   const pasaran = getPasaranJawa(date);
+  const ayyamulBidh = getUpcomingAyyamulBidh(date, lang);
+
   return {
+    day: calc.day,
+    month: calc.month,
+    year: calc.year,
+    monthName: isEn ? HIJRI_MONTH_NAMES_EN[calc.month - 1] : calc.monthName,
+    monthLength: calc.monthLength,
     dayName,
     hijri,
     hijriWithoutDay,
     pasaran,
     combined: `${hijri} (${pasaran})`,
+    ayyamulBidh,
     standard: isEn
       ? "Single Unified Global Hijri Calendar (KHGT)"
-      : "Kalender Hijriyah Global Tunggal (KHGT)",
+      : "Kalender Hijriah Global Tunggal (KHGT)",
     authority: isEn
-      ? "Tarjih & Tajdid Council PP Muhammadiyah"
-      : "Majelis Tarjih & Tajdid PP Muhammadiyah",
+      ? "Tarjih & Tajdid Council PP Muhammadiyah (MASA)"
+      : "Majelis Tarjih & Tajdid PP Muhammadiyah (MASA)",
   };
 }
 

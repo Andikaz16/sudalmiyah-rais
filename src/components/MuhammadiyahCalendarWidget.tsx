@@ -28,6 +28,7 @@ export default function MuhammadiyahCalendarWidget() {
   const [hijriText, setHijriText] = useState<string>("");
   const [pasaranText, setPasaranText] = useState<string>("");
   const [masehiText, setMasehiText] = useState<string>("");
+  const [calendarDetails, setCalendarDetails] = useState<ReturnType<typeof getMuhammadiyahCalendarDetails> | null>(null);
 
   const isEn = language === "en";
 
@@ -36,6 +37,7 @@ export default function MuhammadiyahCalendarWidget() {
     setCurrentDate(now);
     setHijriText(getHijriDate(now, true, language));
     setPasaranText(getPasaranJawa(now));
+    setCalendarDetails(getMuhammadiyahCalendarDetails(now, language));
     setMasehiText(
       new Intl.DateTimeFormat(language === "en" ? "en-US" : "id-ID", {
         weekday: "long",
@@ -47,6 +49,12 @@ export default function MuhammadiyahCalendarWidget() {
   }, [language]);
 
   const principles = t.calendar.principles;
+
+  const ayyamulBidhSchedule = calendarDetails?.ayyamulBidh
+    ? `${calendarDetails.ayyamulBidh.hijriRangeText} (${calendarDetails.ayyamulBidh.masehiRangeText})`
+    : isEn
+    ? "13, 14, 15 Hijri"
+    : "13, 14, 15 Hijriyah";
 
   const upcomingIbadah = [
     {
@@ -61,11 +69,11 @@ export default function MuhammadiyahCalendarWidget() {
     {
       label: isEn ? "Mid-Month Fasting" : "Puasa Pertengahan Bulan",
       name: isEn ? "Ayyamul Bidh" : "Ayyamul Bidh",
-      schedule: isEn ? "13, 14, 15 Hijri" : "13, 14, 15 Hijriyah",
+      schedule: ayyamulBidhSchedule,
       note: isEn
-        ? "Multiplied fasting rewards equivalent to fasting throughout the whole year."
-        : "Pahala puasa berlipat ganda laksana berpuasa sepanjang tahun.",
-      badge: isEn ? "Every Month" : "Tiap Bulan",
+        ? "Synchronized with KHGT MASA calendar. Multiplied rewards equivalent to fasting all year."
+        : "Tersinkronisasi KHGT MASA. Pahala puasa berlipat ganda laksana berpuasa sepanjang tahun.",
+      badge: isEn ? "KHGT MASA" : "KHGT MASA",
     },
   ];
 
@@ -155,7 +163,9 @@ export default function MuhammadiyahCalendarWidget() {
                 <Compass className="w-3.5 h-3.5 text-[#FCD34D]" />
                 {t.calendar.standarMasa}
               </span>
-              <span className="text-[#FCD34D] font-mono font-bold">1448 H</span>
+              <span className="text-[#FCD34D] font-mono font-bold">
+                {calendarDetails?.year ? `${calendarDetails.year} H` : "1448 H"}
+              </span>
             </div>
           </div>
 

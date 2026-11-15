@@ -2165,34 +2165,46 @@ function KalenderFeatureView() {
 
   const hariBesarMuhammadiyah = [
     {
-      title: "Tahun Baru 1448 Hijriyah",
-      dateHijri: "1 Muharram 1448 H",
+      title: "Tahun Baru Islam 1448 Hijriyah",
+      dateHijri: "1 Muharram 1448 H • 16 Juni 2026",
       kategori: "Tahun Baru Islam",
-      desc: "Awal tahun penanggalan Hijriyah berdasar kriteria Kalender Hijriyah Global Tunggal (KHGT).",
+      desc: "Awal tahun penanggalan Hijriyah berdasarkan kriteria Kalender Hijriah Global Tunggal (KHGT) PP Muhammadiyah & MASA.",
+    },
+    {
+      title: "Maulid Nabi Muhammad SAW",
+      dateHijri: "12 Rabiulawal 1448 H • 25 Agustus 2026",
+      kategori: "Sejarah Islam",
+      desc: "Momentum meneladani risalah kenabian, akhlakul karimah, dan perjuangan dakwah Rasulullah SAW sesuai ketetapan KHGT.",
     },
     {
       title: "Milad Muhammadiyah ke-114",
-      dateHijri: "8 Dzulhijjah / 18 November",
+      dateHijri: "9 Jumadilakhir 1448 H • 18 November 2026",
       kategori: "Persyarikatan",
-      desc: "Peringatan hari lahir Persyarikatan Muhammadiyah yang didirikan oleh KH. Ahmad Dahlan di Yogyakarta (1912 M / 1330 H).",
+      desc: "Peringatan hari lahir Persyarikatan Muhammadiyah yang didirikan oleh KH. Ahmad Dahlan di Yogyakarta (18 November 1912 M / 8 Dzulhijjah 1330 H).",
     },
     {
-      title: "Awal Ramadhan 1448 H",
-      dateHijri: "1 Ramadhan 1448 H",
+      title: "Isra Mi'raj Nabi Muhammad SAW",
+      dateHijri: "27 Rajab 1448 H • 5 Januari 2027",
+      kategori: "Sejarah Islam",
+      desc: "Peringatan perjalanan agung Rasulullah SAW dan pensyariatan kewajiban shalat lima waktu berjamaah.",
+    },
+    {
+      title: "Awal Puasa Ramadhan 1448 H",
+      dateHijri: "1 Ramadhan 1448 H • 8 Februari 2027",
       kategori: "Ibadah Wajib",
-      desc: "Awal ibadah puasa Ramadhan mengacu Maklumat PP Muhammadiyah berdasar Hisab Hakiki Wujudul Hilal.",
+      desc: "Awal ibadah puasa Ramadhan 1448 H mengacu penuh pada Kalender Hijriah Global Tunggal (KHGT) Majelis Tarjih PP Muhammadiyah & Aplikasi MASA.",
     },
     {
       title: "Hari Raya Idul Fitri 1448 H",
-      dateHijri: "1 Syawal 1448 H",
+      dateHijri: "1 Syawal 1448 H • 9 Maret 2027",
       kategori: "Hari Raya",
-      desc: "Hari kemenangan umat Islam setelah menunaikan sebulan penuh ibadah puasa Ramadhan.",
+      desc: "Hari kemenangan umat Islam setelah menunaikan sebulan penuh ibadah puasa Ramadhan (29 hari sesuai KHGT 1448 H).",
     },
     {
-      title: "Hari Arafah & Idul Adha 1448 H",
-      dateHijri: "9 & 10 Dzulhijjah 1448 H",
+      title: "Puasa Arafah & Idul Adha 1448 H",
+      dateHijri: "9 & 10 Dzulhijjah 1448 H • 15 & 16 Mei 2027",
       kategori: "Hari Raya & Qurban",
-      desc: "Hari wukuf di Arafah (puasa sunnah Arafah) dilanjutkan Shalat Idul Adha dan penyembelihan hewan qurban.",
+      desc: "Puasa sunnah Arafah (Sabtu, 15 Mei 2027) dilanjutkan Shalat Idul Adha (Ahad, 16 Mei 2027) sesuai ketetapan resmi KHGT MASA.",
     },
   ];
 
@@ -2203,19 +2215,21 @@ function KalenderFeatureView() {
       desc: "Amalan puasa sunnah mingguan yang senantiasa dijaga oleh Rasulullah SAW karena pada hari tersebut amalan diangkat kepada Allah.",
     },
     {
-      name: "Puasa Ayyamul Bidh",
-      day: "13, 14, 15 Setiap Bulan Hijriyah",
-      desc: "Puasa pada hari-hari putih saat bulan purnama penuh. Pahalanya seperti berpuasa sepanjang tahun.",
+      name: "Puasa Ayyamul Bidh (Bulan Ini)",
+      day: calendarInfo?.ayyamulBidh
+        ? `${calendarInfo.ayyamulBidh.hijriRangeText} (${calendarInfo.ayyamulBidh.masehiRangeText})`
+        : "13, 14, 15 Setiap Bulan Hijriyah",
+      desc: "Puasa pada hari-hari putih pertengahan bulan Hijriyah sesuai kalender KHGT MASA. Pahalanya seperti berpuasa sepanjang tahun.",
     },
     {
-      name: "Puasa Asyura & Tasu'a",
-      day: "9 & 10 Muharram",
-      desc: "Menghapuskan dosa-dosa setahun yang telah lalu.",
+      name: "Puasa Tasu'a & Asyura 1448 H",
+      day: "9 & 10 Muharram 1448 H (24 & 25 Juni 2026)",
+      desc: "Menghapuskan dosa-dosa setahun yang telah lalu (HR. Muslim).",
     },
     {
-      name: "Puasa Hari Arafah",
-      day: "9 Dzulhijjah",
-      desc: "Menghapuskan dosa setahun yang lalu dan setahun yang akan datang.",
+      name: "Puasa Hari Arafah 1448 H",
+      day: "9 Dzulhijjah 1448 H (Sabtu, 15 Mei 2027)",
+      desc: "Menghapuskan dosa setahun yang lalu dan setahun yang akan datang (HR. Muslim).",
     },
   ];
 
@@ -2271,12 +2285,12 @@ function KalenderFeatureView() {
           </div>
         </div>
         <a
-          href="https://muhammadiyah.or.id"
+          href="https://khgt.muhammadiyah.or.id"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl bg-[#003B73] text-white hover:bg-[#002855] transition-colors shrink-0 shadow-xs"
         >
-          <span>Akses Portal Resmi</span>
+          <span>Portal Resmi KHGT MASA</span>
           <ExternalLink className="w-3.5 h-3.5" />
         </a>
       </div>

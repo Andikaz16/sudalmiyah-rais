@@ -8,11 +8,14 @@ import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import {
   Calendar,
   Info,
+  Sparkles,
 } from "lucide-react";
 import {
   calculatePrayerTimes,
   CALCULATION_STANDARDS,
-  CalculationMethod,
+  getHijriDate,
+  getPasaranJawa,
+  getIslamicDayName,
 } from "@/lib/prayer-times";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -20,11 +23,10 @@ export default function JadwalPage() {
   const { language } = useLanguage();
   const isEn = language === "en";
 
-  const [selectedMonth, setSelectedMonth] = useState(9); // October
-  const [currentDay, setCurrentDay] = useState(10);
-  const [currentMonth, setCurrentMonth] = useState(9);
+  const [selectedMonth, setSelectedMonth] = useState(10); // November default
+  const [currentDay, setCurrentDay] = useState(15);
+  const [currentMonth, setCurrentMonth] = useState(10);
   const [mounted, setMounted] = useState(false);
-  const [method, setMethod] = useState<CalculationMethod>("tarjih");
 
   const year = 2026;
 
@@ -39,14 +41,19 @@ export default function JadwalPage() {
   const daysInMonth = new Date(year, selectedMonth + 1, 0).getDate();
   const scheduleList = Array.from({ length: daysInMonth }, (_, i) => {
     const d = new Date(year, selectedMonth, i + 1);
-    const times = calculatePrayerTimes(d, method);
+    const times = calculatePrayerTimes(d, "tarjih");
+    const hijriFormatted = getHijriDate(d, false, language);
+    const pasaran = getPasaranJawa(d);
+    const dayName = getIslamicDayName(d, language);
     return {
       day: i + 1,
       dateFormatted: new Intl.DateTimeFormat(isEn ? "en-US" : "id-ID", {
-        weekday: "short",
         day: "numeric",
         month: "short",
       }).format(d),
+      dayName,
+      pasaran,
+      hijriFormatted,
       isToday: mounted && currentDay === i + 1 && currentMonth === selectedMonth,
       times,
     };
@@ -125,38 +132,18 @@ export default function JadwalPage() {
                 </span>
               </h2>
               <span className="text-xs text-stone-500">
-                {isEn ? "Western Indonesia Time (WIB)" : "Waktu Indonesia Barat (WIB)"} • {CALCULATION_STANDARDS[method].shortName}
+                {isEn ? "Western Indonesia Time (WIB)" : "Waktu Indonesia Barat (WIB)"} • {CALCULATION_STANDARDS.tarjih.shortName}
               </span>
             </div>
 
-            {/* Controls: Method Switcher, Month Select, Print */}
+            {/* Controls: Official MASA Badge, Month Select, Print */}
             <div className="flex flex-wrap items-center gap-2.5">
-              {/* Method Toggle */}
-              <div className="inline-flex p-1 bg-[#FAF8F5] rounded-2xl border border-stone-200 text-xs font-semibold">
-                <button
-                  type="button"
-                  onClick={() => setMethod("tarjih")}
-                  className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
-                    method === "tarjih"
-                      ? "bg-[#003B73] text-white shadow-xs font-bold"
-                      : "text-stone-600 hover:text-stone-900"
-                  }`}
-                  title={isEn ? "Official MASA (Muhammadiyah Super App) & Majelis Tarjih standard" : "Standar resmi MASA (Muhammadiyah Super App) & Majelis Tarjih"}
-                >
-                  MASA / Tarjih
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMethod("kemenag")}
-                  className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
-                    method === "kemenag"
-                      ? "bg-[#003B73] text-white shadow-xs font-bold"
-                      : "text-stone-600 hover:text-stone-900"
-                  }`}
-                  title={isEn ? "Ministry of Religious Affairs standard" : "Standar Kementerian Agama RI"}
-                >
-                  Kemenag RI
-                </button>
+              {/* Official MASA / KHGT Standard Badge */}
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#003B73]/10 text-[#003B73] rounded-xl border border-[#003B73]/25 text-xs font-bold">
+                <Sparkles className="w-3.5 h-3.5 text-[#B58A1E]" />
+                <span>
+                  {isEn ? "MASA & KHGT Muhammadiyah" : "Standar Resmi MASA & KHGT"}
+                </span>
               </div>
 
               {/* Month Selector */}
@@ -182,24 +169,24 @@ export default function JadwalPage() {
             </div>
           </div>
 
-          {/* Educational Note: Tarjih vs Kemenag */}
+          {/* Educational Note: MASA & KHGT Muhammadiyah */}
           <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200/90 text-xs space-y-1.5">
             <div className="flex items-center gap-2 font-bold text-[#003B73]">
               <Info className="w-4 h-4 shrink-0" />
               <span>
                 {isEn
-                  ? "Astronomical Hisab Decree of Majelis Tarjih & Tajdid PP Muhammadiyah (MASA App):"
-                  : "Ketetapan Hisab Majelis Tarjih dan Tajdid PP Muhammadiyah (Aplikasi MASA):"}
+                  ? "Official Synchronization with MASA (Muhammadiyah Super App) & KHGT PP Muhammadiyah:"
+                  : "Sinkronisasi Penuh Aplikasi Resmi MASA (Muhammadiyah Super App) & KHGT PP Muhammadiyah:"}
               </span>
             </div>
             <p className="text-stone-600 leading-relaxed text-[11px] sm:text-xs">
               {isEn ? (
                 <>
-                  In accordance with the <strong>31st Muhammadiyah Munas Tarjih Decision</strong>, the sun altitude angle for the start of Fajr prayer is set at <strong>-18°</strong> (approximately 8–10 minutes later than the conventional -20° benchmark). The schedule above is standardized with the official <strong>MASA (Muhammadiyah Super App)</strong> and UMS Campus celestial calculation.
+                  Both the Hijri calendar dates and the 5 daily prayer times on this portal strictly adhere to the <strong>Single Unified Global Hijri Calendar (KHGT)</strong> and the <strong>31st Munas Tarjih PP Muhammadiyah Decree</strong> (Fajr angle <strong>-18°</strong>, Isha <strong>-18°</strong>, Ihtiyat <strong>+2 minutes</strong>), 100% synchronized with the official <strong>MASA (Muhammadiyah Super App)</strong>.
                 </>
               ) : (
                 <>
-                  Sesuai <strong>Keputusan Munas Tarjih Muhammadiyah ke-31</strong>, sudut ketinggian matahari untuk awal waktu Subuh ditetapkan pada <strong>-18°</strong> (mundur sekitar 8–10 menit dibandingkan patokan lama -20° Kemenag). Jadwal di atas secara baku telah diselaraskan dengan aplikasi resmi <strong>MASA (Muhammadiyah Super App)</strong> dan hisab falak Kampus UMS.
+                  Seluruh penanggalan Hijriyah dan jadwal waktu shalat pada portal ini mengacu 100% pada <strong>Kalender Hijriah Global Tunggal (KHGT)</strong> serta <strong>Keputusan Munas Tarjih Muhammadiyah ke-31</strong> (sudut Subuh <strong>-18°</strong>, Isya <strong>-18°</strong>, Ihtiyat <strong>+2 menit</strong>) sebagaimana tertera pada aplikasi resmi <strong>MASA (Muhammadiyah Super App)</strong>.
                 </>
               )}
             </p>
@@ -210,7 +197,8 @@ export default function JadwalPage() {
             <table className="w-full text-left text-xs sm:text-sm">
               <thead>
                 <tr className="border-b border-stone-200 text-stone-500 uppercase text-[11px] tracking-wider bg-[#FAF8F5]">
-                  <th className="py-3 px-4 font-semibold">{isEn ? "Date" : "Tanggal"}</th>
+                  <th className="py-3 px-4 font-semibold">{isEn ? "Gregorian Date" : "Tanggal Masehi"}</th>
+                  <th className="py-3 px-4 font-semibold text-[#B58A1E]">{isEn ? "Hijri Date (KHGT MASA)" : "Tanggal Hijriyah (KHGT MASA)"}</th>
                   <th className="py-3 px-3 font-semibold text-stone-400">Imsak</th>
                   <th className="py-3 px-3 font-semibold text-[#003B73]">{isEn ? "Fajr" : "Subuh"}</th>
                   <th className="py-3 px-3 font-semibold text-stone-400">{isEn ? "Sunrise" : "Terbit"}</th>
@@ -232,12 +220,17 @@ export default function JadwalPage() {
                     }`}
                   >
                     <td className="py-3 px-4 font-sans font-medium whitespace-nowrap">
-                      {item.dateFormatted}
+                      <span className="font-semibold text-stone-900">{item.dayName}</span>{" "}
+                      <span className="text-stone-500 text-xs">({item.pasaran})</span>,{" "}
+                      <span>{item.dateFormatted}</span>
                       {item.isToday && (
                         <span className="ml-2 px-2.5 py-0.5 rounded-full text-[10px] bg-[#003B73] text-white font-bold uppercase tracking-tight">
                           {isEn ? "Today" : "Hari Ini"}
                         </span>
                       )}
+                    </td>
+                    <td className="py-3 px-4 font-sans font-semibold text-[#B58A1E] whitespace-nowrap">
+                      {item.hijriFormatted}
                     </td>
                     <td className="py-3 px-3 text-stone-400">{item.times.Imsak}</td>
                     <td className="py-3 px-3 text-[#003B73] font-semibold">{item.times.Subuh}</td>

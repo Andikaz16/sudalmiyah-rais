@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { User, History, X, Clock, Calendar, ChevronLeft, ChevronRight, Coins, ArrowRight, Share2 } from "lucide-react";
 import { FridayOfficerSchedule } from "@/lib/types";
+import { syncFridayHijriDate } from "@/lib/prayer-times";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface MosqueInfo {
@@ -169,7 +170,7 @@ const fallbackSchedules: FridayOfficerSchedule[] = [
   },
 ];
 
-// Arsip Awal Berdasarkan Rilis Resmi UMS (16 Oktober 2026)
+// Arsip Awal Berdasarkan Rilis Resmi UMS (16 Oktober 2026 = 5 Jumadilawal 1448 H KHGT MASA)
 const initialFridayHistory: FridayOfficerSchedule[] = [
   {
     id: "hist-20261016-sudalmiyah",
@@ -177,7 +178,7 @@ const initialFridayHistory: FridayOfficerSchedule[] = [
     mosqueName: "Masjid Hj. Sudalmiyah Rais",
     mosqueLocation: "Kampus 2 UMS",
     date: "Jumat, 16 Oktober 2026",
-    hijriDate: "4 Jumadilawal 1448 H",
+    hijriDate: "5 Jumadilawal 1448 H",
     khatibName: "Prof. Muhammad Da'i",
     khatibTitle: "Guru Besar Farmasi UMS / Wakil Rektor",
     khatibPhotoUrl: "",
@@ -196,7 +197,7 @@ const initialFridayHistory: FridayOfficerSchedule[] = [
     mosqueName: "Masjid Fadhlurrahman",
     mosqueLocation: "Kampus 1 UMS",
     date: "Jumat, 16 Oktober 2026",
-    hijriDate: "4 Jumadilawal 1448 H",
+    hijriDate: "5 Jumadilawal 1448 H",
     khatibName: "Dr. Muh. Nur Rochim Maksum",
     khatibTitle: "Dosen & Dai Majelis Tabligh Muhammadiyah",
     khatibPhotoUrl: "",
@@ -218,6 +219,7 @@ export default function FridayScheduleSection() {
   const [history, setHistory] = useState<FridayOfficerSchedule[]>(initialFridayHistory);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [clientRefDate, setClientRefDate] = useState<Date | null>(null);
 
   // History Modal State
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
@@ -251,7 +253,9 @@ export default function FridayScheduleSection() {
 
   // Fetch schedules and history from API with anti-cache
   const fetchSchedules = useCallback(() => {
-    fetch(`/api/friday-schedule?t=${Date.now()}`, {
+    const now = new Date();
+    setClientRefDate(now);
+    fetch(`/api/friday-schedule?t=${now.getTime()}`, {
       cache: "no-store",
       headers: { "Cache-Control": "no-cache" },
     })
@@ -260,7 +264,7 @@ export default function FridayScheduleSection() {
         if (data.success && Array.isArray(data.schedules) && data.schedules.length > 0) {
           const sanitized = data.schedules.map((s: FridayOfficerSchedule) => ({
             ...s,
-            hijriDate: s.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H",
+            hijriDate: syncFridayHijriDate(s.date, s.hijriDate, "id", now),
           }));
           setSchedules(sanitized);
         } else if (data.success && data.schedule) {
@@ -269,14 +273,18 @@ export default function FridayScheduleSection() {
             copy[0] = {
               ...copy[0],
               ...data.schedule,
-              hijriDate: data.schedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || "5 Jumadilawal 1448 H",
+              hijriDate: syncFridayHijriDate(data.schedule.date, data.schedule.hijriDate, "id", now),
             };
             return copy;
           });
         }
 
         if (data.success && Array.isArray(data.history) && data.history.length > 0) {
-          setHistory(data.history);
+          const sanitizedHistory = data.history.map((h: FridayOfficerSchedule) => ({
+            ...h,
+            hijriDate: syncFridayHijriDate(h.date, h.hijriDate, "id", now),
+          }));
+          setHistory(sanitizedHistory);
         }
       })
       .catch(() => {});
@@ -383,9 +391,12 @@ export default function FridayScheduleSection() {
       activeSchedule.date === "Jumat Pekan Ini"
         ? "Jumat Pekan Ini"
         : activeSchedule.date;
-    const activeHijri =
-      activeSchedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") ||
-      "5 Jumadilawal 1448 H";
+    const activeHijri = syncFridayHijriDate(
+      activeSchedule.date,
+      activeSchedule.hijriDate,
+      "id",
+      clientRefDate
+    );
 
     return `*JADWAL PETUGAS SHALAT JUMAT 6 MASJID UMS*
 Hari / Tanggal: ${activeDate} (${activeHijri})
@@ -502,7 +513,7 @@ https://masjid.ums.ac.id`;
                       {isEn ? "Friday Prayer Khatib" : "Khatib Shalat Jumat"}
                     </span>
                     <span className="text-xs font-semibold text-[#B58A1E] font-mono">
-                      {activeSchedule.date === "Jumat Pekan Ini" ? (isEn ? "This Friday" : "Jumat Pekan Ini") : activeSchedule.date} • {activeSchedule.hijriDate?.replace(/Rabiul Akhir/gi, "Jumadilawal") || (isEn ? "5 Jumada al-Awwal 1448 AH" : "5 Jumadilawal 1448 H")}
+                      {activeSchedule.date === "Jumat Pekan Ini" ? (isEn ? "This Friday" : "Jumat Pekan Ini") : activeSchedule.date} • {syncFridayHijriDate(activeSchedule.date, activeSchedule.hijriDate, language, clientRefDate)}
                     </span>
                   </div>
 
@@ -822,7 +833,7 @@ https://masjid.ums.ac.id`;
 
                       <div className="flex items-center gap-2 text-xs font-mono text-[#B58A1E] font-semibold">
                         <Calendar className="w-3.5 h-3.5" />
-                        <span>{item.date}</span>
+                        <span>{item.date} • {syncFridayHijriDate(item.date, item.hijriDate, language, clientRefDate)}</span>
                         {item.time && (
                           <span className="inline-flex items-center gap-1 text-stone-500 font-normal">
                             <Clock className="w-3 h-3 ml-1" />
