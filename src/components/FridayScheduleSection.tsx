@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { User, History, X, Clock, Calendar, ChevronLeft, ChevronRight, Coins, ArrowRight, Share2 } from "lucide-react";
+import { User, History, X, Clock, Calendar, ChevronLeft, ChevronRight, Coins, ArrowRight, Share2, Copy, Check, MessageCircle, ExternalLink } from "lucide-react";
 import { FridayOfficerSchedule } from "@/lib/types";
 import { syncFridayHijriDate } from "@/lib/prayer-times";
 import { useLanguage } from "@/context/LanguageContext";
@@ -225,6 +225,11 @@ export default function FridayScheduleSection() {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [historyFilterMosque, setHistoryFilterMosque] = useState<string>("all");
 
+  // Share Modal & Copy State
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [shareScope, setShareScope] = useState<"active" | "all">("active");
+  const [copiedShare, setCopiedShare] = useState(false);
+
   // Synchronize with Hero banner slide change or banner click
   useEffect(() => {
     const handleSync = (e: Event) => {
@@ -303,7 +308,7 @@ export default function FridayScheduleSection() {
 
   // Lock body scroll when modal is open
   useEffect(() => {
-    if (isHistoryModalOpen) {
+    if (isHistoryModalOpen || isShareModalOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -311,7 +316,7 @@ export default function FridayScheduleSection() {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isHistoryModalOpen]);
+  }, [isHistoryModalOpen, isShareModalOpen]);
 
   // Safe navigation handlers
   const totalSlides = MOSQUE_LIST.length;
@@ -357,7 +362,54 @@ export default function FridayScheduleSection() {
     return item.mosqueId === historyFilterMosque;
   });
 
-  const getShareText = () => {
+  const getShareText = (scope: "active" | "all" = shareScope) => {
+    const activeDate =
+      activeSchedule.date === "Jumat Pekan Ini"
+        ? "Jumat Pekan Ini"
+        : activeSchedule.date;
+    const activeHijri = syncFridayHijriDate(
+      activeSchedule.date,
+      activeSchedule.hijriDate,
+      "id",
+      clientRefDate
+    );
+
+    if (scope === "active") {
+      const khatib = activeSchedule.khatibName || "Dalam Konfirmasi";
+      const khatibTitle =
+        activeSchedule.khatibTitle && activeSchedule.khatibTitle !== "Akan Diumumkan Takmir"
+          ? ` (${activeSchedule.khatibTitle})`
+          : "";
+      const tema = activeSchedule.khutbahTheme || "Tema Khutbah Dalam Konfirmasi";
+      const imam = activeSchedule.imamName || "Imam Shalat Jumat";
+      const muadzin = activeSchedule.muadzinName || "Muadzin Shalat Jumat";
+      const time = activeSchedule.time || "11:35 WIB";
+      const infaqStr =
+        activeSchedule.infaqAmount && Number(activeSchedule.infaqAmount) > 0
+          ? `\n• Infaq Jumat Lalu: Rp ${Number(activeSchedule.infaqAmount).toLocaleString("id-ID")}`
+          : "";
+
+      return `*JADWAL PETUGAS SHALAT JUMAT*
+*${activeMosqueInfo.name.toUpperCase()} (${activeMosqueInfo.location})*
+Hari / Tanggal: ${activeDate} (${activeHijri})
+----------------------------------------
+Assalamu'alaikum Warahmatullahi Wabarakatuh.
+Berikut susunan petugas Shalat Jumat di ${activeMosqueInfo.name}:
+
+• Waktu Mulai: ${time}
+• Khatib: ${khatib}${khatibTitle}
+• Tema Khutbah: "${tema}"
+• Imam: ${imam}
+• Muadzin: ${muadzin}${infaqStr}
+
+----------------------------------------
+Himbauan Jamaah:
+${activeSchedule.notes || "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, merapatkan saf, serta menjaga ketertiban, kekhusyukan, dan kebersihan masjid."}
+
+Portal Resmi Masjid Kampus UMS:
+https://masjidums.vercel.app`;
+    }
+
     // Susun daftar petugas shalat jumat untuk seluruh 6 masjid
     const mosqueEntries = MOSQUE_LIST.map((m, idx) => {
       const sched =
@@ -387,17 +439,6 @@ export default function FridayScheduleSection() {
 • Muadzin: ${muadzin}${infaqStr}`;
     }).join("\n\n");
 
-    const activeDate =
-      activeSchedule.date === "Jumat Pekan Ini"
-        ? "Jumat Pekan Ini"
-        : activeSchedule.date;
-    const activeHijri = syncFridayHijriDate(
-      activeSchedule.date,
-      activeSchedule.hijriDate,
-      "id",
-      clientRefDate
-    );
-
     return `*JADWAL PETUGAS SHALAT JUMAT 6 MASJID UMS*
 Hari / Tanggal: ${activeDate} (${activeHijri})
 ----------------------------------------
@@ -412,16 +453,62 @@ Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, merapatkan saf, sert
 
 Masjid Percontohan Amal Usaha Muhammadiyah (AUM)
 
-Portal Resmi Masjid UMS:
-https://masjid.ums.ac.id`;
+Portal Resmi Masjid Kampus UMS:
+https://masjidums.vercel.app`;
   };
 
-  const handleShareWhatsApp = () => {
-    const text = getShareText();
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-    if (typeof window !== "undefined") {
-      window.open(waUrl, "_blank");
+  const copyShareTextToClipboard = async (scope: "active" | "all" = shareScope) => {
+    const text = getShareText(scope);
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setCopiedShare(true);
+      setTimeout(() => setCopiedShare(false), 2500);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopiedShare(true);
+      setTimeout(() => setCopiedShare(false), 2500);
     }
+  };
+
+  const handleOpenShareModal = () => {
+    setShareScope("active");
+    setIsShareModalOpen(true);
+  };
+
+  const handleNativeShare = async () => {
+    const text = getShareText(shareScope);
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      try {
+        await navigator.share({
+          title: `Jadwal Petugas Shalat Jumat - ${activeMosqueInfo.name}`,
+          text,
+        });
+        return;
+      } catch {
+        // user cancelled or share failed, fallback to copy
+      }
+    }
+    await copyShareTextToClipboard(shareScope);
   };
 
   return (
@@ -597,15 +684,33 @@ https://masjid.ums.ac.id`;
                 </div>
 
                 {/* Share Action inside Khatib card */}
-                <div className="mt-3.5 pt-3 border-t border-stone-200/80 flex items-center justify-start">
+                <div className="mt-3.5 pt-3 border-t border-stone-200/80 flex flex-wrap items-center justify-start gap-2.5">
                   <button
                     type="button"
-                    onClick={handleShareWhatsApp}
+                    onClick={handleOpenShareModal}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
-                    title={isEn ? "Share" : "Bagikan"}
+                    title={isEn ? "Share Friday Schedule" : "Bagikan Jadwal Jumat"}
                   >
                     <Share2 className="w-3.5 h-3.5 text-emerald-200" />
                     <span>{isEn ? "Share" : "Bagikan"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => copyShareTextToClipboard("active")}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-xs font-semibold transition-all shadow-2xs cursor-pointer active:scale-95"
+                    title={isEn ? "Copy Schedule Text" : "Salin Teks Jadwal"}
+                  >
+                    {copiedShare ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-emerald-700 font-bold">{isEn ? "Copied!" : "Tersalin!"}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-stone-500" />
+                        <span>{isEn ? "Copy Schedule" : "Salin Jadwal"}</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -911,6 +1016,134 @@ https://masjid.ums.ac.id`;
                 className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold cursor-pointer"
               >
                 Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Dialog: Bagikan Jadwal Petugas Shalat Jumat */}
+      {isShareModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setIsShareModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-xl bg-white rounded-3xl border border-stone-200 shadow-2xl p-6 sm:p-7 max-h-[90vh] flex flex-col text-stone-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-4 border-b border-stone-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-700/10 text-emerald-700 flex items-center justify-center shrink-0">
+                  <Share2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-bold text-stone-900 font-serif">
+                    {isEn ? "Share Friday Officer Schedule" : "Bagikan Jadwal Petugas Jumat"}
+                  </h3>
+                  <p className="text-xs text-stone-500 mt-0.5">
+                    {isEn
+                      ? "Copy or send the official Friday sermon & prayer schedule to WhatsApp"
+                      : "Salin atau kirim susunan resmi petugas Shalat Jumat ke grup WhatsApp"}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsShareModalOpen(false)}
+                className="p-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 transition-colors cursor-pointer"
+                aria-label={isEn ? "Close" : "Tutup"}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Scope Selector: Active Mosque vs All 6 Mosques */}
+            <div className="py-3 flex flex-wrap items-center gap-2 border-b border-stone-100">
+              <button
+                type="button"
+                onClick={() => setShareScope("active")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  shareScope === "active"
+                    ? "bg-[#003B73] text-white shadow-xs"
+                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                }`}
+              >
+                {isEn ? `This Mosque (${activeMosqueInfo.shortName})` : `Masjid Ini (${activeMosqueInfo.shortName})`}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShareScope("all")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  shareScope === "all"
+                    ? "bg-[#003B73] text-white shadow-xs"
+                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                }`}
+              >
+                {isEn ? "All 6 UMS Mosques" : "Semua 6 Masjid Kampus UMS"}
+              </button>
+            </div>
+
+            {/* Preview Box */}
+            <div className="my-4 flex-1 overflow-y-auto bg-[#FAF8F5] border border-stone-200 rounded-2xl p-4 max-h-64">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1.5">
+                {isEn ? "Message Preview" : "Pratinjau Pesan Siap Kirim"}
+              </div>
+              <pre className="text-xs text-stone-800 whitespace-pre-wrap font-sans leading-relaxed select-all">
+                {getShareText(shareScope)}
+              </pre>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => copyShareTextToClipboard(shareScope)}
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+              >
+                {copiedShare ? (
+                  <>
+                    <Check className="w-4 h-4 text-amber-300" />
+                    <span>{isEn ? "Copied to Clipboard!" : "Teks Berhasil Disalin!"}</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 text-stone-200" />
+                    <span>{isEn ? "Copy Schedule Text" : "Salin Teks Jadwal"}</span>
+                  </>
+                )}
+              </button>
+
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareText(shareScope))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  copyShareTextToClipboard(shareScope);
+                }}
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+              >
+                <MessageCircle className="w-4 h-4 text-emerald-200" />
+                <span>{isEn ? "Send to WhatsApp" : "Kirim ke WhatsApp"}</span>
+                <ExternalLink className="w-3.5 h-3.5 text-emerald-200" />
+              </a>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+              <button
+                type="button"
+                onClick={handleNativeShare}
+                className="text-[#003B73] hover:underline font-semibold cursor-pointer"
+              >
+                {isEn ? "Share via Device Apps..." : "Bagikan lewat Aplikasi Lain..."}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsShareModalOpen(false)}
+                className="px-3.5 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold cursor-pointer"
+              >
+                {isEn ? "Close" : "Tutup"}
               </button>
             </div>
           </div>
