@@ -103,7 +103,7 @@ const jsonLdPayload = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://masjid.ums.ac.id"),
+  metadataBase: new URL("https://masjidums.vercel.app"),
   title: {
     default: "Masjid Kampus UMS | Portal Resmi Masjid Sudalmiyah Rais & 6 Masjid Kampus",
     template: "%s | Masjid Kampus UMS",
@@ -145,17 +145,18 @@ export const metadata: Metadata = {
     apple: "/images/logo/logo-masjid.png",
   },
   openGraph: {
-    title: "Masjid Kampus UMS - Portal Resmi 6 Masjid Kampus",
+    title: "Masjid Kampus UMS - Universitas Muhammadiyah Surakarta",
     description:
-      "Portal resmi informasi dan peribadatan Masjid Kampus UMS. Jadwal Shalat Jumat, kajian, ruang ibadah digital & presensi berjamaah.",
-    url: "https://masjid.ums.ac.id",
+      "Portal resmi informasi dan peribadatan 6 Masjid Kampus UMS. Jadwal Shalat Jumat, kajian, ruang ibadah digital & presensi berjamaah.",
+    url: "https://masjidums.vercel.app",
     siteName: "Masjid Kampus UMS",
     images: [
       {
-        url: "https://masjid.ums.ac.id/images/logo/logo-masjid.png",
+        url: "https://masjidums.vercel.app/images/logo/logo-masjid.png",
         width: 512,
         height: 512,
-        alt: "Logo Resmi Masjid Kampus UMS",
+        type: "image/png",
+        alt: "Logo Resmi Universitas Muhammadiyah Surakarta - Masjid Kampus UMS",
       },
     ],
     locale: "id_ID",
@@ -163,10 +164,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Masjid Kampus UMS - Portal Resmi 6 Masjid Kampus",
+    title: "Masjid Kampus UMS - Universitas Muhammadiyah Surakarta",
     description:
-      "Portal resmi informasi dan peribadatan Masjid Kampus UMS. Jadwal Shalat Jumat, kajian, dan presensi jamaah.",
-    images: ["https://masjid.ums.ac.id/images/logo/logo-masjid.png"],
+      "Portal resmi informasi dan peribadatan 6 Masjid Kampus UMS. Jadwal Shalat Jumat, kajian, dan presensi jamaah.",
+    images: ["https://masjidums.vercel.app/images/logo/logo-masjid.png"],
   },
   robots: {
     index: true,
@@ -213,12 +214,8 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
           rel="stylesheet"
         />
-        <meta property="og:image" content="https://masjid.ums.ac.id/images/logo/logo-masjid.png" />
-        <meta property="og:image:secure_url" content="https://masjid.ums.ac.id/images/logo/logo-masjid.png" />
-        <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:width" content="512" />
-        <meta property="og:image:height" content="512" />
-        <meta property="og:image:alt" content="Logo Resmi Masjid Kampus UMS" />
+        <meta property="og:image:secure_url" content="https://masjidums.vercel.app/images/logo/logo-masjid.png" />
+        <link rel="image_src" href="https://masjidums.vercel.app/images/logo/logo-masjid.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

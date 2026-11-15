@@ -227,7 +227,7 @@ export default function FridayScheduleSection() {
 
   // Share Modal & Copy State
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [shareScope, setShareScope] = useState<"active" | "all">("active");
+  const [shareScope, setShareScope] = useState<"active" | "all">("all");
   const [copiedShare, setCopiedShare] = useState(false);
 
   // Synchronize with Hero banner slide change or banner click
@@ -406,8 +406,10 @@ Berikut susunan petugas Shalat Jumat di ${activeMosqueInfo.name}:
 Himbauan Jamaah:
 ${activeSchedule.notes || "Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, merapatkan saf, serta menjaga ketertiban, kekhusyukan, dan kebersihan masjid."}
 
+Masjid Percontohan Amal Usaha Muhammadiyah (AUM)
+
 Portal Resmi Masjid Kampus UMS:
-https://masjidums.vercel.app`;
+https://masjidums.vercel.app/?s=jumat`;
     }
 
     // Susun daftar petugas shalat jumat untuk seluruh 6 masjid
@@ -454,7 +456,7 @@ Jamaah diimbau hadir lebih awal sebelum adzan berkumandang, merapatkan saf, sert
 Masjid Percontohan Amal Usaha Muhammadiyah (AUM)
 
 Portal Resmi Masjid Kampus UMS:
-https://masjidums.vercel.app`;
+https://masjidums.vercel.app/?s=jumat`;
   };
 
   const copyShareTextToClipboard = async (scope: "active" | "all" = shareScope) => {
@@ -491,7 +493,7 @@ https://masjidums.vercel.app`;
   };
 
   const handleOpenShareModal = () => {
-    setShareScope("active");
+    setShareScope("all");
     setIsShareModalOpen(true);
   };
 
@@ -499,9 +501,27 @@ https://masjidums.vercel.app`;
     const text = getShareText(shareScope);
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
       try {
+        const res = await fetch("/images/logo/logo-masjid.png");
+        if (res.ok) {
+          const blob = await res.blob();
+          const file = new File([blob], "logo-masjid-ums.png", { type: "image/png" });
+          if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: "Masjid Kampus UMS - Universitas Muhammadiyah Surakarta",
+              text,
+              files: [file],
+            });
+            return;
+          }
+        }
+      } catch {
+        // fallback to text-only share below
+      }
+      try {
         await navigator.share({
-          title: `Jadwal Petugas Shalat Jumat - ${activeMosqueInfo.name}`,
+          title: "Masjid Kampus UMS - Universitas Muhammadiyah Surakarta",
           text,
+          url: "https://masjidums.vercel.app/?s=jumat",
         });
         return;
       } catch {
@@ -684,33 +704,22 @@ https://masjidums.vercel.app`;
                 </div>
 
                 {/* Share Action inside Khatib card */}
-                <div className="mt-3.5 pt-3 border-t border-stone-200/80 flex flex-wrap items-center justify-start gap-2.5">
+                <div className="mt-3.5 pt-3 border-t border-stone-200/80 flex items-center justify-start">
                   <button
                     type="button"
                     onClick={handleOpenShareModal}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
                     title={isEn ? "Share Friday Schedule" : "Bagikan Jadwal Jumat"}
                   >
+                    <Image
+                      src="/images/logo/logo-masjid.png"
+                      alt="Logo UMS"
+                      width={18}
+                      height={18}
+                      className="w-4 h-4 object-contain shrink-0"
+                    />
                     <Share2 className="w-3.5 h-3.5 text-emerald-200" />
                     <span>{isEn ? "Share" : "Bagikan"}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => copyShareTextToClipboard("active")}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-xs font-semibold transition-all shadow-2xs cursor-pointer active:scale-95"
-                    title={isEn ? "Copy Schedule Text" : "Salin Teks Jadwal"}
-                  >
-                    {copiedShare ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        <span className="text-emerald-700 font-bold">{isEn ? "Copied!" : "Tersalin!"}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5 text-stone-500" />
-                        <span>{isEn ? "Copy Schedule" : "Salin Jadwal"}</span>
-                      </>
-                    )}
                   </button>
                 </div>
               </div>
@@ -1032,11 +1041,17 @@ https://masjidums.vercel.app`;
             className="relative w-full max-w-xl bg-white rounded-3xl border border-stone-200 shadow-2xl p-6 sm:p-7 max-h-[90vh] flex flex-col text-stone-900"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
+            {/* Modal Header with Official UMS Logo */}
             <div className="flex items-start justify-between pb-4 border-b border-stone-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-700/10 text-emerald-700 flex items-center justify-center shrink-0">
-                  <Share2 className="w-5 h-5" />
+                <div className="w-11 h-11 rounded-2xl bg-[#FAF8F5] border border-stone-200 p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
+                  <Image
+                    src="/images/logo/logo-masjid.png"
+                    alt="Logo Universitas Muhammadiyah Surakarta"
+                    width={36}
+                    height={36}
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <div>
                   <h3 className="text-lg sm:text-xl font-bold text-stone-900 font-serif">
@@ -1044,8 +1059,8 @@ https://masjidums.vercel.app`;
                   </h3>
                   <p className="text-xs text-stone-500 mt-0.5">
                     {isEn
-                      ? "Copy or send the official Friday sermon & prayer schedule to WhatsApp"
-                      : "Salin atau kirim susunan resmi petugas Shalat Jumat ke grup WhatsApp"}
+                      ? "Official UMS Mosque Portal thumbnail & schedule ready to share"
+                      : "Dilengkapi thumbnail Logo Resmi UMS saat dikirim ke grup WhatsApp"}
                   </p>
                 </div>
               </div>
@@ -1059,19 +1074,8 @@ https://masjidums.vercel.app`;
               </button>
             </div>
 
-            {/* Scope Selector: Active Mosque vs All 6 Mosques */}
+            {/* Scope Selector: All 6 Mosques vs Active Mosque */}
             <div className="py-3 flex flex-wrap items-center gap-2 border-b border-stone-100">
-              <button
-                type="button"
-                onClick={() => setShareScope("active")}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  shareScope === "active"
-                    ? "bg-[#003B73] text-white shadow-xs"
-                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-                }`}
-              >
-                {isEn ? `This Mosque (${activeMosqueInfo.shortName})` : `Masjid Ini (${activeMosqueInfo.shortName})`}
-              </button>
               <button
                 type="button"
                 onClick={() => setShareScope("all")}
@@ -1083,16 +1087,53 @@ https://masjidums.vercel.app`;
               >
                 {isEn ? "All 6 UMS Mosques" : "Semua 6 Masjid Kampus UMS"}
               </button>
+              <button
+                type="button"
+                onClick={() => setShareScope("active")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  shareScope === "active"
+                    ? "bg-[#003B73] text-white shadow-xs"
+                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                }`}
+              >
+                {isEn ? `This Mosque (${activeMosqueInfo.shortName})` : `Masjid Ini (${activeMosqueInfo.shortName})`}
+              </button>
             </div>
 
-            {/* Preview Box */}
-            <div className="my-4 flex-1 overflow-y-auto bg-[#FAF8F5] border border-stone-200 rounded-2xl p-4 max-h-64">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1.5">
-                {isEn ? "Message Preview" : "Pratinjau Pesan Siap Kirim"}
+            {/* Preview Box with WhatsApp UMS Logo Thumbnail Card */}
+            <div className="my-4 flex-1 overflow-y-auto bg-[#FAF8F5] border border-stone-200 rounded-2xl p-4 max-h-72 space-y-3">
+              {/* Simulated WhatsApp Link Preview Thumbnail Card with UMS Logo */}
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-stone-200/90 shadow-2xs">
+                <div className="w-14 h-14 rounded-xl bg-[#FAF8F5] border border-stone-200 p-1.5 flex items-center justify-center shrink-0">
+                  <Image
+                    src="/images/logo/logo-masjid.png"
+                    alt="Thumbnail Logo UMS"
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-stone-900 truncate">
+                    Masjid Kampus UMS - Universitas Muhammadiyah Surakarta
+                  </div>
+                  <div className="text-[11px] text-stone-600 line-clamp-2 leading-snug mt-0.5">
+                    Portal resmi informasi dan peribadatan 6 Masjid Kampus UMS. Jadwal Shalat Jumat, kajian, ruang ibadah digital &amp; presensi berjamaah.
+                  </div>
+                  <div className="text-[10px] font-mono text-emerald-700 font-semibold mt-0.5 truncate">
+                    masjidums.vercel.app
+                  </div>
+                </div>
               </div>
-              <pre className="text-xs text-stone-800 whitespace-pre-wrap font-sans leading-relaxed select-all">
-                {getShareText(shareScope)}
-              </pre>
+
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1.5">
+                  {isEn ? "Message Preview" : "Pratinjau Teks Pesan"}
+                </div>
+                <pre className="text-xs text-stone-800 whitespace-pre-wrap font-sans leading-relaxed select-all">
+                  {getShareText(shareScope)}
+                </pre>
+              </div>
             </div>
 
             {/* Action Buttons */}
