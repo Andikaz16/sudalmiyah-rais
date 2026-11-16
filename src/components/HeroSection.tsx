@@ -50,7 +50,7 @@ const HERO_SLIDES: HeroSlide[] = [
     mosqueName: "Masjid Ma'had Abu Bakar Ash-Shiddiq",
     description:
       "Pusat dirasat Islamiyah dan bahasa Arab Ma'had Abu bakar Ash-Shiddiq yang sekarang statusnya menjadi Amal Usaha Muhammadiyah (AUM) di lingkungan UMS",
-    objectPosition: "object-[center_40%]",
+    objectPosition: "object-center",
   },
   {
     id: "munajat-shabran",
