@@ -800,66 +800,10 @@ https://masjidums.vercel.app/?s=jumat`;
 
             </div>
 
-            {/* Info Hasil Infaq Shalat Jumat & Rekap Infaq Bulanan (Berdampingan di Seluruh Masjid) */}
-            <div className="mt-6 pt-6 border-t border-stone-200/80 grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-              {/* Sebelah Kiri: Informasi Infaq Shalat Jumat (Pekanan) */}
-              <div className="lg:col-span-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-[#FAF8F5] to-amber-50/30 border border-emerald-200/90 shadow-2xs flex flex-col justify-between gap-4">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-11 h-11 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                    <Coins className="w-5 h-5 text-emerald-100" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-700 text-white shadow-2xs">
-                        {t.friday.infaqCardTitle}
-                      </span>
-                      {activeSchedule.infaqPeriod ? (
-                        <span className="text-xs font-semibold text-stone-600">
-                          • {activeSchedule.infaqPeriod}
-                        </span>
-                      ) : (
-                        <span className="text-xs font-semibold text-stone-500">
-                          • {activeSchedule.date === "Jumat Pekan Ini" ? (isEn ? "This Friday" : "Jumat Pekan Ini") : activeSchedule.date}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap items-baseline gap-2 mt-1.5">
-                      <span className="text-xl sm:text-2xl font-black text-emerald-950 font-mono tracking-tight">
-                        {activeSchedule.infaqAmount !== undefined &&
-                        activeSchedule.infaqAmount !== null &&
-                        Number(activeSchedule.infaqAmount) > 0
-                          ? `Rp ${Number(activeSchedule.infaqAmount).toLocaleString("id-ID")}`
-                          : (isEn ? "Being Calculated by Takmir" : "Dalam Penghitungan Takmir")}
-                      </span>
-                      {activeSchedule.infaqAmount !== undefined &&
-                        activeSchedule.infaqAmount !== null &&
-                        Number(activeSchedule.infaqAmount) > 0 && (
-                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 border border-emerald-300 px-2 py-0.5 rounded-full">
-                            {isEn ? "Verified by Takmir" : "Terverifikasi Takmir"}
-                          </span>
-                        )}
-                    </div>
-                    {activeSchedule.infaqNotes && activeSchedule.infaqNotes.trim() !== "-" && (
-                      <p className="text-xs text-stone-600 mt-1.5 leading-relaxed">
-                        {activeSchedule.infaqNotes}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-end pt-2 border-t border-emerald-200/60">
-                  <a
-                    href="#donasi"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
-                  >
-                    <span>{isEn ? "Digital QRIS Infaq" : "Infaq Digital QRIS"}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
-
-              {/* Sebelah Kanan: Rekap Infaq Bulanan (Bulan Sebelumnya & Bulan Ini) */}
-              <div className="lg:col-span-7 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#003B73]/[0.04] via-[#FAF8F5] to-stone-50 border border-[#003B73]/20 shadow-2xs flex flex-col justify-between gap-3.5">
+            {/* Rekap Infaq Bulanan (Kiri) & Info Hasil Infaq Shalat Jumat (Kanan) */}
+            <div className="mt-6 pt-6 border-t border-stone-200/80 grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
+              {/* Sebelah Kiri: Rekap Infaq Bulanan (Bulan Sebelumnya & Bulan Ini) */}
+              <div className="md:col-span-7 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#003B73]/[0.04] via-[#FAF8F5] to-stone-50 border border-[#003B73]/20 shadow-2xs flex flex-col justify-between gap-3.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg bg-[#003B73] text-white flex items-center justify-center shrink-0">
@@ -932,6 +876,62 @@ https://masjidums.vercel.app/?s=jumat`;
                       </div>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Sebelah Kanan: Informasi Infaq Shalat Jumat (Jumat Pekan Ini) */}
+              <div className="md:col-span-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-[#FAF8F5] to-amber-50/30 border border-emerald-200/90 shadow-2xs flex flex-col justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-11 h-11 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                    <Coins className="w-5 h-5 text-emerald-100" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-700 text-white shadow-2xs">
+                        {t.friday.infaqCardTitle}
+                      </span>
+                      {activeSchedule.infaqPeriod ? (
+                        <span className="text-xs font-semibold text-stone-600">
+                          • {activeSchedule.infaqPeriod}
+                        </span>
+                      ) : (
+                        <span className="text-xs font-semibold text-stone-500">
+                          • {activeSchedule.date === "Jumat Pekan Ini" ? (isEn ? "This Friday" : "Jumat Pekan Ini") : activeSchedule.date}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-baseline gap-2 mt-1.5">
+                      <span className="text-xl sm:text-2xl font-black text-emerald-950 font-mono tracking-tight">
+                        {activeSchedule.infaqAmount !== undefined &&
+                        activeSchedule.infaqAmount !== null &&
+                        Number(activeSchedule.infaqAmount) > 0
+                          ? `Rp ${Number(activeSchedule.infaqAmount).toLocaleString("id-ID")}`
+                          : (isEn ? "Being Calculated by Takmir" : "Dalam Penghitungan Takmir")}
+                      </span>
+                      {activeSchedule.infaqAmount !== undefined &&
+                        activeSchedule.infaqAmount !== null &&
+                        Number(activeSchedule.infaqAmount) > 0 && (
+                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 border border-emerald-300 px-2 py-0.5 rounded-full">
+                            {isEn ? "Verified by Takmir" : "Terverifikasi Takmir"}
+                          </span>
+                        )}
+                    </div>
+                    {activeSchedule.infaqNotes && activeSchedule.infaqNotes.trim() !== "-" && (
+                      <p className="text-xs text-stone-600 mt-1.5 leading-relaxed">
+                        {activeSchedule.infaqNotes}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end pt-2 border-t border-emerald-200/60">
+                  <a
+                    href="#donasi"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                  >
+                    <span>{isEn ? "Digital QRIS Infaq" : "Infaq Digital QRIS"}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               </div>
             </div>
