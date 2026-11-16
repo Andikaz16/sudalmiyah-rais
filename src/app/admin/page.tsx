@@ -132,7 +132,7 @@ const ADMIN_TABS = [
   { id: "DOCUMENTS", label: "Pustaka & Dokumen", shortLabel: "Pustaka Dokumen", icon: BookOpen },
   { id: "BERITA_MASJID", label: "Warta & Berita Masjid", shortLabel: "Warta Berita", icon: Newspaper },
   { id: "KHUTBAH", label: "Naskah Khutbah", shortLabel: "Khutbah", icon: ScrollText },
-  { id: "MUTIARA_HADITS", label: "Mutiara Hadits & Infaq", shortLabel: "Mutiara Hadits", icon: Quote },
+  { id: "MUTIARA_HADITS", label: "Mutiara Al-Qur'an & Hadits", shortLabel: "Al-Qur'an & Hadits", icon: Quote },
 ] as const;
 
 // Client-side image compressor: optimizes uploads for fast transfer & avoids serverless payload limits
@@ -6619,7 +6619,7 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-stone-900 font-serif">
-                    Kelola Mutiara Hadits & Keutamaan Infaq
+                    Kelola Mutiara Al-Qur&apos;an &amp; Hadits
                   </h3>
                   <p className="text-xs text-stone-500">
                     Atur konten hadits nabawi, ayat Al-Qur&apos;an, terjemahan, dan fadhilah infaq yang tampil di Beranda dan Halaman Donasi Infaq.

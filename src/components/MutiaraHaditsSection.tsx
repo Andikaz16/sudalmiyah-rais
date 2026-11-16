@@ -225,8 +225,8 @@ export default function MutiaraHaditsSection() {
     }).format(today);
 
     const title = isEn
-      ? `*HADITH PEARL & WISDOM: ${hadith.themeEn || hadith.theme}*`
-      : `*MUTIARA HADITS & HIKMAH: ${hadith.theme}*`;
+      ? `*QUR'AN & HADITH PEARLS: ${hadith.themeEn || hadith.theme}*`
+      : `*MUTIARA AL-QUR'AN & HADITS: ${hadith.theme}*`;
     const translation = isEn ? (hadith.translationEn || hadith.translation) : hadith.translation;
     const fadhilah = isEn ? (hadith.fadhilahEn || hadith.fadhilah) : hadith.fadhilah;
     const donation = isEn
@@ -371,7 +371,7 @@ ${footer}`;
       ) {
         await navigator.share({
           files: [file],
-          title: `Mutiara Hadits: ${targetHadith.theme}`,
+          title: `Mutiara Al-Qur'an & Hadits: ${targetHadith.theme}`,
           text: customShareText,
         });
       } else {
@@ -415,8 +415,8 @@ ${footer}`;
         const targetHadith = hadiths.find((h) => h.id === selectedHadithId) || hadiths[0] || INFAQ_HADITHS[0];
         await navigator.share({
           title: isEn
-            ? `Hadith Pearl: ${targetHadith.themeEn || targetHadith.theme}`
-            : `Mutiara Hadits: ${targetHadith.theme}`,
+            ? `Qur'an & Hadith Pearls: ${targetHadith.themeEn || targetHadith.theme}`
+            : `Mutiara Al-Qur'an & Hadits: ${targetHadith.theme}`,
           text: customShareText,
           url: typeof window !== "undefined" ? window.location.href : undefined,
         });
@@ -461,7 +461,7 @@ ${footer}`;
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-amber-400/20 text-amber-200 border border-amber-300/40 uppercase tracking-wider flex items-center gap-1.5">
                 <Quote className="w-3.5 h-3.5 text-amber-300" />
-                {isEn ? "Hadith Pearls & Infaq Virtues" : "Mutiara Hadits & Keutamaan Infaq"}
+                {isEn ? "Qur'an & Hadith Pearls" : "Mutiara Al-Qur'an & Hadits"}
               </span>
               <span className="hidden sm:inline-block text-xs text-blue-200/80">
                 • {isEn ? (currentHadith.themeEn || currentHadith.theme) : currentHadith.theme}
@@ -472,7 +472,7 @@ ${footer}`;
               <button
                 onClick={() => handleOpenShare(currentHadithIndex)}
                 className="px-3 py-1 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 border border-amber-400/40 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                title={isEn ? "Share this Hadith Pearl" : "Bagikan Mutiara Hadits Ini"}
+                title={isEn ? "Share Qur'an & Hadith Pearl" : "Bagikan Mutiara Al-Qur'an & Hadits Ini"}
               >
                 <Share2 className="w-3.5 h-3.5 text-amber-300" />
                 <span className="hidden sm:inline">{isEn ? "Share" : "Bagikan"}</span>
@@ -517,13 +517,13 @@ ${footer}`;
               <span className="hidden sm:inline">{isEn ? "Previous" : "Sebelumnya"}</span>
             </button>
 
-            {/* Bagikan Mutiara Hadits Button */}
+            {/* Bagikan Mutiara Al-Qur'an & Hadits Button */}
             <button
               onClick={() => handleOpenShare(currentHadithIndex)}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 active:scale-95 text-stone-950 text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
             >
               <Share2 className="w-4 h-4 text-stone-950" />
-              <span>{isEn ? "Share Hadith Pearl" : "Bagikan Mutiara Hadits"}</span>
+              <span>{isEn ? "Share Qur'an & Hadith" : "Bagikan Mutiara Al-Qur'an & Hadits"}</span>
             </button>
 
             <button
@@ -547,7 +547,7 @@ ${footer}`;
             <div className="flex items-start justify-between pb-4 border-b border-stone-100">
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-stone-900 font-serif">
-                  {isEn ? "Share Hadith Pearl" : "Bagikan Mutiara Hadits"}
+                  {isEn ? "Share Qur'an & Hadith Pearls" : "Bagikan Mutiara Al-Qur'an & Hadits"}
                 </h3>
                 <p className="text-xs text-stone-500 mt-0.5">
                   {isEn

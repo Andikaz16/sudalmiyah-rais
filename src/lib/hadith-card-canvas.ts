@@ -123,10 +123,10 @@ export async function generateHadithPosterBlob(
   ctx.font = "600 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.fillText(`${hijriDate} (KHGT) / ${masehiDate}`, width / 2, badgeY + 22);
 
-  // 6. Hadith Theme / Title
+  // 6. Theme / Title
   ctx.fillStyle = "#FFFFFF";
-  ctx.font = "bold 30px 'Times New Roman', serif";
-  ctx.fillText(`MUTIARA HADITS: ${hadith.theme.toUpperCase()}`, width / 2, 345);
+  ctx.font = "bold 25px 'Times New Roman', serif";
+  wrapText(ctx, `MUTIARA AL-QUR'AN & HADITS: ${hadith.theme.toUpperCase()}`, width / 2, 342, 920, 32, "center");
 
   // 7. Arabic Text (Centered, Gold Highlight)
   ctx.fillStyle = "#FEF08A"; // Soft Gold Arabic
