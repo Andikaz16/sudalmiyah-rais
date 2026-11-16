@@ -230,18 +230,30 @@ export function getPopupRemainingTime(popup: { expiresAt?: string | null } | nul
 
 export type TransactionType = "INCOME" | "EXPENSE";
 
+export type FinancialCategory =
+  | "INFAQ_JUMAT"
+  | "SEDEKAH_SUBUH"
+  | "WAKAF_RENOVASI"
+  | "PEMBANGUNAN"
+  | "OPERASIONAL"
+  | "HONORARIUM"
+  | "KEGIATAN_SOSIAL"
+  | "LAINNYA";
+
 export interface FinancialRecord {
   id: string;
   title: string;
   type: TransactionType;
-  category: "INFAQ_JUMAT" | "SEDEKAH_SUBUH" | "WAKAF_RENOVASI" | "OPERASIONAL" | "HONORARIUM" | "KEGIATAN_SOSIAL";
+  category: FinancialCategory;
   amount: number;
   date: string;
+  mosqueName?: string;
   donorName?: string;
   proofUrl?: string;
   description: string;
   isVerified: boolean;
   verifiedBy?: string;
+  updatedAt?: string;
 }
 
 export interface DonationCampaign {

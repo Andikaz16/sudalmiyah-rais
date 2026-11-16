@@ -12,6 +12,7 @@ import {
   BookOpen,
   ScrollText,
   Globe,
+  Wallet,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -213,6 +214,31 @@ export default function Navbar() {
                               </div>
                             </div>
                           </Link>
+
+                          <Link
+                            href="/layanan/keuangan"
+                            onClick={() => setLayananDropdownOpen(false)}
+                            className={`p-2.5 rounded-xl flex items-start gap-3 transition-colors ${
+                              pathname === "/layanan/keuangan"
+                                ? "bg-stone-100 text-[#003B73]"
+                                : "hover:bg-stone-50 text-stone-800"
+                            }`}
+                          >
+                            <div className="p-2 rounded-lg bg-[#003B73]/10 text-[#003B73] shrink-0 mt-0.5">
+                              <Wallet className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <div className="text-xs font-bold leading-tight flex items-center gap-1.5">
+                                <span>{t.navbar.financialReport}</span>
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-[#003B73]/10 text-[#003B73] border border-[#003B73]/20">
+                                  Transparan
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-stone-500 mt-0.5 leading-snug">
+                                {t.navbar.financialReportDesc}
+                              </div>
+                            </div>
+                          </Link>
                         </div>
                       </div>
                     )}
@@ -398,6 +424,23 @@ export default function Navbar() {
                 pathname === "/layanan/khutbah" ? "bg-white/20 text-white" : "bg-emerald-100 text-emerald-800"
               }`}>
                 Resmi
+              </span>
+            </Link>
+            <Link
+              href="/layanan/keuangan"
+              onClick={() => setIsOpen(false)}
+              className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold ${
+                pathname === "/layanan/keuangan" ? "bg-[#003B73] text-white" : "text-stone-800 hover:bg-white"
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Wallet className="w-3.5 h-3.5" />
+                <span>{t.navbar.financialReport}</span>
+              </div>
+              <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                pathname === "/layanan/keuangan" ? "bg-white/20 text-white" : "bg-[#003B73]/10 text-[#003B73]"
+              }`}>
+                Transparan
               </span>
             </Link>
           </div>

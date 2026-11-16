@@ -1,38 +1,70 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, connection } from "next/server";
 import { z } from "zod";
-import { getDbAsync, logSecurityEvent, saveDb } from "@/lib/db";
+import { getDbAsync, logSecurityEvent, saveDbFields } from "@/lib/db";
 import { checkRateLimit, sanitizeString } from "@/lib/security";
 import { FinancialRecord } from "@/lib/types";
 
 const donationSubmitSchema = z.object({
   donorName: z.string().min(2).max(100),
-  category: z.enum(["INFAQ_JUMAT", "SEDEKAH_SUBUH", "WAKAF_RENOVASI", "OPERASIONAL", "HONORARIUM", "KEGIATAN_SOSIAL"]),
+  category: z.enum([
+    "INFAQ_JUMAT",
+    "SEDEKAH_SUBUH",
+    "WAKAF_RENOVASI",
+    "PEMBANGUNAN",
+    "OPERASIONAL",
+    "HONORARIUM",
+    "KEGIATAN_SOSIAL",
+    "LAINNYA",
+  ]),
   amount: z.number().int().min(10000, "Donasi minimal Rp 10.000").max(500000000),
   description: z.string().max(200).optional(),
+  mosqueName: z.string().max(120).optional(),
 });
 
+export function sortFinancesDesc(records: FinancialRecord[]): FinancialRecord[] {
+  return [...records].sort((a, b) => {
+    const timeDiff = new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime();
+    if (!Number.isNaN(timeDiff) && timeDiff !== 0) return timeDiff;
+    return 0;
+  });
+}
+
 export async function GET() {
+  await connection();
   const db = await getDbAsync();
+  const list = Array.isArray(db.finances) ? sortFinancesDesc(db.finances) : [];
 
-  const totalIncome = db.finances
+  const totalIncome = list
     .filter((f) => f.type === "INCOME" && f.isVerified)
-    .reduce((sum, f) => sum + f.amount, 0);
+    .reduce((sum, f) => sum + Number(f.amount || 0), 0);
 
-  const totalExpense = db.finances
+  const totalExpense = list
     .filter((f) => f.type === "EXPENSE" && f.isVerified)
-    .reduce((sum, f) => sum + f.amount, 0);
+    .reduce((sum, f) => sum + Number(f.amount || 0), 0);
 
   const currentBalance = totalIncome - totalExpense;
 
-  return NextResponse.json({
-    summary: {
-      totalIncome,
-      totalExpense,
-      currentBalance,
+  return NextResponse.json(
+    {
+      success: true,
+      summary: {
+        totalIncome,
+        totalExpense,
+        currentBalance,
+        totalTransactions: list.length,
+      },
+      campaigns: db.campaigns || [],
+      records: list,
+      recentTransactions: list.slice(0, 20),
     },
-    campaigns: db.campaigns,
-    recentTransactions: db.finances.slice(0, 20),
-  });
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    }
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -67,6 +99,7 @@ export async function POST(request: NextRequest) {
       category: data.category,
       amount: data.amount,
       date: new Date().toISOString().split("T")[0],
+      mosqueName: data.mosqueName ? sanitizeString(data.mosqueName) : "Masjid Hj. Sudalmiyah Rais",
       donorName: sanitizeString(data.donorName),
       description: data.description ? sanitizeString(data.description) : "Infaq digital melalui portal Masjid Sudalmiyah",
       isVerified: true,
@@ -74,7 +107,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.finances.unshift(newRecord);
-    await saveDb(db);
+    await saveDbFields(["finances"], { finances: db.finances });
 
     logSecurityEvent(
       "DONATION_SUBMITTED",

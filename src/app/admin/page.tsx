@@ -53,6 +53,10 @@ import {
   Eye,
   ScrollText,
   Quote,
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  Scale,
 } from "lucide-react";
 import { syncFridayHijriDate } from "@/lib/prayer-times";
 import {
@@ -74,6 +78,9 @@ import {
   KhutbahItem,
   InfaqHadith,
   MosqueBankInfo,
+  FinancialRecord,
+  FinancialCategory,
+  TransactionType,
 } from "@/lib/types";
 import { normalizeImageUrl } from "@/lib/utils";
 import { getHijriDate } from "@/lib/prayer-times";
@@ -117,6 +124,7 @@ const ADMIN_TABS = [
   { id: "PETUGAS_JUMAT", label: "Petugas Shalat Jumat", shortLabel: "Petugas Jumat", icon: Clock },
   { id: "QRIS_INFAQ", label: "Kelola QRIS Infaq", shortLabel: "QRIS Infaq", icon: QrCode },
   { id: "REKENING_MASJID", label: "Rekening & QRIS 6 Masjid", shortLabel: "Rekening 6 Masjid", icon: Coins },
+  { id: "KEUANGAN_MASJID", label: "Laporan Keuangan Masjid", shortLabel: "Keuangan", icon: Wallet },
   { id: "REGISTRATIONS", label: "Presensi Kehadiran Agenda", shortLabel: "Presensi Agenda", icon: Users },
   { id: "ABSENSI_SHALAT", label: "Absensi Shalat Berjamaah", shortLabel: "Absensi Shalat", icon: CheckCircle2 },
   { id: "FEEDBACK", label: "Kotak Saran & Aspirasi", shortLabel: "Kotak Saran", icon: MessageSquare },
@@ -192,7 +200,7 @@ async function compressImageForUpload(
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REKENING_MASJID" | "REGISTRATIONS" | "ABSENSI_SHALAT" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID" | "KHUTBAH" | "MUTIARA_HADITS"
+    "AGENDAS" | "PETUGAS_JUMAT" | "QRIS_INFAQ" | "REKENING_MASJID" | "KEUANGAN_MASJID" | "REGISTRATIONS" | "ABSENSI_SHALAT" | "FEEDBACK" | "POPUP_BANNER" | "DOCUMENTS" | "BERITA_MASJID" | "KHUTBAH" | "MUTIARA_HADITS"
   >("AGENDAS");
 
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -473,6 +481,37 @@ export default function AdminDashboardPage() {
   const [bankSaveSuccess, setBankSaveSuccess] = useState(false);
   const activeBankMosqueMeta = ADMIN_MOSQUES.find((m) => m.id === selectedBankMosqueId) || ADMIN_MOSQUES[0];
 
+  // Laporan Keuangan Masjid State
+  const [financeRecords, setFinanceRecords] = useState<FinancialRecord[]>([]);
+  const [loadingFinances, setLoadingFinances] = useState(false);
+  const [savingFinance, setSavingFinance] = useState(false);
+  const [editingFinanceId, setEditingFinanceId] = useState<string | null>(null);
+  const [financeFilterType, setFinanceFilterType] = useState<"ALL" | TransactionType>("ALL");
+  const [financeSearch, setFinanceSearch] = useState("");
+  const [financeForm, setFinanceForm] = useState<{
+    title: string;
+    type: TransactionType;
+    category: FinancialCategory;
+    amount: string;
+    date: string;
+    mosqueName: string;
+    donorName: string;
+    description: string;
+    isVerified: boolean;
+    verifiedBy: string;
+  }>({
+    title: "",
+    type: "INCOME",
+    category: "INFAQ_JUMAT",
+    amount: "",
+    date: "",
+    mosqueName: "Masjid Hj. Sudalmiyah Rais",
+    donorName: "",
+    description: "",
+    isVerified: true,
+    verifiedBy: "Bendahara Takmir",
+  });
+
   // Modal new agenda state
   const [isNewAgendaOpen, setIsNewAgendaOpen] = useState(false);
   const [newAgenda, setNewAgenda] = useState({
@@ -700,7 +739,7 @@ export default function AdminDashboardPage() {
 
   const loadData = async () => {
     try {
-      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes, newsRes, khutbahRes, hadithRes, bankRes] = await Promise.all([
+      const [statsRes, agendaRes, fridayRes, qrisRes, popupRes, docRes, statusRes, newsRes, khutbahRes, hadithRes, bankRes, financeRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch(`/api/agendas?t=${Date.now()}`, { cache: "no-store" }),
         fetch("/api/friday-schedule"),
@@ -712,6 +751,7 @@ export default function AdminDashboardPage() {
         fetch(`/api/admin/khutbah?t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/admin/infaq-hadiths?t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/mosque-bank-accounts?t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/admin/finances?t=${Date.now()}`, { cache: "no-store" }),
       ]);
 
       if (statusRes.ok) {
@@ -830,8 +870,150 @@ export default function AdminDashboardPage() {
         const hadithJson = await hadithRes.json();
         setHadithList(hadithJson.hadiths || []);
       }
+      if (financeRes && financeRes.ok) {
+        const financeJson = await financeRes.json();
+        setFinanceRecords(financeJson.records || []);
+      }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const resetFinanceForm = () => {
+    setEditingFinanceId(null);
+    setFinanceForm({
+      title: "",
+      type: "INCOME",
+      category: "INFAQ_JUMAT",
+      amount: "",
+      date: new Date().toISOString().split("T")[0],
+      mosqueName: "Masjid Hj. Sudalmiyah Rais",
+      donorName: "",
+      description: "",
+      isVerified: true,
+      verifiedBy: "Bendahara Takmir",
+    });
+  };
+
+  const loadFinanceList = async () => {
+    setLoadingFinances(true);
+    try {
+      const res = await fetch(`/api/admin/finances?t=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setFinanceRecords(data.records || []);
+      }
+    } catch (err) {
+      console.error("Gagal memuat data keuangan:", err);
+    } finally {
+      setLoadingFinances(false);
+    }
+  };
+
+  const handleSaveFinance = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const numericAmount = Number(financeForm.amount);
+    if (!numericAmount || numericAmount < 100) {
+      alert("Masukkan nominal transaksi yang valid (minimal Rp 100).");
+      return;
+    }
+    setSavingFinance(true);
+    try {
+      const method = editingFinanceId ? "PUT" : "POST";
+      const payload = {
+        ...(editingFinanceId ? { id: editingFinanceId } : {}),
+        title: financeForm.title.trim(),
+        type: financeForm.type,
+        category: financeForm.category,
+        amount: Math.round(numericAmount),
+        date: financeForm.date,
+        mosqueName: financeForm.mosqueName,
+        donorName: financeForm.donorName.trim(),
+        description: financeForm.description.trim(),
+        isVerified: financeForm.isVerified,
+        verifiedBy: financeForm.verifiedBy.trim() || "Bendahara Takmir",
+      };
+
+      const res = await fetch("/api/admin/finances", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menyimpan transaksi keuangan.");
+
+      if (Array.isArray(data.records)) {
+        setFinanceRecords(data.records);
+      }
+      if (data.summary) {
+        setStats((prev) =>
+          prev
+            ? {
+                ...prev,
+                totalIncome: data.summary.totalIncome,
+                totalExpense: data.summary.totalExpense,
+                currentBalance: data.summary.currentBalance,
+              }
+            : prev
+        );
+      }
+      resetFinanceForm();
+      triggerPublishNotification(
+        editingFinanceId ? "Transaksi Keuangan Diperbarui!" : "Transaksi Keuangan Ditambahkan!",
+        `Catatan ${payload.type === "INCOME" ? "Pemasukan" : "Pengeluaran"} Rp ${payload.amount.toLocaleString("id-ID")} telah dipublikasikan di halaman Laporan Keuangan Masjid.`
+      );
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menyimpan laporan keuangan.");
+    } finally {
+      setSavingFinance(false);
+    }
+  };
+
+  const handleEditFinance = (item: FinancialRecord) => {
+    setEditingFinanceId(item.id);
+    setFinanceForm({
+      title: item.title || "",
+      type: item.type || "INCOME",
+      category: item.category || "INFAQ_JUMAT",
+      amount: String(item.amount || ""),
+      date: item.date || new Date().toISOString().split("T")[0],
+      mosqueName: item.mosqueName || "Masjid Hj. Sudalmiyah Rais",
+      donorName: item.donorName || "",
+      description: item.description || "",
+      isVerified: item.isVerified !== false,
+      verifiedBy: item.verifiedBy || "Bendahara Takmir",
+    });
+    window.scrollTo({ top: 200, behavior: "smooth" });
+  };
+
+  const handleDeleteFinance = async (id: string, title: string) => {
+    if (!confirm(`Hapus catatan transaksi "${title}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/finances?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus catatan transaksi.");
+      if (Array.isArray(data.records)) {
+        setFinanceRecords(data.records);
+      }
+      if (data.summary) {
+        setStats((prev) =>
+          prev
+            ? {
+                ...prev,
+                totalIncome: data.summary.totalIncome,
+                totalExpense: data.summary.totalExpense,
+                currentBalance: data.summary.currentBalance,
+              }
+            : prev
+        );
+      }
+      if (editingFinanceId === id) {
+        resetFinanceForm();
+      }
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menghapus catatan.");
     }
   };
 
@@ -858,6 +1040,9 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
+    setFinanceForm((prev) =>
+      prev.date ? prev : { ...prev, date: new Date().toISOString().split("T")[0] }
+    );
     loadData();
     loadAdminFeedbacks();
   }, []);
@@ -2722,11 +2907,13 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
           <div className="bg-white rounded-2xl border border-stone-200 p-3 shadow-xs">
             <div className="flex items-center justify-between mb-1.5 px-0.5">
               <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
-                Menu Admin (11 Menu):
+                Menu Admin ({ADMIN_TABS.length} Menu):
               </span>
               <span className="text-[10px] font-semibold text-[#003B73]">
                 {activeTab === "FEEDBACK" && feedbackCounts.baru > 0
                   ? `${feedbackCounts.baru} Masukan Baru`
+                  : activeTab === "KEUANGAN_MASJID"
+                  ? `${financeRecords.length} Transaksi`
                   : activeTab === "BERITA_MASJID"
                   ? `${manualNewsList.length} Warta`
                   : activeTab === "KHUTBAH"
@@ -2824,6 +3011,11 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                   {tab.id === "MUTIARA_HADITS" && hadithList.length > 0 && (
                     <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
                       {hadithList.length}
+                    </span>
+                  )}
+                  {tab.id === "KEUANGAN_MASJID" && financeRecords.length > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-100 text-stone-600 font-bold">
+                      {financeRecords.length}
                     </span>
                   )}
                 </button>
@@ -6628,6 +6820,485 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
             </div>
           </div>
         )}
+
+        {/* TAB 13: LAPORAN KEUANGAN MASJID */}
+        {activeTab === "KEUANGAN_MASJID" && (() => {
+          const totalIncome = financeRecords
+            .filter((r) => r.type === "INCOME" && r.isVerified)
+            .reduce((sum, r) => sum + Number(r.amount || 0), 0);
+          const totalExpense = financeRecords
+            .filter((r) => r.type === "EXPENSE" && r.isVerified)
+            .reduce((sum, r) => sum + Number(r.amount || 0), 0);
+          const netBalance = totalIncome - totalExpense;
+
+          const categoryLabelMap: Record<FinancialCategory, string> = {
+            INFAQ_JUMAT: "Infaq Shalat Jumat",
+            SEDEKAH_SUBUH: "Sedekah Subuh",
+            WAKAF_RENOVASI: "Wakaf & Renovasi",
+            PEMBANGUNAN: "Pembangunan Masjid",
+            OPERASIONAL: "Operasional & Marbot",
+            HONORARIUM: "Honorarium Khatib / Dai",
+            KEGIATAN_SOSIAL: "Kajian & Kegiatan Sosial",
+            LAINNYA: "Keperluan Lainnya",
+          };
+
+          const filteredList = financeRecords.filter((item) => {
+            if (financeFilterType !== "ALL" && item.type !== financeFilterType) return false;
+            if (!financeSearch.trim()) return true;
+            const q = financeSearch.toLowerCase();
+            return (
+              item.title.toLowerCase().includes(q) ||
+              item.description.toLowerCase().includes(q) ||
+              (item.donorName || "").toLowerCase().includes(q) ||
+              (item.mosqueName || "").toLowerCase().includes(q)
+            );
+          });
+
+          return (
+            <div className="space-y-6 animate-fade-in">
+              {/* Top Info Header */}
+              <div className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-11 h-11 rounded-2xl bg-[#003B73]/10 text-[#003B73] flex items-center justify-center shrink-0">
+                    <Wallet className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-stone-900 font-serif">
+                      Kelola Laporan Keuangan Infaq Masjid
+                    </h2>
+                    <p className="text-xs text-stone-500 mt-0.5 leading-relaxed">
+                      Catat pemasukan uang infaq dan pengeluaran kas masjid beserta rincian penggunaannya. Data otomatis tampil di halaman publik Layanan &gt; Laporan Keuangan Masjid.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/layanan/keuangan"
+                  target="_blank"
+                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B73]/10 hover:bg-[#003B73]/20 text-[#003B73] text-xs font-bold border border-[#003B73]/20 transition-all shrink-0"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Lihat Tabel Publik</span>
+                </Link>
+              </div>
+
+              {/* 3 KPI Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white rounded-2xl border border-emerald-200 p-4 flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block">
+                      Total Pemasukan Terverifikasi
+                    </span>
+                    <span className="text-xl sm:text-2xl font-black text-emerald-900 font-mono mt-1 block">
+                      Rp {totalIncome.toLocaleString("id-ID")}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-rose-200 p-4 flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700 block">
+                      Total Pengeluaran Terverifikasi
+                    </span>
+                    <span className="text-xl sm:text-2xl font-black text-rose-900 font-mono mt-1 block">
+                      Rp {totalExpense.toLocaleString("id-ID")}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center">
+                    <TrendingDown className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-[#003B73]/25 p-4 flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#003B73] block">
+                      Saldo Kas Masjid Saat Ini
+                    </span>
+                    <span className="text-xl sm:text-2xl font-black text-[#003B73] font-mono mt-1 block">
+                      Rp {netBalance.toLocaleString("id-ID")}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-[#003B73]/10 text-[#003B73] flex items-center justify-center">
+                    <Scale className="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Input / Edit Form */}
+              <form
+                onSubmit={handleSaveFinance}
+                className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-7 shadow-xs space-y-5"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-3">
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-stone-900 font-serif">
+                      {editingFinanceId ? "Edit Catatan Transaksi Keuangan" : "Tambah Pemasukan / Pengeluaran Baru"}
+                    </h3>
+                    <p className="text-[11px] text-stone-500 mt-0.5">
+                      Isi detail pemasukan infaq atau pengeluaran kas beserta rincian peruntukannya.
+                    </p>
+                  </div>
+                  {editingFinanceId && (
+                    <button
+                      type="button"
+                      onClick={resetFinanceForm}
+                      className="px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold cursor-pointer"
+                    >
+                      Batal Edit
+                    </button>
+                  )}
+                </div>
+
+                {/* Type Toggle */}
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-2">
+                    1. Jenis Arus Kas
+                  </label>
+                  <div className="grid grid-cols-2 gap-3 max-w-md">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFinanceForm((prev) => ({
+                          ...prev,
+                          type: "INCOME",
+                          category:
+                            prev.category === "OPERASIONAL" || prev.category === "HONORARIUM"
+                              ? "INFAQ_JUMAT"
+                              : prev.category,
+                        }))
+                      }
+                      className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        financeForm.type === "INCOME"
+                          ? "bg-emerald-700 text-white border-emerald-700 shadow-sm"
+                          : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-emerald-50"
+                      }`}
+                    >
+                      <TrendingUp className="w-4 h-4" />
+                      <span>Pemasukan (Uang Masuk)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFinanceForm((prev) => ({
+                          ...prev,
+                          type: "EXPENSE",
+                          category:
+                            prev.category === "INFAQ_JUMAT" || prev.category === "SEDEKAH_SUBUH"
+                              ? "OPERASIONAL"
+                              : prev.category,
+                        }))
+                      }
+                      className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        financeForm.type === "EXPENSE"
+                          ? "bg-rose-700 text-white border-rose-700 shadow-sm"
+                          : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-rose-50"
+                      }`}
+                    >
+                      <TrendingDown className="w-4 h-4" />
+                      <span>Pengeluaran (Uang Keluar)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="md:col-span-2 lg:col-span-1">
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Judul / Nama Transaksi *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={financeForm.title}
+                      onChange={(e) => setFinanceForm({ ...financeForm, title: e.target.value })}
+                      placeholder={
+                        financeForm.type === "INCOME"
+                          ? "Contoh: Infaq Shalat Jumat Pekan III"
+                          : "Contoh: Pengadaan Alat Kebersihan & Karpet"
+                      }
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Kategori *
+                    </label>
+                    <select
+                      value={financeForm.category}
+                      onChange={(e) =>
+                        setFinanceForm({ ...financeForm, category: e.target.value as FinancialCategory })
+                      }
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs font-semibold"
+                    >
+                      {(Object.keys(categoryLabelMap) as FinancialCategory[]).map((cat) => (
+                        <option key={cat} value={cat}>
+                          {categoryLabelMap[cat]}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Nominal (Rp) *
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-2.5 text-xs font-bold text-stone-500">Rp</span>
+                      <input
+                        type="number"
+                        min="100"
+                        step="100"
+                        required
+                        value={financeForm.amount}
+                        onChange={(e) => setFinanceForm({ ...financeForm, amount: e.target.value })}
+                        placeholder="Contoh: 2500000"
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs font-mono font-bold"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Tanggal Transaksi *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={financeForm.date}
+                      onChange={(e) => setFinanceForm({ ...financeForm, date: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Masjid Terkait
+                    </label>
+                    <select
+                      value={financeForm.mosqueName}
+                      onChange={(e) => setFinanceForm({ ...financeForm, mosqueName: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"
+                    >
+                      {ADMIN_MOSQUES.map((m) => (
+                        <option key={m.id} value={m.name}>
+                          {m.name}
+                        </option>
+                      ))}
+                      <option value="Seluruh Masjid Kampus UMS">Seluruh Masjid Kampus UMS</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      {financeForm.type === "INCOME" ? "Sumber Dana / Donatur" : "Penerima / Pihak Terkait"}
+                    </label>
+                    <input
+                      type="text"
+                      value={financeForm.donorName}
+                      onChange={(e) => setFinanceForm({ ...financeForm, donorName: e.target.value })}
+                      placeholder={
+                        financeForm.type === "INCOME"
+                          ? "Contoh: Kotak Infaq Jamaah / Hamba Allah"
+                          : "Contoh: Toko Sarpras / Panitia Kajian"
+                      }
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Rincian Kegunaan / Keterangan Dana *
+                  </label>
+                  <textarea
+                    rows={2}
+                    required
+                    value={financeForm.description}
+                    onChange={(e) => setFinanceForm({ ...financeForm, description: e.target.value })}
+                    placeholder={
+                      financeForm.type === "INCOME"
+                        ? "Contoh: Perolehan kotak infaq Jumat lantai 1 & 2 serta transfer QRIS jamaah."
+                        : "Contoh: Digunakan untuk pembelian perlengkapan kebersihan wudhu, sabun lantai, dan insentif marbot pekan ini."
+                    }
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-stone-100">
+                  <div className="flex flex-wrap items-center gap-4">
+                    <label className="inline-flex items-center gap-2 text-xs font-semibold text-stone-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={financeForm.isVerified}
+                        onChange={(e) =>
+                          setFinanceForm({ ...financeForm, isVerified: e.target.checked })
+                        }
+                        className="rounded border-stone-300 text-[#003B73] focus:ring-[#003B73]"
+                      />
+                      <span>Tandai Sudah Terverifikasi Takmir (Masuk Total Saldo)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={financeForm.verifiedBy}
+                      onChange={(e) => setFinanceForm({ ...financeForm, verifiedBy: e.target.value })}
+                      placeholder="Verifikator (mis. Bendahara Takmir)"
+                      className="px-3 py-1.5 rounded-lg bg-stone-50 border border-stone-300 text-xs text-stone-800 w-48"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={savingFinance}
+                    className="px-7 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-md shadow-[#003B73]/20 disabled:opacity-50 cursor-pointer transition-all"
+                  >
+                    {savingFinance
+                      ? "Menyimpan..."
+                      : editingFinanceId
+                      ? "Simpan Perubahan Transaksi"
+                      : "Tambah ke Laporan Keuangan"}
+                  </button>
+                </div>
+              </form>
+
+              {/* Transaction List Table */}
+              <div className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {[
+                      { id: "ALL" as const, label: `Semua (${financeRecords.length})` },
+                      {
+                        id: "INCOME" as const,
+                        label: `Pemasukan (${financeRecords.filter((r) => r.type === "INCOME").length})`,
+                      },
+                      {
+                        id: "EXPENSE" as const,
+                        label: `Pengeluaran (${financeRecords.filter((r) => r.type === "EXPENSE").length})`,
+                      },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => setFinanceFilterType(f.id)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all ${
+                          financeFilterType === f.id
+                            ? "bg-[#003B73] text-white"
+                            : "bg-stone-100 text-stone-700 hover:bg-stone-200"
+                        }`}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-full sm:w-60">
+                      <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                      <input
+                        type="text"
+                        value={financeSearch}
+                        onChange={(e) => setFinanceSearch(e.target.value)}
+                        placeholder="Cari transaksi keuangan..."
+                        className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-stone-200 text-xs bg-stone-50 text-stone-900"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={loadFinanceList}
+                      disabled={loadingFinances}
+                      className="inline-flex items-center gap-1 text-xs text-stone-500 hover:text-stone-900 font-medium cursor-pointer shrink-0"
+                    >
+                      <RotateCcw className={`w-3.5 h-3.5 ${loadingFinances ? "animate-spin" : ""}`} />
+                      <span>Segarkan</span>
+                    </button>
+                  </div>
+                </div>
+
+                {filteredList.length === 0 ? (
+                  <div className="py-10 text-center text-xs text-stone-400">
+                    Belum ada transaksi keuangan pada filter ini.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-stone-50 border-b border-stone-200 text-[10px] font-bold uppercase tracking-wider text-stone-500">
+                          <th className="py-2.5 px-3">Tanggal</th>
+                          <th className="py-2.5 px-3">Jenis</th>
+                          <th className="py-2.5 px-3">Uraian &amp; Rincian Kegunaan</th>
+                          <th className="py-2.5 px-3 text-right">Nominal (Rp)</th>
+                          <th className="py-2.5 px-3 text-center">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-100">
+                        {filteredList.map((item) => {
+                          const isIncome = item.type === "INCOME";
+                          return (
+                            <tr key={item.id} className="hover:bg-stone-50/70 align-top">
+                              <td className="py-3 px-3 whitespace-nowrap font-medium text-stone-700">
+                                {item.date}
+                              </td>
+                              <td className="py-3 px-3 whitespace-nowrap">
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                    isIncome
+                                      ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                                      : "bg-rose-50 text-rose-800 border border-rose-200"
+                                  }`}
+                                >
+                                  {isIncome ? "Pemasukan" : "Pengeluaran"}
+                                </span>
+                                <span className="block text-[10px] text-stone-500 mt-1">
+                                  {categoryLabelMap[item.category] || item.category}
+                                </span>
+                              </td>
+                              <td className="py-3 px-3 max-w-md">
+                                <p className="font-bold text-stone-900">{item.title}</p>
+                                <p className="text-stone-600 mt-0.5">{item.description}</p>
+                                <p className="text-[10px] text-stone-500 mt-1">
+                                  {item.mosqueName || "Masjid Hj. Sudalmiyah Rais"}
+                                  {item.donorName ? ` • ${item.donorName}` : ""}
+                                </p>
+                              </td>
+                              <td
+                                className={`py-3 px-3 text-right font-mono font-bold whitespace-nowrap ${
+                                  isIncome ? "text-emerald-700" : "text-rose-700"
+                                }`}
+                              >
+                                {isIncome ? "+" : "-"} Rp {Number(item.amount).toLocaleString("id-ID")}
+                              </td>
+                              <td className="py-3 px-3">
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditFinance(item)}
+                                    className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/60 cursor-pointer"
+                                    title="Edit transaksi"
+                                  >
+                                    <Edit2 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteFinance(item.id, item.title)}
+                                    className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/60 cursor-pointer"
+                                    title="Hapus transaksi"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
       </main>
 
       {/* Modal Responding to Feedback */}

@@ -26,6 +26,7 @@ import {
   Building2,
   Layers,
   MapPin,
+  Wallet,
 } from "lucide-react";
 import { FacilityBooking } from "@/lib/types";
 
@@ -177,7 +178,29 @@ export default function LayananPage() {
 
         {/* Quick Nav Cards: Layanan Masjid */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link
+              href="/layanan/keuangan"
+              className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200/90 shadow-sm hover:shadow-md hover:border-[#003B73] transition-all flex items-center gap-4 group"
+            >
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Wallet className="w-6 h-6" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-stone-900 group-hover:text-[#003B73] transition-colors truncate font-serif">
+                    Laporan Keuangan
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                    Baru
+                  </span>
+                </div>
+                <p className="text-xs text-stone-500 line-clamp-1 mt-0.5">
+                  Tabel infaq masuk &amp; keluar masjid
+                </p>
+              </div>
+            </Link>
+
             <Link
               href="/layanan/khutbah"
               className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200/90 shadow-sm hover:shadow-md hover:border-[#003B73] transition-all flex items-center gap-4 group"
@@ -186,14 +209,9 @@ export default function LayananPage() {
                 <BookOpen className="w-6 h-6" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-stone-900 group-hover:text-[#003B73] transition-colors truncate font-serif">
-                    Naskah Khutbah Jum&apos;at
-                  </h3>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
-                    Baru
-                  </span>
-                </div>
+                <h3 className="text-sm font-bold text-stone-900 group-hover:text-[#003B73] transition-colors truncate font-serif">
+                  Naskah Khutbah Jum&apos;at
+                </h3>
                 <p className="text-xs text-stone-500 line-clamp-1 mt-0.5">
                   Suara Muhammadiyah &amp; Takmir UMS
                 </p>
