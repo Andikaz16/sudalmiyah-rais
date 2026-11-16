@@ -80,6 +80,12 @@ export interface FridayOfficerSchedule {
   infaqAmount?: number | null;
   infaqPeriod?: string;
   infaqNotes?: string;
+  monthlyInfaqPrevAmount?: number | null;
+  monthlyInfaqPrevPeriod?: string;
+  monthlyInfaqPrevNotes?: string;
+  monthlyInfaqCurrAmount?: number | null;
+  monthlyInfaqCurrPeriod?: string;
+  monthlyInfaqCurrNotes?: string;
 }
 
 

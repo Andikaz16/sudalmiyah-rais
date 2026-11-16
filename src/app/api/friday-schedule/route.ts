@@ -25,6 +25,12 @@ const updateFridaySchema = z.object({
   infaqAmount: z.number().nullable().optional(),
   infaqPeriod: z.string().max(100).optional().or(z.literal("")),
   infaqNotes: z.string().max(500).optional().or(z.literal("")),
+  monthlyInfaqPrevAmount: z.number().nullable().optional(),
+  monthlyInfaqPrevPeriod: z.string().max(100).optional().or(z.literal("")),
+  monthlyInfaqPrevNotes: z.string().max(500).optional().or(z.literal("")),
+  monthlyInfaqCurrAmount: z.number().nullable().optional(),
+  monthlyInfaqCurrPeriod: z.string().max(100).optional().or(z.literal("")),
+  monthlyInfaqCurrNotes: z.string().max(500).optional().or(z.literal("")),
 });
 
 export async function GET(request: NextRequest) {
@@ -128,6 +134,30 @@ export async function PUT(request: NextRequest) {
       infaqAmount: data.infaqAmount !== undefined ? data.infaqAmount : (existing?.infaqAmount ?? null),
       infaqPeriod: data.infaqPeriod !== undefined ? sanitizeString(data.infaqPeriod) : (existing?.infaqPeriod || ""),
       infaqNotes: data.infaqNotes !== undefined ? sanitizeString(data.infaqNotes) : (existing?.infaqNotes || ""),
+      monthlyInfaqPrevAmount:
+        data.monthlyInfaqPrevAmount !== undefined
+          ? data.monthlyInfaqPrevAmount
+          : (existing?.monthlyInfaqPrevAmount ?? null),
+      monthlyInfaqPrevPeriod:
+        data.monthlyInfaqPrevPeriod !== undefined
+          ? sanitizeString(data.monthlyInfaqPrevPeriod)
+          : (existing?.monthlyInfaqPrevPeriod || ""),
+      monthlyInfaqPrevNotes:
+        data.monthlyInfaqPrevNotes !== undefined
+          ? sanitizeString(data.monthlyInfaqPrevNotes)
+          : (existing?.monthlyInfaqPrevNotes || ""),
+      monthlyInfaqCurrAmount:
+        data.monthlyInfaqCurrAmount !== undefined
+          ? data.monthlyInfaqCurrAmount
+          : (existing?.monthlyInfaqCurrAmount ?? null),
+      monthlyInfaqCurrPeriod:
+        data.monthlyInfaqCurrPeriod !== undefined
+          ? sanitizeString(data.monthlyInfaqCurrPeriod)
+          : (existing?.monthlyInfaqCurrPeriod || ""),
+      monthlyInfaqCurrNotes:
+        data.monthlyInfaqCurrNotes !== undefined
+          ? sanitizeString(data.monthlyInfaqCurrNotes)
+          : (existing?.monthlyInfaqCurrNotes || ""),
       updatedAt: new Date().toISOString(),
     };
 
@@ -175,9 +205,10 @@ export async function PUT(request: NextRequest) {
       db.fridaySchedule = updatedSchedule;
     }
 
-    await saveDbFields(["fridaySchedule", "fridaySchedules"], {
+    await saveDbFields(["fridaySchedule", "fridaySchedules", "fridayScheduleHistory"], {
       fridaySchedule: db.fridaySchedule,
       fridaySchedules: db.fridaySchedules,
+      fridayScheduleHistory: db.fridayScheduleHistory || [],
     });
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";

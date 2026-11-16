@@ -3494,6 +3494,127 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                   </div>
                 </div>
 
+                {/* Rekap Infaq Bulanan (2 Periode: Bulan Sebelumnya & Bulan Ini) */}
+                <div className="p-5 rounded-2xl bg-[#003B73]/[0.04] border border-[#003B73]/20 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-[#003B73]/15 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-[#003B73]" />
+                      <span className="text-xs font-bold text-[#003B73] uppercase tracking-wider">
+                        Rekap Infaq Bulanan (Bulan Sebelumnya & Bulan Ini)
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-[#003B73]/80 font-semibold">
+                      Tampil di Sebelah Infaq Jumat ({activeMosqueMeta.name})
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      {
+                        key: "prev",
+                        title: "1. Infaq Bulan Sebelumnya",
+                        badge: "Bulan Lalu",
+                        amountField: "monthlyInfaqPrevAmount" as const,
+                        periodField: "monthlyInfaqPrevPeriod" as const,
+                        notesField: "monthlyInfaqPrevNotes" as const,
+                        periodPlaceholder: "Contoh: Oktober 2026",
+                        amountPlaceholder: "Contoh: 24500000",
+                        notesPlaceholder: "Contoh: Total akumulasi infaq bulan lalu",
+                      },
+                      {
+                        key: "curr",
+                        title: "2. Infaq Bulan Ini",
+                        badge: "Bulan Berjalan",
+                        amountField: "monthlyInfaqCurrAmount" as const,
+                        periodField: "monthlyInfaqCurrPeriod" as const,
+                        notesField: "monthlyInfaqCurrNotes" as const,
+                        periodPlaceholder: "Contoh: November 2026",
+                        amountPlaceholder: "Contoh: 12750000",
+                        notesPlaceholder: "Contoh: Rekap berjalan s.d. pekan ini",
+                      },
+                    ].map((cfg) => {
+                      const rawAmount = fridaySchedule[cfg.amountField];
+                      const periodVal = fridaySchedule[cfg.periodField] || "";
+                      const notesVal = fridaySchedule[cfg.notesField] || "";
+                      return (
+                        <div
+                          key={cfg.key}
+                          className="p-4 rounded-xl bg-white border border-stone-200 space-y-3 shadow-2xs"
+                        >
+                          <div className="flex items-center justify-between gap-2 pb-2 border-b border-stone-100">
+                            <span className="text-xs font-bold text-stone-900">{cfg.title}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#003B73]/10 text-[#003B73]">
+                              {cfg.badge}
+                            </span>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-stone-700 mb-1">
+                              Nama Bulan / Periode
+                            </label>
+                            <input
+                              type="text"
+                              placeholder={cfg.periodPlaceholder}
+                              value={periodVal}
+                              onChange={(e) =>
+                                setFridaySchedule({
+                                  ...fridaySchedule,
+                                  [cfg.periodField]: e.target.value,
+                                })
+                              }
+                              className="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-300 text-stone-900 text-xs"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-stone-700 mb-1">
+                              Total Perolehan Infaq (Rp)
+                            </label>
+                            <div className="relative">
+                              <span className="absolute left-3 top-2 text-xs font-bold text-stone-500">
+                                Rp
+                              </span>
+                              <input
+                                type="number"
+                                min="0"
+                                step="1000"
+                                placeholder={cfg.amountPlaceholder}
+                                value={rawAmount !== undefined && rawAmount !== null ? rawAmount : ""}
+                                onChange={(e) =>
+                                  setFridaySchedule({
+                                    ...fridaySchedule,
+                                    [cfg.amountField]:
+                                      e.target.value === "" ? null : Number(e.target.value),
+                                  })
+                                }
+                                className="w-full pl-9 pr-3 py-2 rounded-lg bg-stone-50 border border-stone-300 text-stone-900 text-xs font-mono font-bold"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-stone-700 mb-1">
+                              Keterangan Singkat (Opsional)
+                            </label>
+                            <input
+                              type="text"
+                              placeholder={cfg.notesPlaceholder}
+                              value={notesVal}
+                              onChange={(e) =>
+                                setFridaySchedule({
+                                  ...fridaySchedule,
+                                  [cfg.notesField]: e.target.value,
+                                })
+                              }
+                              className="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-300 text-stone-900 text-xs"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* Submit Action */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
                   <span className="text-xs text-stone-500 text-center sm:text-left">

@@ -362,6 +362,23 @@ export default function FridayScheduleSection() {
     return item.mosqueId === historyFilterMosque;
   });
 
+  const formatShareInfaqLines = (sched?: FridayOfficerSchedule) => {
+    if (!sched) return "";
+    const lines: string[] = [];
+    if (sched.infaqAmount && Number(sched.infaqAmount) > 0) {
+      lines.push(`• Infaq Jumat Lalu: Rp ${Number(sched.infaqAmount).toLocaleString("id-ID")}`);
+    }
+    if (sched.monthlyInfaqPrevAmount && Number(sched.monthlyInfaqPrevAmount) > 0) {
+      const label = sched.monthlyInfaqPrevPeriod || "Bulan Sebelumnya";
+      lines.push(`• Rekap Infaq ${label}: Rp ${Number(sched.monthlyInfaqPrevAmount).toLocaleString("id-ID")}`);
+    }
+    if (sched.monthlyInfaqCurrAmount && Number(sched.monthlyInfaqCurrAmount) > 0) {
+      const label = sched.monthlyInfaqCurrPeriod || "Bulan Ini";
+      lines.push(`• Rekap Infaq ${label}: Rp ${Number(sched.monthlyInfaqCurrAmount).toLocaleString("id-ID")}`);
+    }
+    return lines.length > 0 ? `\n${lines.join("\n")}` : "";
+  };
+
   const getShareText = (scope: "active" | "all" = shareScope) => {
     const activeDate =
       activeSchedule.date === "Jumat Pekan Ini"
@@ -384,10 +401,7 @@ export default function FridayScheduleSection() {
       const imam = activeSchedule.imamName || "Imam Shalat Jumat";
       const muadzin = activeSchedule.muadzinName || "Muadzin Shalat Jumat";
       const time = activeSchedule.time || "11:35 WIB";
-      const infaqStr =
-        activeSchedule.infaqAmount && Number(activeSchedule.infaqAmount) > 0
-          ? `\n• Infaq Jumat Lalu: Rp ${Number(activeSchedule.infaqAmount).toLocaleString("id-ID")}`
-          : "";
+      const infaqStr = formatShareInfaqLines(activeSchedule);
 
       return `*JADWAL PETUGAS SHALAT JUMAT*
 *${activeMosqueInfo.name.toUpperCase()} (${activeMosqueInfo.location})*
@@ -428,10 +442,7 @@ https://masjidums.vercel.app/?s=jumat`;
       const imam = sched?.imamName || "Imam Shalat Jumat";
       const muadzin = sched?.muadzinName || "Muadzin Shalat Jumat";
       const time = sched?.time || "11:35 WIB";
-      const infaqStr =
-        sched?.infaqAmount && Number(sched.infaqAmount) > 0
-          ? `\n• Infaq Jumat Lalu: Rp ${Number(sched.infaqAmount).toLocaleString("id-ID")}`
-          : "";
+      const infaqStr = formatShareInfaqLines(sched);
 
       return `${idx + 1}. *${m.name.toUpperCase()}*
 • Waktu Mulai: ${time}
@@ -789,14 +800,15 @@ https://masjidums.vercel.app/?s=jumat`;
 
             </div>
 
-            {/* Info Hasil Infaq Shalat Jumat (Tampil di Seluruh Masjid) */}
-            <div className="mt-6 pt-6 border-t border-stone-200/80">
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-[#FAF8F5] to-amber-50/30 border border-emerald-200/90 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="flex items-start sm:items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5 sm:mt-0">
+            {/* Info Hasil Infaq Shalat Jumat & Rekap Infaq Bulanan (Berdampingan di Seluruh Masjid) */}
+            <div className="mt-6 pt-6 border-t border-stone-200/80 grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+              {/* Sebelah Kiri: Informasi Infaq Shalat Jumat (Pekanan) */}
+              <div className="lg:col-span-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-[#FAF8F5] to-amber-50/30 border border-emerald-200/90 shadow-2xs flex flex-col justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-11 h-11 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
                     <Coins className="w-5 h-5 text-emerald-100" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-700 text-white shadow-2xs">
                         {t.friday.infaqCardTitle}
@@ -811,7 +823,7 @@ https://masjidums.vercel.app/?s=jumat`;
                         </span>
                       )}
                     </div>
-                    <div className="flex items-baseline gap-2.5 mt-1">
+                    <div className="flex flex-wrap items-baseline gap-2 mt-1.5">
                       <span className="text-xl sm:text-2xl font-black text-emerald-950 font-mono tracking-tight">
                         {activeSchedule.infaqAmount !== undefined &&
                         activeSchedule.infaqAmount !== null &&
@@ -827,15 +839,15 @@ https://masjidums.vercel.app/?s=jumat`;
                           </span>
                         )}
                     </div>
-                    {activeSchedule.infaqNotes && (
-                      <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    {activeSchedule.infaqNotes && activeSchedule.infaqNotes.trim() !== "-" && (
+                      <p className="text-xs text-stone-600 mt-1.5 leading-relaxed">
                         {activeSchedule.infaqNotes}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 self-stretch sm:self-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-emerald-100">
+                <div className="flex items-center justify-end pt-2 border-t border-emerald-200/60">
                   <a
                     href="#donasi"
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
@@ -843,6 +855,83 @@ https://masjidums.vercel.app/?s=jumat`;
                     <span>{isEn ? "Digital QRIS Infaq" : "Infaq Digital QRIS"}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </a>
+                </div>
+              </div>
+
+              {/* Sebelah Kanan: Rekap Infaq Bulanan (Bulan Sebelumnya & Bulan Ini) */}
+              <div className="lg:col-span-7 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#003B73]/[0.04] via-[#FAF8F5] to-stone-50 border border-[#003B73]/20 shadow-2xs flex flex-col justify-between gap-3.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-[#003B73] text-white flex items-center justify-center shrink-0">
+                      <Calendar className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#003B73] text-white shadow-2xs">
+                      {isEn ? "Monthly Infaq Recap" : "Rekap Infaq Bulanan"}
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-[#003B73]/80">
+                    {isEn ? "Previous Month & Current Month" : "Bulan Sebelumnya & Bulan Ini"}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+                  {[
+                    {
+                      key: "prev",
+                      badge: isEn ? "Previous Month" : "Bulan Sebelumnya",
+                      period: activeSchedule.monthlyInfaqPrevPeriod,
+                      amount: activeSchedule.monthlyInfaqPrevAmount,
+                      notes: activeSchedule.monthlyInfaqPrevNotes,
+                      emptyText: isEn ? "Not Yet Entered" : "Belum Diinput Takmir",
+                    },
+                    {
+                      key: "curr",
+                      badge: isEn ? "Current Month" : "Bulan Ini",
+                      period: activeSchedule.monthlyInfaqCurrPeriod,
+                      amount: activeSchedule.monthlyInfaqCurrAmount,
+                      notes: activeSchedule.monthlyInfaqCurrNotes,
+                      emptyText: isEn ? "Being Recapitulated" : "Dalam Rekap Takmir",
+                    },
+                  ].map((item) => {
+                    const hasAmount =
+                      item.amount !== undefined && item.amount !== null && Number(item.amount) > 0;
+                    return (
+                      <div
+                        key={item.key}
+                        className="rounded-xl bg-white border border-stone-200/90 p-3.5 flex flex-col justify-between gap-1.5 shadow-2xs"
+                      >
+                        <div>
+                          <div className="flex flex-wrap items-center justify-between gap-1.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#003B73]/10 text-[#003B73]">
+                              {item.badge}
+                            </span>
+                            {item.period && (
+                              <span className="text-[11px] font-semibold text-stone-600">
+                                {item.period}
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-2 flex flex-wrap items-baseline gap-2">
+                            <span className="text-lg sm:text-xl font-black text-stone-900 font-mono tracking-tight">
+                              {hasAmount
+                                ? `Rp ${Number(item.amount).toLocaleString("id-ID")}`
+                                : item.emptyText}
+                            </span>
+                            {hasAmount && (
+                              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                                {isEn ? "Verified" : "Terverifikasi"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {item.notes && item.notes.trim() !== "-" && (
+                          <p className="text-[11px] text-stone-500 leading-relaxed pt-1 border-t border-stone-100">
+                            {item.notes}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
