@@ -23,9 +23,9 @@ const shalatPresensiSchema = z.object({
   userLat: z.number(),
   userLng: z.number(),
   gpsAccuracyMeters: z.number().min(0).max(50000).optional(),
-  marbotPresent: z.boolean().default(true),
-  marbotName: z.string().max(100).optional().default(""),
-  marbotSignatureUrl: z.string().max(250000).optional().default(""),
+  marbotPresent: z.literal(true).default(true),
+  marbotName: z.string().min(2, "Nama marbot yang bertugas wajib diisi").max(100),
+  marbotSignatureUrl: z.string().min(1, "Paraf marbot wajib diisi").max(250000),
   marbotNotes: z.string().max(300).optional().default(""),
 });
 
