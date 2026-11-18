@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDbAsync, saveDbFields, logSecurityEvent } from "@/lib/db";
-import { sanitizeString, checkRateLimit } from "@/lib/security";
+import { sanitizeString, checkRateLimit, verifySessionToken } from "@/lib/security";
 import { PrayerAttendance, PrayerName } from "@/lib/types";
 import { calculatePrayerTimes } from "@/lib/prayer-times";
 import {
@@ -23,7 +23,11 @@ const shalatPresensiSchema = z.object({
   userLat: z.number(),
   userLng: z.number(),
   gpsAccuracyMeters: z.number().min(0).max(50000).optional(),
-  marbotPresent: z.boolean().default(true),
+});
+
+const marbotVerifySchema = z.object({
+  id: z.string().min(1, "ID presensi wajib disertakan"),
+  marbotPresent: z.boolean(),
   marbotName: z.string().max(100).optional().default(""),
   marbotSignatureUrl: z.string().max(250000).optional().default(""),
   marbotNotes: z.string().max(300).optional().default(""),
@@ -127,21 +131,6 @@ export async function POST(request: NextRequest) {
         );
       }
     }
-    if (data.marbotPresent) {
-      if (!data.marbotName || data.marbotName.trim().length < 2) {
-        return NextResponse.json(
-          { error: "Nama marbot yang bertugas wajib diisi jika marbot berada di masjid." },
-          { status: 400 }
-        );
-      }
-      if (!data.marbotSignatureUrl || data.marbotSignatureUrl.trim().length === 0) {
-        return NextResponse.json(
-          { error: "Paraf / tanda tangan marbot wajib diisi langsung pada kolom paraf." },
-          { status: 400 }
-        );
-      }
-    }
-
     const mosqueData = CAMPUS_MOSQUES_MAP[data.mosqueId] || {
       id: data.mosqueId,
       name: "Masjid Kampus UMS",
@@ -255,10 +244,6 @@ export async function POST(request: NextRequest) {
       locationVerified: true,
       distanceMeters: Math.round(selectedDistance),
       gpsAccuracyMeters: data.gpsAccuracyMeters ? Math.round(data.gpsAccuracyMeters) : undefined,
-      marbotPresent: data.marbotPresent,
-      marbotName: data.marbotPresent && data.marbotName ? sanitizeString(data.marbotName) : undefined,
-      marbotSignatureUrl: data.marbotPresent && data.marbotSignatureUrl ? data.marbotSignatureUrl : undefined,
-      marbotNotes: data.marbotNotes ? sanitizeString(data.marbotNotes) : undefined,
     };
 
     db.prayerAttendances.unshift(newAttendance);
@@ -358,5 +343,87 @@ export async function DELETE(request: NextRequest) {
       { error: "Gagal menghapus data presensi shalat." },
       { status: 500 }
     );
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  const token = request.cookies.get("sudalmiyah_session")?.value;
+  if (!token) {
+    return NextResponse.json({ error: "Otentikasi admin dibutuhkan." }, { status: 401 });
+  }
+
+  const session = await verifySessionToken(token);
+  if (!session || (session.role !== "ADMIN_TAKMIR" && session.role !== "PENGURUS_AGENDA")) {
+    return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+  }
+
+  try {
+    const body = await request.json();
+    const parsed = marbotVerifySchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message || "Data paraf marbot tidak valid." },
+        { status: 400 }
+      );
+    }
+
+    const d = parsed.data;
+    if (d.marbotPresent) {
+      if (!d.marbotName || d.marbotName.trim().length < 2) {
+        return NextResponse.json(
+          { error: "Nama marbot yang bertugas wajib diisi jika marbot hadir." },
+          { status: 400 }
+        );
+      }
+      if (!d.marbotSignatureUrl || d.marbotSignatureUrl.trim().length === 0) {
+        return NextResponse.json(
+          { error: "Paraf marbot wajib digoreskan pada kotak tanda tangan." },
+          { status: 400 }
+        );
+      }
+    }
+
+    const db = await getDbAsync();
+    if (!Array.isArray(db.prayerAttendances)) {
+      db.prayerAttendances = [];
+    }
+
+    const idx = db.prayerAttendances.findIndex((p) => p.id === d.id);
+    if (idx === -1) {
+      return NextResponse.json({ error: "Data presensi tidak ditemukan." }, { status: 404 });
+    }
+
+    const updated: PrayerAttendance = {
+      ...db.prayerAttendances[idx],
+      marbotPresent: d.marbotPresent,
+      marbotName: d.marbotPresent ? sanitizeString(d.marbotName) : undefined,
+      marbotSignatureUrl: d.marbotPresent ? d.marbotSignatureUrl : undefined,
+      marbotNotes: d.marbotNotes ? sanitizeString(d.marbotNotes) : undefined,
+      marbotVerifiedBy: session.email || session.name || "Admin Takmir",
+      marbotVerifiedAt: new Date().toISOString(),
+    };
+
+    db.prayerAttendances[idx] = updated;
+    await saveDbFields(["prayerAttendances"], { prayerAttendances: db.prayerAttendances });
+
+    const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
+    logSecurityEvent(
+      "MARBOT_PARAF_VERIFIED",
+      session.email || session.name,
+      ip,
+      "SUCCESS",
+      `Paraf marbot presensi ${updated.fullName} (${updated.mosqueName}): ${
+        d.marbotPresent ? `Ada Marbot (${updated.marbotName})` : "Tidak Ada Marbot"
+      }`
+    );
+
+    return NextResponse.json({
+      success: true,
+      message: "Status & paraf marbot berhasil disimpan.",
+      attendance: updated,
+    });
+  } catch (err) {
+    console.error("PATCH /api/presensi/shalat error:", err);
+    return NextResponse.json({ error: "Gagal menyimpan paraf marbot." }, { status: 500 });
   }
 }

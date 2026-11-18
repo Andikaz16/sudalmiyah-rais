@@ -57,6 +57,8 @@ import {
   TrendingUp,
   TrendingDown,
   Scale,
+  PenTool,
+  Eraser,
 } from "lucide-react";
 import { syncFridayHijriDate } from "@/lib/prayer-times";
 import {
@@ -335,6 +337,162 @@ export default function AdminDashboardPage() {
   const [prayerFilter, setPrayerFilter] = useState<string>("ALL");
   const [prayerMosqueFilter, setPrayerMosqueFilter] = useState<string>("ALL");
   const [prayerDateFilter, setPrayerDateFilter] = useState<string>("");
+
+  // Modal Paraf & Cek Kehadiran Marbot di Admin
+  const [parafTarget, setParafTarget] = useState<PrayerAttendance | null>(null);
+  const [adminMarbotPresent, setAdminMarbotPresent] = useState<boolean>(true);
+  const [adminMarbotName, setAdminMarbotName] = useState<string>("");
+  const [adminMarbotNotes, setAdminMarbotNotes] = useState<string>("");
+  const [adminHasSignature, setAdminHasSignature] = useState<boolean>(false);
+  const [savingMarbotParaf, setSavingMarbotParaf] = useState<boolean>(false);
+  const adminSigCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const adminIsDrawingRef = useRef<boolean>(false);
+
+  const clearAdminSigCanvas = () => {
+    const canvas = adminSigCanvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      ctx?.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    setAdminHasSignature(false);
+  };
+
+  const handleOpenMarbotParafModal = (item: PrayerAttendance) => {
+    setParafTarget(item);
+    setAdminMarbotPresent(item.marbotPresent !== false);
+    setAdminMarbotName(item.marbotName || "");
+    setAdminMarbotNotes(item.marbotNotes || "");
+    setAdminHasSignature(false);
+    setTimeout(() => {
+      const canvas = adminSigCanvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        ctx?.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }, 50);
+  };
+
+  const getAdminSigPoint = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = adminSigCanvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: ((e.clientX - rect.left) * canvas.width) / rect.width,
+      y: ((e.clientY - rect.top) * canvas.height) / rect.height,
+    };
+  };
+
+  const handleAdminSigDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = adminSigCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const pt = getAdminSigPoint(e);
+    ctx.strokeStyle = "#003B73";
+    ctx.lineWidth = 3.2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(pt.x, pt.y);
+    adminIsDrawingRef.current = true;
+    setAdminHasSignature(true);
+  };
+
+  const handleAdminSigMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!adminIsDrawingRef.current) return;
+    const canvas = adminSigCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const pt = getAdminSigPoint(e);
+    ctx.lineTo(pt.x, pt.y);
+    ctx.stroke();
+  };
+
+  const handleAdminSigUp = () => {
+    adminIsDrawingRef.current = false;
+  };
+
+  const handleSaveAdminMarbotParaf = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!parafTarget) return;
+
+    if (adminMarbotPresent && adminMarbotName.trim().length < 2) {
+      alert("Nama marbot yang bertugas wajib diisi.");
+      return;
+    }
+
+    let finalSigUrl = parafTarget.marbotSignatureUrl || "";
+    if (adminMarbotPresent) {
+      if (adminHasSignature && adminSigCanvasRef.current) {
+        const src = adminSigCanvasRef.current;
+        const exp = document.createElement("canvas");
+        exp.width = src.width;
+        exp.height = src.height;
+        const eCtx = exp.getContext("2d");
+        if (eCtx) {
+          eCtx.fillStyle = "#FFFFFF";
+          eCtx.fillRect(0, 0, exp.width, exp.height);
+          eCtx.drawImage(src, 0, 0);
+        }
+        finalSigUrl = exp.toDataURL("image/png");
+        try {
+          const blob = await new Promise<Blob | null>((resolve) =>
+            exp.toBlob((b) => resolve(b), "image/png")
+          );
+          if (blob) {
+            const fd = new FormData();
+            fd.append("file", new File([blob], `paraf-marbot-${Date.now()}.png`, { type: "image/png" }));
+            const upRes = await fetch("/api/presensi/upload", { method: "POST", body: fd });
+            const upJson = await upRes.json();
+            if (upRes.ok && upJson.url) {
+              finalSigUrl = upJson.url;
+            }
+          }
+        } catch {
+          // keep compact PNG dataUrl fallback
+        }
+      } else if (!finalSigUrl) {
+        alert("Goreskan paraf marbot terlebih dahulu pada kotak tanda tangan.");
+        return;
+      }
+    }
+
+    setSavingMarbotParaf(true);
+    try {
+      const res = await fetch("/api/presensi/shalat", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: parafTarget.id,
+          marbotPresent: adminMarbotPresent,
+          marbotName: adminMarbotPresent ? adminMarbotName.trim() : "",
+          marbotSignatureUrl: adminMarbotPresent ? finalSigUrl : "",
+          marbotNotes: adminMarbotNotes.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menyimpan paraf marbot.");
+
+      if (data.attendance) {
+        setPrayerAttendances((prev) =>
+          prev.map((p) => (p.id === parafTarget.id ? data.attendance : p))
+        );
+      }
+      setParafTarget(null);
+      triggerPublishNotification(
+        "Paraf & Cek Marbot Tersimpan!",
+        adminMarbotPresent
+          ? `Paraf marbot (${adminMarbotName.trim()}) untuk ${parafTarget.fullName} telah tercatat.`
+          : `Status "Tidak Ada Marbot" untuk presensi ${parafTarget.fullName} telah dicatat.`
+      );
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menyimpan paraf marbot.");
+    } finally {
+      setSavingMarbotParaf(false);
+    }
+  };
 
   const exportPrayerCsv = () => {
     let list = prayerAttendances;
@@ -4978,6 +5136,14 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                                 Lihat Paraf
                               </a>
                             )}
+                            <button
+                              type="button"
+                              onClick={() => handleOpenMarbotParafModal(item)}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#003B73]/10 text-[#003B73] hover:bg-[#003B73]/20 cursor-pointer"
+                            >
+                              <PenTool className="w-2.5 h-2.5" />
+                              <span>{item.marbotPresent === undefined ? "Paraf Marbot" : "Ubah Paraf"}</span>
+                            </button>
                           </div>
                           <div className="flex items-center justify-between text-[10px] text-stone-400 font-mono mt-1">
                             <span>
@@ -5080,42 +5246,50 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                               </span>
                             </td>
                             <td className="py-3.5 px-4 text-center">
-                              {item.marbotPresent === true ? (
-                                <div className="inline-flex flex-col items-center gap-1">
-                                  {item.marbotSignatureUrl ? (
-                                    <a
-                                      href={item.marbotSignatureUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="block w-16 h-8 rounded-lg border border-stone-200 bg-white overflow-hidden hover:scale-105 transition-transform"
-                                      title={`Paraf Marbot: ${item.marbotName || "-"}`}
-                                    >
-                                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                                      <img
-                                        src={item.marbotSignatureUrl}
-                                        alt={`Paraf ${item.marbotName || "Marbot"}`}
-                                        className="w-full h-full object-contain"
-                                      />
-                                    </a>
-                                  ) : null}
-                                  <span className="text-[10px] font-bold text-emerald-800">
-                                    Ada ({item.marbotName || "Marbot"})
-                                  </span>
-                                </div>
-                              ) : item.marbotPresent === false ? (
-                                <div className="inline-flex flex-col items-center gap-0.5">
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-50 text-rose-700 border border-rose-200 font-bold">
-                                    Tidak Ada Marbot
-                                  </span>
-                                  {item.marbotNotes && (
-                                    <span className="text-[10px] text-stone-500 max-w-[140px] truncate" title={item.marbotNotes}>
-                                      {item.marbotNotes}
+                              <div className="inline-flex flex-col items-center gap-1.5">
+                                {item.marbotPresent === true ? (
+                                  <>
+                                    {item.marbotSignatureUrl ? (
+                                      <a
+                                        href={item.marbotSignatureUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block w-16 h-8 rounded-lg border border-stone-200 bg-white overflow-hidden hover:scale-105 transition-transform"
+                                        title={`Paraf Marbot: ${item.marbotName || "-"}`}
+                                      >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                          src={item.marbotSignatureUrl}
+                                          alt={`Paraf ${item.marbotName || "Marbot"}`}
+                                          className="w-full h-full object-contain"
+                                        />
+                                      </a>
+                                    ) : null}
+                                    <span className="text-[10px] font-bold text-emerald-800">
+                                      Ada ({item.marbotName || "Marbot"})
                                     </span>
-                                  )}
-                                </div>
-                              ) : (
-                                <span className="text-stone-400 text-[10px]">-</span>
-                              )}
+                                  </>
+                                ) : item.marbotPresent === false ? (
+                                  <>
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-50 text-rose-700 border border-rose-200 font-bold">
+                                      Tidak Ada Marbot
+                                    </span>
+                                    {item.marbotNotes && (
+                                      <span className="text-[10px] text-stone-500 max-w-[140px] truncate" title={item.marbotNotes}>
+                                        {item.marbotNotes}
+                                      </span>
+                                    )}
+                                  </>
+                                ) : null}
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenMarbotParafModal(item)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#003B73]/10 hover:bg-[#003B73]/20 text-[#003B73] text-[10px] font-bold transition-colors cursor-pointer"
+                                >
+                                  <PenTool className="w-3 h-3" />
+                                  <span>{item.marbotPresent === undefined ? "Paraf / Cek" : "Ubah Paraf"}</span>
+                                </button>
+                              </div>
                             </td>
                             <td className="py-3.5 px-4 text-center">
                               <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
@@ -8783,6 +8957,200 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:...:web:...`}
                 Tutup
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Paraf & Cek Kehadiran Marbot (Tab Absensi Shalat) */}
+      {parafTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-3xl shadow-2xl p-5 sm:p-7 my-auto max-h-[92vh] overflow-y-auto">
+            <button
+              type="button"
+              onClick={() => setParafTarget(null)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center cursor-pointer"
+              title="Tutup modal"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <h3 className="text-base sm:text-lg font-bold text-stone-900 font-serif pr-8">
+              Paraf &amp; Cek Kehadiran Marbot Masjid
+            </h3>
+            <p className="text-xs text-stone-500 mt-0.5">
+              Verifikasi keberadaan marbot dan bubuhkan paraf marbot pada catatan presensi jamaah ini.
+            </p>
+
+            {/* Info Jamaah Ringkas */}
+            <div className="mt-4 p-3.5 rounded-2xl bg-[#FAF8F5] border border-stone-200 flex items-center gap-3 text-xs">
+              {parafTarget.photoUrl ? (
+                <a
+                  href={parafTarget.photoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-14 h-14 rounded-xl overflow-hidden border border-stone-200 shrink-0 bg-stone-100"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={parafTarget.photoUrl}
+                    alt={parafTarget.fullName}
+                    className="w-full h-full object-cover"
+                  />
+                </a>
+              ) : null}
+              <div className="min-w-0 flex-1 space-y-0.5">
+                <p className="font-bold text-stone-900 truncate">{parafTarget.fullName}</p>
+                <p className="text-stone-600 truncate">
+                  Shalat {parafTarget.prayerName} • {parafTarget.mosqueName}
+                </p>
+                <p className="text-[11px] font-mono text-stone-500">
+                  {parafTarget.date} • GPS {parafTarget.distanceMeters || 0}m
+                  {parafTarget.gpsAccuracyMeters ? ` (±${parafTarget.gpsAccuracyMeters}m)` : ""}
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveAdminMarbotParaf} className="mt-4 space-y-4">
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setAdminMarbotPresent(true)}
+                  className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                    adminMarbotPresent
+                      ? "bg-emerald-700 text-white border-emerald-700 shadow-sm"
+                      : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-emerald-50"
+                  }`}
+                >
+                  <PenTool className="w-4 h-4" />
+                  <span>Ada Marbot &amp; Paraf</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAdminMarbotPresent(false)}
+                  className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                    !adminMarbotPresent
+                      ? "bg-rose-700 text-white border-rose-700 shadow-sm"
+                      : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-rose-50"
+                  }`}
+                >
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Tidak Ada Marbot</span>
+                </button>
+              </div>
+
+              {adminMarbotPresent ? (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Nama Marbot Masjid yang Bertugas *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={adminMarbotName}
+                      onChange={(e) => setAdminMarbotName(e.target.value)}
+                      placeholder="Contoh: Pak Ahmad / Mas Hendra"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-xs text-stone-900 focus:outline-none focus:border-[#003B73]"
+                    />
+                  </div>
+
+                  {parafTarget.marbotSignatureUrl && !adminHasSignature && (
+                    <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between gap-2 text-[11px]">
+                      <span className="text-emerald-900 font-semibold">Paraf tersimpan saat ini:</span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={parafTarget.marbotSignatureUrl}
+                        alt="Paraf tersimpan"
+                        className="h-10 w-24 object-contain bg-white rounded border border-emerald-200"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-semibold text-stone-700">
+                        Kotak Paraf Marbot {parafTarget.marbotSignatureUrl ? "(Gores jika ingin ubah)" : "*"}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={clearAdminSigCanvas}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-semibold cursor-pointer"
+                      >
+                        <Eraser className="w-3.5 h-3.5" />
+                        <span>Hapus / Ulangi Paraf</span>
+                      </button>
+                    </div>
+                    <div className="relative rounded-2xl border-2 border-dashed border-[#003B73]/40 bg-white overflow-hidden">
+                      {!adminHasSignature && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none text-stone-400">
+                          <PenTool className="w-5 h-5 mb-1 text-stone-300" />
+                          <span className="text-xs font-medium">Goreskan paraf marbot di area ini</span>
+                        </div>
+                      )}
+                      <canvas
+                        ref={adminSigCanvasRef}
+                        width={560}
+                        height={200}
+                        onPointerDown={handleAdminSigDown}
+                        onPointerMove={handleAdminSigMove}
+                        onPointerUp={handleAdminSigUp}
+                        onPointerCancel={handleAdminSigUp}
+                        onPointerLeave={handleAdminSigUp}
+                        className="w-full h-36 touch-none cursor-crosshair block"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
+                      Catatan Tambahan (Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      value={adminMarbotNotes}
+                      onChange={(e) => setAdminMarbotNotes(e.target.value)}
+                      placeholder="Contoh: Marbot hadir penuh & memandu kebersihan"
+                      className="w-full px-3.5 py-2 rounded-xl bg-stone-50 border border-stone-300 text-xs text-stone-900"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-2.5 text-xs">
+                  <p className="text-rose-900 leading-relaxed">
+                    Baris presensi ini akan ditandai sebagai <strong>Tidak Ada Marbot</strong> untuk laporan monitoring LPPIK / Takmir.
+                  </p>
+                  <div>
+                    <label className="block text-xs font-semibold text-rose-950 mb-1">
+                      Keterangan Kondisi (Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      value={adminMarbotNotes}
+                      onChange={(e) => setAdminMarbotNotes(e.target.value)}
+                      placeholder="Contoh: Tidak terlihat petugas marbot saat waktu shalat"
+                      className="w-full px-3.5 py-2 rounded-xl bg-white border border-rose-300 text-xs text-stone-900"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2.5 pt-3 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setParafTarget(null)}
+                  className="px-4 py-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingMarbotParaf}
+                  className="px-6 py-2 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold shadow-sm disabled:opacity-50 cursor-pointer"
+                >
+                  {savingMarbotParaf ? "Menyimpan..." : "Simpan Paraf & Status Marbot"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

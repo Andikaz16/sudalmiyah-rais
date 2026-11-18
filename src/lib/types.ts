@@ -136,6 +136,8 @@ export interface PrayerAttendance {
   marbotName?: string;
   marbotSignatureUrl?: string;
   marbotNotes?: string;
+  marbotVerifiedBy?: string;
+  marbotVerifiedAt?: string;
 }
 
 export interface PopupBanner {

@@ -22,8 +22,6 @@ import {
   ShieldCheck,
   Share2,
   Lock,
-  PenTool,
-  Eraser,
 } from "lucide-react";
 import { calculatePrayerTimes } from "@/lib/prayer-times";
 import {
@@ -207,14 +205,6 @@ export default function ShalatPresensiPage() {
   const gpsWatchRef = useRef<number | null>(null);
   const gpsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Paraf & Cek Kehadiran Marbot Masjid (Sesuai Arahan Takmir/LPPIK)
-  const [marbotPresent, setMarbotPresent] = useState<boolean>(true);
-  const [marbotName, setMarbotName] = useState<string>("");
-  const [marbotNotes, setMarbotNotes] = useState<string>("");
-  const [hasMarbotSignature, setHasMarbotSignature] = useState<boolean>(false);
-  const signatureCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const isDrawingRef = useRef<boolean>(false);
-
   const currentMosqueObj = MOSQUES.find((m) => m.id === selectedMosque) || MOSQUES[0];
   const distanceToSelected =
     userLat !== undefined && userLng !== undefined
@@ -235,10 +225,6 @@ export default function ShalatPresensiPage() {
     nim?: string;
     attendedAt: string;
     distanceMeters?: number;
-    marbotPresent?: boolean;
-    marbotName?: string;
-    marbotSignatureUrl?: string;
-    marbotNotes?: string;
   } | null>(null);
 
   // Compress photo
@@ -461,92 +447,6 @@ export default function ShalatPresensiPage() {
     );
   };
 
-  // Signature Pad Handlers (Paraf Marbot)
-  const getCanvasPoint = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const canvas = signatureCanvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: ((e.clientX - rect.left) * canvas.width) / rect.width,
-      y: ((e.clientY - rect.top) * canvas.height) / rect.height,
-    };
-  };
-
-  const handleSigPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const canvas = signatureCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
-    const pt = getCanvasPoint(e);
-    ctx.strokeStyle = "#003B73";
-    ctx.lineWidth = 3.2;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.beginPath();
-    ctx.moveTo(pt.x, pt.y);
-    isDrawingRef.current = true;
-    setHasMarbotSignature(true);
-  };
-
-  const handleSigPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawingRef.current) return;
-    const canvas = signatureCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const pt = getCanvasPoint(e);
-    ctx.lineTo(pt.x, pt.y);
-    ctx.stroke();
-  };
-
-  const handleSigPointerUp = () => {
-    isDrawingRef.current = false;
-  };
-
-  const clearSignatureCanvas = () => {
-    const canvas = signatureCanvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      ctx?.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    setHasMarbotSignature(false);
-  };
-
-  const exportAndUploadMarbotSignature = async (): Promise<string> => {
-    const srcCanvas = signatureCanvasRef.current;
-    if (!srcCanvas) return "";
-
-    const exportCanvas = document.createElement("canvas");
-    exportCanvas.width = srcCanvas.width;
-    exportCanvas.height = srcCanvas.height;
-    const eCtx = exportCanvas.getContext("2d");
-    if (!eCtx) return srcCanvas.toDataURL("image/png");
-
-    eCtx.fillStyle = "#FFFFFF";
-    eCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-    eCtx.drawImage(srcCanvas, 0, 0);
-
-    const dataUrl = exportCanvas.toDataURL("image/png");
-    try {
-      const blob = await new Promise<Blob | null>((resolve) =>
-        exportCanvas.toBlob((b) => resolve(b), "image/png")
-      );
-      if (blob) {
-        const fd = new FormData();
-        fd.append("file", new File([blob], `paraf-marbot-${Date.now()}.png`, { type: "image/png" }));
-        const res = await fetch("/api/presensi/upload", { method: "POST", body: fd });
-        const json = await res.json();
-        if (res.ok && json.url) {
-          return json.url;
-        }
-      }
-    } catch {
-      // Fallback to compact PNG dataURL if upload fails
-    }
-    return dataUrl;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError("");
@@ -610,25 +510,9 @@ export default function ShalatPresensiPage() {
       return;
     }
 
-    if (marbotPresent) {
-      if (marbotName.trim().length < 2) {
-        alert("Nama marbot yang bertugas wajib diisi sebelum mengirimkan presensi.");
-        return;
-      }
-      if (!hasMarbotSignature) {
-        alert("Paraf langsung dari marbot masjid wajib diisi pada kotak tanda tangan.");
-        return;
-      }
-    }
-
     setIsSubmitting(true);
 
     try {
-      let marbotSignatureUrl = "";
-      if (marbotPresent) {
-        marbotSignatureUrl = await exportAndUploadMarbotSignature();
-      }
-
       const res = await fetch("/api/presensi/shalat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -644,10 +528,6 @@ export default function ShalatPresensiPage() {
           userLat,
           userLng,
           gpsAccuracyMeters: gpsAccuracy,
-          marbotPresent,
-          marbotName: marbotPresent ? marbotName.trim() : "",
-          marbotSignatureUrl,
-          marbotNotes: marbotNotes.trim(),
         }),
       });
 
@@ -759,7 +639,7 @@ export default function ShalatPresensiPage() {
                   WIB
                 </span>
               </div>
-              <div className="flex justify-between items-center pb-2.5 border-b border-stone-200 text-emerald-700 font-medium pt-1">
+              <div className="flex justify-between items-center text-emerald-700 font-medium pt-1">
                 <span className="flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>Verifikasi GPS</span>
@@ -767,38 +647,6 @@ export default function ShalatPresensiPage() {
                 <span className="font-semibold">
                   Terverifikasi ({successRecord.distanceMeters !== undefined ? `${successRecord.distanceMeters}m dari masjid` : "Kawasan Masjid"})
                 </span>
-              </div>
-              <div className="pt-1 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-stone-500 font-medium">Cek Kehadiran Marbot</span>
-                  {successRecord.marbotPresent ? (
-                    <span className="font-bold text-emerald-700">
-                      Hadir • {successRecord.marbotName || "Marbot Masjid"}
-                    </span>
-                  ) : (
-                    <span className="font-bold text-amber-700">
-                      Tidak Ada Marbot di Tempat
-                    </span>
-                  )}
-                </div>
-                {successRecord.marbotPresent && successRecord.marbotSignatureUrl && (
-                  <div className="flex items-center justify-between gap-2 pt-1">
-                    <span className="text-stone-500 font-medium">Paraf Marbot</span>
-                    <div className="bg-white border border-stone-200 rounded-xl p-1.5 w-36 h-14 flex items-center justify-center">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={successRecord.marbotSignatureUrl}
-                        alt="Paraf Marbot Masjid"
-                        className="max-h-full max-w-full object-contain"
-                      />
-                    </div>
-                  </div>
-                )}
-                {!successRecord.marbotPresent && successRecord.marbotNotes && (
-                  <p className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-2">
-                    Catatan: {successRecord.marbotNotes}
-                  </p>
-                )}
               </div>
             </div>
 
@@ -814,10 +662,6 @@ export default function ShalatPresensiPage() {
                   setUserLat(undefined);
                   setUserLng(undefined);
                   setGpsAccuracy(undefined);
-                  setMarbotPresent(true);
-                  setMarbotName("");
-                  setMarbotNotes("");
-                  clearSignatureCanvas();
                 }}
                 className="w-full py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white font-bold text-xs transition-colors shadow-sm cursor-pointer"
               >
@@ -1232,126 +1076,6 @@ export default function ShalatPresensiPage() {
                     <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                     <span>Izin akses lokasi (GPS) ditolak atau tidak aktif. Mohon izinkan browser HP Anda mengakses lokasi untuk melanjutkan absensi shalat berjamaah.</span>
                   </p>
-                )}
-              </div>
-
-              {/* 7. Paraf & Cek Kehadiran Marbot Masjid (Wajib) */}
-              <div className="space-y-3 pt-2 border-t border-stone-200">
-                <div className="flex items-center justify-between gap-2">
-                  <label className="block text-xs font-bold text-stone-800 uppercase tracking-wider">
-                    7. Paraf &amp; Cek Kehadiran Marbot Masjid <span className="text-rose-600">*</span>
-                  </label>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
-                    Wajib
-                  </span>
-                </div>
-                <p className="text-[11px] text-stone-500 leading-relaxed">
-                  Minta marbot masjid yang bertugas untuk membubuhkan paraf langsung di layar sebagai verifikasi kehadiran jamaah sekaligus pengecekan keberadaan marbot di masjid.
-                </p>
-
-                <div className="grid grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setMarbotPresent(true)}
-                    className={`p-3 rounded-2xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                      marbotPresent
-                        ? "bg-emerald-700 text-white border-emerald-700 shadow-sm"
-                        : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-emerald-50"
-                    }`}
-                  >
-                    <PenTool className="w-4 h-4" />
-                    <span>Ada Marbot &amp; Paraf</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMarbotPresent(false)}
-                    className={`p-3 rounded-2xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                      !marbotPresent
-                        ? "bg-amber-600 text-white border-amber-600 shadow-sm"
-                        : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-amber-50"
-                    }`}
-                  >
-                    <AlertTriangle className="w-4 h-4" />
-                    <span>Tidak Ada Marbot</span>
-                  </button>
-                </div>
-
-                {marbotPresent ? (
-                  <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 space-y-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-700 mb-1">
-                        Nama Marbot Masjid yang Memaraf <span className="text-rose-600">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        required={marbotPresent}
-                        placeholder="Contoh: Pak Ahmad / Mas Hendra"
-                        value={marbotName}
-                        onChange={(e) => setMarbotName(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
-                      />
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label className="block text-xs font-semibold text-stone-700">
-                          Kotak Paraf Langsung oleh Marbot <span className="text-rose-600">*</span>
-                        </label>
-                        <button
-                          type="button"
-                          onClick={clearSignatureCanvas}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 text-[11px] font-semibold transition-colors cursor-pointer"
-                        >
-                          <Eraser className="w-3.5 h-3.5" />
-                          <span>Hapus / Ulangi Paraf</span>
-                        </button>
-                      </div>
-
-                      <div className="relative rounded-2xl border-2 border-dashed border-[#003B73]/40 bg-white overflow-hidden">
-                        {!hasMarbotSignature && (
-                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none text-stone-400">
-                            <PenTool className="w-5 h-5 mb-1 text-stone-300" />
-                            <span className="text-xs font-medium">Goreskan paraf marbot di area ini</span>
-                          </div>
-                        )}
-                        <canvas
-                          ref={signatureCanvasRef}
-                          width={560}
-                          height={200}
-                          onPointerDown={handleSigPointerDown}
-                          onPointerMove={handleSigPointerMove}
-                          onPointerUp={handleSigPointerUp}
-                          onPointerCancel={handleSigPointerUp}
-                          onPointerLeave={handleSigPointerUp}
-                          className="w-full h-40 touch-none cursor-crosshair block"
-                        />
-                      </div>
-                      <p className="text-[10px] text-stone-500 mt-1">
-                        Gunakan jari atau stylus langsung di layar HP agar marbot dapat membubuhkan paraf.
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2.5 text-xs">
-                    <div className="flex items-start gap-2 text-amber-900">
-                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                      <p className="leading-relaxed">
-                        Status presensi akan tercatat bahwa <strong>tidak terdapat marbot di masjid</strong> saat waktu shalat ini berlangsung agar dapat ditinjau oleh takmir dan LPPIK.
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-semibold text-amber-950 mb-1">
-                        Keterangan Kondisi Masjid (Opsional)
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Contoh: Pintu terbuka, namun marbot tidak terlihat di pos / adzan oleh jamaah"
-                        value={marbotNotes}
-                        onChange={(e) => setMarbotNotes(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-white border border-amber-300 text-stone-900 text-xs focus:outline-none focus:border-amber-600"
-                      />
-                    </div>
-                  </div>
                 )}
               </div>
 
