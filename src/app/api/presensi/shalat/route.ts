@@ -23,6 +23,10 @@ const shalatPresensiSchema = z.object({
   userLat: z.number(),
   userLng: z.number(),
   gpsAccuracyMeters: z.number().min(0).max(50000).optional(),
+  marbotPresent: z.boolean().default(true),
+  marbotName: z.string().max(100).optional().default(""),
+  marbotSignatureUrl: z.string().max(250000).optional().default(""),
+  marbotNotes: z.string().max(300).optional().default(""),
 });
 
 const marbotVerifySchema = z.object({
@@ -131,6 +135,21 @@ export async function POST(request: NextRequest) {
         );
       }
     }
+    if (data.marbotPresent) {
+      if (!data.marbotName || data.marbotName.trim().length < 2) {
+        return NextResponse.json(
+          { error: "Nama marbot yang bertugas wajib diisi jika marbot berada di masjid." },
+          { status: 400 }
+        );
+      }
+      if (!data.marbotSignatureUrl || data.marbotSignatureUrl.trim().length === 0) {
+        return NextResponse.json(
+          { error: "Paraf / tanda tangan marbot wajib diisi langsung pada kolom paraf." },
+          { status: 400 }
+        );
+      }
+    }
+
     const mosqueData = CAMPUS_MOSQUES_MAP[data.mosqueId] || {
       id: data.mosqueId,
       name: "Masjid Kampus UMS",
@@ -244,6 +263,10 @@ export async function POST(request: NextRequest) {
       locationVerified: true,
       distanceMeters: Math.round(selectedDistance),
       gpsAccuracyMeters: data.gpsAccuracyMeters ? Math.round(data.gpsAccuracyMeters) : undefined,
+      marbotPresent: data.marbotPresent,
+      marbotName: data.marbotPresent && data.marbotName ? sanitizeString(data.marbotName) : undefined,
+      marbotSignatureUrl: data.marbotPresent && data.marbotSignatureUrl ? data.marbotSignatureUrl : undefined,
+      marbotNotes: data.marbotNotes ? sanitizeString(data.marbotNotes) : undefined,
     };
 
     db.prayerAttendances.unshift(newAttendance);
