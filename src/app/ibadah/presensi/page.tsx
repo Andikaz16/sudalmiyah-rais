@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -22,38 +22,17 @@ import {
   ShieldCheck,
   Share2,
   Lock,
+  PenTool,
+  Eraser,
 } from "lucide-react";
 import { calculatePrayerTimes } from "@/lib/prayer-times";
+import {
+  CAMPUS_MOSQUES_LIST,
+  MAX_PRESENSI_RADIUS_METERS,
+  calculateDistanceMeters,
+} from "@/lib/mosque-locations";
 
-interface MosqueOption {
-  id: string;
-  name: string;
-  location: string;
-  lat: number;
-  lng: number;
-}
-
-const MOSQUES: MosqueOption[] = [
-  { id: "sudalmiyah", name: "Masjid Hj. Sudalmiyah Rais", location: "Kampus 2 UMS", lat: -7.5583, lng: 110.7719 },
-  { id: "fadhlurrahman", name: "Masjid Fadhlurrahman", location: "Kampus 1 UMS", lat: -7.5587, lng: 110.7766 },
-  { id: "mas-mansur", name: "Masjid KH. Mas Mansur", location: "Kampus 4 UMS (Pesma)", lat: -7.5558, lng: 110.7634 },
-  { id: "mahad-abu-bakar", name: "Masjid Ma'had Abu Bakar", location: "Kampus 2 UMS", lat: -7.5574, lng: 110.7712 },
-  { id: "munajat-shabran", name: "Masjid Al-Munajat", location: "Makamhaji (Pondok Shabran)", lat: -7.5681, lng: 110.7698 },
-  { id: "ar-razi", name: "Masjid Ar-Razi FKG", location: "Kampus 4 UMS (FKG)", lat: -7.5549, lng: 110.7645 },
-];
-
-function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371e3;
-  const phi1 = (lat1 * Math.PI) / 180;
-  const phi2 = (lat2 * Math.PI) / 180;
-  const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
-  const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-    Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return Math.round(R * c);
-}
+const MOSQUES = CAMPUS_MOSQUES_LIST;
 
 type PrayerKey = "SUBUH" | "DZUHUR" | "ASHAR" | "MAGHRIB" | "ISYA";
 
@@ -217,6 +196,7 @@ export default function ShalatPresensiPage() {
   // GPS
   const [userLat, setUserLat] = useState<number | undefined>(undefined);
   const [userLng, setUserLng] = useState<number | undefined>(undefined);
+  const [gpsAccuracy, setGpsAccuracy] = useState<number | undefined>(undefined);
   const [locationState, setLocationState] = useState<"IDLE" | "CHECKING" | "LOCATED" | "DENIED">("IDLE");
   const [detectedNearestMosque, setDetectedNearestMosque] = useState<{
     id: string;
@@ -224,12 +204,25 @@ export default function ShalatPresensiPage() {
     campus: string;
     distance: number;
   } | null>(null);
+  const gpsWatchRef = useRef<number | null>(null);
+  const gpsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Paraf & Cek Kehadiran Marbot Masjid (Sesuai Arahan Takmir/LPPIK)
+  const [marbotPresent, setMarbotPresent] = useState<boolean>(true);
+  const [marbotName, setMarbotName] = useState<string>("");
+  const [marbotNotes, setMarbotNotes] = useState<string>("");
+  const [hasMarbotSignature, setHasMarbotSignature] = useState<boolean>(false);
+  const signatureCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const isDrawingRef = useRef<boolean>(false);
 
   const currentMosqueObj = MOSQUES.find((m) => m.id === selectedMosque) || MOSQUES[0];
   const distanceToSelected =
     userLat !== undefined && userLng !== undefined
       ? calculateDistanceMeters(userLat, userLng, currentMosqueObj.lat, currentMosqueObj.lng)
       : null;
+  const accuracyMargin =
+    gpsAccuracy && gpsAccuracy > 30 ? Math.min(Math.round(gpsAccuracy * 0.4), 80) : 0;
+  const effectiveRadiusMeters = MAX_PRESENSI_RADIUS_METERS + accuracyMargin;
 
   // Submit status
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -242,6 +235,10 @@ export default function ShalatPresensiPage() {
     nim?: string;
     attendedAt: string;
     distanceMeters?: number;
+    marbotPresent?: boolean;
+    marbotName?: string;
+    marbotSignatureUrl?: string;
+    marbotNotes?: string;
   } | null>(null);
 
   // Compress photo
@@ -344,53 +341,210 @@ export default function ShalatPresensiPage() {
     }
   };
 
+  const selectedMosqueRef = useRef<string>(selectedMosque);
+  useEffect(() => {
+    selectedMosqueRef.current = selectedMosque;
+  }, [selectedMosque]);
+
+  useEffect(() => {
+    return () => {
+      if (gpsWatchRef.current !== null && navigator.geolocation) {
+        navigator.geolocation.clearWatch(gpsWatchRef.current);
+      }
+      if (gpsTimeoutRef.current) {
+        clearTimeout(gpsTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const stopGpsWatch = () => {
+    if (gpsWatchRef.current !== null && typeof navigator !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.clearWatch(gpsWatchRef.current);
+      gpsWatchRef.current = null;
+    }
+    if (gpsTimeoutRef.current) {
+      clearTimeout(gpsTimeoutRef.current);
+      gpsTimeoutRef.current = null;
+    }
+  };
+
+  const applyGpsFix = (pos: GeolocationPosition) => {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    const acc = typeof pos.coords.accuracy === "number" ? Math.round(pos.coords.accuracy) : undefined;
+
+    setUserLat(lat);
+    setUserLng(lng);
+    setGpsAccuracy(acc);
+
+    // Cari masjid kampus UMS terdekat dari koordinat fisik user
+    let nearest = MOSQUES[0];
+    let minD = calculateDistanceMeters(lat, lng, nearest.lat, nearest.lng);
+    for (const m of MOSQUES) {
+      const d = calculateDistanceMeters(lat, lng, m.lat, m.lng);
+      if (d < minD) {
+        minD = d;
+        nearest = m;
+      }
+    }
+
+    setDetectedNearestMosque({
+      id: nearest.id,
+      name: nearest.name,
+      campus: nearest.location,
+      distance: minD,
+    });
+
+    // Pertahankan pilihan masjid user jika sudah masuk radius masjid yang dipilih;
+    // hanya arahkan otomatis jika pilihan user berada di luar radius sedangkan masjid lain masuk radius.
+    const activeChoice = MOSQUES.find((m) => m.id === selectedMosqueRef.current) || MOSQUES[0];
+    const distToSelected = calculateDistanceMeters(lat, lng, activeChoice.lat, activeChoice.lng);
+    const margin = acc && acc > 30 ? Math.min(Math.round(acc * 0.4), 80) : 0;
+    const maxRadius = MAX_PRESENSI_RADIUS_METERS + margin;
+
+    if (distToSelected > maxRadius && minD <= maxRadius) {
+      setSelectedMosque(nearest.id);
+    }
+
+    setLocationState("LOCATED");
+  };
+
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
       setLocationState("DENIED");
       return;
     }
 
+    stopGpsWatch();
     setLocationState("CHECKING");
-    navigator.geolocation.getCurrentPosition(
+
+    let bestPos: GeolocationPosition | null = null;
+    let settled = false;
+
+    const finalizeBest = () => {
+      if (settled) return;
+      settled = true;
+      stopGpsWatch();
+      if (bestPos) {
+        applyGpsFix(bestPos);
+      } else {
+        setLocationState("DENIED");
+      }
+    };
+
+    gpsTimeoutRef.current = setTimeout(() => {
+      finalizeBest();
+    }, 3500);
+
+    gpsWatchRef.current = navigator.geolocation.watchPosition(
       (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        setUserLat(lat);
-        setUserLng(lng);
-
-        // Cari masjid kampus UMS terdekat dari koordinat fisik user
-        let nearest = MOSQUES[0];
-        let minD = calculateDistanceMeters(lat, lng, nearest.lat, nearest.lng);
-
-        for (const m of MOSQUES) {
-          const d = calculateDistanceMeters(lat, lng, m.lat, m.lng);
-          if (d < minD) {
-            minD = d;
-            nearest = m;
-          }
+        if (!bestPos || pos.coords.accuracy < bestPos.coords.accuracy) {
+          bestPos = pos;
+          applyGpsFix(pos);
         }
-
-        setDetectedNearestMosque({
-          id: nearest.id,
-          name: nearest.name,
-          campus: nearest.location,
-          distance: minD,
-        });
-
-        // Jika terdeteksi di dalam radius toleransi salah satu masjid kampus (<= 250m),
-        // otomatis arahkan pilihan masjid ke masjid fisik tersebut
-        if (minD <= 250) {
-          setSelectedMosque(nearest.id);
+        // Jika akurasi GPS sudah sangat presisi (<= 25m), langsung kunci hasil terbaik
+        if (pos.coords.accuracy <= 25) {
+          finalizeBest();
         }
-
-        setLocationState("LOCATED");
       },
       (err) => {
         console.error("GPS error:", err);
-        setLocationState("DENIED");
+        if (bestPos) {
+          finalizeBest();
+        } else {
+          settled = true;
+          stopGpsWatch();
+          setLocationState("DENIED");
+        }
       },
-      { timeout: 12000, enableHighAccuracy: true }
+      { timeout: 12000, maximumAge: 0, enableHighAccuracy: true }
     );
+  };
+
+  // Signature Pad Handlers (Paraf Marbot)
+  const getCanvasPoint = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = signatureCanvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: ((e.clientX - rect.left) * canvas.width) / rect.width,
+      y: ((e.clientY - rect.top) * canvas.height) / rect.height,
+    };
+  };
+
+  const handleSigPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = signatureCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const pt = getCanvasPoint(e);
+    ctx.strokeStyle = "#003B73";
+    ctx.lineWidth = 3.2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(pt.x, pt.y);
+    isDrawingRef.current = true;
+    setHasMarbotSignature(true);
+  };
+
+  const handleSigPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!isDrawingRef.current) return;
+    const canvas = signatureCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const pt = getCanvasPoint(e);
+    ctx.lineTo(pt.x, pt.y);
+    ctx.stroke();
+  };
+
+  const handleSigPointerUp = () => {
+    isDrawingRef.current = false;
+  };
+
+  const clearSignatureCanvas = () => {
+    const canvas = signatureCanvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      ctx?.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    setHasMarbotSignature(false);
+  };
+
+  const exportAndUploadMarbotSignature = async (): Promise<string> => {
+    const srcCanvas = signatureCanvasRef.current;
+    if (!srcCanvas) return "";
+
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = srcCanvas.width;
+    exportCanvas.height = srcCanvas.height;
+    const eCtx = exportCanvas.getContext("2d");
+    if (!eCtx) return srcCanvas.toDataURL("image/png");
+
+    eCtx.fillStyle = "#FFFFFF";
+    eCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    eCtx.drawImage(srcCanvas, 0, 0);
+
+    const dataUrl = exportCanvas.toDataURL("image/png");
+    try {
+      const blob = await new Promise<Blob | null>((resolve) =>
+        exportCanvas.toBlob((b) => resolve(b), "image/png")
+      );
+      if (blob) {
+        const fd = new FormData();
+        fd.append("file", new File([blob], `paraf-marbot-${Date.now()}.png`, { type: "image/png" }));
+        const res = await fetch("/api/presensi/upload", { method: "POST", body: fd });
+        const json = await res.json();
+        if (res.ok && json.url) {
+          return json.url;
+        }
+      }
+    } catch {
+      // Fallback to compact PNG dataURL if upload fails
+    }
+    return dataUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -438,23 +592,43 @@ export default function ShalatPresensiPage() {
       return;
     }
 
-    // Validasi ketat geofence (maksimal 250 meter dari masjid yang dipilih)
-    if (distanceToSelected > 250) {
-      if (detectedNearestMosque && detectedNearestMosque.distance <= 250 && detectedNearestMosque.id !== selectedMosque) {
+    // Validasi ketat geofence terhadap radius masjid yang dipilih
+    if (distanceToSelected > effectiveRadiusMeters) {
+      if (
+        detectedNearestMosque &&
+        detectedNearestMosque.distance <= effectiveRadiusMeters &&
+        detectedNearestMosque.id !== selectedMosque
+      ) {
         setSubmitError(
           `Lokasi GPS Anda terdeteksi berada di kawasan ${detectedNearestMosque.name} (${detectedNearestMosque.distance} meter), bukan di ${currentMosqueObj.name} (${distanceToSelected} meter). Silakan ganti pilihan masjid Anda ke ${detectedNearestMosque.name} sesuai lokasi fisik Anda saat ini.`
         );
       } else {
         setSubmitError(
-          `Posisi GPS Anda terdeteksi berjarak ${distanceToSelected} meter dari ${currentMosqueObj.name} (melebihi batas toleransi kehadiran 250 meter). Presensi shalat berjamaah wajib dilakukan langsung di lingkungan masjid kampus UMS.`
+          `Posisi GPS Anda terdeteksi berjarak ${distanceToSelected} meter dari ${currentMosqueObj.name} (melebihi batas toleransi kehadiran ${MAX_PRESENSI_RADIUS_METERS} meter). Presensi shalat berjamaah wajib dilakukan langsung di lingkungan masjid kampus UMS.`
         );
       }
       return;
     }
 
+    if (marbotPresent) {
+      if (marbotName.trim().length < 2) {
+        alert("Nama marbot yang bertugas wajib diisi sebelum mengirimkan presensi.");
+        return;
+      }
+      if (!hasMarbotSignature) {
+        alert("Paraf langsung dari marbot masjid wajib diisi pada kotak tanda tangan.");
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
+      let marbotSignatureUrl = "";
+      if (marbotPresent) {
+        marbotSignatureUrl = await exportAndUploadMarbotSignature();
+      }
+
       const res = await fetch("/api/presensi/shalat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -469,6 +643,11 @@ export default function ShalatPresensiPage() {
           photoUrl,
           userLat,
           userLng,
+          gpsAccuracyMeters: gpsAccuracy,
+          marbotPresent,
+          marbotName: marbotPresent ? marbotName.trim() : "",
+          marbotSignatureUrl,
+          marbotNotes: marbotNotes.trim(),
         }),
       });
 
@@ -580,7 +759,7 @@ export default function ShalatPresensiPage() {
                   WIB
                 </span>
               </div>
-              <div className="flex justify-between items-center text-emerald-700 font-medium pt-1">
+              <div className="flex justify-between items-center pb-2.5 border-b border-stone-200 text-emerald-700 font-medium pt-1">
                 <span className="flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>Verifikasi GPS</span>
@@ -588,6 +767,38 @@ export default function ShalatPresensiPage() {
                 <span className="font-semibold">
                   Terverifikasi ({successRecord.distanceMeters !== undefined ? `${successRecord.distanceMeters}m dari masjid` : "Kawasan Masjid"})
                 </span>
+              </div>
+              <div className="pt-1 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-stone-500 font-medium">Cek Kehadiran Marbot</span>
+                  {successRecord.marbotPresent ? (
+                    <span className="font-bold text-emerald-700">
+                      Hadir • {successRecord.marbotName || "Marbot Masjid"}
+                    </span>
+                  ) : (
+                    <span className="font-bold text-amber-700">
+                      Tidak Ada Marbot di Tempat
+                    </span>
+                  )}
+                </div>
+                {successRecord.marbotPresent && successRecord.marbotSignatureUrl && (
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <span className="text-stone-500 font-medium">Paraf Marbot</span>
+                    <div className="bg-white border border-stone-200 rounded-xl p-1.5 w-36 h-14 flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={successRecord.marbotSignatureUrl}
+                        alt="Paraf Marbot Masjid"
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    </div>
+                  </div>
+                )}
+                {!successRecord.marbotPresent && successRecord.marbotNotes && (
+                  <p className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-2">
+                    Catatan: {successRecord.marbotNotes}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -602,6 +813,11 @@ export default function ShalatPresensiPage() {
                   setDetectedNearestMosque(null);
                   setUserLat(undefined);
                   setUserLng(undefined);
+                  setGpsAccuracy(undefined);
+                  setMarbotPresent(true);
+                  setMarbotName("");
+                  setMarbotNotes("");
+                  clearSignatureCanvas();
                 }}
                 className="w-full py-3 rounded-full bg-[#003B73] hover:bg-[#002855] text-white font-bold text-xs transition-colors shadow-sm cursor-pointer"
               >
@@ -909,7 +1125,7 @@ export default function ShalatPresensiPage() {
                 </p>
 
                 {locationState === "LOCATED" && distanceToSelected !== null ? (
-                  distanceToSelected <= 250 ? (
+                  distanceToSelected <= effectiveRadiusMeters ? (
                     /* Sesuai dan Terverifikasi */
                     <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs space-y-2">
                       <div className="flex items-start justify-between gap-2">
@@ -922,8 +1138,16 @@ export default function ShalatPresensiPage() {
                             <div className="text-[11px] text-emerald-800 mt-0.5">
                               Anda berada di <strong>{currentMosqueObj.name}</strong> ({currentMosqueObj.location}).
                             </div>
-                            <div className="text-[10px] text-emerald-700 font-mono mt-1">
-                              Jarak fisik saat ini: {distanceToSelected} meter (Batas toleransi radius: 250m)
+                            <div className="text-[10px] text-emerald-700 font-mono mt-1 space-y-0.5">
+                              <div>
+                                Jarak ke {currentMosqueObj.name}: {distanceToSelected} meter (Batas radius: {MAX_PRESENSI_RADIUS_METERS}m)
+                              </div>
+                              {userLat !== undefined && userLng !== undefined && (
+                                <div>
+                                  Titik GPS: {userLat.toFixed(5)}, {userLng.toFixed(5)}
+                                  {gpsAccuracy ? ` (Akurasi: ±${gpsAccuracy}m)` : ""}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -937,7 +1161,7 @@ export default function ShalatPresensiPage() {
                         </button>
                       </div>
                     </div>
-                  ) : detectedNearestMosque && detectedNearestMosque.distance <= 250 && detectedNearestMosque.id !== selectedMosque ? (
+                  ) : detectedNearestMosque && detectedNearestMosque.distance <= effectiveRadiusMeters && detectedNearestMosque.id !== selectedMosque ? (
                     /* User berada di masjid UMS lain */
                     <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-xs space-y-2.5">
                       <div className="flex items-start gap-2.5">
@@ -947,7 +1171,7 @@ export default function ShalatPresensiPage() {
                             Lokasi Masjid Tidak Cocok
                           </div>
                           <p className="text-[11px] text-amber-800 mt-1 leading-relaxed">
-                            Anda memilih <strong>{currentMosqueObj.name}</strong> (jarak: {distanceToSelected} meter), namun GPS mendeteksi Anda sedang berada di kawasan <strong>{detectedNearestMosque.name}</strong> (jarak: {detectedNearestMosque.distance} meter).
+                            Anda memilih <strong>{currentMosqueObj.name}</strong> (jarak: {distanceToSelected} meter), namun GPS mendeteksi Anda sedang berada di kawasan <strong>{detectedNearestMosque.name}</strong> (jarak: {detectedNearestMosque.distance} meter{gpsAccuracy ? `, akurasi ±${gpsAccuracy}m` : ""}).
                           </p>
                         </div>
                       </div>
@@ -978,7 +1202,7 @@ export default function ShalatPresensiPage() {
                             Di Luar Kawasan Masjid Kampus UMS
                           </div>
                           <p className="text-[11px] text-rose-800 mt-1 leading-relaxed">
-                            Posisi GPS Anda terdeteksi berjarak <strong>{distanceToSelected} meter</strong> dari {currentMosqueObj.name} (melebihi batas radius presensi 250 meter). Presensi shalat berjamaah wajib dilakukan secara langsung di lingkungan masjid kampus.
+                            Posisi GPS Anda terdeteksi berjarak <strong>{distanceToSelected} meter</strong> dari {currentMosqueObj.name} (melebihi batas radius presensi {MAX_PRESENSI_RADIUS_METERS} meter{gpsAccuracy ? `, akurasi GPS ±${gpsAccuracy}m` : ""}). Presensi shalat berjamaah wajib dilakukan secara langsung di lingkungan masjid kampus.
                           </p>
                         </div>
                       </div>
@@ -999,7 +1223,7 @@ export default function ShalatPresensiPage() {
                     className="w-full py-3.5 px-4 rounded-2xl bg-[#003B73]/5 hover:bg-[#003B73]/10 text-[#003B73] text-xs font-bold border-2 border-dashed border-[#003B73]/40 hover:border-[#003B73] flex items-center justify-center gap-2 transition-all cursor-pointer"
                   >
                     <Navigation className={`w-4 h-4 text-[#003B73] ${locationState === "CHECKING" ? "animate-spin" : ""}`} />
-                    <span>{locationState === "CHECKING" ? "Mendeteksi Koordinat GPS dan Mencocokkan Masjid..." : "Klik untuk Verifikasi Lokasi di Masjid UMS * (Wajib)"}</span>
+                    <span>{locationState === "CHECKING" ? "Mengunci Sinyal GPS Presisi Tinggi..." : "Klik untuk Verifikasi Lokasi di Masjid UMS * (Wajib)"}</span>
                   </button>
                 )}
 
@@ -1008,6 +1232,126 @@ export default function ShalatPresensiPage() {
                     <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                     <span>Izin akses lokasi (GPS) ditolak atau tidak aktif. Mohon izinkan browser HP Anda mengakses lokasi untuk melanjutkan absensi shalat berjamaah.</span>
                   </p>
+                )}
+              </div>
+
+              {/* 7. Paraf & Cek Kehadiran Marbot Masjid (Wajib) */}
+              <div className="space-y-3 pt-2 border-t border-stone-200">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="block text-xs font-bold text-stone-800 uppercase tracking-wider">
+                    7. Paraf &amp; Cek Kehadiran Marbot Masjid <span className="text-rose-600">*</span>
+                  </label>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
+                    Wajib
+                  </span>
+                </div>
+                <p className="text-[11px] text-stone-500 leading-relaxed">
+                  Minta marbot masjid yang bertugas untuk membubuhkan paraf langsung di layar sebagai verifikasi kehadiran jamaah sekaligus pengecekan keberadaan marbot di masjid.
+                </p>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setMarbotPresent(true)}
+                    className={`p-3 rounded-2xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                      marbotPresent
+                        ? "bg-emerald-700 text-white border-emerald-700 shadow-sm"
+                        : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-emerald-50"
+                    }`}
+                  >
+                    <PenTool className="w-4 h-4" />
+                    <span>Ada Marbot &amp; Paraf</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMarbotPresent(false)}
+                    className={`p-3 rounded-2xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                      !marbotPresent
+                        ? "bg-amber-600 text-white border-amber-600 shadow-sm"
+                        : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-amber-50"
+                    }`}
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>Tidak Ada Marbot</span>
+                  </button>
+                </div>
+
+                {marbotPresent ? (
+                  <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-stone-200 space-y-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        Nama Marbot Masjid yang Memaraf <span className="text-rose-600">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required={marbotPresent}
+                        placeholder="Contoh: Pak Ahmad / Mas Hendra"
+                        value={marbotName}
+                        onChange={(e) => setMarbotName(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-[#003B73]"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs font-semibold text-stone-700">
+                          Kotak Paraf Langsung oleh Marbot <span className="text-rose-600">*</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={clearSignatureCanvas}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 text-[11px] font-semibold transition-colors cursor-pointer"
+                        >
+                          <Eraser className="w-3.5 h-3.5" />
+                          <span>Hapus / Ulangi Paraf</span>
+                        </button>
+                      </div>
+
+                      <div className="relative rounded-2xl border-2 border-dashed border-[#003B73]/40 bg-white overflow-hidden">
+                        {!hasMarbotSignature && (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none text-stone-400">
+                            <PenTool className="w-5 h-5 mb-1 text-stone-300" />
+                            <span className="text-xs font-medium">Goreskan paraf marbot di area ini</span>
+                          </div>
+                        )}
+                        <canvas
+                          ref={signatureCanvasRef}
+                          width={560}
+                          height={200}
+                          onPointerDown={handleSigPointerDown}
+                          onPointerMove={handleSigPointerMove}
+                          onPointerUp={handleSigPointerUp}
+                          onPointerCancel={handleSigPointerUp}
+                          onPointerLeave={handleSigPointerUp}
+                          className="w-full h-40 touch-none cursor-crosshair block"
+                        />
+                      </div>
+                      <p className="text-[10px] text-stone-500 mt-1">
+                        Gunakan jari atau stylus langsung di layar HP agar marbot dapat membubuhkan paraf.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2.5 text-xs">
+                    <div className="flex items-start gap-2 text-amber-900">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <p className="leading-relaxed">
+                        Status presensi akan tercatat bahwa <strong>tidak terdapat marbot di masjid</strong> saat waktu shalat ini berlangsung agar dapat ditinjau oleh takmir dan LPPIK.
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-amber-950 mb-1">
+                        Keterangan Kondisi Masjid (Opsional)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Contoh: Pintu terbuka, namun marbot tidak terlihat di pos / adzan oleh jamaah"
+                        value={marbotNotes}
+                        onChange={(e) => setMarbotNotes(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-white border border-amber-300 text-stone-900 text-xs focus:outline-none focus:border-amber-600"
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
 

@@ -119,11 +119,11 @@ export function verifyDynamicToken(
 
 /**
  * Validasi jarak koordinat (Haversine Formula) ke Masjid Sudalmiyah UMS.
- * Lokasi Masjid Sudalmiyah Kampus 2 UMS: Lat -7.5583, Lng 110.7719
+ * Lokasi Masjid Sudalmiyah Kampus 2 UMS (Sayap Barat Siti Walidah): Lat -7.55795, Lng 110.77135
  */
 export const MASJID_COORDINATES = {
-  latitude: -7.5583,
-  longitude: 110.7719,
+  latitude: -7.55795,
+  longitude: 110.77135,
   maxRadiusMeters: 250, // radius 250 meter mencakup seluruh kawasan masjid & plaza kampus 2 UMS
 };
 

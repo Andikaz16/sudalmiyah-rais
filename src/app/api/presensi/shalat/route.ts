@@ -1,31 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDbAsync, saveDb, logSecurityEvent } from "@/lib/db";
+import { getDbAsync, saveDbFields, logSecurityEvent } from "@/lib/db";
 import { sanitizeString, checkRateLimit } from "@/lib/security";
 import { PrayerAttendance, PrayerName } from "@/lib/types";
 import { calculatePrayerTimes } from "@/lib/prayer-times";
+import {
+  CAMPUS_MOSQUES_MAP,
+  MAX_PRESENSI_RADIUS_METERS,
+  calculateDistanceMeters,
+} from "@/lib/mosque-locations";
 import { z } from "zod";
-
-const CAMPUS_MOSQUES: Record<string, { name: string; location: string; lat: number; lng: number }> = {
-  sudalmiyah: { name: "Masjid Hj. Sudalmiyah Rais", location: "Kampus 2 UMS", lat: -7.5583, lng: 110.7719 },
-  fadhlurrahman: { name: "Masjid Fadhlurrahman", location: "Kampus 1 UMS", lat: -7.5587, lng: 110.7766 },
-  "mas-mansur": { name: "Masjid KH. Mas Mansur", location: "Kampus 4 UMS (Pesma)", lat: -7.5558, lng: 110.7634 },
-  "mahad-abu-bakar": { name: "Masjid Ma'had Abu Bakar", location: "Kampus 2 UMS", lat: -7.5574, lng: 110.7712 },
-  "munajat-shabran": { name: "Masjid Al-Munajat", location: "Makamhaji (Pondok Shabran)", lat: -7.5681, lng: 110.7698 },
-  "ar-razi": { name: "Masjid Ar-Razi FKG", location: "Kampus 4 UMS (FKG)", lat: -7.5549, lng: 110.7645 },
-};
-
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371e3;
-  const phi1 = (lat1 * Math.PI) / 180;
-  const phi2 = (lat2 * Math.PI) / 180;
-  const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
-  const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-    Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
 
 const shalatPresensiSchema = z.object({
   prayerName: z.enum(["SUBUH", "DZUHUR", "ASHAR", "MAGHRIB", "ISYA"]),
@@ -39,6 +22,11 @@ const shalatPresensiSchema = z.object({
   photoUrl: z.string().min(1, "Foto kehadiran shalat berjamaah wajib diunggah"),
   userLat: z.number(),
   userLng: z.number(),
+  gpsAccuracyMeters: z.number().min(0).max(50000).optional(),
+  marbotPresent: z.boolean().default(true),
+  marbotName: z.string().max(100).optional().default(""),
+  marbotSignatureUrl: z.string().max(250000).optional().default(""),
+  marbotNotes: z.string().max(300).optional().default(""),
 });
 
 export async function POST(request: NextRequest) {
@@ -139,24 +127,40 @@ export async function POST(request: NextRequest) {
         );
       }
     }
-    const mosqueData = CAMPUS_MOSQUES[data.mosqueId] || {
+    if (data.marbotPresent) {
+      if (!data.marbotName || data.marbotName.trim().length < 2) {
+        return NextResponse.json(
+          { error: "Nama marbot yang bertugas wajib diisi jika marbot berada di masjid." },
+          { status: 400 }
+        );
+      }
+      if (!data.marbotSignatureUrl || data.marbotSignatureUrl.trim().length === 0) {
+        return NextResponse.json(
+          { error: "Paraf / tanda tangan marbot wajib diisi langsung pada kolom paraf." },
+          { status: 400 }
+        );
+      }
+    }
+
+    const mosqueData = CAMPUS_MOSQUES_MAP[data.mosqueId] || {
+      id: data.mosqueId,
       name: "Masjid Kampus UMS",
       location: "Kawasan UMS",
-      lat: -7.5583,
-      lng: 110.7719,
+      lat: -7.55795,
+      lng: 110.77135,
     };
 
     // Validasi lokasi Geolocation spesifik terhadap masjid yang dipilih jamaah
-    const selectedDistance = calculateDistance(data.userLat, data.userLng, mosqueData.lat, mosqueData.lng);
+    const selectedDistance = calculateDistanceMeters(data.userLat, data.userLng, mosqueData.lat, mosqueData.lng);
 
     // Cari masjid kampus yang secara fisik paling dekat dengan koordinat GPS user
     let nearestKey = data.mosqueId;
     let nearestMosque = mosqueData;
     let nearestDistance = selectedDistance;
 
-    for (const key of Object.keys(CAMPUS_MOSQUES)) {
-      const other = CAMPUS_MOSQUES[key];
-      const d = calculateDistance(data.userLat, data.userLng, other.lat, other.lng);
+    for (const key of Object.keys(CAMPUS_MOSQUES_MAP)) {
+      const other = CAMPUS_MOSQUES_MAP[key];
+      const d = calculateDistanceMeters(data.userLat, data.userLng, other.lat, other.lng);
       if (d < nearestDistance) {
         nearestDistance = d;
         nearestKey = key;
@@ -164,10 +168,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const MAX_ALLOWED_DISTANCE_METERS = 250; // Radius toleransi presensi fisik di kawasan masjid kampus
+    // Jika akurasi GPS indoor berada dalam batas wajar, beri toleransi kecil hanya saat jarak masih mendekati gedung masjid
+    const accuracyMargin =
+      data.gpsAccuracyMeters && data.gpsAccuracyMeters > 30
+        ? Math.min(Math.round(data.gpsAccuracyMeters * 0.4), 80)
+        : 0;
+    const effectiveRadius = MAX_PRESENSI_RADIUS_METERS + accuracyMargin;
 
-    if (selectedDistance > MAX_ALLOWED_DISTANCE_METERS) {
-      if (nearestDistance <= MAX_ALLOWED_DISTANCE_METERS && nearestKey !== data.mosqueId) {
+    if (selectedDistance > effectiveRadius) {
+      if (nearestDistance <= effectiveRadius && nearestKey !== data.mosqueId) {
         return NextResponse.json(
           {
             error: `Lokasi GPS Anda terdeteksi berada di kawasan ${nearestMosque.name} (${Math.round(nearestDistance)} meter), bukan di ${mosqueData.name} (${Math.round(selectedDistance)} meter). Silakan pilih ${nearestMosque.name} sesuai lokasi fisik Anda saat ini.`,
@@ -178,7 +187,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         {
-          error: `Posisi GPS Anda terdeteksi berjarak ${Math.round(selectedDistance)} meter dari ${mosqueData.name} (melebihi batas toleransi radius presensi ${MAX_ALLOWED_DISTANCE_METERS} meter). Pastikan Anda berada langsung di lingkungan masjid kampus UMS saat presensi.`,
+          error: `Posisi GPS Anda terdeteksi berjarak ${Math.round(selectedDistance)} meter dari ${mosqueData.name} (melebihi batas toleransi radius presensi ${MAX_PRESENSI_RADIUS_METERS} meter). Pastikan Anda berada langsung di lingkungan masjid kampus UMS saat presensi.`,
         },
         { status: 400 }
       );
@@ -189,7 +198,7 @@ export async function POST(request: NextRequest) {
       db.prayerAttendances = [];
     }
 
-    const todayDate = new Date().toISOString().split("T")[0];
+    const todayDate = nowWib.toISOString().split("T")[0];
     const cleanNim = data.nim ? sanitizeString(data.nim).toUpperCase().trim() : undefined;
     const cleanFullName = sanitizeString(data.fullName);
 
@@ -245,10 +254,15 @@ export async function POST(request: NextRequest) {
       userLng: data.userLng,
       locationVerified: true,
       distanceMeters: Math.round(selectedDistance),
+      gpsAccuracyMeters: data.gpsAccuracyMeters ? Math.round(data.gpsAccuracyMeters) : undefined,
+      marbotPresent: data.marbotPresent,
+      marbotName: data.marbotPresent && data.marbotName ? sanitizeString(data.marbotName) : undefined,
+      marbotSignatureUrl: data.marbotPresent && data.marbotSignatureUrl ? data.marbotSignatureUrl : undefined,
+      marbotNotes: data.marbotNotes ? sanitizeString(data.marbotNotes) : undefined,
     };
 
     db.prayerAttendances.unshift(newAttendance);
-    await saveDb(db);
+    await saveDbFields(["prayerAttendances"], { prayerAttendances: db.prayerAttendances });
 
     logSecurityEvent(
       "PRAYER_ATTENDANCE_SUCCESS",
@@ -318,7 +332,7 @@ export async function DELETE(request: NextRequest) {
 
     if (action === "clear-all") {
       db.prayerAttendances = [];
-      await saveDb(db);
+      await saveDbFields(["prayerAttendances"], { prayerAttendances: [] });
       return NextResponse.json({
         success: true,
         message: "Seluruh data absensi shalat berhasil dikosongkan.",
@@ -327,7 +341,7 @@ export async function DELETE(request: NextRequest) {
 
     if (id) {
       db.prayerAttendances = (db.prayerAttendances || []).filter((p) => p.id !== id);
-      await saveDb(db);
+      await saveDbFields(["prayerAttendances"], { prayerAttendances: db.prayerAttendances });
       return NextResponse.json({
         success: true,
         message: "Data presensi shalat berhasil dihapus.",

@@ -131,6 +131,11 @@ export interface PrayerAttendance {
   userLng: number;
   locationVerified: boolean;
   distanceMeters?: number;
+  gpsAccuracyMeters?: number;
+  marbotPresent?: boolean;
+  marbotName?: string;
+  marbotSignatureUrl?: string;
+  marbotNotes?: string;
 }
 
 export interface PopupBanner {

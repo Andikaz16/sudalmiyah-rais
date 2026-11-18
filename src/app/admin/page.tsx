@@ -368,6 +368,11 @@ export default function AdminDashboardPage() {
       "Waktu Presensi",
       "Verifikasi GPS",
       "Jarak (Meter)",
+      "Akurasi GPS (Meter)",
+      "Kehadiran Marbot",
+      "Nama Marbot",
+      "Keterangan Marbot",
+      "URL Paraf Marbot",
       "URL Foto Bukti",
     ];
 
@@ -375,6 +380,12 @@ export default function AdminDashboardPage() {
       const timeStr = item.attendedAt
         ? new Date(item.attendedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB"
         : "-";
+      const marbotStatusLabel =
+        item.marbotPresent === true
+          ? "Ada Marbot & Paraf"
+          : item.marbotPresent === false
+          ? "Tidak Ada Marbot"
+          : "Belum Tercatat";
 
       return [
         idx + 1,
@@ -391,6 +402,11 @@ export default function AdminDashboardPage() {
         `"${timeStr}"`,
         `"${item.locationVerified ? "Terverifikasi di Kawasan Masjid UMS" : "Manual"}"`,
         `"${item.distanceMeters || 0}"`,
+        `"${item.gpsAccuracyMeters ?? "-"}"`,
+        `"${marbotStatusLabel}"`,
+        `"${(item.marbotName || "-").replace(/"/g, '""')}"`,
+        `"${(item.marbotNotes || "-").replace(/"/g, '""')}"`,
+        `"${item.marbotSignatureUrl || "-"}"`,
         `"${item.photoUrl || "-"}"`,
       ].join(",");
     });
@@ -4850,7 +4866,7 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
               </div>
 
               {/* Summary Metrics */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
                 <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
                   <span className="text-[11px] text-stone-500 font-medium block">Total Hadir Shalat</span>
                   <span className="text-xl sm:text-2xl font-black text-stone-900 font-mono mt-0.5 block">{filtered.length}</span>
@@ -4868,7 +4884,7 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                   <span className="text-xl sm:text-2xl font-black text-amber-900 font-mono mt-0.5 block">
                     {filtered.filter((p) => p.participantRole !== "MAHASISWA").length}
                   </span>
-                  <span className="text-[10px] text-stone-400 mt-1 block">Jamaah umum & staf</span>
+                  <span className="text-[10px] text-stone-400 mt-1 block">Jamaah umum &amp; staf</span>
                 </div>
                 <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
                   <span className="text-[11px] text-emerald-700 font-medium block">Verifikasi Lokasi GPS</span>
@@ -4876,6 +4892,15 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                     {filtered.filter((p) => p.locationVerified).length}
                   </span>
                   <span className="text-[10px] text-emerald-600 mt-1 block">100% Valid di masjid</span>
+                </div>
+                <div className="col-span-2 lg:col-span-1 p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
+                  <span className="text-[11px] text-[#003B73] font-medium block">Cek Marbot &amp; Paraf</span>
+                  <span className="text-xl sm:text-2xl font-black text-[#003B73] font-mono mt-0.5 block">
+                    {filtered.filter((p) => p.marbotPresent === true).length}
+                  </span>
+                  <span className="text-[10px] text-stone-500 mt-1 block">
+                    Ada marbot • {filtered.filter((p) => p.marbotPresent === false).length} tanpa marbot
+                  </span>
                 </div>
               </div>
 
@@ -4933,6 +4958,27 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                           <p className="text-[11px] text-stone-500 truncate mt-0.5">
                             {item.mosqueName}
                           </p>
+                          <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                            {item.marbotPresent === true ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">
+                                Marbot Hadir ({item.marbotName || "-"})
+                              </span>
+                            ) : item.marbotPresent === false ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-rose-50 text-rose-800 border border-rose-200 font-bold">
+                                Tidak Ada Marbot
+                              </span>
+                            ) : null}
+                            {item.marbotSignatureUrl && (
+                              <a
+                                href={item.marbotSignatureUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[10px] font-bold text-[#003B73] underline"
+                              >
+                                Lihat Paraf
+                              </a>
+                            )}
+                          </div>
                           <div className="flex items-center justify-between text-[10px] text-stone-400 font-mono mt-1">
                             <span>
                               {new Date(item.attendedAt).toLocaleTimeString("id-ID", {
@@ -4942,7 +4988,10 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                               })}{" "}
                               WIB • {item.date}
                             </span>
-                            <span className="text-emerald-700 font-bold">GPS: {item.distanceMeters || 0}m</span>
+                            <span className="text-emerald-700 font-bold">
+                              GPS: {item.distanceMeters || 0}m
+                              {item.gpsAccuracyMeters ? ` (±${item.gpsAccuracyMeters}m)` : ""}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -4962,6 +5011,7 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                         <th className="py-3.5 px-4 font-semibold">Masjid Kampus</th>
                         <th className="py-3.5 px-4 font-semibold">Waktu Presensi</th>
                         <th className="py-3.5 px-4 font-semibold text-center">GPS Valid</th>
+                        <th className="py-3.5 px-4 font-semibold text-center">Paraf Marbot</th>
                         <th className="py-3.5 px-4 text-center font-semibold">Status</th>
                         <th className="py-3.5 px-4 text-center font-semibold">Aksi</th>
                       </tr>
@@ -4969,7 +5019,7 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                     <tbody className="divide-y divide-stone-100 font-medium">
                       {filtered.length === 0 ? (
                         <tr>
-                          <td colSpan={9} className="py-8 text-center text-stone-400 text-xs">
+                          <td colSpan={10} className="py-8 text-center text-stone-400 text-xs">
                             Belum ada data absensi shalat untuk filter ini.
                           </td>
                         </tr>
@@ -5023,8 +5073,49 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                             <td className="py-3.5 px-4 text-center">
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
                                 <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                <span>{item.distanceMeters || 0}m</span>
+                                <span>
+                                  {item.distanceMeters || 0}m
+                                  {item.gpsAccuracyMeters ? ` (±${item.gpsAccuracyMeters}m)` : ""}
+                                </span>
                               </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              {item.marbotPresent === true ? (
+                                <div className="inline-flex flex-col items-center gap-1">
+                                  {item.marbotSignatureUrl ? (
+                                    <a
+                                      href={item.marbotSignatureUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="block w-16 h-8 rounded-lg border border-stone-200 bg-white overflow-hidden hover:scale-105 transition-transform"
+                                      title={`Paraf Marbot: ${item.marbotName || "-"}`}
+                                    >
+                                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                                      <img
+                                        src={item.marbotSignatureUrl}
+                                        alt={`Paraf ${item.marbotName || "Marbot"}`}
+                                        className="w-full h-full object-contain"
+                                      />
+                                    </a>
+                                  ) : null}
+                                  <span className="text-[10px] font-bold text-emerald-800">
+                                    Ada ({item.marbotName || "Marbot"})
+                                  </span>
+                                </div>
+                              ) : item.marbotPresent === false ? (
+                                <div className="inline-flex flex-col items-center gap-0.5">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-50 text-rose-700 border border-rose-200 font-bold">
+                                    Tidak Ada Marbot
+                                  </span>
+                                  {item.marbotNotes && (
+                                    <span className="text-[10px] text-stone-500 max-w-[140px] truncate" title={item.marbotNotes}>
+                                      {item.marbotNotes}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-stone-400 text-[10px]">-</span>
+                              )}
                             </td>
                             <td className="py-3.5 px-4 text-center">
                               <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
