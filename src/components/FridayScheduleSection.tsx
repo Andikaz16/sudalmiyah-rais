@@ -404,7 +404,7 @@ export default function FridayScheduleSection() {
       const infaqStr = formatShareInfaqLines(activeSchedule);
 
       return `*JADWAL PETUGAS SHALAT JUMAT*
-*${activeMosqueInfo.name.toUpperCase()} (${activeMosqueInfo.location})*
+*${activeMosqueInfo.name.toUpperCase()}*
 Hari / Tanggal: ${activeDate} (${activeHijri})
 ----------------------------------------
 Assalamu'alaikum Warahmatullahi Wabarakatuh.

@@ -4320,7 +4320,7 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                   Pilih Masjid yang Dikelola:
                 </span>
                 <span className="text-[11px] font-semibold text-[#003B73]">
-                  Sedang Mengedit: <strong>{activeBankMosqueMeta.name}</strong> ({activeBankMosqueMeta.location})
+                  Sedang Mengedit: <strong>{activeBankMosqueMeta.name}</strong>
                 </span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">

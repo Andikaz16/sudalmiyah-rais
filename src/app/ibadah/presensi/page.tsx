@@ -932,7 +932,7 @@ export default function ShalatPresensiPage() {
                 >
                   {MOSQUES.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {m.name} ({m.location})
+                      {m.name}
                     </option>
                   ))}
                 </select>
@@ -1115,7 +1115,7 @@ export default function ShalatPresensiPage() {
                               Lokasi GPS Terverifikasi Sesuai
                             </div>
                             <div className="text-[11px] text-emerald-800 mt-0.5">
-                              Anda berada di <strong>{currentMosqueObj.name}</strong> ({currentMosqueObj.location}).
+                              Anda berada di <strong>{currentMosqueObj.name}</strong>.
                             </div>
                             <div className="text-[10px] text-emerald-700 font-mono mt-1 space-y-0.5">
                               <div>
