@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   cacheComponents: true,
   partialPrefetching: true,
+  serverExternalPackages: ["firebase-admin", "@opentelemetry/api"],
   images: {
     unoptimized: true,
     remotePatterns: [

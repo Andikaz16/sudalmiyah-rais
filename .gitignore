@@ -45,3 +45,7 @@ next-env.d.ts
 scratch_*
 *.docx
 scripts/create_surat_*.py
+
+# Firebase Admin private keys & local downloads
+/Downloads/
+*-firebase-adminsdk-*.json

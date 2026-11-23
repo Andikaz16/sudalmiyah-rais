@@ -1,5 +1,5 @@
 import { NextResponse, connection } from "next/server";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseAdminConfigured, isFirebaseConfigured } from "@/lib/firebase";
 import { isImgbbConfigured } from "@/lib/imgbb";
 
 export async function GET() {
@@ -7,6 +7,7 @@ export async function GET() {
   return NextResponse.json(
     {
       firebaseConfigured: isFirebaseConfigured(),
+      firebaseAdminConfigured: isFirebaseAdminConfigured(),
       imgbbConfigured: isImgbbConfigured(),
       blobConfigured: false,
     },

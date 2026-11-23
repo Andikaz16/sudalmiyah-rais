@@ -22,8 +22,11 @@ import {
   InfaqHadith,
   MosqueBankInfo,
 } from "./types";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { getFirestoreDb, isFirebaseConfigured } from "./firebase";
+import {
+  getFirestoreDoc,
+  isFirebaseConfigured,
+  setFirestoreDoc,
+} from "./firebase";
 import { syncFridayHijriDate } from "./prayer-times";
 
 export interface DatabaseSchema {
@@ -1070,21 +1073,21 @@ export function getDb(): DatabaseSchema {
 export async function getDbAsync(): Promise<DatabaseSchema> {
   if (isFirebaseConfigured()) {
     try {
-      const firestore = getFirestoreDb();
-      if (firestore) {
-        const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const cloudData = ensureDbDefaults(snap.data() as DatabaseSchema);
-          memoryDb = cloudData;
-          return cloudData;
-        } else {
-          // First time initialization: seed Firestore with current local data
-          const local = getDb();
-          await setDoc(docRef, JSON.parse(JSON.stringify(local)));
-          memoryDb = local;
-          return local;
-        }
+      const snapData = await getFirestoreDoc("masjid_sudalmiyah", "data_store");
+      if (snapData) {
+        const cloudData = ensureDbDefaults(snapData as unknown as DatabaseSchema);
+        memoryDb = cloudData;
+        return cloudData;
+      } else {
+        // First time initialization: seed Firestore with current local data
+        const local = getDb();
+        await setFirestoreDoc(
+          "masjid_sudalmiyah",
+          "data_store",
+          JSON.parse(JSON.stringify(local))
+        );
+        memoryDb = local;
+        return local;
       }
     } catch (err) {
       console.warn("Notice: Firestore read error, falling back to local file:", err);
@@ -1112,11 +1115,12 @@ export async function saveDb(data: DatabaseSchema): Promise<void> {
   // Persist directly to Firebase Cloud Firestore if configured
   if (isFirebaseConfigured()) {
     try {
-      const firestore = getFirestoreDb();
-      if (firestore) {
-        const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
-        await setDoc(docRef, JSON.parse(JSON.stringify(data)), { merge: true });
-      }
+      await setFirestoreDoc(
+        "masjid_sudalmiyah",
+        "data_store",
+        JSON.parse(JSON.stringify(data)),
+        true
+      );
     } catch (err) {
       console.error("Notice: Firestore write error:", err);
       throw err;
@@ -1151,17 +1155,13 @@ export async function saveDbFields(
 
   if (isFirebaseConfigured()) {
     try {
-      const firestore = getFirestoreDb();
-      if (firestore) {
-        const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
-        const updatePayload: Record<string, any> = {};
-        for (const f of fields) {
-          if (payload[f] !== undefined) {
-            updatePayload[f] = JSON.parse(JSON.stringify(payload[f]));
-          }
+      const updatePayload: Record<string, any> = {};
+      for (const f of fields) {
+        if (payload[f] !== undefined) {
+          updatePayload[f] = JSON.parse(JSON.stringify(payload[f]));
         }
-        await updateDoc(docRef, updatePayload);
       }
+      await setFirestoreDoc("masjid_sudalmiyah", "data_store", updatePayload, true);
     } catch (err) {
       console.error("Notice: Firestore fields update error:", err);
       throw err;
@@ -1217,23 +1217,23 @@ export function logSecurityEvent(
     }
 
     if (isFirebaseConfigured()) {
-      const firestore = getFirestoreDb();
-      if (firestore) {
-        const docRef = doc(firestore, "masjid_sudalmiyah", "data_store");
-        getDoc(docRef)
-          .then((snap) => {
-            if (snap.exists()) {
-              const currentData = snap.data();
-              const existingLogs: SecurityAuditLog[] = Array.isArray(currentData.auditLogs)
-                ? currentData.auditLogs
-                : [];
-              existingLogs.unshift(log);
-              const trimmed = existingLogs.slice(0, 200);
-              updateDoc(docRef, { auditLogs: trimmed }).catch(() => {});
-            }
-          })
-          .catch(() => {});
-      }
+      getFirestoreDoc("masjid_sudalmiyah", "data_store")
+        .then((currentData) => {
+          if (currentData) {
+            const existingLogs: SecurityAuditLog[] = Array.isArray(currentData.auditLogs)
+              ? (currentData.auditLogs as SecurityAuditLog[])
+              : [];
+            existingLogs.unshift(log);
+            const trimmed = existingLogs.slice(0, 200);
+            setFirestoreDoc(
+              "masjid_sudalmiyah",
+              "data_store",
+              { auditLogs: trimmed },
+              true
+            ).catch(() => {});
+          }
+        })
+        .catch(() => {});
     }
   } catch (err) {
     console.warn("Security event logging error ignored:", err);

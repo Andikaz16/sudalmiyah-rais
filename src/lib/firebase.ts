@@ -1,5 +1,17 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import {
+  ServiceAccount,
+  initializeApp as initializeAdminApp,
+  getApps as getAdminApps,
+  cert,
+} from "firebase-admin/app";
+import {
+  getFirestore as getAdminFirestore,
+  Firestore as AdminFirestore,
+} from "firebase-admin/firestore";
+
+const ADMIN_APP_NAME = "sudalmiyah-admin";
 
 const DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyC9fp4Mjpd6rHOQmOEPT-hLrKvPttjms7I",
@@ -43,12 +55,92 @@ const firebaseConfig = {
   ).trim(),
 };
 
+function parseServiceAccountFromEnv(): ServiceAccount | null {
+  try {
+    const rawJson = process.env.FIREBASE_SERVICE_ACCOUNT_KEY?.trim();
+    const rawBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64?.trim();
+
+    let jsonStr = rawJson;
+    if (!jsonStr && rawBase64) {
+      jsonStr = Buffer.from(rawBase64, "base64").toString("utf-8");
+    }
+
+    if (jsonStr) {
+      const parsed = JSON.parse(jsonStr) as ServiceAccount & {
+        private_key?: string;
+        client_email?: string;
+        project_id?: string;
+      };
+      if (parsed.private_key) {
+        parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+      }
+      if (parsed.client_email && parsed.private_key) {
+        return parsed;
+      }
+    }
+
+    const clientEmail = (
+      process.env.FIREBASE_ADMIN_CLIENT_EMAIL ||
+      process.env.FIREBASE_CLIENT_EMAIL
+    )?.trim();
+    const privateKey = (
+      process.env.FIREBASE_ADMIN_PRIVATE_KEY ||
+      process.env.FIREBASE_PRIVATE_KEY
+    )
+      ?.trim()
+      ?.replace(/\\n/g, "\n");
+
+    if (clientEmail && privateKey) {
+      return {
+        projectId: firebaseConfig.projectId,
+        clientEmail,
+        privateKey,
+      };
+    }
+  } catch (err) {
+    console.error("Failed to parse Firebase Admin service account:", err);
+  }
+  return null;
+}
+
+export function isFirebaseAdminConfigured(): boolean {
+  return Boolean(parseServiceAccountFromEnv());
+}
+
+export function getAdminFirestoreDb(): AdminFirestore | null {
+  const serviceAccount = parseServiceAccountFromEnv();
+  if (!serviceAccount) return null;
+
+  try {
+    const existing = getAdminApps().find((a) => a.name === ADMIN_APP_NAME);
+    const app =
+      existing ||
+      initializeAdminApp(
+        {
+          credential: cert(serviceAccount),
+          projectId:
+            (serviceAccount as { project_id?: string }).project_id ||
+            serviceAccount.projectId ||
+            firebaseConfig.projectId,
+        },
+        ADMIN_APP_NAME
+      );
+    return getAdminFirestore(app);
+  } catch (err) {
+    console.error("Firebase Admin Firestore initialization error:", err);
+    return null;
+  }
+}
+
 export function isFirebaseConfigured(): boolean {
-  return Boolean(
-    firebaseConfig.projectId &&
-    firebaseConfig.projectId.length > 0 &&
-    firebaseConfig.apiKey &&
-    firebaseConfig.apiKey.length > 0
+  return (
+    isFirebaseAdminConfigured() ||
+    Boolean(
+      firebaseConfig.projectId &&
+      firebaseConfig.projectId.length > 0 &&
+      firebaseConfig.apiKey &&
+      firebaseConfig.apiKey.length > 0
+    )
   );
 }
 
@@ -70,6 +162,56 @@ export function getFirestoreDb() {
   }
 }
 
+export async function getFirestoreDoc(
+  collectionName: string,
+  docId: string
+): Promise<Record<string, unknown> | null> {
+  const adminDb = getAdminFirestoreDb();
+  if (adminDb) {
+    const snap = await adminDb.collection(collectionName).doc(docId).get();
+    return snap.exists ? ((snap.data() as Record<string, unknown>) || null) : null;
+  }
+
+  const clientDb = getFirestoreDb();
+  if (!clientDb) return null;
+  const snap = await getDoc(doc(clientDb, collectionName, docId));
+  return snap.exists() ? ((snap.data() as Record<string, unknown>) || null) : null;
+}
+
+export async function setFirestoreDoc(
+  collectionName: string,
+  docId: string,
+  data: Record<string, unknown>,
+  merge = false
+): Promise<void> {
+  const adminDb = getAdminFirestoreDb();
+  if (adminDb) {
+    await adminDb.collection(collectionName).doc(docId).set(data, { merge });
+    return;
+  }
+
+  const clientDb = getFirestoreDb();
+  if (!clientDb) {
+    throw new Error("Firebase Firestore is not configured.");
+  }
+  await setDoc(doc(clientDb, collectionName, docId), data, { merge });
+}
+
+export async function deleteFirestoreDoc(
+  collectionName: string,
+  docId: string
+): Promise<void> {
+  const adminDb = getAdminFirestoreDb();
+  if (adminDb) {
+    await adminDb.collection(collectionName).doc(docId).delete();
+    return;
+  }
+
+  const clientDb = getFirestoreDb();
+  if (!clientDb) return;
+  await deleteDoc(doc(clientDb, collectionName, docId));
+}
+
 /**
  * Uploads media file to Firebase Firestore media_store collection.
  * Automatically chunks large files to bypass Firestore 1MiB document limits.
@@ -81,18 +223,16 @@ export async function uploadMediaToFirebase(
   contentType: string,
   folder: string = "general"
 ): Promise<string> {
-  const db = getFirestoreDb();
-  if (!db) {
+  if (!isFirebaseConfigured()) {
     throw new Error("Firebase Firestore is not configured.");
   }
 
   const id = `med-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 7)}`;
-  const docRef = doc(db, "media_store", id);
   const fullBase64 = buffer.toString("base64");
   const CHUNK_SIZE = 600 * 1024; // 600KB chunks (safe under 1MiB Firestore limit)
 
   if (fullBase64.length <= CHUNK_SIZE) {
-    await setDoc(docRef, {
+    await setFirestoreDoc("media_store", id, {
       id,
       filename,
       folder,
@@ -104,7 +244,7 @@ export async function uploadMediaToFirebase(
     });
   } else {
     const totalChunks = Math.ceil(fullBase64.length / CHUNK_SIZE);
-    await setDoc(docRef, {
+    await setFirestoreDoc("media_store", id, {
       id,
       filename,
       folder,
@@ -117,8 +257,7 @@ export async function uploadMediaToFirebase(
 
     for (let i = 0; i < totalChunks; i++) {
       const chunkStr = fullBase64.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-      const chunkDocRef = doc(db, "media_store", `${id}_c${i}`);
-      await setDoc(chunkDocRef, { chunk: chunkStr });
+      await setFirestoreDoc("media_store", `${id}_c${i}`, { chunk: chunkStr });
     }
   }
 
@@ -132,25 +271,19 @@ export async function uploadMediaToFirebase(
 export async function getMediaFromFirebase(
   id: string
 ): Promise<{ data: Buffer; contentType: string; filename: string } | null> {
-  const db = getFirestoreDb();
-  if (!db) return null;
+  if (!isFirebaseConfigured()) return null;
 
   try {
-    const docRef = doc(db, "media_store", id);
-    const snap = await getDoc(docRef);
-    if (!snap.exists()) return null;
-
-    const data = snap.data();
+    const data = await getFirestoreDoc("media_store", id);
     if (!data) return null;
 
-    let base64 = data.base64;
-    if (data.isChunked && data.totalChunks) {
+    let base64 = typeof data.base64 === "string" ? data.base64 : "";
+    if (data.isChunked && typeof data.totalChunks === "number") {
       const chunks: string[] = [];
       for (let i = 0; i < data.totalChunks; i++) {
-        const chunkDocRef = doc(db, "media_store", `${id}_c${i}`);
-        const chunkSnap = await getDoc(chunkDocRef);
-        if (chunkSnap.exists() && chunkSnap.data()?.chunk) {
-          chunks.push(chunkSnap.data().chunk);
+        const chunkData = await getFirestoreDoc("media_store", `${id}_c${i}`);
+        if (chunkData && typeof chunkData.chunk === "string") {
+          chunks.push(chunkData.chunk);
         }
       }
       base64 = chunks.join("");
@@ -160,8 +293,8 @@ export async function getMediaFromFirebase(
 
     return {
       data: Buffer.from(base64, "base64"),
-      contentType: data.contentType || "image/jpeg",
-      filename: data.filename || "file",
+      contentType: (typeof data.contentType === "string" && data.contentType) || "image/jpeg",
+      filename: (typeof data.filename === "string" && data.filename) || "file",
     };
   } catch (err) {
     console.error("Error retrieving media from Firebase:", err);
@@ -174,29 +307,25 @@ export async function getMediaFromFirebase(
  * Also cleans up chunked documents if present.
  */
 export async function deleteMediaFromFirebase(idOrUrl: string): Promise<void> {
-  const db = getFirestoreDb();
-  if (!db) return;
+  if (!isFirebaseConfigured()) return;
 
   try {
     const id = idOrUrl.startsWith("/api/media/")
       ? idOrUrl.replace("/api/media/", "").trim()
       : idOrUrl.trim();
     if (!id) return;
-    const docRef = doc(db, "media_store", id);
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      const data = snap.data();
-      if (data?.isChunked && data?.totalChunks) {
-        for (let i = 0; i < data.totalChunks; i++) {
-          try {
-            await deleteDoc(doc(db, "media_store", `${id}_c${i}`));
-          } catch {
-            // Ignore individual chunk delete error
-          }
+
+    const data = await getFirestoreDoc("media_store", id);
+    if (data?.isChunked && typeof data.totalChunks === "number") {
+      for (let i = 0; i < data.totalChunks; i++) {
+        try {
+          await deleteFirestoreDoc("media_store", `${id}_c${i}`);
+        } catch {
+          // Ignore individual chunk delete error
         }
       }
     }
-    await deleteDoc(docRef);
+    await deleteFirestoreDoc("media_store", id);
   } catch (err) {
     console.warn("Notice: Failed to delete media doc from Firebase:", err);
   }
