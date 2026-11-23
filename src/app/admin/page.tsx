@@ -6918,7 +6918,7 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                   className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 active:scale-95 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Tambah Hadits Baru</span>
+                  <span>Tambah Al-Qur&apos;an/Hadits</span>
                 </button>
               </div>
             </div>
@@ -8653,7 +8653,7 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-200">
               <div>
                 <h3 className="text-lg font-bold text-stone-900 font-serif">
-                  {editingHadithId ? "Edit Mutiara Hadits & Infaq" : "Tambah Mutiara Hadits & Infaq Baru"}
+                  {editingHadithId ? "Edit Mutiara Al-Qur'an & Hadits" : "Tambah Mutiara Al-Qur'an & Hadits"}
                 </h3>
                 <p className="text-xs text-stone-500 mt-0.5">
                   Teks ini akan otomatis ditayangkan di slider Beranda & Donasi serta dapat dibagikan jamaah ke WhatsApp dalam bentuk poster berlogo resmi UMS.
@@ -8826,7 +8826,7 @@ Ma'asyiral Muslimin Jamaah Shalat Jumat yang Dirahmati Allah,
                   disabled={savingHadith}
                   className="px-6 py-2.5 rounded-full bg-[#003B73] hover:bg-[#002855] text-white text-xs font-bold transition-all shadow-md shadow-[#003B73]/20 disabled:opacity-50 cursor-pointer"
                 >
-                  {savingHadith ? "Menyimpan..." : editingHadithId ? "Perbarui Hadits" : "Simpan Hadits"}
+                  {savingHadith ? "Menyimpan..." : editingHadithId ? "Perbarui Al-Qur'an/Hadits" : "Simpan Al-Qur'an/Hadits"}
                 </button>
               </div>
             </form>
