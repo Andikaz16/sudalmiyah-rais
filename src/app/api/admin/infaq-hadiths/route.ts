@@ -1,18 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getDbAsync, saveDb, logSecurityEvent, getDefaultInfaqHadiths } from "@/lib/db";
+import { getDbAsync, saveDbField, logSecurityEvent, getDefaultInfaqHadiths } from "@/lib/db";
 import { sanitizeString, verifySessionToken } from "@/lib/security";
 import { InfaqHadith } from "@/lib/types";
 
+function formatHadithError(error: unknown, fallback: string): string {
+  const code = (error as { code?: string })?.code;
+  if (code === "permission-denied") {
+    return `${fallback} Akses database Firebase Firestore ditolak (permission-denied). Periksa Firestore Security Rules / masa berlaku Test Mode di Firebase Console.`;
+  }
+  return fallback;
+}
+
 const hadithSchema = z.object({
   theme: z.string().min(3, "Tema hadits minimal 3 karakter").max(120),
-  themeEn: z.string().max(150).optional(),
+  themeEn: z.string().max(150).optional().or(z.literal("")),
   arabic: z.string().min(5, "Teks Arab minimal 5 karakter"),
   translation: z.string().min(10, "Terjemahan minimal 10 karakter"),
-  translationEn: z.string().optional(),
+  translationEn: z.string().optional().or(z.literal("")),
   source: z.string().min(3, "Sumber / Perawi minimal 3 karakter").max(120),
   fadhilah: z.string().min(5, "Fadhilah / Keutamaan minimal 5 karakter").max(300),
-  fadhilahEn: z.string().max(350).optional(),
+  fadhilahEn: z.string().max(350).optional().or(z.literal("")),
   isActive: z.boolean().default(true),
   order: z.number().optional(),
 });
@@ -89,7 +97,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.infaqHadiths.push(newHadith);
-    await saveDb(db);
+    await saveDbField("infaqHadiths", db.infaqHadiths);
 
     const clientIp = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -107,7 +115,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("POST /api/admin/infaq-hadiths error:", error);
-    return NextResponse.json({ error: "Gagal menyimpan hadits." }, { status: 500 });
+    return NextResponse.json(
+      { error: formatHadithError(error, "Gagal menyimpan hadits.") },
+      { status: 500 }
+    );
   }
 }
 
@@ -164,7 +175,7 @@ export async function PUT(request: NextRequest) {
     };
 
     db.infaqHadiths[index] = updatedHadith;
-    await saveDb(db);
+    await saveDbField("infaqHadiths", db.infaqHadiths);
 
     const clientIp = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -182,7 +193,10 @@ export async function PUT(request: NextRequest) {
     });
   } catch (error) {
     console.error("PUT /api/admin/infaq-hadiths error:", error);
-    return NextResponse.json({ error: "Gagal memperbarui hadits." }, { status: 500 });
+    return NextResponse.json(
+      { error: formatHadithError(error, "Gagal memperbarui hadits.") },
+      { status: 500 }
+    );
   }
 }
 
@@ -206,7 +220,7 @@ export async function DELETE(request: NextRequest) {
 
     if (isReset) {
       db.infaqHadiths = getDefaultInfaqHadiths();
-      await saveDb(db);
+      await saveDbField("infaqHadiths", db.infaqHadiths);
 
       const clientIp = request.headers.get("x-forwarded-for") || "127.0.0.1";
       logSecurityEvent(
@@ -235,7 +249,7 @@ export async function DELETE(request: NextRequest) {
 
     const deleted = db.infaqHadiths.find((h) => h.id === id);
     db.infaqHadiths = db.infaqHadiths.filter((h) => h.id !== id);
-    await saveDb(db);
+    await saveDbField("infaqHadiths", db.infaqHadiths);
 
     const clientIp = request.headers.get("x-forwarded-for") || "127.0.0.1";
     logSecurityEvent(
@@ -252,7 +266,10 @@ export async function DELETE(request: NextRequest) {
     });
   } catch (error) {
     console.error("DELETE /api/admin/infaq-hadiths error:", error);
-    return NextResponse.json({ error: "Gagal menghapus hadits." }, { status: 500 });
+    return NextResponse.json(
+      { error: formatHadithError(error, "Gagal menghapus hadits.") },
+      { status: 500 }
+    );
   }
 }
 
@@ -292,7 +309,7 @@ export async function PATCH(request: NextRequest) {
     }
     db.infaqHadiths[index].updatedAt = new Date().toISOString();
 
-    await saveDb(db);
+    await saveDbField("infaqHadiths", db.infaqHadiths);
 
     return NextResponse.json({
       success: true,
@@ -301,6 +318,9 @@ export async function PATCH(request: NextRequest) {
     });
   } catch (error) {
     console.error("PATCH /api/admin/infaq-hadiths error:", error);
-    return NextResponse.json({ error: "Gagal memperbarui status." }, { status: 500 });
+    return NextResponse.json(
+      { error: formatHadithError(error, "Gagal memperbarui status.") },
+      { status: 500 }
+    );
   }
 }
